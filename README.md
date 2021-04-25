@@ -30,6 +30,7 @@ cargo make --profile release serve
   - [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P)
   - [Orbitron](https://fonts.google.com/specimen/Orbitron)
 ## 宿題
+- Demoを見てると、すり抜けてしまう瞬間があるみたい…。再現性がはっきりするなら治したい
 - 音を鳴らしたい。beep音でいいから。
 - 環境によってメモリリークするかも。bevyの依存crateでGPU関係が怪しそう。治せるかどうかは未知数。  
 もしかしたらbevy0.5に移行したので大丈夫になったかも。
