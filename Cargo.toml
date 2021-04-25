@@ -1,0 +1,27 @@
+[package]
+name = "tigtag"
+version = "0.1.0"
+authors = ["hyoi"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = [
+  "bevy/bevy_gltf",
+  "bevy/bevy_winit",
+  "bevy/render",
+  "bevy/png",
+]
+native = [ "bevy/bevy_wgpu" ]
+web    = [ "bevy_webgl2"    ]
+
+[dependencies]
+bevy = { version = "0.5.0", default-features = false }
+bevy_webgl2 = { version="0.5.2", optional = true }
+bevy_prototype_lyon = "0.3.1"
+
+winit = { version = "0.24.0" }
+getrandom = { version = "0.2.2", features = [ "wasm-bindgen" ] }
+
+rand = "0.8.3"
