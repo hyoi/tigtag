@@ -18,10 +18,10 @@ web    = [ "bevy_webgl2"    ]
 
 [dependencies]
 bevy = { version = "0.5.0", default-features = false }
-bevy_webgl2 = { version="0.5.2", optional = true }
+bevy_webgl2 = { version = "0.5.2", optional = true }
 bevy_prototype_lyon = "0.3.1"
 
-winit = { version = "0.24.0" }
-getrandom = { version = "0.2.2", features = [ "wasm-bindgen" ] }
+winit = "0.24.0"
+getrandom = { version = "0.2.3", features = [ "wasm-bindgen" ] }
 
-rand = "0.8.3"
+rand = "0.8.4"
