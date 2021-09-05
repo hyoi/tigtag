@@ -56,31 +56,30 @@ const FETCH_ASSETS: [ &str; 4 ] =
 struct LoadedAssets { preload: Vec<HandleUntyped> }
 
 //ローディングアニメ関係
-const PRELOADING_MESSAGE_SCALE: f32 = 0.7;
 const PRELOADING_MESSAGE_ARRAY: [ &str; 13 ] = 
-[//	 0123456789 123456789 123456789 123456789 123
-	"##  #           #                           ", //0
-	"##  # ### #   # #    ###  #  ##  # #  #  ## ", //1
-	"# # # # # # # # #    # # # # # #   ## # #   ", //2
-	"# # # # # # # # #    # # # # # # # #### # ##", //3
-	"#  ## # #  # #  #    # # ### # # # # ## #  #", //4
-	"#  ## ###  # #  #### ### # # ##  # #  #  ## ", //5
-	"",
-	"###                      #   #              ", //7
-	"#  # #   ###  #  ### ### # # #  #  # ### # #", //8
-	"#  # #   #   # # #   #   # # # # #    #  # #", //9
-	"###  #   ### # # ### ### # # # # # #  #  # #", //10
-	"#    #   #   ###   # #    # #  ### #  #     ", //11
-	"#    ### ### # # ### ###  # #  # # #  #  # #", //12
+[//	 0123456789 123456789 123456789 123456789 12345
+	" ##  #           #                            ", //0
+	" ##  # ### #   # #    ###  #  ##  # #  #  ##  ", //1
+	" # # # # # # # # #    # # # # # #   ## # #    ", //2
+	" # # # # # # # # #    # # # # # # # #### # ## ", //3
+	" #  ## # #  # #  #    # # ### # # # # ## #  # ", //4
+	" #  ## ###  # #  #### ### # # ##  # #  #  ##  ", //5
+	"",												  //6
+	" ###                      #   #               ", //7
+	" #  # #   ###  #  ### ### # # #  #  # ### # # ", //8
+	" #  # #   #   # # #   #   # # # # #    #  # # ", //9
+	" ###  #   ### # # ### ### # # # # # #  #  # # ", //10
+	" #    #   #   ###   # #    # #  ### #  #      ", //11
+	" #    ### ### # # ### ###  # #  # # #  #  # # ", //12
 ];
 
 //スプライト識別用Component
 struct PreloadingAnimeTile ( usize, usize );
 
 //タイルのスプライト
-const SPRITE_TILE_PIXEL: f32   = PIXEL_PER_GRID - 1.0;
-const SPRITE_TILE_COLOR: Color = Color::rgb( 0.25, 0.06, 0.04 );
 const SPRITE_TILE_DEPTH: f32   = 0.0;
+const SPRITE_TILE_PIXEL: f32   = PIXEL_PER_GRID;
+const SPRITE_TILE_COLOR: Color = Color::rgb_linear( 0.25, 0.06, 0.04 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -126,8 +125,8 @@ fn spawn_preload_anime_tile
 )
 {	let mut rng = rand::thread_rng();
 
-	for ( map_y, s ) in PRELOADING_MESSAGE_ARRAY.iter().enumerate()
-	{	for ( map_x, c ) in s.chars().enumerate()
+	for ( grid_y, s ) in PRELOADING_MESSAGE_ARRAY.iter().enumerate()
+	{	for ( grid_x, c ) in s.chars().enumerate()
 		{	if c == ' ' { continue }	//空白文字は無視
 
 			//スプライトの初期位置は乱数で決める
@@ -136,7 +135,7 @@ fn spawn_preload_anime_tile
 			let xy = conv_sprite_coordinates( x, y );
 
 			cmds.spawn_bundle( sprite_preloading_anime_tile( xy, &mut color_matl ) )
-				.insert( PreloadingAnimeTile ( map_x, map_y ) );
+				.insert( PreloadingAnimeTile ( grid_x, grid_y ) );
 		} 
 	}
 }
@@ -147,14 +146,23 @@ fn move_preload_anime_tile
 	time: Res<Time>,
 )
 {	let time_delta = time.delta().as_secs_f32() * 5.0;
+
+	let half_screen_w = SCREEN_WIDTH / 2.0;
+	let mess_width = PRELOADING_MESSAGE_ARRAY[ 0 ].len() as f32 * SPRITE_TILE_PIXEL;
+	let scale =  SCREEN_WIDTH / mess_width;
+
 	q.for_each_mut
 	(	| ( mut transform, tile ) |
-		{	let locate = &mut transform.translation;
-			let ( goal_x, goal_y ) = conv_sprite_coordinates( tile.0, tile.1 );
+		{	let position = &mut transform.translation;
+			let ( grid_x, grid_y ) = ( tile.0 , tile.1 );
+			let ( goal_x, goal_y ) = conv_sprite_coordinates( grid_x, grid_y );
 
-			locate.x += ( goal_x * PRELOADING_MESSAGE_SCALE - locate.x ) * time_delta;
-			locate.y += ( goal_y * PRELOADING_MESSAGE_SCALE - locate.y ) * time_delta;
-    	}
+			//横幅の調整
+			let goal_x = ( goal_x + half_screen_w ) * scale - half_screen_w;
+
+			position.x += ( goal_x - position.x ) * time_delta;
+			position.y += ( goal_y - position.y ) * time_delta;
+		}
 	);
 }
 

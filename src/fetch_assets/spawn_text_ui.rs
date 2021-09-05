@@ -86,7 +86,7 @@ const UI_LOWER_CENTER: [ MessageSect; 0 ] =
 
 pub struct UiLowerRight;
 const UI_LOWER_RIGHT: [ MessageSect; 1 ] =
-[	( "© 2021 hyoi.orz", FONT_REGGAEONE_REGULAR, PIXEL_PER_GRID * 1.0, Color::WHITE ),
+[	( "© 2021 hyoi", FONT_REGGAEONE_REGULAR, PIXEL_PER_GRID * 1.0, Color::WHITE ),
 ];
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
