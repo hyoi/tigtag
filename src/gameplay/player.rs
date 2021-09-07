@@ -17,6 +17,7 @@ use super::util::Direction;
 pub struct Player
 {	pub grid_position  : ( usize, usize ),
 	pub sprite_position: ( f32, f32 ),
+	pub sprite_position_old: ( f32, f32 ),
 	direction     : Direction,
 	next_direction: Direction,
 	wait: Timer,
@@ -48,6 +49,7 @@ pub fn spawn_sprite_player
 	let player = Player
 	{	grid_position: ( grid_x, grid_y ),
 		sprite_position: ( sprite_x, sprite_y ),
+		sprite_position_old: ( sprite_x, sprite_y ),
 		direction: Direction::Up,
 		next_direction: Direction::Up,
 		wait: Timer::from_seconds( PLAYER_WAIT, false ),
@@ -61,7 +63,7 @@ pub fn spawn_sprite_player
 
 //自機のスプライトを移動する
 pub fn move_sprite_player
-(	( mut q_player, q_chasers ): ( Query<( &mut Player, &mut Transform )>, Query<&Chaser> ),
+(	mut q_player: Query<( &mut Player, &mut Transform )>,
 	( state, mut event ): ( Res<State<GameState>>, EventWriter<GameState> ),
 	( mut map, mut record ): ( ResMut<MapInfo>, ResMut<Record> ),
 	mut cmds: Commands,
@@ -71,7 +73,7 @@ pub fn move_sprite_player
 	let ( mut player, mut transform ) = q_player.single_mut().unwrap();
 	let is_wait_finished = player.wait.tick( time_delta ).finished();
 	let is_demoplay = matches!( state.current(), GameState::DemoPlay );
-	let ( old_xy, new_xy );
+	let new_xy;
 
 	//スプライトの表示位置を更新する
 	if is_wait_finished
@@ -105,15 +107,7 @@ pub fn move_sprite_player
 		let delta = PLAYER_MOVE_COEF * time_delta.as_secs_f32();
 		new_xy = update_sprite_position_by_delta( &mut transform, delta, player.direction );
 	}
-	old_xy = player.sprite_position;
-
-	//衝突ならeventをセットして関数から脱出
-	for chaser in q_chasers.iter()
-	{	if is_collision( old_xy, new_xy, chaser.sprite_position )
-		{	event.send( GameState::GameOver );
-			return
-		}
-	}
+	player.sprite_position_old = player.sprite_position;
 	player.sprite_position = new_xy;
 
 	//スプライト(三角形)の表示向きを更新する

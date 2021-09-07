@@ -17,8 +17,9 @@ use super::util::Direction;
 
 //スプライト識別用Component
 pub struct Chaser
-{	grid_position: ( usize, usize ),
+{	pub grid_position: ( usize, usize ),
 	pub sprite_position: ( f32, f32 ),
+	pub sprite_position_old: ( f32, f32 ),
 	direction: Direction,
 	wait: Timer,
 	stop: bool,
@@ -68,6 +69,7 @@ pub fn spawn_sprite_chasers
 		let chaser = Chaser
 		{	grid_position: ( grid_x, grid_y ),
 			sprite_position: ( sprite_x, sprite_y ),
+			sprite_position_old: ( sprite_x, sprite_y ),
 			direction: Direction::Up,
 			wait: Timer::from_seconds( CHASER_WAIT, false ),
 			stop: true,
@@ -84,7 +86,6 @@ pub fn spawn_sprite_chasers
 //追手のスプライトを移動する
 pub fn move_sprite_chasers
 (	( q_player, mut q_chasers ): ( Query<&Player>, Query<( &mut Chaser, &mut Transform )> ),
-	mut event: EventWriter<GameState>,
 	map: Res<MapInfo>,
 	time: Res<Time>,
 )
@@ -96,7 +97,7 @@ pub fn move_sprite_chasers
 	(	| ( mut chaser, mut transform ) |
 		{	let time_delta = time_delta.mul_f32( chaser.speedup );
 			let is_wait_finished = chaser.wait.tick( time_delta ).finished();
-			let ( old_xy, new_xy );
+			let new_xy;
 
 			//スプライトの表示位置を更新する
 			if is_wait_finished
@@ -112,13 +113,7 @@ pub fn move_sprite_chasers
 				let delta  = CHASER_MOVE_COEF * time_delta.as_secs_f32();
 				new_xy = update_sprite_position_by_delta( &mut transform, delta, chaser.direction );
 			}
-			old_xy = chaser.sprite_position;
-
-			//衝突ならeventをセットして関数から脱出
-			if is_collision( old_xy, new_xy, player.sprite_position )
-			{	event.send( GameState::GameOver );
-				return
-			}
+			chaser.sprite_position_old = chaser.sprite_position;
 			chaser.sprite_position = new_xy;
 
 			//追手の回転アニメーション

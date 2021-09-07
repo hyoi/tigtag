@@ -97,19 +97,6 @@ pub fn init_position_player( map: &MapInfo ) -> ( usize, usize )
 	( x, y )
 }
 
-//移動体が障害物と交差するか
-pub fn is_collision
-(	( sx, sy ): ( f32, f32 ), //移動開始位置
-	( ex, ey ): ( f32, f32 ), //移動終了位置
-	( tx, ty ): ( f32, f32 ), //障害物の位置
-) -> bool
-{	//衝突する場合はXかYが先に一致している(このゲームには斜め移動がないので)
-	if ey as i32 == ty as i32 && ( sx..=ex ).contains( &tx ) { return true }
-	if ex as i32 == tx as i32 && ( sy..=ey ).contains( &ty ) { return true }
-
-	false
-}
-
 //マップの上下左右にあるものを取り出す
 pub fn get_map_obj_ulrd( ( x, y ): ( usize, usize ), map: &MapInfo ) -> ( MapObj, MapObj, MapObj, MapObj )
 {	let get_map_obj = | ( dx, dy ) |

@@ -48,13 +48,18 @@ impl Plugin for PluginGamePlay
 		//------------------------------------------------------------------------------------------
 		.add_system_set													// ＜GameState::GamePlay＞
 		(	SystemSet::on_update( GameState::GamePlay )					// ＜on_update()＞
-				.label( Label::MoveCharacter )							// ＜label＞
+				.before( Label::CollisionDetection )					// ＜before＞
 				.with_system( move_sprite_player.system() )				// 自機を移動
 				.with_system( move_sprite_chasers.system() )			// 追手を移動
 		)
 		.add_system_set													// ＜GameState::GamePlay＞
 		(	SystemSet::on_update( GameState::GamePlay )					// ＜on_update()＞
-				.after( Label::MoveCharacter )							// ＜after＞
+				.label( Label::CollisionDetection )						// ＜label＞
+				.with_system( detect_collision.system() )				// 衝突ならeventに書き込む
+		)
+		.add_system_set													// ＜GameState::GamePlay＞
+		(	SystemSet::on_update( GameState::GamePlay )					// ＜on_update()＞
+				.after( Label::CollisionDetection )						// ＜after＞
 				.with_system( change_state_clear_or_over.system() )		// 勝利⇒GameClear、敗北⇒GameOverへ遷移
 		)
 		//------------------------------------------------------------------------------------------
@@ -125,6 +130,44 @@ pub fn clear_record( mut record: ResMut<Record> )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//自機と追手が交差するか
+pub fn detect_collision
+(	q_player : Query<&Player>,
+	q_chasers: Query<&Chaser>,
+	mut event: EventWriter<GameState>,
+)
+{	let player = q_player.single().unwrap();
+	let ( p_grid_x, p_grid_y ) = player.grid_position;
+	let ( p_new_x, p_new_y ) = player.sprite_position;
+	let ( p_old_x, p_old_y ) = player.sprite_position_old;
+
+	for chaser in q_chasers.iter()
+	{	let ( c_grid_x, c_grid_y ) = chaser.grid_position;
+		let ( c_new_x, c_new_y ) = chaser.sprite_position;
+		let ( c_old_x, c_old_y ) = chaser.sprite_position_old;
+
+		let is_collision = if p_grid_y == c_grid_y	//Y軸が一致するなら
+		{	( p_new_x..=p_old_x ).contains( &c_new_x ) ||
+			( p_new_x..=p_old_x ).contains( &c_old_x ) ||
+			( c_new_x..=c_old_x ).contains( &p_new_x ) ||
+			( c_new_x..=c_old_x ).contains( &p_old_x )
+		}
+		else if p_grid_x == c_grid_x 				//X軸が一致するなら
+		{	( p_new_y..=p_old_y ).contains( &c_new_y ) ||
+			( p_new_y..=p_old_y ).contains( &c_old_y ) ||
+			( c_new_y..=c_old_y ).contains( &p_new_y ) ||
+			( c_new_y..=c_old_y ).contains( &p_old_y )
+		}
+		else
+		{ false };
+
+		if is_collision
+		{	event.send( GameState::GameOver );
+			return
+		}
+	}
+}
 
 //eventで渡されたstateへ遷移する(キューの先頭だけ処理、早い者勝ち)
 fn change_state_clear_or_over

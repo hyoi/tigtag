@@ -34,13 +34,18 @@ impl Plugin for PluginDemoPlay
 		)
 		.add_system_set													// ＜GameState::Demo＞
 		(	SystemSet::on_update( GameState::DemoPlay )					// ＜on_update()＞
-				.label( Label::MoveCharacter )							// ＜label＞
+				.before( Label::CollisionDetection )					// ＜before＞
 				.with_system( move_sprite_player.system() )				// 自機を移動
 				.with_system( move_sprite_chasers.system() )			// 追手を移動
 		)
 		.add_system_set													// ＜GameState::DemoPlay＞
 		(	SystemSet::on_update( GameState::DemoPlay )					// ＜on_update()＞
-				.after( Label::MoveCharacter )							// ＜after＞
+				.label( Label::CollisionDetection )						// ＜label＞
+				.with_system( detect_collision.system() )				// 衝突ならeventに書き込む
+		)
+		.add_system_set													// ＜GameState::DemoPlay＞
+		(	SystemSet::on_update( GameState::DemoPlay )					// ＜on_update()＞
+				.after( Label::CollisionDetection )						// ＜after＞
 				.with_system( change_state_demoloop.system() )			// 勝利／敗北⇒DemoLoopへ遷移
 		)
 		.add_system_set													// ＜GameState::Demo＞
