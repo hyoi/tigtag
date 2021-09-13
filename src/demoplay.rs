@@ -8,10 +8,10 @@ impl Plugin for PluginDemoPlay
 {	fn build( &self, app: &mut AppBuilder )
 	{	app
 		//------------------------------------------------------------------------------------------
-		.add_system_set													// ＜GameState::DemoStart＞
-		(	SystemSet::on_enter( GameState::DemoStart )					// ＜on_enter()＞
-				.with_system( show_message_demo.system() )				// タイトルを表示する
-		)
+		// .add_system_set												// ＜GameState::DemoStart＞
+		// (	SystemSet::on_enter( GameState::DemoStart )				// ＜on_enter()＞
+		// 		.with_system( show_message_demo.system() )				// タイトルを表示する
+		// )
 		.add_system_set													// ＜GameState::DemoStart＞
 		(	SystemSet::on_enter( GameState::DemoStart )					// ＜on_enter()＞
 				.label( Label::GenerateMap )							// ＜label＞
@@ -32,21 +32,16 @@ impl Plugin for PluginDemoPlay
 		(	SystemSet::on_update( GameState::DemoPlay )					// ＜on_update()＞
 				.with_system( change_state_gamestart_by_key.system() )	// SPACEキー入力⇒GameStartへ遷移
 		)
-		.add_system_set													// ＜GameState::Demo＞
+		.add_system_set													// ＜GameState::DemoPlay＞
 		(	SystemSet::on_update( GameState::DemoPlay )					// ＜on_update()＞
-				.before( Label::CollisionDetection )					// ＜before＞
-				.with_system( move_sprite_player.system() )				// 自機を移動
-				.with_system( move_sprite_chasers.system() )			// 追手を移動
+				.before( Label::MoveSpriteCharacters )					// ＜before＞
+				.with_system( detect_score_and_collision.system() )		// クリア⇒DemoLoop、衝突⇒DemoLoop
 		)
 		.add_system_set													// ＜GameState::DemoPlay＞
 		(	SystemSet::on_update( GameState::DemoPlay )					// ＜on_update()＞
-				.label( Label::CollisionDetection )						// ＜label＞
-				.with_system( detect_collision.system() )				// 衝突ならeventに書き込む
-		)
-		.add_system_set													// ＜GameState::DemoPlay＞
-		(	SystemSet::on_update( GameState::DemoPlay )					// ＜on_update()＞
-				.after( Label::CollisionDetection )						// ＜after＞
-				.with_system( change_state_demoloop.system() )			// 勝利／敗北⇒DemoLoopへ遷移
+				.label( Label::MoveSpriteCharacters )					// ＜label＞
+				.with_system( move_sprite_player.system() )				// 自機のスプライトを移動する
+				.with_system( move_sprite_chaser.system() )				// 追手のスプライトを移動する
 		)
 		.add_system_set													// ＜GameState::Demo＞
 		(	SystemSet::on_exit( GameState::DemoPlay )					// ＜on_exit()＞
@@ -72,17 +67,10 @@ fn change_state_demoplay( mut state: ResMut<State<GameState>> )
 
 //無条件にDemoStartへ遷移する
 fn change_state_demostart( mut state: ResMut<State<GameState>> )
-{	let _ = state.overwrite_set( GameState::DemoStart );
-}
+{	use std::{ thread, time };
+	thread::sleep( time::Duration::from_secs( 3 ) );
 
-//eventで渡されたstateを無視してDemoLoopへ遷移する(デモなので)
-fn change_state_demoloop
-(	mut state : ResMut<State<GameState>>,
-	mut events: EventReader<GameState>,
-)
-{	if events.iter().next().is_some()
-	{	let _ = state.overwrite_set( GameState::DemoLoop );
-	}
+	let _ = state.overwrite_set( GameState::DemoStart );
 }
 
 //End of code.

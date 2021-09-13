@@ -46,8 +46,7 @@ pub enum GameState
 #[derive(Clone,Hash,Debug,Eq,PartialEq,SystemLabel)]
 enum Label
 {	GenerateMap,
-//	MoveCharacter,
-	CollisionDetection,
+	MoveSpriteCharacters,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

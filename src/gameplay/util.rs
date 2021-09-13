@@ -4,6 +4,22 @@ use super::*;
 
 //定義と定数
 
+//Resource Score
+pub struct Record
+{	pub score	  : usize,
+	pub high_score: usize,
+	pub stage	  : usize,
+}
+impl Default for Record
+{	fn default() -> Self
+	{	Self
+		{	score	  : 0,
+			high_score: 0,
+			stage	  : 1,
+		}
+	}
+}
+
 //向きを表す列挙型
 #[derive(Clone,Copy,PartialEq)]
 pub enum Direction { Up, Left, Right, Down, }
@@ -16,6 +32,19 @@ pub const DOWN : ( i32, i32 ) = (  0,  1 );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//ゲームクリア時にステージを＋１する
+pub fn increment_record( mut record: ResMut<Record> )
+{	record.stage += 1;
+}
+
+//ゲームオーバー時にスコアとステージを初期化する
+pub fn clear_record( mut record: ResMut<Record> )
+{	record.score = 0;
+	record.stage = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //二次元配列の添え字から画面座標を算出する
 pub fn conv_sprite_coordinates( x: usize, y: usize ) -> ( f32, f32 )
 {	let x = ( PIXEL_PER_GRID - SCREEN_WIDTH  ) / 2.0 + PIXEL_PER_GRID * x as f32;
@@ -24,7 +53,7 @@ pub fn conv_sprite_coordinates( x: usize, y: usize ) -> ( f32, f32 )
 }
 
 //スプライトの位置をグリッドに合わせて更新する
-pub fn fit_sprite_position_to_grid( transform: &mut Transform, x: usize, y: usize ) -> ( f32, f32 )
+pub fn fit_pixel_position_to_grid( transform: &mut Transform, x: usize, y: usize ) -> ( f32, f32 )
 {	let ( x, y ) = conv_sprite_coordinates( x, y );
 	let position = &mut transform.translation;
 	position.x = x;
@@ -34,7 +63,7 @@ pub fn fit_sprite_position_to_grid( transform: &mut Transform, x: usize, y: usiz
 }
 
 //スプライトの位置を向きとΔで更新する(グリッドの間の移動)
-pub fn update_sprite_position_by_delta( transform: &mut Transform, delta: f32, direction: Direction ) -> ( f32, f32 )
+pub fn update_pixel_position_by_delta( transform: &mut Transform, delta: f32, direction: Direction ) -> ( f32, f32 )
 {	let position = &mut transform.translation;
 	match direction
 	{	Direction::Up    => position.y += delta,
