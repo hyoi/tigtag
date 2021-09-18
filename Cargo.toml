@@ -1,6 +1,6 @@
 [package]
 name = "tigtag"
-version = "0.1.0"
+version = "0.1.2"
 authors = ["hyoi"]
 edition = "2018"
 
