@@ -2,9 +2,9 @@ Note: Japanese text only.
 
 # ぴこげー: TigTag
 「tig」も「tag」も和訳は「鬼ごっこ」だそうです。  
-よくある逃げ回ってドットをすべて拾ったらステージクリアなゲーム。  
+逃げ回ってドットをすべて拾ったらステージクリアなゲーム。(よくあるヤツ)  
 昔のベーマガみたいなピコゲーを作ってみたかったのです。  
-なお、逆襲なし、追手は重なるとスピードアップするマゾ仕様。
+逆襲なし、追手は重なるとスピードアップするマゾ仕様。
 ## 操作方法
 カーソルキーで上下左右に移動。Escで一時停止。   
 スペースキーでゲーム開始など。  
@@ -29,8 +29,6 @@ cargo make --profile release serve
 - [Google Fonts](https://fonts.google.com/)
   - [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P)
   - [Orbitron](https://fonts.google.com/specimen/Orbitron)
+  - [Reggae One](https://fonts.google.com/specimen/Reggae+One?subset=japanese)
 ## 宿題
-- Demoを見てると、すり抜けてしまう瞬間があるみたい…。再現性がはっきりするなら治したい
 - 音を鳴らしたい。beep音でいいから。
-- 環境によってメモリリークするかも。bevyの依存crateでGPU関係が怪しそう。治せるかどうかは未知数。  
-もしかしたらbevy0.5に移行したので大丈夫になったかも。
