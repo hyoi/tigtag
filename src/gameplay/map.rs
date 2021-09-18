@@ -174,9 +174,9 @@ fn sprite_dot
 	GeometryBuilder::build_as
 	(	circle,
 		ShapeColors::new( SPRITE_DOT_COLOR ),
-        DrawMode::Fill( FillOptions::default() ),
-        Transform::from_translation( position ),
-    )
+		DrawMode::Fill( FillOptions::default() ),
+		Transform::from_translation( position ),
+	)
 }
 /*//WASM
 #[cfg(target_arch = "wasm32")]

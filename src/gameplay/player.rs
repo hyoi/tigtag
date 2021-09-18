@@ -21,7 +21,7 @@ pub struct Player
 	direction     : Direction,
 	next_direction: Direction,
 	wait: Timer,
-	stop: bool,
+	pub stop: bool,
 }
 
 //自機のスプライト
@@ -198,7 +198,7 @@ fn sprite_player
 	GeometryBuilder::build_as
 	(	triangle,
 		ShapeColors::new( SPRITE_PLAYER_COLOR ),
-        DrawMode::Fill( FillOptions::default() ),
+		DrawMode::Fill( FillOptions::default() ),
 		Transform::from_translation( position )
 	)
 }

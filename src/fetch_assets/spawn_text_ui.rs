@@ -33,7 +33,7 @@ const MESSAGE_CLEAR: [ MessageSect; 3 ] =
 	( "\nNext stage...\n\n", FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 2.0, Color::WHITE  ),
 	( ""                   , FONT_ORBITRON_BLACK      , PIXEL_PER_GRID * 4.0, Color::WHITE  ),
 ];
-pub const GAMECLEAR_COUNTDOWN: usize = 10;
+pub const GAMECLEAR_COUNTDOWN: usize = 5;
 
 pub struct MessageOver
 {	pub count: usize,
@@ -86,7 +86,7 @@ const UI_LOWER_CENTER: [ MessageSect; 0 ] =
 
 pub struct UiLowerRight;
 const UI_LOWER_RIGHT: [ MessageSect; 1 ] =
-[	( "© 2021 hyoi", FONT_REGGAEONE_REGULAR, PIXEL_PER_GRID * 1.0, Color::WHITE ),
+[	( "2021 hyoi", FONT_REGGAEONE_REGULAR, PIXEL_PER_GRID * 0.7, Color::WHITE ),
 ];
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

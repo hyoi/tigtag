@@ -22,7 +22,8 @@ pub struct Chaser
 	pub pixel_position_old: ( f32, f32 ),
 	direction: Direction,
 	wait: Timer,
-	stop: bool,
+	pub stop: bool,
+	pub collision: bool,
 	color: Color,
 	speedup: f32,
 }
@@ -73,6 +74,7 @@ pub fn spawn_sprite_chasers
 			direction: Direction::Up,
 			wait: Timer::from_seconds( CHASER_WAIT, false ),
 			stop: true,
+			collision: false,
 			color,
 			speedup: 1.,
 		};
@@ -85,10 +87,10 @@ pub fn spawn_sprite_chasers
 
 //自機のスプライトを移動する
 pub fn move_sprite_chaser
-(	q_player: Query<&Player>,
-	mut q_chaser: Query<( &mut Chaser, &mut Transform )>,
-	map: ResMut<MapInfo>,
-	time: Res<Time>
+(	mut q_chaser: Query<( &mut Chaser, &mut Transform )>,
+	q_player: Query<&Player>,
+	map     : ResMut<MapInfo>,
+	time    : Res<Time>
 )
 {	let time_delta = time.delta();
 	let player = q_player.single().unwrap();
