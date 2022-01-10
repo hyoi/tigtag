@@ -57,7 +57,6 @@ pub fn spawn_sprite_chasers
 (	q: Query<Entity, With<Chaser>>,
 	record: Res<Record>,
 	mut cmds: Commands,
-	mut color_matl: ResMut<Assets<ColorMaterial>>,
 )
 {	//スプライトが居れば削除する
 	q.for_each( | id | cmds.entity( id ).despawn() );
@@ -79,7 +78,7 @@ pub fn spawn_sprite_chasers
 			color,
 			speedup: 1.,
 		};
-		let sprite = sprite_chaser( chaser.pixel_position, color, &mut color_matl );
+		let sprite = sprite_chaser( chaser.pixel_position, color );
 		cmds.spawn_bundle( sprite ).insert( chaser );
 	} );
 }
@@ -232,20 +231,14 @@ fn decide_direction
 fn sprite_chaser
 (	( x, y ): ( f32, f32 ),
 	color: Color,
-	color_matl: &mut ResMut<Assets<ColorMaterial>>,
 ) -> SpriteBundle
 {	let position = Vec3::new( x, y, SPRITE_CHASER_DEPTH );
 	let square   = Vec2::new( SPRITE_CHASER_PIXEL, SPRITE_CHASER_PIXEL );
 
-	let mut sprite = SpriteBundle
-	{	transform: Transform::from_translation( position ),
-		sprite   : Sprite
-		{	color: color.into(),
-			custom_size: Some( square ),
-			..Default::default()
-		},
-		..Default::default()
-	};
+	let transform = Transform::from_translation( position );
+	let sprite = Sprite { color, custom_size: Some( square ), ..Default::default() };
+
+	let mut sprite = SpriteBundle { transform, sprite, ..Default::default() };
 
 	//45°傾けて菱形に見せる
 	let quat = Quat::from_rotation_z( 45_f32.to_radians() );

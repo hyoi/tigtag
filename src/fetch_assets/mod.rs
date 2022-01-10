@@ -177,7 +177,7 @@ fn sprite_preloading_anime_tile
 
 	let transform = Transform::from_translation( position );
 	let sprite    = Sprite
-	{	color: SPRITE_TILE_COLOR.into(),
+	{	color: SPRITE_TILE_COLOR,
 		custom_size: Some( square ),
 		..Default::default()
 	};
