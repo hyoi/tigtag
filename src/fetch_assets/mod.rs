@@ -175,15 +175,14 @@ fn sprite_preloading_anime_tile
 {	let position = Vec3::new( x, y, SPRITE_TILE_DEPTH );
 	let square   = Vec2::new( SPRITE_TILE_PIXEL, SPRITE_TILE_PIXEL );
 
-	SpriteBundle
-	{	transform: Transform::from_translation( position ),
-		sprite   : Sprite
-		{	color: SPRITE_TILE_COLOR.into(),
-			custom_size: Some( square ),
-			..Default::default()
-		},
+	let transform = Transform::from_translation( position );
+	let sprite    = Sprite
+	{	color: SPRITE_TILE_COLOR.into(),
+		custom_size: Some( square ),
 		..Default::default()
-	}
+	};
+
+	SpriteBundle { transform, sprite, ..Default::default() }
 }
 
 //End of code.
