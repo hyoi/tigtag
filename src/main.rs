@@ -4,15 +4,17 @@ use bevy_prototype_lyon::{ prelude::*, entity::ShapeBundle };
 use rand::prelude::*;
 
 //internal modules
-mod fetch_assets;
-mod ui;
-mod demoplay;
-mod gameplay;
+mod consts;
+// mod fetch_assets;
+// mod ui;
+// mod demoplay;
+// mod gameplay;
 
-use fetch_assets::*;
-use ui::*;
-use demoplay::*;
-use gameplay::*;
+use consts::*;
+// use fetch_assets::*;
+// use ui::*;
+// use demoplay::*;
+// use gameplay::*;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -62,7 +64,7 @@ fn main()
 		..Default::default()
 	};
 	
-	let mut app = App::build();
+	let mut app = App::new();
 	app
 	//----------------------------------------------------------------------------------------------
 	.insert_resource( main_window )									// メインウィンドウ
@@ -76,22 +78,22 @@ fn main()
 	.add_state( GameState::Init )									// 状態遷移の初期値
 	.add_event::<GameState>()										// 状態遷移のイベント
 	//----------------------------------------------------------------------------------------------
-	.add_startup_system( spawn_camera.system() )					// bevyのカメラ設置
-	.add_system( handle_esc_key_for_pause.system() )				// [Esc]でpause処理
+	.add_startup_system( spawn_camera )					// bevyのカメラ設置
+	.add_system( handle_esc_key_for_pause )				// [Esc]でpause処理
 	//----------------------------------------------------------------------------------------------
-	.add_plugin( PluginFetchAssets )
-	.add_plugin( PluginUi )
-	.add_plugin( PluginDemoPlay )
-	.add_plugin( PluginGamePlay )
+	// .add_plugin( PluginFetchAssets )
+	// .add_plugin( PluginUi )
+	// .add_plugin( PluginDemoPlay )
+	// .add_plugin( PluginGamePlay )
 	//----------------------------------------------------------------------------------------------
 	;
 
 	//----------------------------------------------------------------------------------------------
-	#[cfg(target_arch = "wasm32")]
-	app.add_plugin( bevy_webgl2::WebGL2Plugin );					// WASM用のプラグイン
+	// #[cfg(target_arch = "wasm32")]
+	// app.add_plugin( bevy_webgl2::WebGL2Plugin );					// WASM用のプラグイン
 	//----------------------------------------------------------------------------------------------
 	#[cfg(not(target_arch = "wasm32"))]								// WASMで不要なキー操作
-	app.add_system( toggle_window_mode.system() );					// [Alt]+[Enter]でフルスクリーン
+	app.add_system( toggle_window_mode );					// [Alt]+[Enter]でフルスクリーン
 	//----------------------------------------------------------------------------------------------
 
 	app.run();														// アプリの実行
@@ -117,7 +119,7 @@ fn toggle_window_mode
 	if is_pressed_alt && is_pressed_return
 	{	use bevy::window::WindowMode::*;
 		if let Some( window ) = window.get_primary_mut()
-		{	let x = if window.mode() == Windowed { Fullscreen { use_size: true } } else { Windowed };
+		{	let x = if window.mode() == Windowed { Fullscreen } else { Windowed };
 			window.set_mode( x );
 		}
 	}
@@ -125,11 +127,11 @@ fn toggle_window_mode
 
 //ESCキーが入力さたら一時停止する
 fn handle_esc_key_for_pause
-(	mut q: Query<&mut Visible, With<MessagePause>>,
+(	mut q: Query<&mut Visibility, With<MessagePause>>,
 	mut inkey: ResMut<Input<KeyCode>>,
 	mut state: ResMut<State<GameState>>,
 )
-{	if let Ok( mut ui ) = q.single_mut()
+{	if let Ok( mut ui ) = q.get_single_mut()
 	{	if inkey.just_pressed( KeyCode::Escape ) 
 		{	match state.current()
 			{	GameState::Pause => { ui.is_visible = false; state.pop().unwrap() },
