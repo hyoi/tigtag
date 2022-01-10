@@ -17,84 +17,84 @@ pub use util::*;
 //Pluginの手続き
 pub struct PluginGamePlay;
 impl Plugin for PluginGamePlay
-{	fn build( &self, app: &mut AppBuilder )
+{	fn build( &self, app: &mut App )
 	{	app
 		//==========================================================================================
-		.init_resource::<Record>()										// スコア等のリソース
-		.init_resource::<MapInfo>()										// マップ情報のリソース
+//		.init_resource::<Record>()								// スコア等のリソース
+//		.init_resource::<MapInfo>()								// マップ情報のリソース
 		//==========================================================================================
-		.add_system_set													// ＜GameState::GameStart＞
-		(	SystemSet::on_enter( GameState::GameStart )					// ＜on_enter()＞
-				.with_system( show_message_start.system() )				// スタートメッセージを表示する
-				.with_system( reset_gamestart_counter.system() )		// カウントダウン用のカウンタークリア
+		.add_system_set											// ＜GameState::GameStart＞
+		(	SystemSet::on_enter( GameState::GameStart )			// ＜on_enter()＞
+				.with_system( show_message_start )				// スタートメッセージを表示する
+				.with_system( reset_gamestart_counter )			// カウントダウン用のカウンタークリア
 		)
-		.add_system_set													// ＜GameState::GameStart＞
-		(	SystemSet::on_enter( GameState::GameStart )					// ＜on_enter()＞
-				.label( Label::GenerateMap )							// ＜label＞
-				.with_system( spawn_sprite_new_map.system() )			// 新マップを生成して表示
+		.add_system_set											// ＜GameState::GameStart＞
+		(	SystemSet::on_enter( GameState::GameStart )			// ＜on_enter()＞
+				.label( Label::GenerateMap )					// ＜label＞
+				.with_system( spawn_sprite_new_map )			// 新マップを生成して表示
 		)
-		.add_system_set													// ＜GameState::GameStart＞
-		(	SystemSet::on_enter( GameState::GameStart )					// ＜on_enter()＞
-				.after( Label::GenerateMap )							// ＜after＞
-				.with_system( spawn_sprite_player.system() )			// 自機を配置(マップ生成後)
-				.with_system( spawn_sprite_chasers.system() )			// 追手を配置
+		.add_system_set											// ＜GameState::GameStart＞
+		(	SystemSet::on_enter( GameState::GameStart )			// ＜on_enter()＞
+				.after( Label::GenerateMap )					// ＜after＞
+				.with_system( spawn_sprite_player )				// 自機を配置(マップ生成後)
+				.with_system( spawn_sprite_chasers )			// 追手を配置
 		)
 		//------------------------------------------------------------------------------------------
-		.add_system_set													// ＜GameState::GameStart＞
-		(	SystemSet::on_update( GameState::GameStart )				// ＜on_update()＞
-				.with_system( change_state_gameplay_with_cd.system() )	// カウントダウン終了⇒GamePlayへ遷移
+		.add_system_set											// ＜GameState::GameStart＞
+		(	SystemSet::on_update( GameState::GameStart )		// ＜on_update()＞
+				.with_system( change_state_gameplay_with_cd )	// カウントダウン終了⇒GamePlayへ遷移
 		)
 		//------------------------------------------------------------------------------------------
-		.add_system_set													// ＜GameState::GameStart＞
-		(	SystemSet::on_exit( GameState::GameStart )					// ＜on_exit()＞
-				.with_system( hide_message_start.system() )				// スタートメッセージを隠す
-		)
-		//==========================================================================================
-		.add_system_set													// ＜GameState::GamePlay＞
-		(	SystemSet::on_update( GameState::GamePlay )					// ＜on_update()＞
-				.before( Label::MoveSpriteCharacters )					// ＜before＞
-				.with_system( detect_score_and_collision.system() )		// クリア⇒GameClear、衝突⇒GameOver
-		)
-		.add_system_set													// ＜GameState::GamePlay＞
-		(	SystemSet::on_update( GameState::GamePlay )					// ＜on_update()＞
-				.label( Label::MoveSpriteCharacters )					// ＜label＞
-				.with_system( move_sprite_player.system() )				// 自機のスプライトを移動する
-				.with_system( move_sprite_chaser.system() )				// 追手のスプライトを移動する
+		.add_system_set											// ＜GameState::GameStart＞
+		(	SystemSet::on_exit( GameState::GameStart )			// ＜on_exit()＞
+				.with_system( hide_message_start )				// スタートメッセージを隠す
 		)
 		//==========================================================================================
-		.add_system_set													// ＜GameState::GameClear＞
-		(	SystemSet::on_enter( GameState::GameClear )					// ＜on_enter()＞
-				.with_system( show_message_clear.system() )				// クリアメッセージを表示する
-				.with_system( reset_gameclear_counter.system() )		// カウントダウン用のカウンタークリア
+		.add_system_set											// ＜GameState::GamePlay＞
+		(	SystemSet::on_update( GameState::GamePlay )			// ＜on_update()＞
+				.before( Label::MoveSpriteCharacters )			// ＜before＞
+//				.with_system( detect_score_and_collision )		// クリア⇒GameClear、衝突⇒GameOver
 		)
-		//------------------------------------------------------------------------------------------
-		.add_system_set													// ＜GameState::GameClear＞
-		(	SystemSet::on_update( GameState::GameClear )				// ＜on_update()＞
-				.with_system( change_state_gamestart_with_cd.system() )	// カウントダウン終了⇒GameStartへ遷移
-		)
-		//------------------------------------------------------------------------------------------
-		.add_system_set													// ＜GameState::Clear＞
-		(	SystemSet::on_exit( GameState::GameClear )					// ＜on_exit()＞
-				.with_system( hide_message_clear.system() )				// クリアメッセージを隠す
-				.with_system( increment_record.system() )				// ステージを＋１する
+		.add_system_set											// ＜GameState::GamePlay＞
+		(	SystemSet::on_update( GameState::GamePlay )			// ＜on_update()＞
+				.label( Label::MoveSpriteCharacters )			// ＜label＞
+				.with_system( move_sprite_player )				// 自機のスプライトを移動する
+				.with_system( move_sprite_chaser )				// 追手のスプライトを移動する
 		)
 		//==========================================================================================
-		.add_system_set													// ＜GameState::GameOver＞
-		(	SystemSet::on_enter( GameState::GameOver )					// ＜on_enter()＞
-				.with_system( show_message_over.system() )				// ゲームオーバーを表示する
-				.with_system( reset_gameover_counter.system() )			// カウントダウン用のカウンタークリア
+		.add_system_set											// ＜GameState::GameClear＞
+		(	SystemSet::on_enter( GameState::GameClear )			// ＜on_enter()＞
+				.with_system( show_message_clear )				// クリアメッセージを表示する
+				.with_system( reset_gameclear_counter )			// カウントダウン用のカウンタークリア
 		)
 		//------------------------------------------------------------------------------------------
-		.add_system_set													// ＜GameState::GameOver＞
-		(	SystemSet::on_update( GameState::GameOver )					// ＜on_update()＞
-				.with_system( change_state_gamestart_by_key.system() )	// SPACEキー入力⇒GameStartへ遷移
-				.with_system( change_state_demostart_with_cd.system() )	// カウントダウン終了⇒DemoStartへ遷移
+		.add_system_set											// ＜GameState::GameClear＞
+		(	SystemSet::on_update( GameState::GameClear )		// ＜on_update()＞
+				.with_system( change_state_gamestart_with_cd )	// カウントダウン終了⇒GameStartへ遷移
 		)
 		//------------------------------------------------------------------------------------------
-		.add_system_set													// ＜GameState::GameOver＞
-		(	SystemSet::on_exit( GameState::GameOver )					// ＜on_exit()＞
-				.with_system( hide_message_over.system() )				// ゲームオーバーを隠す
-				.with_system( clear_record.system() )					// スコアとステージを初期化
+		.add_system_set											// ＜GameState::Clear＞
+		(	SystemSet::on_exit( GameState::GameClear )			// ＜on_exit()＞
+				.with_system( hide_message_clear )				// クリアメッセージを隠す
+				.with_system( increment_record )				// ステージを＋１する
+		)
+		//==========================================================================================
+		.add_system_set											// ＜GameState::GameOver＞
+		(	SystemSet::on_enter( GameState::GameOver )			// ＜on_enter()＞
+				.with_system( show_message_over )				// ゲームオーバーを表示する
+				.with_system( reset_gameover_counter )			// カウントダウン用のカウンタークリア
+		)
+		//------------------------------------------------------------------------------------------
+		.add_system_set											// ＜GameState::GameOver＞
+		(	SystemSet::on_update( GameState::GameOver )			// ＜on_update()＞
+				.with_system( change_state_gamestart_by_key )	// SPACEキー入力⇒GameStartへ遷移
+				.with_system( change_state_demostart_with_cd )	// カウントダウン終了⇒DemoStartへ遷移
+		)
+		//------------------------------------------------------------------------------------------
+		.add_system_set											// ＜GameState::GameOver＞
+		(	SystemSet::on_exit( GameState::GameOver )			// ＜on_exit()＞
+				.with_system( hide_message_over )				// ゲームオーバーを隠す
+				.with_system( clear_record )					// スコアとステージを初期化
 		)
 		//==========================================================================================
 		;
@@ -102,12 +102,12 @@ impl Plugin for PluginGamePlay
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 //得点と衝突を判定する。クリアならGameClearへ、衝突ならGameOverへ遷移する
 pub fn detect_score_and_collision
 (	mut q_set: QuerySet
-	<(	Query<( &mut Player, &mut Transform )>,
-		Query<( &mut Chaser, &mut Transform )>,
+	<(	QueryState<( &mut Player, &mut Transform )>,
+		QueryState<( &mut Chaser, &mut Transform )>,
 	)>,
 	mut state : ResMut<State<GameState>>,
 	mut record: ResMut<Record>,
@@ -117,7 +117,7 @@ pub fn detect_score_and_collision
 {	let is_demoplay = matches!( state.current(), GameState::DemoPlay );
 
 	//自機のgrid座標のオブジェクトがドットなら
-	let ( mut player, mut transform ) = q_set.q0_mut().iter_mut().next().unwrap();
+	let ( mut player, mut transform ) = q_set.q0().iter_mut().next().unwrap();
 	let ( p_grid_x, p_grid_y ) = player.grid_position;
 	if let MapObj::Dot( opt_dot ) = map.array[ p_grid_x ][ p_grid_y ]
 	{	//得点処理
@@ -151,7 +151,7 @@ pub fn detect_score_and_collision
 	let ( mut p_new_x, mut p_new_y ) = ( ( p_new_xf32 * 100.0 ) as i32, ( p_new_yf32 * 100.0 ) as i32 );
 	let ( mut p_old_x, mut p_old_y ) = ( ( p_old_xf32 * 100.0 ) as i32, ( p_old_yf32 * 100.0 ) as i32 );
 
-	for ( mut chaser, _ ) in q_set.q1_mut().iter_mut()
+	for ( mut chaser, _ ) in q_set.q1().iter_mut()
 	{//	let ( c_grid_x, c_grid_y ) = chaser.grid_position;
 		let ( c_new_xf32, c_new_yf32 ) = chaser.pixel_position;
 		let ( c_old_xf32, c_old_yf32 ) = chaser.pixel_position_old;
@@ -188,7 +188,7 @@ pub fn detect_score_and_collision
 
 			//playerが移動中にchaserに衝突したなら
 			if ! p_stop
-			{	let ( mut player, mut transform ) = q_set.q0_mut().iter_mut().next().unwrap();
+			{	let ( mut player, mut transform ) = q_set.q0().iter_mut().next().unwrap();
 				player.stop = true;
 				let position = &mut transform.translation;
 				position.x = c_new_xf32;
@@ -209,7 +209,7 @@ pub fn detect_score_and_collision
 	//衝突ならstateをセットして関数から脱出
 	if is_over
 	{	//衝突時にchaserの表示位置を調整する
-		for ( mut chaser, mut transform ) in q_set.q1_mut().iter_mut()
+		for ( mut chaser, mut transform ) in q_set.q1().iter_mut()
 		{	chaser.stop = true;
 			if p_stop && chaser.collision
 			{	//playerが停止中ならchaserがplayerへ衝突した
@@ -223,7 +223,7 @@ pub fn detect_score_and_collision
 		let _ = state.overwrite_set( next );
 	}
 }
-
+*/
 //SPACEキーが入力されたらGameStartへ遷移する
 pub fn change_state_gamestart_by_key
 (	mut inkey: ResMut<Input<KeyCode>>,

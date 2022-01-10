@@ -4,7 +4,7 @@ use super::*;
 pub fn reset_gamestart_counter
 (	mut q: Query<&mut MessageStart>,
 )
-{	if let Ok( mut counter ) = q.single_mut()
+{	if let Ok( mut counter ) = q.get_single_mut()
 	{	counter.count = COUNTDOWN_TEXT.len();
 		counter.timer.reset();
 	}
@@ -16,7 +16,7 @@ pub fn change_state_gameplay_with_cd
 	mut state: ResMut<State<GameState>>,
 	time: Res<Time>,
 )
-{	if let Ok( ( mut text, mut counter ) ) = q.single_mut()
+{	if let Ok( ( mut text, mut counter ) ) = q.get_single_mut()
 	{	//1秒経過したら
 		if counter.timer.tick( time.delta() ).finished()
 		{	counter.count -= 1;
@@ -41,7 +41,7 @@ pub fn change_state_gameplay_with_cd
 pub fn reset_gameclear_counter
 (	mut q: Query<&mut MessageClear>,
 )
-{	if let Ok( mut counter ) = q.single_mut()
+{	if let Ok( mut counter ) = q.get_single_mut()
 	{	counter.count = GAMECLEAR_COUNTDOWN + 1;
 		counter.timer.reset();
 	}
@@ -53,7 +53,7 @@ pub fn change_state_gamestart_with_cd
 	mut state: ResMut<State<GameState>>,
 	time: Res<Time>,
 )
-{	if let Ok( ( mut text, mut counter ) ) = q.single_mut()
+{	if let Ok( ( mut text, mut counter ) ) = q.get_single_mut()
 	{	//1秒経過したら
 		if counter.timer.tick( time.delta() ).finished()
 		{	counter.count -= 1;
@@ -77,7 +77,7 @@ pub fn change_state_gamestart_with_cd
 pub fn reset_gameover_counter
 (	mut q: Query<&mut MessageOver>,
 )
-{	if let Ok( mut counter ) = q.single_mut()
+{	if let Ok( mut counter ) = q.get_single_mut()
 	{	counter.count = GAMEOVER_COUNTDOWN + 1;
 		counter.timer.reset();
 	}
@@ -89,7 +89,7 @@ pub fn change_state_demostart_with_cd
 	mut state: ResMut<State<GameState>>,
 	time: Res<Time>,
 )
-{	if let Ok( ( mut text, mut counter ) ) = q.single_mut()
+{	if let Ok( ( mut text, mut counter ) ) = q.get_single_mut()
 	{	//1秒経過したら
 		if counter.timer.tick( time.delta() ).finished()
 		{	counter.count -= 1;

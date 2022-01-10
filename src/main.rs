@@ -9,16 +9,16 @@ mod consts;
 mod util;
 mod fetch_assets;
 mod ui;
-// mod demoplay;
-// mod gameplay;
+mod gameplay;
+mod demoplay;
 
 use types::*;
 use consts::*;
 use util::*;
 use fetch_assets::*;
 use ui::*;
-// use demoplay::*;
-// use gameplay::*;
+use gameplay::*;
+use demoplay::*;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -82,14 +82,15 @@ fn main()
 	.add_state( GameState::Init )							// 状態遷移の初期値
 	.add_event::<GameState>()								// 状態遷移のイベント
 	.init_resource::<Record>()								// スコア等のリソース
+	.init_resource::<MapInfo>()								// マップ情報のリソース
 	//----------------------------------------------------------------------------------------------
 	.add_startup_system( spawn_camera )						// bevyのカメラ設置
 	.add_system( handle_esc_key_for_pause )					// [Esc]でpause処理
 	//----------------------------------------------------------------------------------------------
 	.add_plugin( PluginFetchAssets )
 	.add_plugin( PluginUi )
-	// .add_plugin( PluginDemoPlay )
-	// .add_plugin( PluginGamePlay )
+	.add_plugin( PluginGamePlay )
+	.add_plugin( PluginDemoPlay )
 	//----------------------------------------------------------------------------------------------
 	;
 

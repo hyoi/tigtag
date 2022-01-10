@@ -16,6 +16,7 @@ const CHASER_ROTATE_COEF: f32 = 90. / CHASER_WAIT;
 use super::util::Direction;
 
 //スプライト識別用Component
+#[ derive( Component ) ]
 pub struct Chaser
 {	pub grid_position: ( usize, usize ),
 	pub pixel_position: ( f32, f32 ),
@@ -93,7 +94,7 @@ pub fn move_sprite_chaser
 	time    : Res<Time>
 )
 {	let time_delta = time.delta();
-	let player = q_player.single().unwrap();
+	let player = q_player.get_single().unwrap();
 
 	//ループして追手を処理する
 	q_chaser.for_each_mut
@@ -233,13 +234,16 @@ fn sprite_chaser
 	color: Color,
 	color_matl: &mut ResMut<Assets<ColorMaterial>>,
 ) -> SpriteBundle
-{	let locate   = Vec3::new( x, y, SPRITE_CHASER_DEPTH );
+{	let position = Vec3::new( x, y, SPRITE_CHASER_DEPTH );
 	let square   = Vec2::new( SPRITE_CHASER_PIXEL, SPRITE_CHASER_PIXEL );
 
 	let mut sprite = SpriteBundle
-	{	material : color_matl.add( color.into() ),
-		transform: Transform::from_translation( locate ),
-		sprite   : Sprite::new( square ),
+	{	transform: Transform::from_translation( position ),
+		sprite   : Sprite
+		{	color: color.into(),
+			custom_size: Some( square ),
+			..Default::default()
+		},
 		..Default::default()
 	};
 

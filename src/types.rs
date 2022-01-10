@@ -16,4 +16,24 @@ impl Default for Record
 	}
 }
 
+//Resource Map
+pub struct MapInfo
+{	pub array: [ [ MapObj; MAP_HEIGHT ]; MAP_WIDTH ],
+	pub count_dots: usize,
+}
+impl Default for MapInfo
+{	fn default() -> Self
+	{	Self
+		{	array: [ [ MapObj::Space; MAP_HEIGHT ]; MAP_WIDTH ],
+			count_dots: 0,
+		}
+	}
+}
+#[derive(Copy,Clone,PartialEq)]
+pub enum MapObj
+{	Space,
+	Dot ( Option<Entity> ),
+	Wall,
+}
+
 //End of code.

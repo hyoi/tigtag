@@ -14,6 +14,7 @@ const PLAYER_MOVE_COEF: f32 = PIXEL_PER_GRID / PLAYER_WAIT;
 use super::util::Direction;
 
 //スプライト識別用Component
+#[ derive( Component ) ]
 pub struct Player
 {	pub grid_position  : ( usize, usize ),
 	pub pixel_position: ( f32, f32 ),
@@ -71,7 +72,7 @@ pub fn move_sprite_player
 )
 {	let is_demoplay = matches!( state.current(), GameState::DemoPlay );
 
-	let ( mut player, mut transform ) = q_player.single_mut().unwrap();
+	let ( mut player, mut transform ) = q_player.get_single_mut().unwrap();
 	let ( mut grid_x, mut grid_y ) = player.grid_position;
 
 	let time_delta = time.delta();
@@ -188,19 +189,15 @@ fn sprite_player
 (	( x, y ): ( f32, f32 ),
 	_color_matl: &mut ResMut<Assets<ColorMaterial>>,
 ) -> ShapeBundle
-{	let position = Vec3::new( x, y, SPRITE_PLAYER_DEPTH );
-	let triangle = &shapes::RegularPolygon
+{	let triangle = &shapes::RegularPolygon
 	{	sides: 3,
 		feature: shapes::RegularPolygonFeature::Radius( SPRITE_PLAYER_PIXEL ),
 		..shapes::RegularPolygon::default()
 	};
+	let drawmode  = DrawMode::Fill( FillMode { options: FillOptions::default(), color: SPRITE_PLAYER_COLOR } );
+	let transform = Transform::from_translation( Vec3::new( x, y, SPRITE_PLAYER_DEPTH ) );
 
-	GeometryBuilder::build_as
-	(	triangle,
-		ShapeColors::new( SPRITE_PLAYER_COLOR ),
-		DrawMode::Fill( FillOptions::default() ),
-		Transform::from_translation( position )
-	)
+	GeometryBuilder::build_as( triangle, drawmode, transform )
 }
 /*//WASM
 #[cfg(target_arch = "wasm32")]
