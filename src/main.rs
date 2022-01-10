@@ -5,13 +5,15 @@ use rand::prelude::*;
 
 //internal modules
 mod consts;
-// mod fetch_assets;
+mod util;
+mod fetch_assets;
 // mod ui;
 // mod demoplay;
 // mod gameplay;
 
 use consts::*;
-// use fetch_assets::*;
+use util::*;
+use fetch_assets::*;
 // use ui::*;
 // use demoplay::*;
 // use gameplay::*;
@@ -81,7 +83,7 @@ fn main()
 	.add_startup_system( spawn_camera )					// bevyのカメラ設置
 	.add_system( handle_esc_key_for_pause )				// [Esc]でpause処理
 	//----------------------------------------------------------------------------------------------
-	// .add_plugin( PluginFetchAssets )
+	.add_plugin( PluginFetchAssets )
 	// .add_plugin( PluginUi )
 	// .add_plugin( PluginDemoPlay )
 	// .add_plugin( PluginGamePlay )

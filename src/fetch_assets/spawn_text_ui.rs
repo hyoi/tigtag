@@ -1,96 +1,5 @@
 use super::*;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//定義と定数
-
-type MessageSect<'a> = ( &'a str, &'a str, f32, Color );
-
-//中央
-pub struct MessageDemo;
-const MESSAGE_DEMO: [ MessageSect; 4 ] =
-[	( "TigTag\n\n"    , FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 3.5, Color::rgb_linear( 0.3, 1.0, 0.1 ) ),
-	( "D E M O\n\n"   , FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 1.0, Color::YELLOW ),
-	( "Game Start\n\n", FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 1.0, Color::CYAN   ),
-	( "Hit SPACE Key" , FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 1.0, Color::CYAN   ),
-];
-
-pub struct MessageStart
-{	pub count: usize,
-	pub timer: Timer,
-}
-const MESSAGE_START: [ MessageSect; 1 ] =
-[	( "", FONT_ORBITRON_BLACK, PIXEL_PER_GRID * 4.0, Color::CYAN ),
-];
-pub const COUNTDOWN_TEXT: [ &str; 4 ] = [ "Go!", "Ready...\n1", "Ready...\n2", "Ready...\n3" ];
-
-pub struct MessageClear
-{	pub count: usize,
-	pub timer: Timer,
-}
-const MESSAGE_CLEAR: [ MessageSect; 3 ] =
-[	( "Clear!!"            , FONT_ORBITRON_BLACK      , PIXEL_PER_GRID * 6.0, Color::YELLOW ),
-	( "\nNext stage...\n\n", FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 2.0, Color::WHITE  ),
-	( ""                   , FONT_ORBITRON_BLACK      , PIXEL_PER_GRID * 4.0, Color::WHITE  ),
-];
-pub const GAMECLEAR_COUNTDOWN: usize = 5;
-
-pub struct MessageOver
-{	pub count: usize,
-	pub timer: Timer,
-}
-const MESSAGE_OVER: [ MessageSect; 3 ] =
-[	( "GameOver"                      , FONT_REGGAEONE_REGULAR   , PIXEL_PER_GRID * 6.0, Color::RED    ),
-	( "\n\nReplay?\n\nHit SPACE Key\n", FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 1.0, Color::YELLOW ),
-	( ""                              , FONT_ORBITRON_BLACK      , PIXEL_PER_GRID * 4.0, Color::CYAN   ),
-];
-pub const GAMEOVER_COUNTDOWN: usize = 10;
-
-pub struct MessagePause;
-const MESSAGE_PAUSE: [ MessageSect; 1 ] =
-[	( "P A U S E", FONT_ORBITRON_BLACK, PIXEL_PER_GRID * 4.0, Color::WHITE ),
-];
-
-//上端
-pub struct UiUpperLeft;
-const UI_UPPER_LEFT: [ MessageSect; 2 ] =
-[	( "STAGE", FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 0.5, Color::ORANGE ),
-	( ""     , FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 0.9, Color::WHITE  ),
-];
-
-pub struct UiUpperCenter;
-const UI_UPPER_CENTER: [ MessageSect; 2 ] =
-[	( "YOUR", FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 0.5, Color::ORANGE ),
-	( ""    , FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 0.9, Color::WHITE  ),
-//	( ""    , FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 0.4, Color::SILVER ),
-];
-
-pub struct UiUpperRight;
-const UI_UPPER_RIGHT: [ MessageSect; 2 ] =
-[	( "HIGH", FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 0.5, Color::ORANGE ),
-	( ""    , FONT_PRESSSTART2P_REGULAR, PIXEL_PER_GRID * 0.9, Color::WHITE  ),
-];
-
-//下端
-pub struct UiLowerLeft;
-const UI_LOWER_LEFT: [ MessageSect; 2 ] =
-[	( "FPS", FONT_REGGAEONE_REGULAR, PIXEL_PER_GRID * 1.0, Color::ORANGE ),
-	( ""   , FONT_REGGAEONE_REGULAR, PIXEL_PER_GRID * 1.4, Color::WHITE  ),
-];
-
-pub struct UiLowerCenter;
-const UI_LOWER_CENTER: [ MessageSect; 0 ] =
-[//	( "鬼ごっこ", FONT_REGGAEONE_REGULAR, PIXEL_PER_GRID * 2.0, Color::WHITE  ),
-//	( APP_TITLE, FONT_REGGAEONE_REGULAR, PIXEL_PER_GRID * 1.0, Color::ORANGE ),
-];
-
-pub struct UiLowerRight;
-const UI_LOWER_RIGHT: [ MessageSect; 1 ] =
-[	( "2021 hyoi", FONT_REGGAEONE_REGULAR, PIXEL_PER_GRID * 0.7, Color::WHITE ),
-];
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 //テキストUIを配置する
 pub fn spawn_text_ui_message( mut cmds: Commands, asset_svr: Res<AssetServer> )
 {	//中央に表示するtext
@@ -101,11 +10,11 @@ pub fn spawn_text_ui_message( mut cmds: Commands, asset_svr: Res<AssetServer> )
 	let mut pause_text = text_messsage( &MESSAGE_PAUSE, &asset_svr );
 
 	//初期は非表示
-	demo_text.visible.is_visible  = false;
-	start_text.visible.is_visible = false;
-	clear_text.visible.is_visible = false;
-	over_text.visible.is_visible  = false;
-	pause_text.visible.is_visible = false;
+	demo_text.visibility.is_visible  = false;
+	start_text.visibility.is_visible = false;
+	clear_text.visibility.is_visible = false;
+	over_text.visibility.is_visible  = false;
+	pause_text.visibility.is_visible = false;
 
 	//上端・下端に表示するtext
 	let mut ui_upper_left   = text_messsage( &UI_UPPER_LEFT  , &asset_svr );
@@ -186,8 +95,8 @@ fn hidden_frame_for_centering() -> NodeBundle
 		align_items    : AlignItems::Center,
 		..Default::default()
 	};
-	let visible = Visible { is_visible: false, ..Default::default() };
-	NodeBundle { style, visible, ..Default::default() }
+	let visibility = Visibility { is_visible: false, ..Default::default() };
+	NodeBundle { style, visibility, ..Default::default() }
 }
 
 //上端幅合せ用の隠しフレーム
@@ -199,8 +108,8 @@ fn hidden_upper_frame() -> NodeBundle
 		justify_content: JustifyContent::FlexEnd, //画面の上端
 		..Default::default()
 	};
-	let visible = Visible { is_visible: false, ..Default::default() };
-	NodeBundle { style, visible, ..Default::default() }
+	let visibility = Visibility { is_visible: false, ..Default::default() };
+	NodeBundle { style, visibility, ..Default::default() }
 }
 
 //下端幅合せ用の隠しフレーム
@@ -212,8 +121,8 @@ fn hidden_lower_frame() -> NodeBundle
 		justify_content: JustifyContent::FlexStart, //画面の下端
 		..Default::default()
 	};
-	let visible = Visible { is_visible: false, ..Default::default() };
-	NodeBundle { style, visible, ..Default::default() }
+	let visibility = Visibility { is_visible: false, ..Default::default() };
+	NodeBundle { style, visibility, ..Default::default() }
 }
 
 //End of code.
