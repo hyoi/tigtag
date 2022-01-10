@@ -4,17 +4,19 @@ use bevy_prototype_lyon::{ prelude::*, entity::ShapeBundle };
 use rand::prelude::*;
 
 //internal modules
+mod types;
 mod consts;
 mod util;
 mod fetch_assets;
-// mod ui;
+mod ui;
 // mod demoplay;
 // mod gameplay;
 
+use types::*;
 use consts::*;
 use util::*;
 use fetch_assets::*;
-// use ui::*;
+use ui::*;
 // use demoplay::*;
 // use gameplay::*;
 
@@ -69,22 +71,23 @@ fn main()
 	let mut app = App::new();
 	app
 	//----------------------------------------------------------------------------------------------
-	.insert_resource( main_window )									// メインウィンドウ
-	.insert_resource( ClearColor( SCREEN_BGCOLOR ) )				// 背景色
-	.insert_resource( Msaa { samples: 4 } )							// アンチエイリアス
+	.insert_resource( main_window )							// メインウィンドウ
+	.insert_resource( ClearColor( SCREEN_BGCOLOR ) )		// 背景色
+	.insert_resource( Msaa { samples: 4 } )					// アンチエイリアス
 	//----------------------------------------------------------------------------------------------
-	.add_plugins( DefaultPlugins )									// デフォルトプラグイン
-	.add_plugin( FrameTimeDiagnosticsPlugin::default() )			// fps計測のプラグイン
-	.add_plugin( ShapePlugin )										// bevy_prototype_lyon
+	.add_plugins( DefaultPlugins )							// デフォルトプラグイン
+	.add_plugin( FrameTimeDiagnosticsPlugin::default() )	// fps計測のプラグイン
+	.add_plugin( ShapePlugin )								// bevy_prototype_lyon
 	//----------------------------------------------------------------------------------------------
-	.add_state( GameState::Init )									// 状態遷移の初期値
-	.add_event::<GameState>()										// 状態遷移のイベント
+	.add_state( GameState::Init )							// 状態遷移の初期値
+	.add_event::<GameState>()								// 状態遷移のイベント
+	.init_resource::<Record>()								// スコア等のリソース
 	//----------------------------------------------------------------------------------------------
-	.add_startup_system( spawn_camera )					// bevyのカメラ設置
-	.add_system( handle_esc_key_for_pause )				// [Esc]でpause処理
+	.add_startup_system( spawn_camera )						// bevyのカメラ設置
+	.add_system( handle_esc_key_for_pause )					// [Esc]でpause処理
 	//----------------------------------------------------------------------------------------------
 	.add_plugin( PluginFetchAssets )
-	// .add_plugin( PluginUi )
+	.add_plugin( PluginUi )
 	// .add_plugin( PluginDemoPlay )
 	// .add_plugin( PluginGamePlay )
 	//----------------------------------------------------------------------------------------------
