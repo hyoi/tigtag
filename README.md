@@ -9,13 +9,14 @@ Note: Japanese text only.
 カーソルキーで上下左右に移動。Escで一時停止。   
 スペースキーでゲーム開始など。  
 Alt＋Enterでフルスクリーンとウインドウモード切替（Not WASM版）。
-## WASM版
-https://hyoi.github.io/tigtag/
+## ~~WASM版~~
+まだ正常に動きませんでした‥‥  
+~~https://hyoi.github.io/tigtag/~~
 ## Rustのコンパイル版
 ```
 cargo run --release    
 ```
-WASM版 (brvy0.6からbevy_webgl2に頼らなくても良くなりました)
+~~WASM版 (brvy0.6からbevy_webgl2に頼らなくても良くなりました)~~
 ```
 cargo build --target wasm32-unknown-unknown
 ```
