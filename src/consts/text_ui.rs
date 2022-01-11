@@ -104,7 +104,7 @@ pub const UI_LOWER_CENTER: [ MessageSect; 0 ] =
 #[ derive( Component ) ]
 pub struct UiLowerRight;
 pub const UI_LOWER_RIGHT: [ MessageSect; 1 ] =
-[	( "2021 hyoi", FONT_REGGAEONE_REGULAR, PIXEL_PER_GRID * 0.7, Color::WHITE ),
+[	( "powered by Bevy0.6 / 2021 hyoi", FONT_REGGAEONE_REGULAR, PIXEL_PER_GRID * 0.7, Color::WHITE ),
 ];
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
