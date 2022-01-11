@@ -53,7 +53,7 @@ impl Plugin for PluginGamePlay
 		.add_system_set											// ＜GameState::GamePlay＞
 		(	SystemSet::on_update( GameState::GamePlay )			// ＜on_update()＞
 				.before( Label::MoveSpriteCharacters )			// ＜before＞
-//				.with_system( detect_score_and_collision )		// クリア⇒GameClear、衝突⇒GameOver
+				.with_system( detect_score_and_collision )		// クリア⇒GameClear、衝突⇒GameOver
 		)
 		.add_system_set											// ＜GameState::GamePlay＞
 		(	SystemSet::on_update( GameState::GamePlay )			// ＜on_update()＞
@@ -102,7 +102,7 @@ impl Plugin for PluginGamePlay
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
+
 //得点と衝突を判定する。クリアならGameClearへ、衝突ならGameOverへ遷移する
 pub fn detect_score_and_collision
 (	mut q_set: QuerySet
@@ -117,7 +117,8 @@ pub fn detect_score_and_collision
 {	let is_demoplay = matches!( state.current(), GameState::DemoPlay );
 
 	//自機のgrid座標のオブジェクトがドットなら
-	let ( mut player, mut transform ) = q_set.q0().iter_mut().next().unwrap();
+	let mut q0 = q_set.q0();
+	let ( mut player, mut transform ) = q0.iter_mut().next().unwrap();
 	let ( p_grid_x, p_grid_y ) = player.grid_position;
 	if let MapObj::Dot( opt_dot ) = map.array[ p_grid_x ][ p_grid_y ]
 	{	//得点処理
@@ -188,7 +189,8 @@ pub fn detect_score_and_collision
 
 			//playerが移動中にchaserに衝突したなら
 			if ! p_stop
-			{	let ( mut player, mut transform ) = q_set.q0().iter_mut().next().unwrap();
+			{	let mut q0 = q_set.q0();
+				let ( mut player, mut transform ) = q0.iter_mut().next().unwrap();
 				player.stop = true;
 				let position = &mut transform.translation;
 				position.x = c_new_xf32;
@@ -223,7 +225,7 @@ pub fn detect_score_and_collision
 		let _ = state.overwrite_set( next );
 	}
 }
-*/
+
 //SPACEキーが入力されたらGameStartへ遷移する
 pub fn change_state_gamestart_by_key
 (	mut inkey: ResMut<Input<KeyCode>>,

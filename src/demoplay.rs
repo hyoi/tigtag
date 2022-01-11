@@ -36,7 +36,7 @@ impl Plugin for PluginDemoPlay
 		.add_system_set											// ＜GameState::DemoPlay＞
 		(	SystemSet::on_update( GameState::DemoPlay )			// ＜on_update()＞
 				.before( Label::MoveSpriteCharacters )			// ＜before＞
-//				.with_system( detect_score_and_collision )		// クリア⇒DemoLoop、衝突⇒DemoLoop
+				.with_system( detect_score_and_collision )		// クリア⇒DemoLoop、衝突⇒DemoLoop
 		)
 		.add_system_set											// ＜GameState::DemoPlay＞
 		(	SystemSet::on_update( GameState::DemoPlay )			// ＜on_update()＞
