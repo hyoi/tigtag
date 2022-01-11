@@ -8,27 +8,27 @@ pub use spawn_text_ui::*;
 //Pluginの手続き
 pub struct PluginFetchAssets;
 impl Plugin for PluginFetchAssets
-{	fn build( &self, app: &mut AppBuilder )
+{	fn build( &self, app: &mut App )
 	{	app
 		//------------------------------------------------------------------------------------------
-		.add_system_set													// ＜GameState::Init＞
-		(	SystemSet::on_enter( GameState::Init )						// ＜on_enter()＞
-				.with_system( start_fetching_assets.system() )			// Assetの事前ロード開始
-				.with_system( spawn_preload_anime_tile.system() )		// ローディングアニメ用スプライトの生成
+		.add_system_set											// ＜GameState::Init＞
+		(	SystemSet::on_enter( GameState::Init )				// ＜on_enter()＞
+				.with_system( start_fetching_assets )			// Assetの事前ロード開始
+				.with_system( spawn_preload_anime_tile )		// ローディングアニメ用スプライトの生成
 		)
-		.add_system_set													// ＜GameState::Init＞
-		(	SystemSet::on_update( GameState::Init )						// ＜on_update()＞
-				.with_system( change_state_after_loading.system() )		// ロード完了⇒GameState::DemoStartへ
-				.with_system( move_preload_anime_tile.system() )		// ローディングアニメ
+		.add_system_set											// ＜GameState::Init＞
+		(	SystemSet::on_update( GameState::Init )				// ＜on_update()＞
+				.with_system( change_state_after_loading )		// ロード完了⇒GameState::DemoStartへ
+				.with_system( move_preload_anime_tile )			// ローディングアニメ
 		)
-		.add_system_set													// ＜GameState::Init＞
-		(	SystemSet::on_exit( GameState::Init )						// ＜on_exit()＞
-				.with_system( despawn_preloading_anime_tile.system() )	// ローディングアニメ用スプライトの削除
+		.add_system_set											// ＜GameState::Init＞
+		(	SystemSet::on_exit( GameState::Init )				// ＜on_exit()＞
+				.with_system( despawn_preloading_anime_tile )	// ローディングアニメ用スプライトの削除
 		)
 		//------------------------------------------------------------------------------------------
-		.add_system_set													// ＜GameState::Init＞
-		(	SystemSet::on_exit( GameState::Init )						// ＜on_exit()＞
-				.with_system( spawn_text_ui_message.system() )			// assetesプリロード後にUIを非表示で生成
+		.add_system_set											// ＜GameState::Init＞
+		(	SystemSet::on_exit( GameState::Init )				// ＜on_exit()＞
+				.with_system( spawn_text_ui_message )			// assetesプリロード後にUIを非表示で生成
 		)
 		//------------------------------------------------------------------------------------------
 		;
@@ -38,12 +38,6 @@ impl Plugin for PluginFetchAssets
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //定義と定数
-
-//事前ロード対象のAsset
-pub const FONT_PRESSSTART2P_REGULAR: &str = "fonts/PressStart2P-Regular.ttf";
-pub const FONT_ORBITRON_BLACK	   : &str = "fonts/Orbitron-Black.ttf";
-pub const FONT_REGGAEONE_REGULAR   : &str = "fonts/ReggaeOne-Regular.ttf";
-pub const IMAGE_SPRITE_WALL		   : &str = "sprites/wall.png";
 
 const FETCH_ASSETS: [ &str; 4 ] =
 [	FONT_PRESSSTART2P_REGULAR,
@@ -74,6 +68,7 @@ const PRELOADING_MESSAGE_ARRAY: [ &str; 13 ] =
 ];
 
 //スプライト識別用Component
+#[ derive( Component ) ]
 struct PreloadingAnimeTile ( usize, usize );
 
 //タイルのスプライト
@@ -121,7 +116,6 @@ fn change_state_after_loading
 //ローディングアニメ用スプライトを生成する
 fn spawn_preload_anime_tile
 (	mut cmds: Commands,
-	mut color_matl: ResMut<Assets<ColorMaterial>>,
 )
 {	let mut rng = rand::thread_rng();
 
@@ -134,7 +128,7 @@ fn spawn_preload_anime_tile
 			let y  = rng.gen_range( 0..MAP_HEIGHT );
 			let xy = conv_sprite_coordinates( x, y );
 
-			cmds.spawn_bundle( sprite_preloading_anime_tile( xy, &mut color_matl ) )
+			cmds.spawn_bundle( sprite_preloading_anime_tile( xy ) )
 				.insert( PreloadingAnimeTile ( grid_x, grid_y ) );
 		} 
 	}
@@ -142,7 +136,7 @@ fn spawn_preload_anime_tile
 
 //スプライトを動かしてローディングアニメを見せる
 fn move_preload_anime_tile
-(	q: Query<( &mut Transform, &PreloadingAnimeTile )>,
+(	mut q: Query<( &mut Transform, &PreloadingAnimeTile )>,
 	time: Res<Time>,
 )
 {	let time_delta = time.delta().as_secs_f32() * 5.0;
@@ -177,17 +171,18 @@ fn despawn_preloading_anime_tile
 //ローディングアニメ用スプライトのバンドルを生成
 fn sprite_preloading_anime_tile
 (	( x, y ): ( f32, f32 ),
-	color_matl: &mut ResMut<Assets<ColorMaterial>>,
 ) -> SpriteBundle
 {	let position = Vec3::new( x, y, SPRITE_TILE_DEPTH );
 	let square   = Vec2::new( SPRITE_TILE_PIXEL, SPRITE_TILE_PIXEL );
 
-	SpriteBundle
-	{	material : color_matl.add( SPRITE_TILE_COLOR.into() ),
-		transform: Transform::from_translation( position ),
-		sprite   : Sprite::new( square ),
+	let transform = Transform::from_translation( position );
+	let sprite    = Sprite
+	{	color: SPRITE_TILE_COLOR,
+		custom_size: Some( square ),
 		..Default::default()
-	}
+	};
+
+	SpriteBundle { transform, sprite, ..Default::default() }
 }
 
 //End of code.

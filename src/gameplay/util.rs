@@ -4,21 +4,21 @@ use super::*;
 
 //定義と定数
 
-//Resource Score
-pub struct Record
-{	pub score	  : usize,
-	pub high_score: usize,
-	pub stage	  : usize,
-}
-impl Default for Record
-{	fn default() -> Self
-	{	Self
-		{	score	  : 0,
-			high_score: 0,
-			stage	  : 1,
-		}
-	}
-}
+// //Resource Score
+// pub struct Record
+// {	pub score	  : usize,
+// 	pub high_score: usize,
+// 	pub stage	  : usize,
+// }
+// impl Default for Record
+// {	fn default() -> Self
+// 	{	Self
+// 		{	score	  : 0,
+// 			high_score: 0,
+// 			stage	  : 1,
+// 		}
+// 	}
+// }
 
 //向きを表す列挙型
 #[derive(Clone,Copy,PartialEq)]

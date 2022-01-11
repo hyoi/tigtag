@@ -16,6 +16,7 @@ const CHASER_ROTATE_COEF: f32 = 90. / CHASER_WAIT;
 use super::util::Direction;
 
 //スプライト識別用Component
+#[ derive( Component ) ]
 pub struct Chaser
 {	pub grid_position: ( usize, usize ),
 	pub pixel_position: ( f32, f32 ),
@@ -56,7 +57,6 @@ pub fn spawn_sprite_chasers
 (	q: Query<Entity, With<Chaser>>,
 	record: Res<Record>,
 	mut cmds: Commands,
-	mut color_matl: ResMut<Assets<ColorMaterial>>,
 )
 {	//スプライトが居れば削除する
 	q.for_each( | id | cmds.entity( id ).despawn() );
@@ -78,7 +78,7 @@ pub fn spawn_sprite_chasers
 			color,
 			speedup: 1.,
 		};
-		let sprite = sprite_chaser( chaser.pixel_position, color, &mut color_matl );
+		let sprite = sprite_chaser( chaser.pixel_position, color );
 		cmds.spawn_bundle( sprite ).insert( chaser );
 	} );
 }
@@ -93,7 +93,7 @@ pub fn move_sprite_chaser
 	time    : Res<Time>
 )
 {	let time_delta = time.delta();
-	let player = q_player.single().unwrap();
+	let player = q_player.get_single().unwrap();
 
 	//ループして追手を処理する
 	q_chaser.for_each_mut
@@ -231,17 +231,14 @@ fn decide_direction
 fn sprite_chaser
 (	( x, y ): ( f32, f32 ),
 	color: Color,
-	color_matl: &mut ResMut<Assets<ColorMaterial>>,
 ) -> SpriteBundle
-{	let locate   = Vec3::new( x, y, SPRITE_CHASER_DEPTH );
+{	let position = Vec3::new( x, y, SPRITE_CHASER_DEPTH );
 	let square   = Vec2::new( SPRITE_CHASER_PIXEL, SPRITE_CHASER_PIXEL );
 
-	let mut sprite = SpriteBundle
-	{	material : color_matl.add( color.into() ),
-		transform: Transform::from_translation( locate ),
-		sprite   : Sprite::new( square ),
-		..Default::default()
-	};
+	let transform = Transform::from_translation( position );
+	let sprite = Sprite { color, custom_size: Some( square ), ..Default::default() };
+
+	let mut sprite = SpriteBundle { transform, sprite, ..Default::default() };
 
 	//45°傾けて菱形に見せる
 	let quat = Quat::from_rotation_z( 45_f32.to_radians() );

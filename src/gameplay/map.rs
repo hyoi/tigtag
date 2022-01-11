@@ -4,31 +4,32 @@ use super::*;
 
 //定義と定数
 
-//マップの縦横のマス数
-pub const MAP_WIDTH : usize = 31; //43, 31, 25
-pub const MAP_HEIGHT: usize = 21; //21, 21, 17
+// //マップの縦横のマス数
+// pub const MAP_WIDTH : usize = 31; //43, 31, 25
+// pub const MAP_HEIGHT: usize = 21; //21, 21, 17
 
-//マップ情報
-pub struct MapInfo
-{	pub array: [ [ MapObj; MAP_HEIGHT ]; MAP_WIDTH ],
-	pub count_dots: usize,
-}
-impl Default for MapInfo
-{	fn default() -> Self
-	{	Self
-		{	array: [ [ MapObj::Space; MAP_HEIGHT ]; MAP_WIDTH ],
-			count_dots: 0,
-		}
-	}
-}
-#[derive(Copy,Clone,PartialEq)]
-pub enum MapObj
-{	Space,
-	Dot ( Option<Entity> ),
-	Wall,
-}
+// //マップ情報
+// pub struct MapInfo
+// {	pub array: [ [ MapObj; MAP_HEIGHT ]; MAP_WIDTH ],
+// 	pub count_dots: usize,
+// }
+// impl Default for MapInfo
+// {	fn default() -> Self
+// 	{	Self
+// 		{	array: [ [ MapObj::Space; MAP_HEIGHT ]; MAP_WIDTH ],
+// 			count_dots: 0,
+// 		}
+// 	}
+// }
+// #[derive(Copy,Clone,PartialEq)]
+// pub enum MapObj
+// {	Space,
+// 	Dot ( Option<Entity> ),
+// 	Wall,
+// }
 
 //スプライト識別用Component
+#[ derive( Component ) ]
 pub struct SpriteMap;
 
 //マップのスプライト
@@ -66,7 +67,7 @@ pub fn spawn_sprite_new_map
 					MapObj::Dot( Some( id ) )
 				},
 				MapObj::Wall =>
-				{	cmds.spawn_bundle( sprite_wall( ( x, y ), &mut color_matl, &asset_svr ) )
+				{	cmds.spawn_bundle( sprite_wall( ( x, y ), &asset_svr ) )
 						.insert( SpriteMap );
 					MapObj::Wall
 				},
@@ -146,19 +147,16 @@ fn make_new_maze( map: &mut ResMut<MapInfo> )
 //壁用のスプライトバンドルを生成
 fn sprite_wall
 (	( x, y ): ( f32, f32 ),
-	color_matl: &mut ResMut<Assets<ColorMaterial>>,
 	asset_svr: &Res<AssetServer>,
 ) -> SpriteBundle
-{	let texture_handle = asset_svr.load( IMAGE_SPRITE_WALL ).into();
-	let position = Vec3::new( x, y, SPRITE_MAP_DEPTH );
+{	let position = Vec3::new( x, y, SPRITE_MAP_DEPTH );
 	let square   = Vec2::new( SPRITE_WALL_PIXEL, SPRITE_WALL_PIXEL );
 
-	SpriteBundle
-	{	material : color_matl.add( texture_handle ),
-		transform: Transform::from_translation( position ),
-		sprite   : Sprite::new( square ),
-		..Default::default()
-	}
+	let texture   = asset_svr.load( IMAGE_SPRITE_WALL );
+	let transform = Transform::from_translation( position );
+	let sprite    = Sprite { custom_size: Some( square ), ..Default::default() };
+
+	SpriteBundle { texture, transform, sprite, ..Default::default() }
 }
 
 //ドット用のスプライトバンドルを生成
@@ -168,15 +166,11 @@ fn sprite_dot
 (	( x, y ): ( f32, f32 ),
 	_color_matl: &mut ResMut<Assets<ColorMaterial>>,
 ) -> ShapeBundle
-{	let position = Vec3::new( x, y, SPRITE_MAP_DEPTH );
+{	let circle    = &shapes::Circle { radius: SPRITE_DOT_RAIDUS, ..shapes::Circle::default() };
+	let drawmode  = DrawMode::Fill( FillMode { options: FillOptions::default(), color: SPRITE_DOT_COLOR } );
+	let transform = Transform::from_translation( Vec3::new( x, y, SPRITE_MAP_DEPTH ) );
 
-	let circle = &shapes::Circle { radius: SPRITE_DOT_RAIDUS, ..shapes::Circle::default() };
-	GeometryBuilder::build_as
-	(	circle,
-		ShapeColors::new( SPRITE_DOT_COLOR ),
-		DrawMode::Fill( FillOptions::default() ),
-		Transform::from_translation( position ),
-	)
+	GeometryBuilder::build_as( circle, drawmode, transform )
 }
 /*//WASM
 #[cfg(target_arch = "wasm32")]
