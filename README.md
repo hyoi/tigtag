@@ -19,11 +19,11 @@ cargo run --release
 ```
 WASMの場合は、bevy 0.6 から bevy_webgl2 に頼らなくても良くなりました。
 ```
-cargo build --target wasm32-unknown-unknown
-wasm-bindgen --out-dir ./target --target web --no-typescript .\target\wasm32-unknown-unknown\release\tigtag.wasm
+cargo build --release --target wasm32-unknown-unknown
+wasm-bindgen --out-dir ./target --target web --no-typescript ./target/wasm32-unknown-unknown/release/tigtag.wasm
 ```
-※`wasm-bindgen`コマンドの各ディレクトリーは各自環境に合わせてください。   
-※WASMのコンパイルには事前にRustのtargetの追加とかwasm-bindgenのインストールとか必要です。たぶんきっとおそらく。  
+※`wasm-bindgen`コマンドの各ディレクトリーは作業環境に合わせてください。   
+※WASMのコンパイルには事前にRustのtargetの追加とwasm-bindgenのインストールが必要です。たぶんきっとおそらく。  
 ```
 rustup target install wasm32-unknown-unknown
 cargo install -f wasm-bindgen-cli
