@@ -5,22 +5,30 @@ Note: Japanese text only.
 逃げ回ってドットをすべて拾ったらステージクリアなゲーム。(よくあるヤツ)  
 昔のベーマガみたいなピコゲーを作りたかったのです。  
 逆襲なし、追手は重なるとスピードアップするマゾ仕様。
+## WASM版
+https://hyoi.github.io/tigtag/
 ## 操作方法
-カーソルキーで上下左右に移動。Escで一時停止。   
-スペースキーでゲーム開始など。  
-Alt＋Enterでフルスクリーンとウインドウモード切替（Not WASM版）。
-## ~~WASM版~~
-まだ正常に動きませんでした‥‥  
-~~https://hyoi.github.io/tigtag/~~
-## Rustのコンパイル版
+`⇧` `⇩` `⇦` `⇨` キーで上下左右に移動。   
+`Esc`キーで一時停止(Pause)。   
+`Space`キーでゲーム開始など。  
+`Alt`＋`Enter`でフルスクリーンとウインドウモード切替（デスクトップアプリ）。
+## コンパイル方法
+デスクトップアプリにするなら `cargo run`でOK。
 ```
 cargo run --release    
 ```
-~~WASM版 (brvy0.6からbevy_webgl2に頼らなくても良くなりました)~~
+WASMの場合は、bevy 0.6 から bevy_webgl2 に頼らなくても良くなりました。
 ```
 cargo build --target wasm32-unknown-unknown
+wasm-bindgen --out-dir ./target --target web --no-typescript .\target\wasm32-unknown-unknown\release\tigtag.wasm
 ```
-※事前にRustのtargetの追加とかwasm-bindgenとか必要です。たぶんきっとおそらく
+※`wasm-bindgen`コマンドの各ディレクトリーは各自環境に合わせてください。   
+※WASMのコンパイルには事前にRustのtargetの追加とかwasm-bindgenのインストールとか必要です。たぶんきっとおそらく。  
+```
+rustup target install wasm32-unknown-unknown
+cargo install -f wasm-bindgen-cli
+```
+　[Unofficial Bevy Cheat Book - 8.4. Browser (WebAssembly)](https://bevy-cheatbook.github.io/platforms/wasm.html)をご参考に。
 ## お世話になりました
 - [bevy](https://bevyengine.org/)と[その仲間たち](https://crates.io/search?q=bevy)
   - [bevy_prototype_lyon](https://github.com/Nilirad/bevy_prototype_lyon/)
