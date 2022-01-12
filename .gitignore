@@ -1,5 +1,6 @@
 /target/*
 /Cargo.lock
+/.cargo/*
 
 !/target/wasm_bg.wasm
 !/target/wasm.js
