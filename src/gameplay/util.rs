@@ -1,24 +1,6 @@
 use super::*;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 //定義と定数
-
-// //Resource Score
-// pub struct Record
-// {	pub score	  : usize,
-// 	pub high_score: usize,
-// 	pub stage	  : usize,
-// }
-// impl Default for Record
-// {	fn default() -> Self
-// 	{	Self
-// 		{	score	  : 0,
-// 			high_score: 0,
-// 			stage	  : 1,
-// 		}
-// 	}
-// }
 
 //向きを表す列挙型
 #[derive(Clone,Copy,PartialEq)]
@@ -44,13 +26,6 @@ pub fn clear_record( mut record: ResMut<Record> )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//二次元配列の添え字から画面座標を算出する
-pub fn conv_sprite_coordinates( x: usize, y: usize ) -> ( f32, f32 )
-{	let x = ( PIXEL_PER_GRID - SCREEN_WIDTH  ) / 2.0 + PIXEL_PER_GRID * x as f32;
-	let y = ( SCREEN_HEIGHT - PIXEL_PER_GRID ) / 2.0 - PIXEL_PER_GRID * y as f32 - PIXEL_PER_GRID;
-	( x, y )
-}
 
 //スプライトの位置をグリッドに合わせて更新する
 pub fn fit_pixel_position_to_grid( transform: &mut Transform, x: usize, y: usize ) -> ( f32, f32 )

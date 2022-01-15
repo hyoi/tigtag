@@ -1,9 +1,5 @@
 use super::*;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//定義と定数
-
 //移動ウェイト
 const CHASER_WAIT : f32 = 0.13;
 const CHASER_ACCEL: f32 = 0.4; //スピードアップの割増
@@ -16,7 +12,7 @@ const CHASER_ROTATE_COEF: f32 = 90. / CHASER_WAIT;
 use super::util::Direction;
 
 //スプライト識別用Component
-#[ derive( Component ) ]
+#[derive(Component)]
 pub struct Chaser
 {	pub grid_position: ( usize, usize ),
 	pub pixel_position: ( f32, f32 ),
@@ -228,23 +224,15 @@ fn decide_direction
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //追手のスプライトバンドルを生成
-fn sprite_chaser
-(	( x, y ): ( f32, f32 ),
-	color: Color,
-) -> SpriteBundle
+fn sprite_chaser( ( x, y ): ( f32, f32 ), color: Color ) -> SpriteBundle
 {	let position = Vec3::new( x, y, SPRITE_CHASER_DEPTH );
 	let square   = Vec2::new( SPRITE_CHASER_PIXEL, SPRITE_CHASER_PIXEL );
+	let quat     = Quat::from_rotation_z( 45_f32.to_radians() ); //45°傾ける
 
-	let transform = Transform::from_translation( position );
+	let transform = Transform::from_translation( position ).with_rotation( quat );
 	let sprite = Sprite { color, custom_size: Some( square ), ..Default::default() };
 
-	let mut sprite = SpriteBundle { transform, sprite, ..Default::default() };
-
-	//45°傾けて菱形に見せる
-	let quat = Quat::from_rotation_z( 45_f32.to_radians() );
-	sprite.transform.rotate( quat ); //.rotate()は()を返すのでメソッドチェーンできない
-
-	sprite
+	SpriteBundle { transform, sprite, ..Default::default() }
 }
 
 //End of code.

@@ -1,9 +1,5 @@
 use super::*;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//定義と定数
-
 //移動ウェイト
 const PLAYER_WAIT: f32 = 0.09;
 
@@ -14,7 +10,7 @@ const PLAYER_MOVE_COEF: f32 = PIXEL_PER_GRID / PLAYER_WAIT;
 use super::util::Direction;
 
 //スプライト識別用Component
-#[ derive( Component ) ]
+#[derive(Component)]
 pub struct Player
 {	pub grid_position  : ( usize, usize ),
 	pub pixel_position: ( f32, f32 ),
@@ -37,7 +33,6 @@ pub fn spawn_sprite_player
 (	q: Query<Entity, With<Player>>,
 	map: Res<MapInfo>,
 	mut cmds: Commands,
-	mut color_matl: ResMut<Assets<ColorMaterial>>,
 )
 {	//スプライトがあれば削除する
 	q.for_each( | id | cmds.entity( id ).despawn() );
@@ -56,7 +51,7 @@ pub fn spawn_sprite_player
 		wait: Timer::from_seconds( PLAYER_WAIT, false ),
 		stop: true,
 	};
-	let sprite = sprite_player( player.pixel_position, &mut color_matl );
+	let sprite = sprite_player( player.pixel_position );
 	cmds.spawn_bundle( sprite ).insert( player );
 }
 
@@ -183,12 +178,7 @@ pub fn move_sprite_player
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //自機のスプライトバンドルを生成
-//Native
-//#[cfg(not(target_arch = "wasm32"))]
-fn sprite_player
-(	( x, y ): ( f32, f32 ),
-	_color_matl: &mut ResMut<Assets<ColorMaterial>>,
-) -> ShapeBundle
+fn sprite_player( ( x, y ): ( f32, f32 ) ) -> ShapeBundle
 {	let triangle = &shapes::RegularPolygon
 	{	sides: 3,
 		feature: shapes::RegularPolygonFeature::Radius( SPRITE_PLAYER_PIXEL ),
@@ -199,22 +189,5 @@ fn sprite_player
 
 	GeometryBuilder::build_as( triangle, drawmode, transform )
 }
-/*//WASM
-#[cfg(target_arch = "wasm32")]
-fn sprite_player
-(	( x, y ): ( f32, f32 ),
-	color_matl: &mut ResMut<Assets<ColorMaterial>>,
-) -> SpriteBundle
-{	let position = Vec3::new( x, y, SPRITE_PLAYER_DEPTH );
-	let square = Vec2::new( SPRITE_PLAYER_PIXEL, SPRITE_PLAYER_PIXEL );
-
-	SpriteBundle
-	{	material : color_matl.add( SPRITE_PLAYER_COLOR.into() ),
-		transform: Transform::from_translation( position ),
-		sprite   : Sprite::new( square ),
-		..Default::default()
-	}
-}
-*/
 
 //End of code.
