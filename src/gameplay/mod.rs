@@ -1,31 +1,34 @@
 use super::*;
 
+//external modules
+use bevy_prototype_lyon::{ prelude::*, entity::ShapeBundle };
+use rand::prelude::*;
+
+//Sub module
 mod map;
 mod player;
 mod chasers;
 mod countdown_ui;
 mod util;
 
+//Re export
 pub use map::*;
 pub use player::*;
 pub use chasers::*;
 pub use countdown_ui::*;
 pub use util::*;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 //Pluginの手続き
 pub struct PluginGamePlay;
 impl Plugin for PluginGamePlay
 {	fn build( &self, app: &mut App )
 	{	app
-		//==========================================================================================
-//		.init_resource::<Record>()								// スコア等のリソース
-//		.init_resource::<MapInfo>()								// マップ情報のリソース
+		//------------------------------------------------------------------------------------------
+		.add_plugin( ShapePlugin )								// bevy_prototype_lyon
 		//==========================================================================================
 		.add_system_set											// ＜GameState::GameStart＞
 		(	SystemSet::on_enter( GameState::GameStart )			// ＜on_enter()＞
-				.with_system( show_message_start )				// スタートメッセージを表示する
+				.with_system( show_ui::<MessageStart> )			// スタートメッセージを表示する
 				.with_system( reset_gamestart_counter )			// カウントダウン用のカウンタークリア
 		)
 		.add_system_set											// ＜GameState::GameStart＞
@@ -47,7 +50,7 @@ impl Plugin for PluginGamePlay
 		//------------------------------------------------------------------------------------------
 		.add_system_set											// ＜GameState::GameStart＞
 		(	SystemSet::on_exit( GameState::GameStart )			// ＜on_exit()＞
-				.with_system( hide_message_start )				// スタートメッセージを隠す
+				.with_system( hide_ui::<MessageStart> )			// スタートメッセージを隠す
 		)
 		//==========================================================================================
 		.add_system_set											// ＜GameState::GamePlay＞
@@ -64,7 +67,7 @@ impl Plugin for PluginGamePlay
 		//==========================================================================================
 		.add_system_set											// ＜GameState::GameClear＞
 		(	SystemSet::on_enter( GameState::GameClear )			// ＜on_enter()＞
-				.with_system( show_message_clear )				// クリアメッセージを表示する
+				.with_system( show_ui::<MessageClear> )			// クリアメッセージを表示する
 				.with_system( reset_gameclear_counter )			// カウントダウン用のカウンタークリア
 		)
 		//------------------------------------------------------------------------------------------
@@ -75,13 +78,13 @@ impl Plugin for PluginGamePlay
 		//------------------------------------------------------------------------------------------
 		.add_system_set											// ＜GameState::Clear＞
 		(	SystemSet::on_exit( GameState::GameClear )			// ＜on_exit()＞
-				.with_system( hide_message_clear )				// クリアメッセージを隠す
+				.with_system( hide_ui::<MessageClear> )			// クリアメッセージを隠す
 				.with_system( increment_record )				// ステージを＋１する
 		)
 		//==========================================================================================
 		.add_system_set											// ＜GameState::GameOver＞
 		(	SystemSet::on_enter( GameState::GameOver )			// ＜on_enter()＞
-				.with_system( show_message_over )				// ゲームオーバーを表示する
+				.with_system( show_ui::<MessageOver> )			// ゲームオーバーを表示する
 				.with_system( reset_gameover_counter )			// カウントダウン用のカウンタークリア
 		)
 		//------------------------------------------------------------------------------------------
@@ -93,10 +96,10 @@ impl Plugin for PluginGamePlay
 		//------------------------------------------------------------------------------------------
 		.add_system_set											// ＜GameState::GameOver＞
 		(	SystemSet::on_exit( GameState::GameOver )			// ＜on_exit()＞
-				.with_system( hide_message_over )				// ゲームオーバーを隠す
+				.with_system( hide_ui::<MessageOver> )			// ゲームオーバーを隠す
 				.with_system( clear_record )					// スコアとステージを初期化
 		)
-		//==========================================================================================
+		//------------------------------------------------------------------------------------------
 		;
 	}
 }
@@ -196,13 +199,6 @@ pub fn detect_score_and_collision
 				position.x = c_new_xf32;
 				position.y = c_new_yf32;
 			}
-
-			// let p_grid = format!( "({}, {})", &p_grid_x, &p_grid_y );
-			// let c_grid = format!( "({}, {})", &c_grid_x, &c_grid_y );
-			// let p_pixel = format!( "S({}, {}) -> E({}, {})", &p_old_x, &p_old_y, &p_new_x, &p_new_y );
-			// let c_pixel = format!( "S({}, {}) -> E({}, {})", &c_old_x, &c_old_y, &c_new_x, &c_new_y );
-			// dbg!( p_grid, c_grid, p_pixel, c_pixel );
-			// println!();
 
 			break;	//QuerySetのmutable borrowに影響するので必要らしい
 		}

@@ -1,5 +1,26 @@
 use super::*;
 
+//ゲームの状態遷移
+#[derive(Clone,Copy,Debug,Eq,PartialEq,Hash)]
+pub enum GameState
+{	Init,
+	DemoStart,
+	DemoPlay,
+	DemoLoop,
+	GameStart,
+	GamePlay,
+	GameClear,
+	GameOver,
+	Pause,
+}
+
+//ECSのSystem Labels
+#[derive(Clone,Hash,Debug,Eq,PartialEq,SystemLabel)]
+pub enum Label
+{	GenerateMap,
+	MoveSpriteCharacters,
+}
+
 //Resource Score
 pub struct Record
 {	pub score	  : usize,

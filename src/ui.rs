@@ -37,7 +37,6 @@ fn update_ui_upper_center
 {	if let Ok( mut ui ) = q.get_single_mut()
 	{	let na = "-----".to_string();
 		ui.sections[ 1 ].value = o_record.map_or( na, | x | format!( "{:05}", x.score ) );
-//		ui.sections[ 2 ].value = format!( "/{:03}", map.count_dots );
 	}
 }
 
@@ -67,48 +66,6 @@ fn update_ui_lower_left
 		} else { na };
 		ui.sections[ 1 ].value = fps_avr;
 	}
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//タイトルを表示する
-pub fn show_message_demo( mut q: Query<&mut Visibility, With<MessageDemo>> )
-{	let _ = q.get_single_mut().map( | mut ui | ui.is_visible = true );
-}
-
-//タイトルを隠す
-pub fn hide_message_demo( mut q: Query<&mut Visibility, With<MessageDemo>> )
-{	let _ = q.get_single_mut().map( | mut ui | ui.is_visible = false );
-}
-
-//スタートメッセージを表示
-pub fn show_message_start( mut q: Query<&mut Visibility, With<MessageStart>> )
-{	let _ = q.get_single_mut().map( | mut ui | ui.is_visible = true );
-}
-
-//スタートメッセージを隠す
-pub fn hide_message_start( mut q: Query<&mut Visibility, With<MessageStart>> )
-{	let _ = q.get_single_mut().map( | mut ui | ui.is_visible = false );
-}
-
-//クリアメッセージを表示
-pub fn show_message_clear( mut q: Query<&mut Visibility, With<MessageClear>> )
-{	let _ = q.get_single_mut().map( | mut ui | ui.is_visible = true );
-}
-
-//クリアメッセージを隠す
-pub fn hide_message_clear( mut q: Query<&mut Visibility, With<MessageClear>> )
-{	let _ = q.get_single_mut().map( | mut ui | ui.is_visible = false );
-}
-
-//ゲームオーバーを表示
-pub fn show_message_over( mut q: Query<&mut Visibility, With<MessageOver>> )
-{	let _ = q.get_single_mut().map( | mut ui | ui.is_visible = true );
-}
-
-//ゲームオーバーを隠す
-pub fn hide_message_over( mut q: Query<&mut Visibility, With<MessageOver>> )
-{	let _ = q.get_single_mut().map( | mut ui | ui.is_visible = false );
 }
 
 //End of code.

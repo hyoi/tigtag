@@ -1,9 +1,7 @@
 use super::*;
 
 //ゲームスタートのカウンターを初期化する
-pub fn reset_gamestart_counter
-(	mut q: Query<&mut MessageStart>,
-)
+pub fn reset_gamestart_counter( mut q: Query<&mut MessageStart> )
 {	if let Ok( mut counter ) = q.get_single_mut()
 	{	counter.count = COUNTDOWN_TEXT.len();
 		counter.timer.reset();
@@ -38,9 +36,7 @@ pub fn change_state_gameplay_with_cd
 //--------------------------------------------------------------------------------------------------
 
 //ゲームクリアのカウンターを初期化する
-pub fn reset_gameclear_counter
-(	mut q: Query<&mut MessageClear>,
-)
+pub fn reset_gameclear_counter( mut q: Query<&mut MessageClear> )
 {	if let Ok( mut counter ) = q.get_single_mut()
 	{	counter.count = GAMECLEAR_COUNTDOWN + 1;
 		counter.timer.reset();
@@ -74,9 +70,7 @@ pub fn change_state_gamestart_with_cd
 //--------------------------------------------------------------------------------------------------
 
 //ゲームオーバーのカウンターを初期化する
-pub fn reset_gameover_counter
-(	mut q: Query<&mut MessageOver>,
-)
+pub fn reset_gameover_counter( mut q: Query<&mut MessageOver> )
 {	if let Ok( mut counter ) = q.get_single_mut()
 	{	counter.count = GAMEOVER_COUNTDOWN + 1;
 		counter.timer.reset();

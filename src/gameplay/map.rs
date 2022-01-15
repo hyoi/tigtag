@@ -1,35 +1,7 @@
 use super::*;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//定義と定数
-
-// //マップの縦横のマス数
-// pub const MAP_WIDTH : usize = 31; //43, 31, 25
-// pub const MAP_HEIGHT: usize = 21; //21, 21, 17
-
-// //マップ情報
-// pub struct MapInfo
-// {	pub array: [ [ MapObj; MAP_HEIGHT ]; MAP_WIDTH ],
-// 	pub count_dots: usize,
-// }
-// impl Default for MapInfo
-// {	fn default() -> Self
-// 	{	Self
-// 		{	array: [ [ MapObj::Space; MAP_HEIGHT ]; MAP_WIDTH ],
-// 			count_dots: 0,
-// 		}
-// 	}
-// }
-// #[derive(Copy,Clone,PartialEq)]
-// pub enum MapObj
-// {	Space,
-// 	Dot ( Option<Entity> ),
-// 	Wall,
-// }
-
 //スプライト識別用Component
-#[ derive( Component ) ]
+#[derive(Component)]
 pub struct SpriteMap;
 
 //マップのスプライト
@@ -46,7 +18,6 @@ pub fn spawn_sprite_new_map
 	mut map: ResMut<MapInfo>,
 	mut cmds: Commands,
 	asset_svr: Res<AssetServer>,
-	mut color_matl: ResMut<Assets<ColorMaterial>>,
 )
 {	//スプライトがあれば削除する
 	q.for_each( | id | cmds.entity( id ).despawn() );
@@ -54,21 +25,19 @@ pub fn spawn_sprite_new_map
 	//mapを初期化する
 	make_new_maze( &mut map );
 
-	//壁とドットのスプライトを配置する
+	//mapのスプライトを配置する
 	let mut count = 0;
 	for ( x, ary ) in map.array.iter_mut().enumerate()
 	{	for ( y, obj ) in ary.iter_mut().enumerate()
-		{	let ( x, y ) = conv_sprite_coordinates( x, y );
+		{	let xy = conv_sprite_coordinates( x, y );
 			*obj = match obj
 			{	MapObj::Dot(_) =>
 				{	count += 1;
-					let id = cmds.spawn_bundle( sprite_dot( ( x, y ), &mut color_matl ) )
-								 .insert( SpriteMap ).id(); 
+					let id = cmds.spawn_bundle( sprite_dot( xy ) ).insert( SpriteMap ).id(); 
 					MapObj::Dot( Some( id ) )
 				},
 				MapObj::Wall =>
-				{	cmds.spawn_bundle( sprite_wall( ( x, y ), &asset_svr ) )
-						.insert( SpriteMap );
+				{	cmds.spawn_bundle( sprite_wall( xy, &asset_svr ) ).insert( SpriteMap );
 					MapObj::Wall
 				},
 				_ => MapObj::Space,
@@ -85,9 +54,6 @@ fn make_new_maze( map: &mut ResMut<MapInfo> )
 	let half_w = MAP_WIDTH  / 2;
 	let half_h = MAP_HEIGHT / 2;
 	let short_side = if half_w >= half_h { half_h } else { half_w };
-
-//	map.array.iter_mut().for_each( | x | ( *x ).fill( MapObj::Space ) );
-//	map.count_dots = 0;
 
 	//二次元配列の中の矩形領域を置き換える無名関数
 	let mut box_fill = | obj, ( mut x1, mut y1), ( mut x2, mut y2 ) |
@@ -145,10 +111,7 @@ fn make_new_maze( map: &mut ResMut<MapInfo> )
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //壁用のスプライトバンドルを生成
-fn sprite_wall
-(	( x, y ): ( f32, f32 ),
-	asset_svr: &Res<AssetServer>,
-) -> SpriteBundle
+fn sprite_wall( ( x, y ): ( f32, f32 ), asset_svr: &Res<AssetServer> ) -> SpriteBundle
 {	let position = Vec3::new( x, y, SPRITE_MAP_DEPTH );
 	let square   = Vec2::new( SPRITE_WALL_PIXEL, SPRITE_WALL_PIXEL );
 
@@ -160,34 +123,12 @@ fn sprite_wall
 }
 
 //ドット用のスプライトバンドルを生成
-//Native
-//#[cfg(not(target_arch = "wasm32"))]
-fn sprite_dot
-(	( x, y ): ( f32, f32 ),
-	_color_matl: &mut ResMut<Assets<ColorMaterial>>,
-) -> ShapeBundle
+fn sprite_dot( ( x, y ): ( f32, f32 ) ) -> ShapeBundle
 {	let circle    = &shapes::Circle { radius: SPRITE_DOT_RAIDUS, ..shapes::Circle::default() };
 	let drawmode  = DrawMode::Fill( FillMode { options: FillOptions::default(), color: SPRITE_DOT_COLOR } );
 	let transform = Transform::from_translation( Vec3::new( x, y, SPRITE_MAP_DEPTH ) );
 
 	GeometryBuilder::build_as( circle, drawmode, transform )
 }
-/*//WASM
-#[cfg(target_arch = "wasm32")]
-fn sprite_dot
-(	( x, y ): ( f32, f32 ),
-	color_matl: &mut ResMut<Assets<ColorMaterial>>,
-) -> SpriteBundle
-{	let position = Vec3::new( x, y, SPRITE_MAP_DEPTH );
-	let square   = Vec2::new( SPRITE_DOT_RAIDUS * 2., SPRITE_DOT_RAIDUS * 2. );
-
-	SpriteBundle
-	{	material : color_matl.add( SPRITE_DOT_COLOR.into() ),
-		transform: Transform::from_translation( position ),
-		sprite   : Sprite::new( square ),
-		..Default::default()
-	}
-}
-*/
 
 //End of code.
