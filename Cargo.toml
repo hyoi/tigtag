@@ -4,8 +4,26 @@ version = "0.2.1"
 authors = ["hyoi"]
 edition = "2021"
 
+[dependencies.bevy]
+version = "0.6"
+default-features = false
+# https://github.com/bevyengine/bevy/blob/v0.6.0/Cargo.toml#L20-L28
+# These are the remaining default features other than `bevy_audio` and `vorbis`
+features = [
+# "bevy_audio",
+  "bevy_gilrs",
+  "bevy_winit",
+  "render",
+  "png",
+  "hdr",
+# "vorbis",
+  "x11",
+  "filesystem_watcher",
+]
+
 [dependencies]
-bevy = "0.6.0"
+#bevy = "0.6.0"
+bevy_kira_audio = "0.8.0"
 bevy_prototype_lyon = "0.4.0"
 rand = "0.8.4"
 
