@@ -2,6 +2,7 @@ use super::*;
 
 //external modules
 use bevy_prototype_lyon::{ prelude::*, entity::ShapeBundle };
+use bevy_kira_audio::{ Audio, AudioPlugin };
 use rand::prelude::*;
 
 //Sub module
@@ -25,6 +26,7 @@ impl Plugin for PluginGamePlay
 	{	app
 		//------------------------------------------------------------------------------------------
 		.add_plugin( ShapePlugin )								// bevy_prototype_lyon
+		.add_plugin( AudioPlugin )								// bevy_kira_audio
 		//==========================================================================================
 		.add_system_set											// ＜GameState::GameStart＞
 		(	SystemSet::on_enter( GameState::GameStart )			// ＜on_enter()＞
@@ -115,6 +117,8 @@ pub fn detect_score_and_collision
 	mut state : ResMut<State<GameState>>,
 	mut record: ResMut<Record>,
 	mut map   : ResMut<MapInfo>,
+	asset_svr : Res<AssetServer>,
+	audio     : Res<Audio>,
 	mut cmds  : Commands,
 )
 {	let is_demoplay = matches!( state.current(), GameState::DemoPlay );
@@ -125,6 +129,7 @@ pub fn detect_score_and_collision
 	let ( p_grid_x, p_grid_y ) = player.grid_position;
 	if let MapObj::Dot( opt_dot ) = map.array[ p_grid_x ][ p_grid_y ]
 	{	//得点処理
+		audio.play( asset_svr.load( SOUND_BEEP ) );
 		record.score += 1;
 		map.array[ p_grid_x ][ p_grid_y ] = MapObj::Space;
 		map.count_dots -= 1;

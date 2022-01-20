@@ -1,6 +1,5 @@
 //external modules
 use bevy::{ prelude::*, diagnostic::* };
-use bevy_kira_audio::{ Audio, AudioPlugin };
 
 //internal modules
 mod types;
@@ -41,8 +40,6 @@ fn main()
 	//----------------------------------------------------------------------------------------------
 	.add_plugins( DefaultPlugins )							// デフォルトプラグイン
 	.add_plugin( FrameTimeDiagnosticsPlugin::default() )	// fps計測のプラグイン
-	.add_plugin( AudioPlugin )
-	.add_startup_system( start_background_audio )
 	//----------------------------------------------------------------------------------------------
 	.add_state( GameState::Init )							// 状態遷移の初期値
 	.add_event::<GameState>()								// 状態遷移のイベント
@@ -65,10 +62,4 @@ fn main()
 	app.run();												// アプリの実行
 }
 
-fn start_background_audio
-(	asset_server: Res<AssetServer>,
-	audio: Res<Audio>
-)
-{	audio.play_looped( asset_server.load( SE_BEEP ) );
-}
 //End of code.
