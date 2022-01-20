@@ -21,6 +21,7 @@ pub const FONT_PRESSSTART2P_REGULAR: &str = "fonts/PressStart2P-Regular.ttf";
 pub const FONT_ORBITRON_BLACK	   : &str = "fonts/Orbitron-Black.ttf";
 pub const FONT_REGGAEONE_REGULAR   : &str = "fonts/ReggaeOne-Regular.ttf";
 pub const IMAGE_SPRITE_WALL		   : &str = "sprites/wall.png";
+pub const SOUND_BEEP			   : &str = "sounds/beep.ogg";
 
 //TEXT UIのメッセージセクションの型
 pub type MessageSect<'a> = ( &'a str, &'a str, f32, Color );
