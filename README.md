@@ -4,7 +4,8 @@ Note: Japanese text only.
 「tig」も「tag」も和訳は「鬼ごっこ」だそうです。  
 逃げ回ってドットをすべて拾ったらステージクリアなゲーム。(よくあるヤツ)  
 昔のベーマガみたいなピコゲーを作りたかったのです。  
-逆襲なし、追手は重なるとスピードアップするマゾ仕様。
+逆襲なし、追手は重なるとスピードアップするマゾ仕様。  
+取り急ぎたいへん耳障りなSEが実装されています。ボリューム上げるな要注意っ (≧ω≦;)
 ## WASM版
 https://hyoi.github.io/tigtag/
 ## 操作方法
@@ -32,10 +33,11 @@ cargo install -f wasm-bindgen-cli
 ## お世話になりました
 - [bevy](https://bevyengine.org/)と[その仲間たち](https://crates.io/search?q=bevy)
   - [bevy_prototype_lyon](https://github.com/Nilirad/bevy_prototype_lyon/)
+  - [bevy_kira_audio](https://github.com/NiklasEi/bevy_kira_audio)
   - [Unofficial Bevy Cheat Book](https://bevy-cheatbook.github.io/)
 - [Google Fonts](https://fonts.google.com/)
   - [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P)
   - [Orbitron](https://fonts.google.com/specimen/Orbitron)
   - [Reggae One](https://fonts.google.com/specimen/Reggae+One?subset=japanese)
 ## 宿題
-- 音を鳴らしたい。beep音でいいから。
+- ~~音を鳴らしたい。beep音でいいから。~~
