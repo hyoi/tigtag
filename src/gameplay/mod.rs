@@ -161,8 +161,7 @@ pub fn detect_score_and_collision
 	let ( mut p_old_x, mut p_old_y ) = ( ( p_old_xf32 * 100.0 ) as i32, ( p_old_yf32 * 100.0 ) as i32 );
 
 	for ( mut chaser, _ ) in q_set.q1().iter_mut()
-	{//	let ( c_grid_x, c_grid_y ) = chaser.grid_position;
-		let ( c_new_xf32, c_new_yf32 ) = chaser.pixel_position;
+	{	let ( c_new_xf32, c_new_yf32 ) = chaser.pixel_position;
 		let ( c_old_xf32, c_old_yf32 ) = chaser.pixel_position_old;
 
 		let ( mut c_new_x, mut c_new_y ) = ( ( c_new_xf32 * 100.0 ) as i32, ( c_new_yf32 * 100.0 ) as i32 );

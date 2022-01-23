@@ -81,7 +81,7 @@ pub fn spawn_sprite_chasers
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//自機のスプライトを移動する
+//追手のスプライトを移動する
 pub fn move_sprite_chaser
 (	mut q_chaser: Query<( &mut Chaser, &mut Transform )>,
 	q_player: Query<&Player>,

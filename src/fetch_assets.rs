@@ -33,11 +33,12 @@ impl Plugin for PluginFetchAssets
 
 //定義と定数
 
-const FETCH_ASSETS: [ &str; 4 ] =
+const FETCH_ASSETS: [ &str; 5 ] =
 [	FONT_PRESSSTART2P_REGULAR,
 	FONT_ORBITRON_BLACK,
 	FONT_REGGAEONE_REGULAR,
 	IMAGE_SPRITE_WALL,
+	SOUND_BEEP,
 ];
 
 //ロードしたAssetのハンドルの保存先

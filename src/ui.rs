@@ -28,11 +28,10 @@ fn update_ui_upper_left
 	}
 }
 
-//スコアと残ドット数の表示を更新する
+//スコアの表示を更新する
 fn update_ui_upper_center
 (	mut q: Query<&mut Text, With<UiUpperCenter>>,
 	o_record: Option<Res<Record>>,
-//	map: Res<MapInfo>,
 )
 {	if let Ok( mut ui ) = q.get_single_mut()
 	{	let na = "-----".to_string();
