@@ -59,6 +59,9 @@ fn main()
 	#[cfg(not(target_arch = "wasm32"))]						// WASMで不要なキー操作
 	app.add_system( toggle_window_mode );					// [Alt]+[Enter]でフルスクリー
 
+	#[cfg(target_arch = "wasm32")]							//WASMで使用する
+    app.add_plugin(bevy_web_resizer::Plugin);				//ブラウザ中央に表示する
+
 	app.run();												// アプリの実行
 }
 
