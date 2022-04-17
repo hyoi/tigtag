@@ -110,9 +110,9 @@ impl Plugin for PluginGamePlay
 
 //得点と衝突を判定する。クリアならGameClearへ、衝突ならGameOverへ遷移する
 pub fn detect_score_and_collision
-(	mut q_set: QuerySet
-	<(	QueryState<( &mut Player, &mut Transform )>,
-		QueryState<( &mut Chaser, &mut Transform )>,
+(	mut q_set: ParamSet
+	<(	Query<( &mut Player, &mut Transform )>,
+		Query<( &mut Chaser, &mut Transform )>,
 	)>,
 	mut state : ResMut<State<GameState>>,
 	mut record: ResMut<Record>,
@@ -124,7 +124,7 @@ pub fn detect_score_and_collision
 {	let is_demoplay = matches!( state.current(), GameState::DemoPlay );
 
 	//自機のgrid座標のオブジェクトがドットなら
-	let mut q0 = q_set.q0();
+	let mut q0 = q_set.p0();
 	let ( mut player, mut transform ) = q0.iter_mut().next().unwrap();
 	let ( p_grid_x, p_grid_y ) = player.grid_position;
 	if let MapObj::Dot( opt_dot ) = map.array[ p_grid_x ][ p_grid_y ]
@@ -160,7 +160,7 @@ pub fn detect_score_and_collision
 	let ( mut p_new_x, mut p_new_y ) = ( ( p_new_xf32 * 100.0 ) as i32, ( p_new_yf32 * 100.0 ) as i32 );
 	let ( mut p_old_x, mut p_old_y ) = ( ( p_old_xf32 * 100.0 ) as i32, ( p_old_yf32 * 100.0 ) as i32 );
 
-	for ( mut chaser, _ ) in q_set.q1().iter_mut()
+	for ( mut chaser, _ ) in q_set.p1().iter_mut()
 	{	let ( c_new_xf32, c_new_yf32 ) = chaser.pixel_position;
 		let ( c_old_xf32, c_old_yf32 ) = chaser.pixel_position_old;
 
@@ -196,7 +196,7 @@ pub fn detect_score_and_collision
 
 			//playerが移動中にchaserに衝突したなら
 			if ! p_stop
-			{	let mut q0 = q_set.q0();
+			{	let mut q0 = q_set.p0();
 				let ( mut player, mut transform ) = q0.iter_mut().next().unwrap();
 				player.stop = true;
 				let position = &mut transform.translation;
@@ -211,7 +211,7 @@ pub fn detect_score_and_collision
 	//衝突ならstateをセットして関数から脱出
 	if is_over
 	{	//衝突時にchaserの表示位置を調整する
-		for ( mut chaser, mut transform ) in q_set.q1().iter_mut()
+		for ( mut chaser, mut transform ) in q_set.p1().iter_mut()
 		{	chaser.stop = true;
 			if p_stop && chaser.collision
 			{	//playerが停止中ならchaserがplayerへ衝突した

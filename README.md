@@ -29,11 +29,12 @@ wasm-bindgen --out-dir ./target --target web --no-typescript ./target/wasm32-unk
 rustup target install wasm32-unknown-unknown
 cargo install -f wasm-bindgen-cli
 ```
-　[Unofficial Bevy Cheat Book - 8.4. Browser (WebAssembly)](https://bevy-cheatbook.github.io/platforms/wasm.html)をご参考に。
+　[Unofficial Bevy Cheat Book - 13.5. Browser (WebAssembly)](https://bevy-cheatbook.github.io/platforms/wasm.html)をご参考に。
 ## お世話になりました
 - [bevy](https://bevyengine.org/)と[その仲間たち](https://crates.io/search?q=bevy)
   - [bevy_prototype_lyon](https://github.com/Nilirad/bevy_prototype_lyon/)
   - [bevy_kira_audio](https://github.com/NiklasEi/bevy_kira_audio)
+  - [bevy-web-resizer](https://github.com/frewsxcv/bevy-web-resizer)
   - [Unofficial Bevy Cheat Book](https://bevy-cheatbook.github.io/)
 - [Google Fonts](https://fonts.google.com/)
   - [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P)

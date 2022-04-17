@@ -1,15 +1,16 @@
 [package]
 name = "tigtag"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["hyoi"]
 edition = "2021"
 
 [dependencies.bevy]
-version = "0.6.1"
+version = "0.7.0"
 default-features = false
-# https://github.com/bevyengine/bevy/blob/v0.6.0/Cargo.toml#L20-L28
 # These are the remaining default features other than `bevy_audio` and `vorbis`
+# https://github.com/bevyengine/bevy/blob/v0.7.0/Cargo.toml#L20-L29
 features = [
+  "animation",
 # "bevy_audio",
   "bevy_gilrs",
   "bevy_winit",
@@ -22,10 +23,9 @@ features = [
 ]
 
 [dependencies]
-bevy-web-resizer = "1.0.0"
-#bevy = "0.6.0"
-bevy_kira_audio = "0.8.0"
-bevy_prototype_lyon = "0.4.0"
+bevy-web-resizer = "2.0.0"
+bevy_kira_audio = "0.9.0"
+bevy_prototype_lyon = "0.5.0"
 rand = "0.8.5"
 
 # WASMの場合にどれか指定する必要がある？？
