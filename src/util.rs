@@ -2,8 +2,7 @@ use super::*;
 
 //bevyのカメラの設置
 pub fn spawn_camera( mut cmds: Commands )
-{	cmds.spawn_bundle( UiCameraBundle::default() );
-	cmds.spawn_bundle( OrthographicCameraBundle::new_2d() );
+{	cmds.spawn_bundle( Camera2dBundle::default() );
 }
 
 // ComponentでQueryしたEnityを削除する
