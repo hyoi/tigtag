@@ -3,7 +3,7 @@ use super::*;
 //定義と定数
 
 //向きを表す列挙型
-#[derive(Clone,Copy,PartialEq)]
+#[derive(Clone,Copy,PartialEq,Eq)]
 pub enum Direction { Up, Left, Right, Down, }
 
 //グリッドの上下左右の定数

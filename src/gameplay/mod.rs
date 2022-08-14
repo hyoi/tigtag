@@ -109,6 +109,7 @@ impl Plugin for PluginGamePlay
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //得点と衝突を判定する。クリアならGameClearへ、衝突ならGameOverへ遷移する
+#[allow(clippy::type_complexity)]
 pub fn detect_score_and_collision
 (	mut q_set: ParamSet
 	<(	Query<( &mut Player, &mut Transform )>,
