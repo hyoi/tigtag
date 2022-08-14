@@ -159,10 +159,10 @@ fn sprite_preloading_anime_tile( ( x, y ): ( f32, f32 ) ) -> SpriteBundle
 	let sprite    = Sprite
 	{	color: SPRITE_TILE_COLOR,
 		custom_size: Some( square ),
-		..Default::default()
+		..default()
 	};
 
-	SpriteBundle { transform, sprite, ..Default::default() }
+	SpriteBundle { transform, sprite, ..default() }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,21 +211,21 @@ pub fn spawn_text_ui_message( mut cmds: Commands, asset_svr: Res<AssetServer> )
 		position_type  : PositionType::Absolute,
 		justify_content: JustifyContent::Center,
 		align_items    : AlignItems::Center,
-		..Default::default()
+		..default()
 	} );
 	let upper_frame  = hidden_frame( Style
 	{	size           : Size::new( Val::Px( SCREEN_WIDTH ), Val::Px( SCREEN_HEIGHT ) ),
 		position_type  : PositionType::Absolute,
 		flex_direction : FlexDirection::Column,
 		justify_content: JustifyContent::FlexEnd, //画面の上端
-		..Default::default()
+		..default()
 	} );
 	let lower_frame  = hidden_frame( Style
 	{	size           : Size::new( Val::Px( SCREEN_WIDTH ), Val::Px( SCREEN_HEIGHT ) ),
 		position_type  : PositionType::Absolute,
 		flex_direction : FlexDirection::Column,
 		justify_content: JustifyContent::FlexStart, //画面の下端
-		..Default::default()
+		..default()
 	} );
 
 	//隠しフレームの上に子要素を作成する
@@ -271,9 +271,9 @@ fn text_ui( message: &[ MessageSect ], asset_svr: &Res<AssetServer> ) -> TextBun
 	let position_type = PositionType::Absolute;
 
 	let text  = Text { sections, alignment };
-	let style = Style { position_type, ..Default::default() };
+	let style = Style { position_type, ..default() };
 
-	TextBundle { style, text, ..Default::default() }
+	TextBundle { style, text, ..default() }
 }
 
 //レイアウト用に隠しフレームを作る

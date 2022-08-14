@@ -117,9 +117,9 @@ fn sprite_wall( ( x, y ): ( f32, f32 ), asset_svr: &Res<AssetServer> ) -> Sprite
 
 	let texture   = asset_svr.load( IMAGE_SPRITE_WALL );
 	let transform = Transform::from_translation( position );
-	let sprite    = Sprite { custom_size: Some( square ), ..Default::default() };
+	let sprite    = Sprite { custom_size: Some( square ), ..default() };
 
-	SpriteBundle { texture, transform, sprite, ..Default::default() }
+	SpriteBundle { texture, transform, sprite, ..default() }
 }
 
 //ドット用のスプライトバンドルを生成

@@ -28,7 +28,7 @@ fn main()
 		width    : SCREEN_WIDTH,
 		height   : SCREEN_HEIGHT,
 		resizable: false,
-		..Default::default()
+		..default()
 	};
 	
 	let mut app = App::new();
