@@ -1,7 +1,6 @@
 use super::*;
 
 //external modules
-use bevy_prototype_lyon::{ prelude::*, entity::ShapeBundle };
 use bevy_kira_audio::{ Audio, AudioPlugin };
 use rand::prelude::*;
 
@@ -25,7 +24,6 @@ impl Plugin for PluginGamePlay
 {	fn build( &self, app: &mut App )
 	{	app
 		//------------------------------------------------------------------------------------------
-		.add_plugin( ShapePlugin )								// bevy_prototype_lyon
 		.add_plugin( AudioPlugin )								// bevy_kira_audio
 		//==========================================================================================
 		.add_system_set											// ＜GameState::GameStart＞

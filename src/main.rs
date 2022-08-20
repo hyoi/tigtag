@@ -1,5 +1,5 @@
 //external modules
-use bevy::{ prelude::*, diagnostic::* };
+use bevy::{ prelude::*, diagnostic::*, sprite::MaterialMesh2dBundle };
 
 //internal modules
 mod types;

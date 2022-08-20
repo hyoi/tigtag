@@ -33,6 +33,8 @@ pub fn spawn_sprite_player
 (	q: Query<Entity, With<Player>>,
 	map: Res<MapInfo>,
 	mut cmds: Commands,
+	mut meshes: ResMut<Assets<Mesh>>,
+	mut materials: ResMut<Assets<ColorMaterial>>,
 )
 {	//スプライトがあれば削除する
 	q.for_each( | id | cmds.entity( id ).despawn() );
@@ -51,7 +53,13 @@ pub fn spawn_sprite_player
 		wait: Timer::from_seconds( PLAYER_WAIT, false ),
 		stop: true,
 	};
-	let sprite = sprite_player( player.pixel_position );
+
+	let ( x, y ) = player.pixel_position;
+	let transform = Transform::from_translation( Vec3::new( x, y, SPRITE_PLAYER_DEPTH ) );
+	let mesh	  = meshes.add( shape::RegularPolygon::new( SPRITE_PLAYER_PIXEL, 3 ).into() ).into();
+	let material  = materials.add( ColorMaterial::from( SPRITE_PLAYER_COLOR ) );
+
+	let sprite = MaterialMesh2dBundle { transform, mesh, material, ..default() };
 	cmds.spawn_bundle( sprite ).insert( player );
 }
 
@@ -173,21 +181,6 @@ pub fn move_sprite_player
 		//ウェイトをリセットする
 		player.wait.reset();
 	}
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//自機のスプライトバンドルを生成
-fn sprite_player( ( x, y ): ( f32, f32 ) ) -> ShapeBundle
-{	let triangle = &shapes::RegularPolygon
-	{	sides: 3,
-		feature: shapes::RegularPolygonFeature::Radius( SPRITE_PLAYER_PIXEL ),
-		..shapes::RegularPolygon::default()
-	};
-	let drawmode  = DrawMode::Fill( FillMode { options: FillOptions::default(), color: SPRITE_PLAYER_COLOR } );
-	let transform = Transform::from_translation( Vec3::new( x, y, SPRITE_PLAYER_DEPTH ) );
-
-	GeometryBuilder::build_as( triangle, drawmode, transform )
 }
 
 //End of code.

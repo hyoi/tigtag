@@ -39,7 +39,6 @@ features = [
 
 [dependencies]
 bevy-web-resizer = "3.0.0"
-bevy_prototype_lyon = "0.6.0"
 rand = "0.8.5"
 
 # WASMの場合にどれか指定する必要がある？？
