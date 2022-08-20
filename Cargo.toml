@@ -26,7 +26,7 @@ features = [
 
 # https://bevy-cheatbook.github.io/features/audio.html#kira-audio
 [dependencies.bevy_kira_audio]
-version = "0.11"
+version = "0.12"
 # `ogg` format support is enabled by default, disable if you don't want it
 default-features = false
 # enable the features you care about

@@ -1,7 +1,7 @@
 use super::*;
 
 //external modules
-use bevy_kira_audio::{ Audio, AudioPlugin };
+use bevy_kira_audio::{ Audio, AudioPlugin, AudioControl };
 use rand::prelude::*;
 
 //Sub module
