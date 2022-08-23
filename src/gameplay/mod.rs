@@ -1,8 +1,7 @@
 use super::*;
 
 //external modules
-use bevy_prototype_lyon::{ prelude::*, entity::ShapeBundle };
-use bevy_kira_audio::{ Audio, AudioPlugin };
+use bevy_kira_audio::{ Audio, AudioPlugin, AudioControl };
 use rand::prelude::*;
 
 //Sub module
@@ -25,7 +24,6 @@ impl Plugin for PluginGamePlay
 {	fn build( &self, app: &mut App )
 	{	app
 		//------------------------------------------------------------------------------------------
-		.add_plugin( ShapePlugin )								// bevy_prototype_lyon
 		.add_plugin( AudioPlugin )								// bevy_kira_audio
 		//==========================================================================================
 		.add_system_set											// ＜GameState::GameStart＞
@@ -109,6 +107,7 @@ impl Plugin for PluginGamePlay
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //得点と衝突を判定する。クリアならGameClearへ、衝突ならGameOverへ遷移する
+#[allow(clippy::type_complexity)]
 pub fn detect_score_and_collision
 (	mut q_set: ParamSet
 	<(	Query<( &mut Player, &mut Transform )>,

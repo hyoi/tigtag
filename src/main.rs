@@ -1,5 +1,5 @@
 //external modules
-use bevy::{ prelude::*, diagnostic::* };
+use bevy::{ prelude::*, diagnostic::*, sprite::MaterialMesh2dBundle };
 
 //internal modules
 mod types;
@@ -28,7 +28,7 @@ fn main()
 		width    : SCREEN_WIDTH,
 		height   : SCREEN_HEIGHT,
 		resizable: false,
-		..Default::default()
+		..default()
 	};
 	
 	let mut app = App::new();

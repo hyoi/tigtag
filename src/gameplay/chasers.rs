@@ -230,9 +230,9 @@ fn sprite_chaser( ( x, y ): ( f32, f32 ), color: Color ) -> SpriteBundle
 	let quat     = Quat::from_rotation_z( 45_f32.to_radians() ); //45°傾ける
 
 	let transform = Transform::from_translation( position ).with_rotation( quat );
-	let sprite = Sprite { color, custom_size: Some( square ), ..Default::default() };
+	let sprite = Sprite { color, custom_size: Some( square ), ..default() };
 
-	SpriteBundle { transform, sprite, ..Default::default() }
+	SpriteBundle { transform, sprite, ..default() }
 }
 
 //End of code.

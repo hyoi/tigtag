@@ -18,6 +18,8 @@ pub fn spawn_sprite_new_map
 	mut map: ResMut<MapInfo>,
 	mut cmds: Commands,
 	asset_svr: Res<AssetServer>,
+	mut meshes: ResMut<Assets<Mesh>>,
+	mut materials: ResMut<Assets<ColorMaterial>>,
 )
 {	//スプライトがあれば削除する
 	q.for_each( | id | cmds.entity( id ).despawn() );
@@ -33,7 +35,13 @@ pub fn spawn_sprite_new_map
 			*obj = match obj
 			{	MapObj::Dot(_) =>
 				{	count += 1;
-					let id = cmds.spawn_bundle( sprite_dot( xy ) ).insert( SpriteMap ).id(); 
+					let ( x, y ) = xy;
+					let transform = Transform::from_translation( Vec3::new( x, y, SPRITE_MAP_DEPTH ) );
+					let mesh	  = meshes.add( shape::Circle::new( SPRITE_DOT_RAIDUS ).into() ).into();
+					let material  = materials.add( ColorMaterial::from( SPRITE_DOT_COLOR ) );
+
+					let sprite = MaterialMesh2dBundle{ transform, mesh, material, ..default() };
+					let id = cmds.spawn_bundle( sprite ).insert( SpriteMap ).id();
 					MapObj::Dot( Some( id ) )
 				},
 				MapObj::Wall =>
@@ -117,18 +125,9 @@ fn sprite_wall( ( x, y ): ( f32, f32 ), asset_svr: &Res<AssetServer> ) -> Sprite
 
 	let texture   = asset_svr.load( IMAGE_SPRITE_WALL );
 	let transform = Transform::from_translation( position );
-	let sprite    = Sprite { custom_size: Some( square ), ..Default::default() };
+	let sprite    = Sprite { custom_size: Some( square ), ..default() };
 
-	SpriteBundle { texture, transform, sprite, ..Default::default() }
-}
-
-//ドット用のスプライトバンドルを生成
-fn sprite_dot( ( x, y ): ( f32, f32 ) ) -> ShapeBundle
-{	let circle    = &shapes::Circle { radius: SPRITE_DOT_RAIDUS, ..shapes::Circle::default() };
-	let drawmode  = DrawMode::Fill( FillMode { options: FillOptions::default(), color: SPRITE_DOT_COLOR } );
-	let transform = Transform::from_translation( Vec3::new( x, y, SPRITE_MAP_DEPTH ) );
-
-	GeometryBuilder::build_as( circle, drawmode, transform )
+	SpriteBundle { texture, transform, sprite, ..default() }
 }
 
 //End of code.

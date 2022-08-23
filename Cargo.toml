@@ -1,18 +1,20 @@
 [package]
 name = "tigtag"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["hyoi"]
 edition = "2021"
 
 [dependencies.bevy]
-version = "0.7.0"
+version = "0.8.0"
 default-features = false
 # These are the remaining default features other than `bevy_audio` and `vorbis`
-# https://github.com/bevyengine/bevy/blob/v0.7.0/Cargo.toml#L20-L29
+# https://github.com/bevyengine/bevy/blob/v0.8.0/Cargo.toml#L28-L39
 features = [
   "animation",
+  "bevy_asset",
 # "bevy_audio",
   "bevy_gilrs",
+  "bevy_scene",
   "bevy_winit",
   "render",
   "png",
@@ -22,10 +24,21 @@ features = [
   "filesystem_watcher",
 ]
 
+# https://bevy-cheatbook.github.io/features/audio.html#kira-audio
+[dependencies.bevy_kira_audio]
+version = "0.12"
+# `ogg` format support is enabled by default, disable if you don't want it
+default-features = false
+# enable the features you care about
+features = [
+  "wav",
+  "flac",
+  "mp3",
+  "ogg",
+]
+
 [dependencies]
-bevy-web-resizer = "2.0.0"
-bevy_kira_audio = "0.9.0"
-bevy_prototype_lyon = "0.5.0"
+bevy-web-resizer = "3.0.0"
 rand = "0.8.5"
 
 # WASMの場合にどれか指定する必要がある？？

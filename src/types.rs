@@ -50,7 +50,7 @@ impl Default for MapInfo
 		}
 	}
 }
-#[derive(Copy,Clone,PartialEq)]
+#[derive(Copy,Clone,PartialEq,Eq)]
 pub enum MapObj
 {	Space,
 	Dot ( Option<Entity> ),
