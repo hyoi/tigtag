@@ -5,7 +5,7 @@ authors = ["hyoi"]
 edition = "2021"
 
 [dependencies.bevy]
-version = "0.8.0"
+version = "0.8"
 default-features = false
 # These are the remaining default features other than `bevy_audio` and `vorbis`
 # https://github.com/bevyengine/bevy/blob/v0.8.0/Cargo.toml#L28-L39
