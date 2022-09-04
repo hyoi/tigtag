@@ -1,68 +1,34 @@
-//external modules
-use bevy::{ prelude::*, diagnostic::*, sprite::MaterialMesh2dBundle };
+//import external modules
+use bevy::{ prelude::*, sprite::* };
+use bevy_kira_audio::{ Audio, AudioPlugin, AudioControl };
+use once_cell::sync::*;
+use rand::prelude::*;
 
-//internal modules
-mod types;
-mod consts;
-mod util;
+//internal submodules
+mod public;
+mod init_app;
+mod game_play;
+mod demo_play;
 
-use types::*;
-use consts::*;
-use util::*;
+use public::*;
+use init_app::*;
+use game_play::*;
+use demo_play::*;
 
-mod fetch_assets;
-mod ui;
-mod gameplay;
-mod demoplay;
-
-use fetch_assets::*;
-use ui::*;
-use gameplay::*;
-use demoplay::*;
-
-//メイン関数
 fn main()
-{	//Main Window
-	let main_window = WindowDescriptor
-	{	title    : String::from( APP_TITLE ),
-		width    : SCREEN_WIDTH,
-		height   : SCREEN_HEIGHT,
-		resizable: false,
-		..default()
-	};
-	
-	let mut app = App::new();
-	app
-	//----------------------------------------------------------------------------------------------
-	.insert_resource( main_window )							// メインウィンドウ
-	.insert_resource( ClearColor( SCREEN_BGCOLOR ) )		// 背景色
-	.insert_resource( Msaa { samples: 4 } )					// アンチエイリアス
-	//----------------------------------------------------------------------------------------------
-	.add_plugins( DefaultPlugins )							// デフォルトプラグイン
-	.add_plugin( FrameTimeDiagnosticsPlugin::default() )	// fps計測のプラグイン
-	//----------------------------------------------------------------------------------------------
-	.add_state( GameState::Init )							// 状態遷移の初期値
-	.add_event::<GameState>()								// 状態遷移のイベント
-	.init_resource::<Record>()								// スコア等のリソース
-	.init_resource::<MapInfo>()								// マップ情報のリソース
-	//----------------------------------------------------------------------------------------------
-	.add_startup_system( spawn_camera )						// bevyのカメラ設置
-	.add_system( handle_esc_key_for_pause )					// [Esc]でpause処理
-	//----------------------------------------------------------------------------------------------
-	.add_plugin( PluginFetchAssets )
-	.add_plugin( PluginUi )
-	.add_plugin( PluginGamePlay )
-	.add_plugin( PluginDemoPlay )
-	//----------------------------------------------------------------------------------------------
-	;
+{   //bevy_kira_audioが標準出力へInfoを出力するのを抑止
+    #[cfg( not( target_arch = "wasm32" ) )]
+    {   use std::env;
+        env::set_var( "RUST_LOG", "OFF" );
+    }
 
-	#[cfg(not(target_arch = "wasm32"))]						// WASMで不要なキー操作
-	app.add_system( toggle_window_mode );					// [Alt]+[Enter]でフルスクリー
-
-	#[cfg(target_arch = "wasm32")]							//WASMで使用する
-    app.add_plugin(bevy_web_resizer::Plugin);				//ブラウザ中央に表示する
-
-	app.run();												// アプリの実行
+    //アプリの実行
+    App::new()
+    .add_plugin( InitApp  )
+    .add_plugin( GamePlay )
+    .add_plugin( DemoPlay )
+    .run()
+    ;
 }
 
 //End of code.
