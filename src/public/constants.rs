@@ -131,8 +131,8 @@ pub const NA5  : &str = "#####";
 
 //中央に表示するtext UI
 pub const CENTER_TITLE_TEXT: [ MessageSect; 4 ] =
-[   ( "TigTag\n\n"	     , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, Color::rgba( 0.6, 1.0, 0.4, 0.75 ) ),
-    ( "D E M O\n"		 , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::YELLOW ),
+[   ( "TigTag\n\n"       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, Color::rgba( 0.6, 1.0, 0.4, 0.75 ) ),
+    ( "D E M O\n"        , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::YELLOW ),
     ( "\nHit SPACE Key\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
     ( "\nto Start !!"    , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
 ];

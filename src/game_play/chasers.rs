@@ -10,10 +10,10 @@ pub const COLOR_SPRITE_CHASERS: [ ( Color, Option<FnChasing> ); 4 ] =
 
 //追手の移動方向を決める(赤)
 fn which_way_red_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
-{	     if sides.contains( &DxDy::Left  ) && player.next.x < chaser.grid.x { return DxDy::Left  }
-	else if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
-	else if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
-	else if sides.contains( &DxDy::Down  ) && player.next.y > chaser.grid.y { return DxDy::Down  }
+{        if sides.contains( &DxDy::Left  ) && player.next.x < chaser.grid.x { return DxDy::Left  }
+    else if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
+    else if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
+    else if sides.contains( &DxDy::Down  ) && player.next.y > chaser.grid.y { return DxDy::Down  }
 
     let mut rng = rand::thread_rng();
     sides[ rng.gen_range( 0..sides.len() ) ]
@@ -23,8 +23,8 @@ fn which_way_red_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) 
 fn which_way_blue_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
 {        if sides.contains( &DxDy::Down  ) && player.next.y > chaser.grid.y { return DxDy::Down  }
     else if sides.contains( &DxDy::Left  ) && player.next.x < chaser.grid.x { return DxDy::Left  }
-	else if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
-	else if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
+    else if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
+    else if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
 
     let mut rng = rand::thread_rng();
     sides[ rng.gen_range( 0..sides.len() ) ]
@@ -32,10 +32,10 @@ fn which_way_blue_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] )
 
 //追手の移動方向を決める(緑)
 fn which_way_green_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
-{	     if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
+{        if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
     else if sides.contains( &DxDy::Down  ) && player.next.y > chaser.grid.y { return DxDy::Down  }
     else if sides.contains( &DxDy::Left  ) && player.next.x < chaser.grid.x { return DxDy::Left  }
-	else if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
+    else if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
 
     let mut rng = rand::thread_rng();
     sides[ rng.gen_range( 0..sides.len() ) ]
@@ -43,7 +43,7 @@ fn which_way_green_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] 
 
 //追手の移動方向を決める(ピンク)
 fn which_way_pink_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
-{	     if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
+{        if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
     else if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
     else if sides.contains( &DxDy::Down  ) && player.next.y > chaser.grid.y { return DxDy::Down  }
     else if sides.contains( &DxDy::Left  ) && player.next.x < chaser.grid.x { return DxDy::Left  }
@@ -199,18 +199,18 @@ pub fn move_sprite
         }
     }
 
-	//追手は重なるとスピードアップする
+    //追手は重なるとスピードアップする
     let mut color_grid = Vec::with_capacity( q_chaser.iter().len() );
-	for ( mut chaser, _ ) in q_chaser.iter_mut()
-	{	color_grid.push( ( chaser.color, chaser.next ) );
-		chaser.speedup = 1.0;
-	}
-	for ( color, grid ) in color_grid
-	{	for ( mut chaser, _ ) in q_chaser.iter_mut()
-		{	if grid != chaser.next || color == chaser.color { continue }
-			chaser.speedup += CHASER_ACCEL;
-		}
-	}
+    for ( mut chaser, _ ) in q_chaser.iter_mut()
+    {   color_grid.push( ( chaser.color, chaser.next ) );
+        chaser.speedup = 1.0;
+    }
+    for ( color, grid ) in color_grid
+    {   for ( mut chaser, _ ) in q_chaser.iter_mut()
+        {   if grid != chaser.next || color == chaser.color { continue }
+            chaser.speedup += CHASER_ACCEL;
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,25 +218,25 @@ pub fn move_sprite
 //衝突を判定する。条件を満たしたら、
 //デモならTitleへ、衝突ならOverへ遷移する
 pub fn detect_collisions
-(	q_player: Query<&Player>,
+(   q_player: Query<&Player>,
     q_chaser: Query<&Chaser>,
     record: Res<Record>,
-	mut state: ResMut<State<GameState>>,
-	mut ev_over: EventWriter<EventOver>,
+    mut state: ResMut<State<GameState>>,
+    mut ev_over: EventWriter<EventOver>,
 )
 {   if cfg!( debug_assertions ) { return }   //debugでは無敵
 
-	//クリアしていなければ衝突判定する
-	if ! state.current().is_clearstage() && is_collision( q_player, q_chaser )
-	{	let next = if record.is_demoplay()
+    //クリアしていなければ衝突判定する
+    if ! state.current().is_clearstage() && is_collision( q_player, q_chaser )
+    {   let next = if record.is_demoplay()
         {   GameState::DemoNext
         }
         else
         {   GameState::GameOver
         };
-		let _ = state.overwrite_set( next );
-		ev_over.send( EventOver );	//後続の処理にゲームオーバーを伝える
-	}
+        let _ = state.overwrite_set( next );
+        ev_over.send( EventOver );    //後続の処理にゲームオーバーを伝える
+    }
 }
 
 //衝突判定関数
@@ -248,40 +248,40 @@ fn is_collision
 
     if let Ok ( player ) = q_player.get_single()
     {   //自機の移動区間を a1➜a2 とする
-    	let mut a1 = player.px_start;
-	    let mut a2 = player.px_end;
-    	if a1.x > a2.x { std::mem::swap( &mut a1.x, &mut a2.x ) } //a1.x < a2.xにする
-	    if a1.y > a2.y { std::mem::swap( &mut a1.y, &mut a2.y ) } //a1.y < a2.yにする
+        let mut a1 = player.px_start;
+        let mut a2 = player.px_end;
+        if a1.x > a2.x { std::mem::swap( &mut a1.x, &mut a2.x ) } //a1.x < a2.xにする
+        if a1.y > a2.y { std::mem::swap( &mut a1.y, &mut a2.y ) } //a1.y < a2.yにする
 
-    	//各追手ごとの処理
-    	for chaser in q_chaser.iter()
-	    {	//同じグリッドにいる場合
-    		if player.px_end == chaser.px_end
-	    	{	is_collision = true;
-		    	break;
-    		}
+        //各追手ごとの処理
+        for chaser in q_chaser.iter()
+        {   //同じグリッドにいる場合
+            if player.px_end == chaser.px_end
+            {   is_collision = true;
+                break;
+            }
 
-    		//追手の移動区間を b1➜b2 とする
-	    	let mut b1 = chaser.px_start;
-		    let mut b2 = chaser.px_end;
-    		if b1.x > b2.x { std::mem::swap( &mut b1.x, &mut b2.x ) } //b1.x < b2.xにする
-	    	if b1.y > b2.y { std::mem::swap( &mut b1.y, &mut b2.y ) } //b1.y < b2.yにする
+            //追手の移動区間を b1➜b2 とする
+            let mut b1 = chaser.px_start;
+            let mut b2 = chaser.px_end;
+            if b1.x > b2.x { std::mem::swap( &mut b1.x, &mut b2.x ) } //b1.x < b2.xにする
+            if b1.y > b2.y { std::mem::swap( &mut b1.y, &mut b2.y ) } //b1.y < b2.yにする
 
-    		//移動した微小区間の重なりを判定する
-	    	if player.px_end.y == chaser.px_end.y
-    		{	//Y軸が一致する場合
-	    		is_collision = is_overlap( a1.x, a2.x, b1.x, b2.x, player.side, chaser.side );
-		    }
-    		else if player.px_end.x == chaser.px_end.x
-	    	{	//X軸が一致する場合
-    			is_collision = is_overlap( a1.y, a2.y, b1.y, b2.y, player.side, chaser.side );
-    		}
-	    	if is_collision { break }
-    	}
+            //移動した微小区間の重なりを判定する
+            if player.px_end.y == chaser.px_end.y
+            {   //Y軸が一致する場合
+                is_collision = is_overlap( a1.x, a2.x, b1.x, b2.x, player.side, chaser.side );
+            }
+            else if player.px_end.x == chaser.px_end.x
+            {   //X軸が一致する場合
+                is_collision = is_overlap( a1.y, a2.y, b1.y, b2.y, player.side, chaser.side );
+            }
+            if is_collision { break }
+        }
     }
 
-	//衝突判定の結果を返す
-	is_collision
+    //衝突判定の結果を返す
+    is_collision
 }
 
 //線分の重なりで衝突を判定
@@ -290,14 +290,14 @@ fn is_overlap
     b1: f32, b2: f32,
     a_side: DxDy, b_side: DxDy,
 ) -> bool
-{	//a1➜a2 と b1➜b2 が重ならないなら衝突しない(この条件が一番多いので先にはじく)
-	if a2 < b1 || b2 < a1 { return false }
+{   //a1➜a2 と b1➜b2 が重ならないなら衝突しない(この条件が一番多いので先にはじく)
+    if a2 < b1 || b2 < a1 { return false }
 
     //1つ目、2つ目の条件: a1➜a2 と b1➜b2 が包含関係なら衝突する
-	//3つ目の条件: 部分的に重なる場合 移動が対向なら衝突する(同一方向なら衝突しない)
-	if a1 < b1 && b2 < a2 || b1 < a1 && a2 < b2 || a_side != b_side { return true }
+    //3つ目の条件: 部分的に重なる場合 移動が対向なら衝突する(同一方向なら衝突しない)
+    if a1 < b1 && b2 < a2 || b1 < a1 && a2 < b2 || a_side != b_side { return true }
 
-	false
+    false
 }
 
 //Endo of code.

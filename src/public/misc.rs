@@ -95,7 +95,7 @@ pub fn despawn_entity<T: Component>
 (   q: Query<Entity, With<T>>,
     mut cmds: Commands,
 )
-{	q.for_each( | id | cmds.entity( id ).despawn_recursive() );
+{   q.for_each( | id | cmds.entity( id ).despawn_recursive() );
 }
 
 //End of cooe.

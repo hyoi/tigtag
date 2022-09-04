@@ -5,8 +5,8 @@ pub fn spawn_sprite
 (   q: Query<Entity, With<Player>>,
     mut map: ResMut<Map>,
     mut cmds: Commands,
-	mut meshes: ResMut<Assets<Mesh>>,
-	mut materials: ResMut<Assets<ColorMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 )
 {   //スプライトがあれば削除する
     q.for_each( | id | cmds.entity( id ).despawn_recursive() );

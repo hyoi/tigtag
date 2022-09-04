@@ -80,7 +80,7 @@ pub fn spawn_sprite
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
-	mut materials: ResMut<Assets<ColorMaterial>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 )
 {   //スプライトがあれば削除する
     q1.for_each( | id | cmds.entity( id ).despawn_recursive() );
