@@ -134,9 +134,9 @@ fn change_state_after_loading
     for handle in assets.preload.iter()
     {   use bevy::asset::LoadState::*;
         match asset_svr.get_load_state( handle )
-        {   Loaded => {}        //完了
-            Failed => panic!(), //ロード失敗⇒パニック
-            _      => return,   //on_update()の中なので関数は繰り返し呼び出される
+        {   Loaded => {} //完了
+            Failed => panic!( "Can't load assets" ), //ロード失敗⇒パニック
+            _      => return, //on_update()の中なので関数は繰り返し呼び出される
         }
     }
 
