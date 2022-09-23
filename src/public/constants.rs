@@ -89,10 +89,10 @@ pub const DEPTH_SPRITE_BRICK_WALL : f32 = 10.0;  //スプライト重なり順
 pub const DEPTH_SPRITE_TILE       : f32 = 0.0;   //スプライト重なり順
 
 #[allow( dead_code )]
-pub const COLOR_SPRITE_DEBUG_GRID: Color = Color::rgba( 0.8, 0.8, 0.8, 0.1 );     //スプライト色(透過)
-pub const COLOR_SPRITE_DOT       : Color = Color::rgba( 1.0, 1.0, 0.7, 1.0 );     //スプライト色
-pub const COLOR_SPRITE_PLAYER    : Color = Color::YELLOW;                         //スプライト色
-pub const COLOR_SPRITE_TILE      : Color = Color::rgb_linear( 0.25, 0.06, 0.04 ); //スプライト色
+pub const COLOR_SPRITE_DEBUG_GRID: Color = Color::rgba( 0.8, 0.8, 0.8, 0.1 );   //スプライト色(透過)
+pub const COLOR_SPRITE_DOT       : Color = Color::rgba( 1.0, 1.0, 0.7, 1.0 );   //スプライト色
+pub const COLOR_SPRITE_PLAYER    : Color = Color::YELLOW;                       //スプライト色
+pub const COLOR_SPRITE_TILE      : Color = Color::YELLOW;                       //スプライト色
 
 pub const MAGNIFY_SPRITE_DOT   : f32 = 0.08;    //スプライト拡縮率
 pub const MAGNIFY_SPRITE_PLAYER: f32 = 0.4;     //スプライト拡縮率
