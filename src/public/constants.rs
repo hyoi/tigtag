@@ -13,7 +13,7 @@ pub static MAP_PIXELS_DISPLAY_OFFSET: Lazy<Pixel> = Lazy::new   //マップ表�
 );
 
 pub const DESIGN_GAME_FRAME: [ &str; SCREEN_GRIDS_HEIGHT as usize ] = //画面デザイン(枠)
-//   0123456789 123456789 1234
+//   0123456789 123456789 123456789
 [   "                         ", //0----
     "#########################", //1
     "#                       #", //2
@@ -33,7 +33,7 @@ pub const DESIGN_GAME_FRAME: [ &str; SCREEN_GRIDS_HEIGHT as usize ] = //画面�
     "#                       #", //16
     "#########################", //17
     "                         ", //18
-]; //0123456789 123456789 123456
+]; //0123456789 123456789 123456789
 
 const SCREEN_SCALING      : f32 = 4.0;
 const BASE_PIXELS_PER_GRID: i32 = 8;
@@ -58,16 +58,18 @@ pub const MAP_GRIDS_RANGE_Y: Range<i32> = 0..MAP_GRIDS_HEIGHT;          //マッ
 pub const ASSETS_FONT_ORBITRON_BLACK      : &str = "fonts/Orbitron-Black.ttf";       //フォント
 pub const ASSETS_FONT_REGGAEONE_REGULAR   : &str = "fonts/ReggaeOne-Regular.ttf";    //フォント
 pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "fonts/PressStart2P-Regular.ttf"; //フォント
+pub const ASSETS_FONT_BIZUDPGOTHIC_REGULAR: &str = "fonts/BIZUDPGothic-Regular.ttf"; //フォント
 pub const ASSETS_SPRITE_DEBUG_GRID        : &str = "sprites/debug_grid.png";         //スプライト
 pub const ASSETS_SPRITE_BRICK_WALL        : &str = "sprites/brick_wall.png";         //スプライト
 pub const ASSETS_SPRITE_KANI_DOTOWN       : &str = "sprites/kani_DOTOWN.png";        //スプライト
 pub const ASSETS_SOUND_BEEP               : &str = "audio/sounds/beep.ogg";          //サウンド
 
 //事前ロード対象のAsset
-pub const FETCH_ASSETS: [ &str; 7 ] =
+pub const FETCH_ASSETS: [ &str; 8 ] =
 [   ASSETS_FONT_ORBITRON_BLACK,
     ASSETS_FONT_REGGAEONE_REGULAR,
     ASSETS_FONT_PRESSSTART2P_REGULAR,
+    ASSETS_FONT_BIZUDPGOTHIC_REGULAR,
     ASSETS_SPRITE_DEBUG_GRID,
     ASSETS_SPRITE_BRICK_WALL,
     ASSETS_SPRITE_KANI_DOTOWN,
@@ -197,6 +199,12 @@ pub const FOOTER_CENTER_TEXT: [ MessageSect; 1 ] =
 ];
 pub const FOOTER_RIGHT_TEXT: [ MessageSect; 1 ] =
 [   ( "Powered by RUST & BEVY ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
+];
+
+//debug用数字タイル
+#[cfg( debug_assertions )]
+pub const NUM_TILE_TEXT: [ MessageSect; 1 ] =
+[   ( "", ASSETS_FONT_BIZUDPGOTHIC_REGULAR, PIXELS_PER_GRID * 0.3, Color::rgba( 1.0, 1.0, 1.0, 0.3 ) ),
 ];
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

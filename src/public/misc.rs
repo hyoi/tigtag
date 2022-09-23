@@ -7,30 +7,6 @@ pub fn spawn_camera( mut cmds: Commands )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//デバッグ用に方眼を表示する
-#[cfg( debug_assertions )]
-pub fn spawn_debug_grid
-(   mut cmds: Commands,
-    asset_svr: Res<AssetServer>,
-)
-{   let custom_size = Some ( Pixel::new( PIXELS_PER_GRID, PIXELS_PER_GRID ) );
-    let color = COLOR_SPRITE_DEBUG_GRID;
-
-    for x in SCREEN_GRIDS_RANGE_X
-    {   for y in SCREEN_GRIDS_RANGE_Y
-        {   let pixel_xy = Grid::new( x, y ).into_pixel_screen();
-            cmds
-            .spawn_bundle( SpriteBundle::default() )
-            .insert( Sprite { custom_size, color, ..default() } )
-            .insert( Transform::from_translation( pixel_xy.extend( DEPTH_SPRITE_DEBUG_GRID ) ) )
-            .insert( asset_svr.load( ASSETS_SPRITE_DEBUG_GRID ) as Handle<Image> )
-            ;
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 //[Alt]+[Enter]でウィンドウとフルスクリーンを切り替える
 #[cfg( not( target_arch = "wasm32" ) )]
 pub fn toggle_window_mode

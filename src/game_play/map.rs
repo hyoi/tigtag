@@ -72,10 +72,12 @@ pub fn make_new_data
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+type WithMapEntities = Or< ( With<SpriteWall>, With<SpriteDot> ) >;
+
 //スプライトをspawnしてマップを表示する
 pub fn spawn_sprite
-(   q1: Query<Entity, With<SpriteWall>>,
-    q2: Query<Entity, With<SpriteDot>>,
+(   q1: Query<Entity, WithMapEntities>,
+    // mut q2: Query<( &mut Text, &TextUiNumTile )>,
     mut map: ResMut<Map>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
@@ -84,7 +86,6 @@ pub fn spawn_sprite
 )
 {   //スプライトがあれば削除する
     q1.for_each( | id | cmds.entity( id ).despawn_recursive() );
-    q2.for_each( | id | cmds.entity( id ).despawn_recursive() );
 
     //壁とドットのスプライトを配置する
     let custom_size = Some( Pixel::new( PIXELS_PER_GRID, PIXELS_PER_GRID ) );
@@ -123,6 +124,37 @@ pub fn spawn_sprite
             }
         }
     }
+
+    //Debug用の表示
+    // for y in MAP_GRIDS_RANGE_Y
+    // {   for x in MAP_GRIDS_RANGE_X
+    //     {   let grid = Grid::new( x, y );
+    //         if map.is_passage( grid )
+    //         {   let count = map.count_9squares( grid );
+    //             q2.for_each_mut
+    //             (   | ( mut text, TextUiNumTile( x ) ) |
+    //                 if *x == grid
+    //                 {   text.sections[ 0 ].value = count.to_string()
+    //                 }
+    //             )
+    //         }
+    //     }
+    // }
 }
+
+// impl Map
+// {   pub fn count_9squares( &mut self, center: Grid ) -> i32
+//     {   let mut count = 0;
+//         for dx in -1..=1
+//         {   for dy in -1..=1
+//             {   let grid = center + Grid::new( dx, dy );
+//                 if self.is_passage( grid ) && *self.o_entity_mut( grid ) != None
+//                 {   count += 1;
+//                 }
+//             }
+//         }
+//         count
+//     }
+// }
 
 //End of code.

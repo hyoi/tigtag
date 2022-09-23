@@ -3,6 +3,7 @@ use super::*;
 //壁とドットのComponent
 #[derive( Component )] pub struct SpriteWall;
 #[derive( Component )] pub struct SpriteDot;
+#[derive( Component )] pub struct TextUiNumTile ( pub Grid ); //Debug用の数値表示タイル
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

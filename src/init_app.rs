@@ -29,6 +29,7 @@ impl Plugin for InitApp
         .init_resource::<Map>()                 //迷路の情報
         .add_event::<EventClear>()              //ステージクリアイベント
         .add_event::<EventOver>()               //ゲームオーバーイベント
+//      .insert_resource( MarkAfterFetchAssets ( GameState::Debug ) ) //for debug(text UI)
         ;
 
         //共通のSystem
@@ -59,7 +60,7 @@ impl Plugin for InitApp
         .add_system_set
         (   SystemSet::on_exit( GameState::Init )           //<EXIT>
             .with_system( despawn_entity::<SpriteTile> )    //アニメ用スプライトの削除
-            .with_system( spawn_game_frame )                //枠の表示
+            .with_system( spawn_game_frame )                //ゲームの枠の表示
             .with_system( spawn_text_ui )                   //text UIのspawn
         )
         ;
@@ -69,7 +70,7 @@ impl Plugin for InitApp
         app
         .add_system_set
         (   SystemSet::on_exit( GameState::Init )           //<EXIT>
-            .with_system( spawn_debug_grid )                //方眼を表示
+            .with_system( spawn_debug_info )                //debug用の情報を表示
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -171,7 +172,7 @@ fn move_sprite_now_loading
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//画面枠を表示する
+//ゲームの枠を表示する
 fn spawn_game_frame
 (   mut cmds : Commands,
     asset_svr: Res<AssetServer>,
@@ -344,6 +345,86 @@ fn spawn_text_ui
     .insert( asset_svr.load( ASSETS_SPRITE_KANI_DOTOWN ) as Handle<Image> )
     .insert( Transform::from_translation( pixel.extend( DEPTH_SPRITE_KANI_DOTOWN ) ) )
     ;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//デバッグ用の情報を表示
+#[cfg( debug_assertions )]
+pub fn spawn_debug_info
+(   mut cmds: Commands,
+    asset_svr: Res<AssetServer>,
+)
+{   let custom_size = Some ( Pixel::new( PIXELS_PER_GRID, PIXELS_PER_GRID ) );
+    let color = COLOR_SPRITE_DEBUG_GRID;
+
+    //方眼を表示する
+    for x in SCREEN_GRIDS_RANGE_X
+    {   for y in SCREEN_GRIDS_RANGE_Y
+        {   let pixel_xy = Grid::new( x, y ).into_pixel_screen();
+            cmds
+            .spawn_bundle( SpriteBundle::default() )
+            .insert( Sprite { custom_size, color, ..default() } )
+            .insert( Transform::from_translation( pixel_xy.extend( DEPTH_SPRITE_DEBUG_GRID ) ) )
+            .insert( asset_svr.load( ASSETS_SPRITE_DEBUG_GRID ) as Handle<Image> )
+            ;
+        }
+    }
+
+    //Map内に数値用のText UIを表示する
+    for x in MAP_GRIDS_RANGE_X
+    {   for y in MAP_GRIDS_RANGE_Y
+        {   let grid = Grid::new( x, y );
+            let pixel = grid.into_pixel_map();
+
+            //UIのFLEX座標系に合せる
+            let mut text_ui = Pixel::new( pixel.x, - pixel.y );
+            text_ui.x += SCREEN_PIXELS_WIDTH  / 2.0 - PIXELS_PER_GRID / 2.0;
+            text_ui.y += SCREEN_PIXELS_HEIGHT / 2.0 - PIXELS_PER_GRID;
+
+            let mut txt = NUM_TILE_TEXT;
+            let val = format!( "{}:{}", x, y );
+            txt[ 0 ].0 = &val;
+
+            cmds
+            .spawn_bundle( text_ui_num_tile( text_ui, &txt, &asset_svr ) )
+            .insert( TextUiNumTile ( grid ) )
+            ;
+        }
+    }
+}
+
+//デバッグ用のText UI
+#[cfg( debug_assertions )]
+fn text_ui_num_tile
+(   pixel: Pixel,
+    message: &[ MessageSect ],
+    asset_svr: &Res<AssetServer>,
+) -> TextBundle
+{   let mut sections = Vec::new();
+    for ( line, file, size, color ) in message.iter()
+    {   let value = line.to_string();
+        let style = TextStyle
+        {   font     : asset_svr.load( *file ),
+            font_size: *size,
+            color    : *color
+        };
+        sections.push( TextSection { value, style } );
+    }
+    let text = Text { sections, ..default() };
+    let ( left, top, width, height ) =
+    (   Val::Px( pixel.x ),
+        Val::Px( pixel.y ),
+        Val::Px( PIXELS_PER_GRID ),
+        Val::Px( PIXELS_PER_GRID ),
+    );
+    let style = Style
+    {   position_type: PositionType::Absolute,
+        position: UiRect { left, top, ..default() },
+        size: Size { width, height },
+        ..default()
+    };
+    TextBundle { text, style, ..default() }
 }
 
 //End of code.

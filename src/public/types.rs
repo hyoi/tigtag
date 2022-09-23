@@ -42,8 +42,9 @@ impl Record
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ゲームの状態
+#[allow( dead_code )]
 #[derive( Clone, Copy, Eq, PartialEq, Hash, Debug )]
-pub enum GameState { Init, Title, DemoNext, Start, MainLoop, GameOver, Replay, ClearStage, Pause, }
+pub enum GameState { Init, Title, DemoNext, Start, MainLoop, GameOver, Replay, ClearStage, Pause, Debug }
 #[allow( dead_code )]
 impl GameState
 {   pub fn is_clearstage( &self ) -> bool { *self == GameState::ClearStage }
