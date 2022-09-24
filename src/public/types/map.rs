@@ -18,6 +18,7 @@ pub struct Map
 {   pub rng            : rand::prelude::StdRng,     //マップ生成専用の乱数生成器(マップに再現性を持たせるため)
     map_bits           : Vec<Vec<usize>>,           //マップの各グリッドの状態をbitで保存
     dot_entities       : Vec<Vec<Option<Entity>>>,  //ドットをdespawnする際に使うEntityIDを保存
+    land_values        : Vec<Vec<i32>>,             //マス目(通路のドット)の重みづけ用
     pub remaining_dots : i32,                       //マップに残っているドットの数
     dummy_o_entity_none: Option<Entity>,            //o_entity_mut()の範囲外アクセスで&mut Noneを返すために使用
 }
@@ -37,6 +38,7 @@ impl Default for Map
         {   rng                : StdRng::seed_from_u64( seed ),
             map_bits           : vec![ vec![ 0   ; MAP_GRIDS_HEIGHT as usize ]; MAP_GRIDS_WIDTH as usize ],
             dot_entities       : vec![ vec![ None; MAP_GRIDS_HEIGHT as usize ]; MAP_GRIDS_WIDTH as usize ],
+            land_values        : vec![ vec![ 0   ; MAP_GRIDS_HEIGHT as usize ]; MAP_GRIDS_WIDTH as usize ],
             remaining_dots     : 0,
             dummy_o_entity_none: None,
         }
@@ -46,8 +48,8 @@ impl Default for Map
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //マップ構造体のメソッド
-//メソッド経由にして範囲外アクセスも意図した値を返す。
-//パニックさせないため構造体メンバーに直接アクセスさせない(Not pub)。
+//メソッド経由にすることで配列の範囲外アクセスもパニックさせず意図した値を返す。
+//構造体メンバーに直接アクセスさせない(構造体メンバーはNot pub)。
 impl Map
 {   fn bits    ( &    self, grid: Grid ) ->      usize {      self.map_bits[ grid.x as usize ][ grid.y as usize ] }
     fn bits_mut( &mut self, grid: Grid ) -> &mut usize { &mut self.map_bits[ grid.x as usize ][ grid.y as usize ] }
@@ -90,6 +92,9 @@ impl Map
         }
         else { &mut self.dummy_o_entity_none } //範囲外は&mut Option::Noneを返す
     }
+
+    pub fn land_values    ( &    self, grid: Grid ) ->      i32 {      self.land_values[ grid.x as usize ][ grid.y as usize ] }
+    pub fn land_values_mut( &mut self, grid: Grid ) -> &mut i32 { &mut self.land_values[ grid.x as usize ][ grid.y as usize ] }
 }
 
 //End of code.
