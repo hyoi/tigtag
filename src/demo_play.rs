@@ -9,7 +9,11 @@ impl Plugin for DemoPlay
         app
         .add_system_set
         (   SystemSet::on_enter( GameState::Title )             //<ENTER>
+            .before( Mark::MakeMapNewData )                     //<before>
             .with_system( init_demoplay_record )                //デモプレイ開始時の初期化
+        )
+        .add_system_set
+        (   SystemSet::on_enter( GameState::Title )             //<ENTER>
             .label( Mark::MakeMapNewData )                      //<label>
             .with_system( map::make_new_data )                  //新マップのデータ作成
         )
