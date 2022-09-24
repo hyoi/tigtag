@@ -131,7 +131,7 @@ pub fn spawn_sprite
 
 impl Map
 {   //中心の座標をもらい、周囲9マスのドットを数える
-    fn count_9squares( &self, center: Grid ) -> i32
+    pub fn count_9squares( &self, center: Grid ) -> i32
     {   let mut count = 0;
         for dx in -1..=1
         {   for dy in -1..=1

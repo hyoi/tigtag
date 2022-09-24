@@ -190,15 +190,15 @@ fn rotate_player_sprite
 
 //スコアの処理とクリア判定
 pub fn scoring_and_clear_stage
-(   q: Query<&Player>,
+(   q1: Query<&Player>,
+    mut _q2: Query<( &mut Text, &TextUiNumTile )>,
     mut record: ResMut<Record>,
     mut map: ResMut<Map>,
     mut state: ResMut<State<GameState>>,
     mut ev_clear: EventWriter<EventClear>,
-    mut cmds: Commands,
-    ( asset_svr, audio ): ( Res<AssetServer>, Res<Audio> ),
+    ( mut cmds, asset_svr, audio ): ( Commands, Res<AssetServer>, Res<Audio> ),
 )
-{   if let Ok ( player ) = q.get_single()
+{   if let Ok ( player ) = q1.get_single()
     {   //自機の位置にドットがあるなら
         if let Some ( id ) = map.o_entity( player.grid )
         {   //スプライト削除
@@ -226,6 +226,32 @@ pub fn scoring_and_clear_stage
                 };
                 let _ = state.overwrite_set( next );
                 ev_clear.send( EventClear );    //後続の処理にクリアを伝える
+            }
+            else
+            {   //クリアではないなら周囲9マスのland_valuesを更新する
+                for dx in -1..=1
+                {   for dy in -1..=1
+                    {   let grid = player.grid + Grid::new( dx, dy );
+                        *map.land_values_mut( grid )
+                            = if map.is_passage( grid ) && map.o_entity( grid ).is_some()
+                            {   map.count_9squares( grid )
+                            }
+                            else
+                            {   0
+                            };
+                    
+                        //デバッグ用の表示
+                        #[cfg( debug_assertions )]
+                        _q2.for_each_mut
+                        (   | ( mut text, TextUiNumTile( x ) ) |
+                            if *x == grid
+                            {   let count = map.land_values( grid );
+                                text.sections[ 0 ].value
+                                    = if count != 0 { count.to_string() } else { "".to_string() }
+                            }
+                        );
+                    }
+                }
             }
         }
     }
