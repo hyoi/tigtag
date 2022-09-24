@@ -220,7 +220,6 @@ pub fn move_sprite
 pub fn detect_collisions
 (   q_player: Query<&Player>,
     q_chaser: Query<&Chaser>,
-    record: Res<Record>,
     mut state: ResMut<State<GameState>>,
     mut ev_over: EventWriter<EventOver>,
 )
@@ -228,12 +227,13 @@ pub fn detect_collisions
 
     //クリアしていなければ衝突判定する
     if ! state.current().is_clearstage() && is_collision( q_player, q_chaser )
-    {   let next = if record.is_demoplay()
-        {   GameState::DemoNext
-        }
-        else
-        {   GameState::GameOver
-        };
+    {   let next
+            = if state.current().is_demoplay()
+            {   GameState::DemoNext
+            }
+            else
+            {   GameState::GameOver
+            };
         let _ = state.overwrite_set( next );
         ev_over.send( EventOver );    //後続の処理にゲームオーバーを伝える
     }

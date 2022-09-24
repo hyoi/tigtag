@@ -153,8 +153,7 @@ impl Plugin for GamePlay
 fn init_gameplay_record
 (   mut record: ResMut<Record>,
 )
-{   record.set_mode_play();
-    record.score = 0;
+{   record.score = 0;
     record.stage = 0;
 }
 

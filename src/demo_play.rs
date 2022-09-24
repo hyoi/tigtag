@@ -61,8 +61,7 @@ impl Plugin for DemoPlay
 fn init_demoplay_record
 (   mut record: ResMut<Record>,
 )
-{   record.set_mode_demo();
-    record.score = 0;
+{   record.score = 0;
     record.stage = 0;
 }
 

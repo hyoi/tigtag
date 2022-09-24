@@ -17,7 +17,6 @@ pub struct Record
 {   pub stage   : i32,      //ステージ数
     pub score   : i32,      //スコア
     pub hi_score: i32,      //ハイスコア
-    demo_flag   : bool,     //true:Demo mode, false: Player mode
     pub count   : i32,      //カウントダウンタイマーの初期値
     pub timer   : Timer,    //カウントダウンタイマー用タイマー
 }
@@ -27,16 +26,10 @@ impl Default for Record
         {   stage    : 0,
             score    : 0,
             hi_score : 0,
-            demo_flag: true,
             count: 0,
             timer: Timer::from_seconds( 1.0, false ),
         }
     }
-}
-impl Record
-{   pub fn is_demoplay( &self ) -> bool { self.demo_flag }
-    pub fn set_mode_demo( &mut self ) { self.demo_flag = true  }
-    pub fn set_mode_play( &mut self ) { self.demo_flag = false }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +42,7 @@ pub enum GameState { Init, Title, DemoNext, Start, MainLoop, GameOver, Replay, C
 impl GameState
 {   pub fn is_clearstage( &self ) -> bool { *self == GameState::ClearStage }
     pub fn is_pause     ( &self ) -> bool { *self == GameState::Pause      }
+    pub fn is_demoplay  ( &self ) -> bool { *self == GameState::Title      }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

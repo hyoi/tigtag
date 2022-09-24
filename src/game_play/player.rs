@@ -53,8 +53,8 @@ pub fn spawn_sprite
 //自機の移動
 pub fn move_sprite
 (   mut q: Query<(&mut Player, &mut Transform)>,
-    record: Res<Record>,
     map: Res<Map>,
+    state: Res<State<GameState>>,
     mut ev_clear: EventReader<EventClear>,
     mut ev_over : EventReader<EventOver>,
     inkey: Res<Input<KeyCode>>,
@@ -79,7 +79,7 @@ pub fn move_sprite
         //自機の進行方向を決める
         player.stop = false;
         let mut side = player.side;
-        if ! record.is_demoplay()
+        if ! state.current().is_demoplay()
         {   //demoでなければプレイヤーのキー入力を確認(入力がなければ停止)
                  if inkey.pressed( KeyCode::Up    ) { side = DxDy::Up;    }
             else if inkey.pressed( KeyCode::Down  ) { side = DxDy::Down;  }
@@ -212,18 +212,19 @@ pub fn scoring_and_clear_stage
             audio.play( asset_svr.load( ASSETS_SOUND_BEEP ) );
 
             //ハイスコアの更新
-            if ! record.is_demoplay() && record.score > record.hi_score
+            if ! state.current().is_demoplay() && record.score > record.hi_score
             {   record.hi_score = record.score;
             }
 
             //全ドットを拾ったら、Clearへ遷移する
             if map.remaining_dots <= 0
-            {   let next = if record.is_demoplay()
-                {   GameState::DemoNext
-                }
-                else
-                {   GameState::ClearStage
-                };
+            {   let next
+                    = if state.current().is_demoplay()
+                    {   GameState::DemoNext
+                    }
+                    else
+                    {   GameState::ClearStage
+                    };
                 let _ = state.overwrite_set( next );
                 ev_clear.send( EventClear );    //後続の処理にクリアを伝える
             }
