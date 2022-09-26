@@ -52,7 +52,7 @@ pub fn spawn_sprite
 
 //自機の移動
 pub fn move_sprite
-(   mut q: Query<(&mut Player, &mut Transform)>,
+(   ( mut q_player, q_chaser ): ( Query<(&mut Player, &mut Transform)>, Query<&Chaser> ),
     map: Res<Map>,
     state: Res<State<GameState>>,
     mut ev_clear: EventReader<EventClear>,
@@ -64,7 +64,7 @@ pub fn move_sprite
     if ev_clear.iter().next().is_some() { return }
     if ev_over .iter().next().is_some() { return }
 
-    let ( mut player, mut transform ) = q.get_single_mut().unwrap(); //プレイヤーの情報
+    let ( mut player, mut transform ) = q_player.get_single_mut().unwrap(); //プレイヤーの情報
     let time_delta = time.delta().mul_f32( player.speedup ); //前回からの経過時間×スピードアップ係数
 
     //待ち時間が完了したら
@@ -101,29 +101,27 @@ pub fn move_sprite
             if map.is_passage( player.next + DxDy::Left  ) && player.side != DxDy::Right { sides.push( DxDy::Left  ) }
 
             //demoなのでプレイヤーのキー入力を詐称する
-            let count = sides.len();
-
             use std::cmp::Ordering;
-            match count.cmp( &1 )
-            {   Ordering::Equal =>
-                {   //一本道では道なりに進む
-                    side = sides[ 0 ];
-                },
-                Ordering::Greater =>
-                {   //道が複数あるなら、乱数で決める
-                    let mut rng = rand::thread_rng();
-                    side = sides[ rng.gen_range( 0..sides.len() ) ];
-                },
-                Ordering::Less =>
-                {   //行き止まりでは逆走する(このゲームに行き止まりはないけど)
-                    side = match player.side
-                    {   DxDy::Up    => DxDy::Down ,
-                        DxDy::Down  => DxDy::Up   ,
-                        DxDy::Right => DxDy::Left ,
-                        DxDy::Left  => DxDy::Right,
-                    };
-                },
-            }
+            side
+                = match sides.len().cmp( &1 )
+                {   Ordering::Equal => //一本道なら道なりに進む
+                        sides[ 0 ],
+                    Ordering::Greater => //分かれ道なら乱数で決める
+                        if let Some ( fnx ) = player.fn_runaway
+                        {   fnx( &player, q_chaser, &map, &sides )
+                        }
+                        else
+                        {   let mut rng = rand::thread_rng();
+                            sides[ rng.gen_range( 0..sides.len() ) ] //関数ポインタがNoneの場合
+                        },
+                    Ordering::Less => //行き止まりなら逆走する(このゲームに行き止まりはないけど)
+                        match player.side
+                        {   DxDy::Up    => DxDy::Down ,
+                            DxDy::Down  => DxDy::Up   ,
+                            DxDy::Right => DxDy::Left ,
+                            DxDy::Left  => DxDy::Right,
+                        },
+                };
         }
 
         //自機の向きが変化したらスプライトを回転させる
@@ -184,6 +182,14 @@ fn rotate_player_sprite
 
     let quat = Quat::from_rotation_z( angle.to_radians() );
     transform.rotate( quat );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//(demoplay)自機の移動方向を決める関数
+fn test_func( _p: &Player, _q_c: Query<&Chaser>, _m: &Map, sides: &[ DxDy ] ) -> DxDy
+{   let mut rng = rand::thread_rng();
+    sides[ rng.gen_range( 0..sides.len() ) ]
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
