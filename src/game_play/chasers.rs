@@ -145,35 +145,28 @@ pub fn move_sprite
             if map.is_passage( chaser.next + DxDy::Left  ) && chaser.side != DxDy::Right { sides.push( DxDy::Left  ) }
 
             //追手の向きを決める（自機のプレーヤーのキー入力に相当）
-            chaser.stop = false;
-            let count = sides.len(); //countは1以上(このゲームのマップには行き止まりが無いので)
-
             use std::cmp::Ordering;
-            match count.cmp( &1 )
-            {   Ordering::Equal =>
-                {   //一本道では道なりに進む
-                    chaser.side = sides[ 0 ];
-                },
-                Ordering::Greater =>
-                {   //道が複数あるなら外部関数で進行方向を決める
-                    if chaser.fn_chasing.is_some()
-                    {   chaser.side = ( chaser.fn_chasing.unwrap() )( &mut chaser, player, &sides );
-                    }
-                    else
-                    {   //外部関数が設定されていなければ停止フラグを立てる
-                        chaser.stop = true;
-                    }
-                },
-                Ordering::Less =>
-                {   //行き止まりでは逆走する(このゲームに行き止まりはないけど)
-                    chaser.side = match chaser.side
-                    {   DxDy::Up    => DxDy::Down ,
-                        DxDy::Down  => DxDy::Up   ,
-                        DxDy::Right => DxDy::Left ,
-                        DxDy::Left  => DxDy::Right,
-                    };
-                },
-            }
+            chaser.stop = false;
+            chaser.side
+                = match sides.len().cmp( &1 ) //sides要素数は1以上(このゲームのマップに行き止まりが無いので)
+                {   Ordering::Equal =>
+                        sides[ 0 ], //一本道なら道なりに進む
+                    Ordering::Greater =>
+                        if let Some ( fnx ) = chaser.fn_chasing
+                        {   fnx( &mut chaser, player, &sides ) //分かれ道なら外部関数で進行方向を決める
+                        }
+                        else
+                        {   chaser.stop = true; //外部関数がない(None)なら停止フラグを立てる
+                            chaser.side
+                        },
+                    Ordering::Less =>
+                        match chaser.side //行き止まりなら逆走する(このゲームに行き止まりはないけど)
+                        {   DxDy::Up    => DxDy::Down ,
+                            DxDy::Down  => DxDy::Up   ,
+                            DxDy::Right => DxDy::Left ,
+                            DxDy::Left  => DxDy::Right,
+                        },
+                };
 
             //現在の位置と次の位置を更新する
             chaser.grid = chaser.next;
