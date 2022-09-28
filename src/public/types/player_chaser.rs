@@ -26,7 +26,7 @@ impl Default for Player
             speedup   : 1.0,
             px_start  : Pixel::default(),
             px_end    : Pixel::default(),
-            fn_runaway: Some ( which_way_player_goes ), //None,
+            fn_runaway: None,
         }
     }
 }
