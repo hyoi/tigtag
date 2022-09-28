@@ -1,5 +1,8 @@
 use super::*;
 
+mod which_way_goes;
+pub use which_way_goes::*; //re-export
+
 //スプライトをspawnして自機を表示する
 pub fn spawn_sprite
 (   q: Query<Entity, With<Player>>,
@@ -103,19 +106,19 @@ pub fn move_sprite
             //demoなのでプレイヤーのキー入力を詐称する
             use std::cmp::Ordering;
             side
-                = match sides.len().cmp( &1 )
-                {   Ordering::Equal => //一本道なら道なりに進む
-                        sides[ 0 ],
-                    Ordering::Greater => //分かれ道なら乱数で決める
+                = match sides.len().cmp( &1 ) //sides要素数は1以上(このゲームのマップに行き止まりが無いので)
+                {   Ordering::Equal =>
+                        sides[ 0 ], //一本道なら道なりに進む
+                    Ordering::Greater =>
                         if let Some ( fnx ) = player.fn_runaway
-                        {   fnx( &player, q_chaser, &map, &sides )
+                        {   fnx( &player, q_chaser, &map, &sides ) //分かれ道なら外部関数で進行方向を決める
                         }
                         else
                         {   let mut rng = rand::thread_rng();
-                            sides[ rng.gen_range( 0..sides.len() ) ] //関数ポインタがNoneの場合
+                            sides[ rng.gen_range( 0..sides.len() ) ] //外部関数がない(None)なら乱数で決める
                         },
-                    Ordering::Less => //行き止まりなら逆走する(このゲームに行き止まりはないけど)
-                        match player.side
+                    Ordering::Less =>
+                        match player.side //行き止まりなら逆走する(このゲームに行き止まりはないけど)
                         {   DxDy::Up    => DxDy::Down ,
                             DxDy::Down  => DxDy::Up   ,
                             DxDy::Right => DxDy::Left ,
@@ -157,39 +160,32 @@ fn rotate_player_sprite
     transform: &mut Mut<Transform>,
     input: DxDy
 )
-{   let angle: f32 = match player.side
-    {   DxDy::Up =>
-        {        if input == DxDy::Left  {  90.0 }
-            else if input == DxDy::Right { -90.0 }
-            else                         { 180.0 }
-        }
-        DxDy::Down =>
-        {        if input == DxDy::Right {  90.0 }
-            else if input == DxDy::Left  { -90.0 }
-            else                         { 180.0 }
-        }
-        DxDy::Right =>
-        {        if input == DxDy::Up    {  90.0 }
-            else if input == DxDy::Down  { -90.0 }
-            else                         { 180.0 }
-        }
-        DxDy::Left =>
-        {        if input == DxDy::Down  {  90.0 }
-            else if input == DxDy::Up    { -90.0 }
-            else                         { 180.0 }
-        }
-    };
+{   let angle: f32
+        = match player.side
+        {   DxDy::Up =>
+            {        if input == DxDy::Left  {  90.0 }
+                else if input == DxDy::Right { -90.0 }
+                else                         { 180.0 }
+            }
+            DxDy::Down =>
+            {        if input == DxDy::Right {  90.0 }
+                else if input == DxDy::Left  { -90.0 }
+                else                         { 180.0 }
+            }
+            DxDy::Right =>
+            {        if input == DxDy::Up    {  90.0 }
+                else if input == DxDy::Down  { -90.0 }
+                else                         { 180.0 }
+            }
+            DxDy::Left =>
+            {        if input == DxDy::Down  {  90.0 }
+                else if input == DxDy::Up    { -90.0 }
+                else                         { 180.0 }
+            }
+        };
 
     let quat = Quat::from_rotation_z( angle.to_radians() );
     transform.rotate( quat );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//(demoplay)自機の移動方向を決める関数
-fn test_func( _p: &Player, _q_c: Query<&Chaser>, _m: &Map, sides: &[ DxDy ] ) -> DxDy
-{   let mut rng = rand::thread_rng();
-    sides[ rng.gen_range( 0..sides.len() ) ]
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -264,4 +260,4 @@ pub fn scoring_and_clear_stage
     }
 }
 
-//End of code
+//End of code.
