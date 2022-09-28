@@ -42,6 +42,7 @@ pub fn spawn_sprite
         next    : grid,
         px_start: pixel,
         px_end  : pixel,
+        fn_runaway: Some ( which_way_player_goes ), //default()に任せるとNone 
         ..default()
     };
     cmds
