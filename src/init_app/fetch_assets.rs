@@ -21,7 +21,6 @@ pub fn spawn_sprite_now_loading
     let color = COLOR_SPRITE_TILE;
     let custom_size = Some ( Pixel::new( PIXELS_PER_GRID, PIXELS_PER_GRID ) * 0.75 );
  
-
     for ( goal_y, line ) in DESIGN_NOWLOADING_MESSAGE.iter().enumerate()
     {   for ( goal_x, chara ) in line.chars().enumerate()
         {   if chara == ' ' { continue }    //空白文字は無視
