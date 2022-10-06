@@ -216,9 +216,7 @@ pub fn detect_collisions
     mut state: ResMut<State<GameState>>,
     mut ev_over: EventWriter<EventOver>,
 )
-{   if cfg!( debug_assertions ) { return }   //debugでは無敵
-
-    //クリアしていなければ衝突判定する
+{   //クリアしていなければ衝突判定する
     if ! state.current().is_clearstage() && is_collision( q_player, q_chaser )
     {   let next
             = if state.current().is_demoplay()
