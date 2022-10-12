@@ -43,6 +43,16 @@ impl Plugin for DemoPlay
         ;
         //------------------------------------------------------------------------------------------
 
+        //debugで表示するスプライトの削除
+        #[cfg( debug_assertions )]
+        app
+        .add_system_set
+        (   SystemSet::on_update( GameState::Title )            //<UPDATE>
+            .before( Mark::DetectCollisions )                   //<before>
+            .with_system( despawn_entity::<PathFinder> )        //スプライト削除
+        )
+        ;
+
         //GameState::DemoNext
         //------------------------------------------------------------------------------------------
         app

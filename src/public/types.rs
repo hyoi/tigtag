@@ -150,4 +150,7 @@ pub struct LoadedAssets { pub preload: Vec<HandleUntyped> }
 //マーカーResource
 pub struct MarkAfterFetchAssets ( pub GameState );
 
+//開発用スプライトのComponent
+#[derive( Component )] pub struct PathFinder;
+
 //End of code.
