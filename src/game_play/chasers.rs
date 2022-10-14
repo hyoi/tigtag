@@ -1,15 +1,7 @@
 use super::*;
 
-//追手のスプライトの色と移動方向決定関数
-pub const COLOR_SPRITE_CHASERS: [ ( Color, Option<FnChasing> ); 4 ] =
-[   ( Color::RED,   Some ( which_way_red_goes   ) ),
-    ( Color::GREEN, Some ( which_way_green_goes ) ),
-    ( Color::PINK,  Some ( which_way_pink_goes  ) ),
-    ( Color::BLUE,  Some ( which_way_blue_goes  ) ),
-];
-
 //追手の移動方向を決める(赤)
-fn which_way_red_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
+pub fn which_way_red_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
 {        if sides.contains( &DxDy::Left  ) && player.next.x < chaser.grid.x { return DxDy::Left  }
     else if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
     else if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
@@ -20,7 +12,7 @@ fn which_way_red_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) 
 }
 
 //追手の移動方向を決める(青)
-fn which_way_blue_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
+pub fn which_way_blue_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
 {        if sides.contains( &DxDy::Down  ) && player.next.y > chaser.grid.y { return DxDy::Down  }
     else if sides.contains( &DxDy::Left  ) && player.next.x < chaser.grid.x { return DxDy::Left  }
     else if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
@@ -31,7 +23,7 @@ fn which_way_blue_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] )
 }
 
 //追手の移動方向を決める(緑)
-fn which_way_green_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
+pub fn which_way_green_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
 {        if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
     else if sides.contains( &DxDy::Down  ) && player.next.y > chaser.grid.y { return DxDy::Down  }
     else if sides.contains( &DxDy::Left  ) && player.next.x < chaser.grid.x { return DxDy::Left  }
@@ -42,7 +34,7 @@ fn which_way_green_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] 
 }
 
 //追手の移動方向を決める(ピンク)
-fn which_way_pink_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
+pub fn which_way_pink_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
 {        if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
     else if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
     else if sides.contains( &DxDy::Down  ) && player.next.y > chaser.grid.y { return DxDy::Down  }
@@ -71,7 +63,7 @@ pub fn spawn_sprite
     (   | ( i, ( x, y ) ) |
         {   let grid  = Grid::new( x, y );
             let pixel = grid.into_pixel_map();
-            let ( color, fn_chasing ) = COLOR_SPRITE_CHASERS[ ( ( stage + i ) % 4 ) as usize ];
+            let ( color, fn_chasing ) = COLOR_SPRITE_CHASERS[ ( ( stage - 1 + i ) % 4 ) as usize ];
             let chaser = Chaser
             {   grid,
                 next    : grid,

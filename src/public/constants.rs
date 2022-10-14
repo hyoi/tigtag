@@ -122,6 +122,13 @@ pub const CHASER_INIT_POSITION: [ ( i32, i32 ); 4 ] =               //スター�
 const MAX_X: i32 = MAP_GRIDS_WIDTH  - 2;
 const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
 
+pub const COLOR_SPRITE_CHASERS: [ ( Color, Option<FnChasing> ); 4 ] = 
+[   ( Color::RED,   Some ( which_way_red_goes   ) ), //追手の色と移動方向決定関数
+    ( Color::GREEN, Some ( which_way_green_goes ) ), //追手の色と移動方向決定関数
+    ( Color::PINK,  Some ( which_way_pink_goes  ) ), //追手の色と移動方向決定関数
+    ( Color::BLUE,  Some ( which_way_blue_goes  ) ), //追手の色と移動方向決定関数
+];
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //text UIの設定値
