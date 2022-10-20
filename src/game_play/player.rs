@@ -56,13 +56,11 @@ pub fn spawn_sprite
 
 //自機の移動
 pub fn move_sprite
-(   ( mut q_player, q_chaser ): ( Query<(&mut Player, &mut Transform)>, Query<&Chaser> ),
+(   ( mut q_player, q_chasers ): ( Query<(&mut Player, &mut Transform)>, Query<&Chaser> ),
     map: Res<Map>,
-    state: Res<State<GameState>>,
-    mut ev_clear: EventReader<EventClear>,
-    mut ev_over : EventReader<EventOver>,
-    inkey: Res<Input<KeyCode>>,
-    time : Res<Time>,
+    state: ResMut<State<GameState>>,
+    ( mut ev_clear, mut ev_over ): ( EventReader<EventClear>, EventReader<EventOver> ),
+    ( cmds, inkey, time ): ( Commands, Res<Input<KeyCode>>, Res<Time> ),
 )
 {   //直前の判定でクリア／オーバーしていたらスプライトの表示を変更しない
     if ev_clear.iter().next().is_some() { return }
@@ -97,35 +95,31 @@ pub fn move_sprite
             }
         }
         else
-        {   //demoなら四方で壁がない方向を確認する（逆走防止付き）
-            let mut sides = Vec::with_capacity( 4 );
-            if map.is_passage( player.next + DxDy::Up    ) && player.side != DxDy::Down  { sides.push( DxDy::Up    ) }
-            if map.is_passage( player.next + DxDy::Down  ) && player.side != DxDy::Up    { sides.push( DxDy::Down  ) }
-            if map.is_passage( player.next + DxDy::Right ) && player.side != DxDy::Left  { sides.push( DxDy::Right ) }
-            if map.is_passage( player.next + DxDy::Left  ) && player.side != DxDy::Right { sides.push( DxDy::Left  ) }
+        {   //四方の脇道を取得する
+            let mut sides = map.get_byways_list( player.next );         //脇道のリスト
+            sides.retain( | side | player.next + side != player.grid ); //戻り路を排除
 
             //demoなのでプレイヤーのキー入力を詐称する
             use std::cmp::Ordering;
-            side
-                = match sides.len().cmp( &1 ) //sides要素数は1以上(このゲームのマップに行き止まりが無いので)
-                {   Ordering::Equal =>
-                        sides[ 0 ], //一本道なら道なりに進む
-                    Ordering::Greater =>
-                        if let Some ( fnx ) = player.fn_runaway
-                        {   fnx( &player, q_chaser, &map, &sides ) //分かれ道なら外部関数で進行方向を決める
-                        }
-                        else
-                        {   let mut rng = rand::thread_rng();
-                            sides[ rng.gen_range( 0..sides.len() ) ] //外部関数がない(None)なら乱数で決める
-                        },
-                    Ordering::Less =>
-                        match player.side //行き止まりなら逆走する(このゲームに行き止まりはないけど)
-                        {   DxDy::Up    => DxDy::Down ,
-                            DxDy::Down  => DxDy::Up   ,
-                            DxDy::Right => DxDy::Left ,
-                            DxDy::Left  => DxDy::Right,
-                        },
-                };
+            side = match sides.len().cmp( &1 )
+            {   Ordering::Equal => //一本道 ⇒ 道なりに進む
+                    sides[ 0 ],
+                Ordering::Greater => //三叉路または十字路
+                    if let Some ( fnx ) = player.fn_runaway
+                    {   fnx( &player, q_chasers, map, &sides, state, cmds ) //外部関数で進行方向を決める
+                    }
+                    else
+                    {   let mut rng = rand::thread_rng();
+                        sides[ rng.gen_range( 0..sides.len() ) ] //外部関数がない(None)なら乱数で決める
+                    },
+                Ordering::Less => //行き止まり ⇒ 逆走 (このゲームに行き止まりはないけど)
+                    match player.side
+                    {   DxDy::Up    => DxDy::Down ,
+                        DxDy::Down  => DxDy::Up   ,
+                        DxDy::Right => DxDy::Left ,
+                        DxDy::Left  => DxDy::Right,
+                    },
+            };
         }
 
         //自機の向きが変化したらスプライトを回転させる
@@ -161,29 +155,24 @@ fn rotate_player_sprite
     transform: &mut Mut<Transform>,
     input: DxDy
 )
-{   let angle: f32
-        = match player.side
-        {   DxDy::Up =>
-            {        if input == DxDy::Left  {  90.0 }
-                else if input == DxDy::Right { -90.0 }
-                else                         { 180.0 }
-            }
-            DxDy::Down =>
-            {        if input == DxDy::Right {  90.0 }
-                else if input == DxDy::Left  { -90.0 }
-                else                         { 180.0 }
-            }
-            DxDy::Right =>
-            {        if input == DxDy::Up    {  90.0 }
-                else if input == DxDy::Down  { -90.0 }
-                else                         { 180.0 }
-            }
-            DxDy::Left =>
-            {        if input == DxDy::Down  {  90.0 }
-                else if input == DxDy::Up    { -90.0 }
-                else                         { 180.0 }
-            }
-        };
+{   let angle: f32 = match player.side
+    {   DxDy::Up =>
+                 if input == DxDy::Left  {  90.0 }
+            else if input == DxDy::Right { -90.0 }
+            else                         { 180.0 },
+        DxDy::Down =>
+                 if input == DxDy::Right {  90.0 }
+            else if input == DxDy::Left  { -90.0 }
+            else                         { 180.0 },
+        DxDy::Right =>
+                 if input == DxDy::Up    {  90.0 }
+            else if input == DxDy::Down  { -90.0 }
+            else                         { 180.0 },
+        DxDy::Left =>
+                 if input == DxDy::Down  {  90.0 }
+            else if input == DxDy::Up    { -90.0 }
+            else                         { 180.0 },
+    };
 
     let quat = Quat::from_rotation_z( angle.to_radians() );
     transform.rotate( quat );
@@ -215,7 +204,12 @@ pub fn scoring_and_clear_stage
             audio.play( asset_svr.load( ASSETS_SOUND_BEEP ) );
 
             //ハイスコアの更新
+            #[cfg(not( debug_assertions ))]
             if ! state.current().is_demoplay() && record.score > record.hi_score
+            {   record.hi_score = record.score;
+            }
+            #[cfg( debug_assertions )] //Debug中はdemoでもハイスコアを記録する
+            if record.score > record.hi_score
             {   record.hi_score = record.score;
             }
 
