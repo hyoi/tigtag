@@ -8,8 +8,11 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //MAPのマスの状態           0b76543210
-const BIT_WALL   : usize = 0b00000001; //壁
-const BIT_PASSAGE: usize = 0b00000010; //通路（広間ではない空間）
+const BIT_WALL     : usize = 0b00000001; //壁
+const BIT_WAY_RIGHT: usize = 0b00000010; //右に道
+const BIT_WAY_LEFT : usize = 0b00000100; //左に道
+const BIT_WAY_DOWN : usize = 0b00001000; //上に道
+const BIT_WAY_UP   : usize = 0b00010000; //下に道
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -56,14 +59,12 @@ impl Map
 
     pub fn set_wall( &mut self, grid: Grid )
     {   if MAP_GRIDS_RANGE_X.contains( &grid.x ) && MAP_GRIDS_RANGE_Y.contains( &grid.y )
-        {   *self.bits_mut( grid ) &= ! BIT_PASSAGE;    //通路フラグOFF
-            *self.bits_mut( grid ) |=   BIT_WALL;       //壁フラグON
+        {   *self.bits_mut( grid ) |= BIT_WALL; //壁フラグON
         }
     }
     pub fn set_passage( &mut self, grid: Grid )
     {   if MAP_GRIDS_RANGE_X.contains( &grid.x ) && MAP_GRIDS_RANGE_Y.contains( &grid.y )
-        {   *self.bits_mut( grid ) |=   BIT_PASSAGE;    //通路フラグON
-            *self.bits_mut( grid ) &= ! BIT_WALL;       //壁フラグOFF
+        {   *self.bits_mut( grid ) &= ! BIT_WALL; //壁フラグOFF
         }
     }
 
@@ -75,9 +76,33 @@ impl Map
     }
     pub fn is_passage( &self, grid: Grid ) -> bool
     {   if MAP_GRIDS_RANGE_X.contains( &grid.x ) && MAP_GRIDS_RANGE_Y.contains( &grid.y )
-        {   self.bits( grid ) & BIT_PASSAGE != 0
+        {   self.bits( grid ) & BIT_WALL == 0
         }
         else { false } //範囲外は通路ではない
+    }
+
+    pub fn init_byways_bit( &mut self )
+    {   for y in MAP_GRIDS_RANGE_Y
+        {   for x in MAP_GRIDS_RANGE_X
+            {   let grid = Grid::new( x, y );
+                if self.is_passage( grid + DxDy::Right ) { *self.bits_mut( grid ) |= BIT_WAY_RIGHT } else { *self.bits_mut( grid ) &= ! BIT_WAY_RIGHT }
+                if self.is_passage( grid + DxDy::Left  ) { *self.bits_mut( grid ) |= BIT_WAY_LEFT  } else { *self.bits_mut( grid ) &= ! BIT_WAY_LEFT  }
+                if self.is_passage( grid + DxDy::Down  ) { *self.bits_mut( grid ) |= BIT_WAY_DOWN  } else { *self.bits_mut( grid ) &= ! BIT_WAY_DOWN  }
+                if self.is_passage( grid + DxDy::Up    ) { *self.bits_mut( grid ) |= BIT_WAY_UP    } else { *self.bits_mut( grid ) &= ! BIT_WAY_UP    }
+            }
+        }
+    }
+
+    pub fn get_byways_list( &self, grid: Grid ) -> Vec<DxDy>
+    {   let mut vec = Vec::<DxDy>::with_capacity( 4 );
+        if MAP_GRIDS_RANGE_X.contains( &grid.x ) && MAP_GRIDS_RANGE_Y.contains( &grid.y )
+        {   let bits = self.bits( grid );
+            if bits & BIT_WAY_RIGHT != 0 { vec.push( DxDy::Right ) }
+            if bits & BIT_WAY_LEFT  != 0 { vec.push( DxDy::Left  ) }
+            if bits & BIT_WAY_DOWN  != 0 { vec.push( DxDy::Down  ) }
+            if bits & BIT_WAY_UP    != 0 { vec.push( DxDy::Up    ) }
+        }
+        vec //範囲外は空になる（最外壁の外の座標だから上下左右に道はない）
     }
 
     pub fn o_entity( &self, grid: Grid ) -> Option<Entity>

@@ -68,6 +68,9 @@ pub fn make_new_data
 
     //新マップを作ったらステージ数を＋１する
     record.stage += 1;
+
+    //全グリッドに対し、四方の通路の状態をセットする
+    map.init_byways_bit();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,8 +115,7 @@ pub fn spawn_sprite
                     material: materials.add( ColorMaterial::from( COLOR_SPRITE_DOT ) ),
                     ..default()
                 };
-                let id =
-                cmds
+                let id = cmds
                 .spawn_bundle( circle )
                 .insert( Transform::from_translation( pixel.extend( DEPTH_SPRITE_DOT ) ) )
                 .insert( SpriteDot )
