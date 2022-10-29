@@ -1,7 +1,14 @@
 use super::*;
 
+const COLOR_SPRITE_CHASERS: [ ( Color, Option<FnChasing> ); 4 ] = 
+[   ( Color::RED,   Some ( which_way_red_goes   ) ), //追手の色と移動方向決定関数
+    ( Color::GREEN, Some ( which_way_green_goes ) ), //追手の色と移動方向決定関数
+    ( Color::PINK,  Some ( which_way_pink_goes  ) ), //追手の色と移動方向決定関数
+    ( Color::BLUE,  Some ( which_way_blue_goes  ) ), //追手の色と移動方向決定関数
+];
+
 //追手の移動方向を決める(赤)
-pub fn which_way_red_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
+fn which_way_red_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
 {        if sides.contains( &DxDy::Left  ) && player.next.x < chaser.grid.x { return DxDy::Left  }
     else if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
     else if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
@@ -12,7 +19,7 @@ pub fn which_way_red_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy 
 }
 
 //追手の移動方向を決める(青)
-pub fn which_way_blue_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
+fn which_way_blue_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
 {        if sides.contains( &DxDy::Down  ) && player.next.y > chaser.grid.y { return DxDy::Down  }
     else if sides.contains( &DxDy::Left  ) && player.next.x < chaser.grid.x { return DxDy::Left  }
     else if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
@@ -23,7 +30,7 @@ pub fn which_way_blue_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy
 }
 
 //追手の移動方向を決める(緑)
-pub fn which_way_green_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
+fn which_way_green_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
 {        if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
     else if sides.contains( &DxDy::Down  ) && player.next.y > chaser.grid.y { return DxDy::Down  }
     else if sides.contains( &DxDy::Left  ) && player.next.x < chaser.grid.x { return DxDy::Left  }
@@ -34,7 +41,7 @@ pub fn which_way_green_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxD
 }
 
 //追手の移動方向を決める(ピンク)
-pub fn which_way_pink_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
+fn which_way_pink_goes( chaser: &mut Chaser, player: &Player, sides: &[ DxDy ] ) -> DxDy
 {        if sides.contains( &DxDy::Right ) && player.next.x > chaser.grid.x { return DxDy::Right }
     else if sides.contains( &DxDy::Up    ) && player.next.y < chaser.grid.y { return DxDy::Up    }
     else if sides.contains( &DxDy::Down  ) && player.next.y > chaser.grid.y { return DxDy::Down  }
@@ -207,16 +214,29 @@ pub fn detect_collisions
     q_chaser: Query<&Chaser>,
     mut state: ResMut<State<GameState>>,
     mut ev_over: EventWriter<EventOver>,
+    mut record: ResMut<Record>,
+    mut demo_record: ResMut<DemoRecord>,
 )
-{   //クリアしていなければ衝突判定する
+{   //クリアしておらず、且つ衝突判定が真なら、衝突処理する
     if ! state.current().is_clearstage() && is_collision( q_player, q_chaser )
-    {   let next
-            = if state.current().is_demoplay()
-            {   GameState::DemoNext
+    {   let next =
+        {   if state.current().is_demoplay()
+            {   //Demoの場合、記録を残す
+                if record.score > demo_record.hi_score
+                {   demo_record.hi_score = record.score;
+                    demo_record.stage    = record.stage;
+                }
+
+                //demoの場合、衝突したらrecordゼロクリアする
+                record.score = 0;
+                record.stage = 0;
+
+                GameState::DemoLoop
             }
             else
             {   GameState::GameOver
-            };
+            }
+        };
         let _ = state.overwrite_set( next );
         ev_over.send( EventOver );    //後続の処理にゲームオーバーを伝える
     }

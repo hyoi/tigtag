@@ -4,13 +4,13 @@ use super::*;
 mod ui_update;              //text UI表示
 use ui_update::UiUpdate;    //プラグイン
 
-pub mod map;        //pub必須(demoplayモジュールからmap::spawn_spriteのように呼び出す都合上)
-pub mod player;     //pub必須(demoplayモジュールからplayer::spawn_spriteのように呼び出す都合上)
-pub mod chasers;    //pub必須(demoplayモジュールからchasers::spawn_spriteのように呼び出す都合上)
+pub mod map;     //pub必須(demoplayモジュールから呼び出すため)
+pub mod player;  //pub必須(demoplayモジュールから呼び出すため)
+pub mod chasers; //pub必須(demoplayモジュールから呼び出すため)
 
-pub use map::*;
-pub use player::*;
-pub use chasers::*;
+pub use map::*;     //pub必須(demoplayモジュールから呼び出すため)
+pub use player::*;  //pub必須(demoplayモジュールから呼び出すため)
+pub use chasers::*; //pub必須(demoplayモジュールから呼び出すため)
 
 //プラグインの設定
 pub struct GamePlay;
@@ -18,53 +18,52 @@ impl Plugin for GamePlay
 {   fn build( &self, app: &mut App )
     {   //etc.
         app
-        .add_plugin( UiUpdate )                                       //上下のtext UIの表示更新
-        .add_system( chasers::rotate_sprite )                         //追手スプライトがあれば回転させる
-        .insert_resource( MarkAfterFetchAssets ( GameState::Title ) ) //Assetsロード後のState変更先
+        .add_plugin( UiUpdate )                                           //header & footer UIの表示更新
+        .add_system( chasers::rotate_sprite )                             //追手スプライトがあれば回転させる
+        .insert_resource( MarkAfterFetchAssets ( GameState::TitleDemo ) ) //Assetsロード後のState変更先
         ;
 
-        //GameState::Title
+        //GameState::TitleDemo
         //------------------------------------------------------------------------------------------
         app
         .add_system_set
-        (   SystemSet::on_enter( GameState::Title )                 //<ENTER>
+        (   SystemSet::on_enter( GameState::TitleDemo )             //<ENTER>
             .with_system( show_component::<TextUiTitle> )           //text UI（Title）表示
         )
         .add_system_set
-        (   SystemSet::on_update( GameState::Title )                //<UPDATE>
-            .with_system( into_next_state_with_key::<TextUiTitle> ) //SPACEキー入力⇒Replay
+        (   SystemSet::on_update( GameState::TitleDemo )            //<UPDATE>
+            .with_system( into_next_state_with_key::<TextUiTitle> ) //SPACEキー入力⇒GameStart
         )
         .add_system_set
-        (   SystemSet::on_exit( GameState::Title )                  //<EXIT>
+        (   SystemSet::on_exit( GameState::TitleDemo )              //<EXIT>
             .with_system( hide_component::<TextUiTitle> )           //text UI（Title）消去
-            .with_system( init_gameplay_record )                    //プレイ開始時の初期化
         )
         ;
         //------------------------------------------------------------------------------------------
 
-        //GameState::Start
+        //GameState::GameStart
         //------------------------------------------------------------------------------------------
         app
         .add_system_set
-        (   SystemSet::on_enter( GameState::Start )             //<ENTER>
+        (   SystemSet::on_enter( GameState::GameStart )         //<ENTER>
             .with_system( show_component::<TextUiStart> )       //text UI（Start）表示
             .with_system( set_countdown_params::<TextUiStart> ) //カウントダウンタイマー初期化
             .label( Mark::MakeMapNewData )                      //<label>
             .with_system( map::make_new_data )                  //新マップのデータ作成
         )
         .add_system_set
-        (   SystemSet::on_enter( GameState::Start )             //<ENTER>
+        (   SystemSet::on_enter( GameState::GameStart )         //<ENTER>
             .after( Mark::MakeMapNewData )                      //<after>
             .with_system( map::spawn_sprite )                   //スプライトをspawnする
             .with_system( player::spawn_sprite )                //スプライトをspawnする
             .with_system( chasers::spawn_sprite )               //スプライトをspawnする
         )
         .add_system_set
-        (   SystemSet::on_update( GameState::Start )            //<UPDATE>
+        (   SystemSet::on_update( GameState::GameStart )        //<UPDATE>
             .with_system( countdown_message::<TextUiStart> )    //カウントダウン後⇒MainLoop
         )
         .add_system_set
-        (   SystemSet::on_exit( GameState::Start )              //<EXIT>
+        (   SystemSet::on_exit( GameState::GameStart )          //<EXIT>
             .with_system( hide_component::<TextUiStart> )       //text UI（Start）消去
         )
         ;
@@ -102,26 +101,13 @@ impl Plugin for GamePlay
         )
         .add_system_set
         (   SystemSet::on_update( GameState::GameOver )             //<UPDATE>
-            .with_system( countdown_message::<TextUiOver> )         //カウントダウン後⇒Title
-            .with_system( into_next_state_with_key::<TextUiOver> )  //SPACEキー入力⇒Replay
+            .with_system( countdown_message::<TextUiOver> )         //カウントダウン後⇒TitleDemo
+            .with_system( into_next_state_with_key::<TextUiOver> )  //SPACEキー入力⇒GameStart
         )
         .add_system_set
         (   SystemSet::on_exit( GameState::GameOver )               //<EXIT>
             .with_system( hide_component::<TextUiOver> )            //text UI（GameOver）消去
-        )
-        ;
-        //------------------------------------------------------------------------------------------
-
-        //GameState::Replay
-        //------------------------------------------------------------------------------------------
-        app
-        .add_system_set
-        (   SystemSet::on_update( GameState::Replay )           //<UPDATE>
-            .with_system( goto_start )                          //無条件でStateを更新⇒Start 
-        )
-        .add_system_set
-        (   SystemSet::on_exit( GameState::Replay )             //<EXIT>
-            .with_system( init_gameplay_record )                //プレイ開始時の初期化
+            .with_system( init_gameplay_record )                    //プレイ開始時の初期化
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -136,7 +122,7 @@ impl Plugin for GamePlay
         )
         .add_system_set
         (   SystemSet::on_update( GameState::ClearStage )       //<UPDATE>
-            .with_system( countdown_message::<TextUiClear> )    //カウントダウン後⇒Start
+            .with_system( countdown_message::<TextUiClear> )    //カウントダウン後⇒GameStart
         )
         .add_system_set
         (   SystemSet::on_exit( GameState::ClearStage )         //<EXIT>
@@ -157,32 +143,29 @@ fn init_gameplay_record
     record.stage = 0;
 }
 
-//無条件でStateを更新⇒Start
-fn goto_start
-(   mut state: ResMut<State<GameState>>,
-)
-{   let _ = state.overwrite_set( GameState::Start );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
 //キーが入力さたらStateを更新する
 fn into_next_state_with_key<T: Component + TextUiWithHitKey>
 (   mut q: Query<&T>,
-    mut inkey: ResMut<Input<KeyCode>>,
+    mut record: ResMut<Record>,
     mut state: ResMut<State<GameState>>,
+    mut inkey: ResMut<Input<KeyCode>>,
 )
 {   if let Ok ( target ) = q.get_single_mut()
     {   if ! inkey.just_pressed( target.key_code() ) { return }
 
+        //GameState::GameStartへ遷移する前にゼロクリアする
+        let current = state.current();
+        if *current == GameState::TitleDemo || *current == GameState::GameOver
+        {   record.score = 0;
+            record.stage = 0;
+        }
+        
         let _ = state.overwrite_set( target.next_state() );
     
         //NOTE: https://bevy-cheatbook.github.io/programming/states.html#with-input
         inkey.reset( target.key_code() );    
     }
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //カウントダウンタイマーを初期化する
 fn set_countdown_params<T: Component + TextUiWithCountDown>
