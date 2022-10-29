@@ -204,24 +204,20 @@ pub fn scoring_and_clear_stage
             audio.play( asset_svr.load( ASSETS_SOUND_BEEP ) );
 
             //ハイスコアの更新
-            #[cfg(not( debug_assertions ))]
             if ! state.current().is_demoplay() && record.score > record.hi_score
-            {   record.hi_score = record.score;
-            }
-            #[cfg( debug_assertions )] //Debug中はdemoでもハイスコアを記録する
-            if record.score > record.hi_score
             {   record.hi_score = record.score;
             }
 
             //全ドットを拾ったら、Clearへ遷移する
             if map.remaining_dots <= 0
-            {   let next
-                    = if state.current().is_demoplay()
-                    {   GameState::DemoNext
+            {   let next =
+                {   if state.current().is_demoplay()
+                    {   GameState::DemoLoop
                     }
                     else
                     {   GameState::ClearStage
-                    };
+                    }
+                };
                 let _ = state.overwrite_set( next );
                 ev_clear.send( EventClear );    //後続の処理にクリアを伝える
             }
@@ -230,14 +226,15 @@ pub fn scoring_and_clear_stage
                 for dx in -1..=1
                 {   for dy in -1..=1
                     {   let grid = player.grid + Grid::new( dx, dy );
-                        *map.land_values_mut( grid )
-                            = if map.is_passage( grid ) && map.o_entity( grid ).is_some()
+                        *map.land_values_mut( grid ) =
+                        {   if map.is_passage( grid ) && map.o_entity( grid ).is_some()
                             {   map.count_9squares( grid )
                             }
                             else
                             {   0
-                            };
-                    
+                            }
+                        };
+
                         //デバッグ用の表示
                         #[cfg( debug_assertions )]
                         _q2.for_each_mut
