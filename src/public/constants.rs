@@ -122,13 +122,6 @@ pub const CHASER_INIT_POSITION: [ ( i32, i32 ); 4 ] =               //スター�
 const MAX_X: i32 = MAP_GRIDS_WIDTH  - 2;
 const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
 
-pub const COLOR_SPRITE_CHASERS: [ ( Color, Option<FnChasing> ); 4 ] = 
-[   ( Color::RED,   Some ( which_way_red_goes   ) ), //追手の色と移動方向決定関数
-    ( Color::GREEN, Some ( which_way_green_goes ) ), //追手の色と移動方向決定関数
-    ( Color::PINK,  Some ( which_way_pink_goes  ) ), //追手の色と移動方向決定関数
-    ( Color::BLUE,  Some ( which_way_blue_goes  ) ), //追手の色と移動方向決定関数
-];
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //text UIの設定値
@@ -137,15 +130,15 @@ pub const NA3  : &str = "###";
 pub const NA2_2: &str = "##.##";
 pub const NA2  : &str = "##";
 pub const NA5  : &str = "#####";
+pub const NA2_5: &str = "##-#####";
 
 //中央に表示するtext UI
-pub const CENTER_TITLE_TEXT: [ MessageSect; 4 ] =
-[   ( "TigTag\n\n"       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, Color::rgba( 0.6, 1.0, 0.4, 0.75 ) ),
-    ( "D E M O\n"        , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::YELLOW ),
-    ( "\nHit SPACE Key\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
-    ( "\nto Start !!"    , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
+pub const CENTER_TITLE_TEXT: [ MessageSect; 3 ] =
+[   ( "TigTag\n"       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, Color::rgba( 0.6, 1.0, 0.4, 0.75 ) ),
+    ( "\nD E M O\n\n\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::YELLOW ),
+    ( "Hit SPACE Key"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
 ];
-pub const TEXT_UI_TITLE: TextUiTitle = TextUiTitle ( KeyCode::Space, GameState::Start );
+pub const TEXT_UI_TITLE: TextUiTitle = TextUiTitle ( KeyCode::Space, GameState::GameStart );
 
 pub const CENTER_START_TEXT: [ MessageSect; 5 ] =
 [   ( "Game Start\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN   ),
@@ -164,7 +157,7 @@ pub const CENTER_OVER_TEXT: [ MessageSect; 5 ] =
     ( "Hit SPACE Key\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
     ( ""               , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::YELLOW ),
 ];
-pub const TEXT_UI_OVER: TextUiOver = TextUiOver ( 10, GameState::Title, 4, cd_string_over, KeyCode::Space, GameState::Replay );
+pub const TEXT_UI_OVER: TextUiOver = TextUiOver ( 10, GameState::TitleDemo, 4, cd_string_over, KeyCode::Space, GameState::GameStart );
 fn cd_string_over( n: i32 ) -> String { n.to_string() }
 
 pub const CENTER_CLEAR_TEXT: [ MessageSect; 5 ] =
@@ -174,7 +167,7 @@ pub const CENTER_CLEAR_TEXT: [ MessageSect; 5 ] =
     ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE   ),
     ( ""               , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::YELLOW ),
 ];
-pub const TEXT_UI_CLEAR: TextUiClear = TextUiClear ( 1, GameState::Start, 4, cd_string_clear );
+pub const TEXT_UI_CLEAR: TextUiClear = TextUiClear ( 1, GameState::GameStart, 4, cd_string_clear );
 fn cd_string_clear( n: i32 ) -> String { ( n + 4 ).to_string() }
 
 pub const CENTER_PAUSE_TEXT: [ MessageSect; 1 ] =
@@ -187,9 +180,9 @@ pub const HEADER_LEFT_TEXT: [ MessageSect; 2 ] =
     ( NA2      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
 ];
 pub const HEADER_CENTER_TEXT: [ MessageSect; 3 ] =
-[   ( " SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
-    ( NA5      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
-    ( ""       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.5, Color::RED   ),  //placeholder for debug
+[   ( " SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD   ),
+    ( NA5      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE  ),
+    ( ""       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.5, Color::SILVER ),  //placeholder for debug
 ];
 pub const HEADER_RIGHT_TEXT: [ MessageSect; 2 ] =
 [   ( " Hi-SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
@@ -197,9 +190,11 @@ pub const HEADER_RIGHT_TEXT: [ MessageSect; 2 ] =
 ];
 
 //フッターに表示するtext UI
-pub const FOOTER_LEFT_TEXT: [ MessageSect; 2 ] =
-[   ( " FPS ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::GOLD  ),
-    ( NA2_2  , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.9, Color::WHITE ),
+pub const FOOTER_LEFT_TEXT: [ MessageSect; 4 ] =
+[   ( " FPS " , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID       * 0.6, Color::TEAL   ),
+    ( NA2_2   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4, Color::SILVER ),
+    ( " demo ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID       * 0.6, Color::TEAL   ),
+    ( NA2_5   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4, Color::SILVER ),
 ];
 pub const FOOTER_CENTER_TEXT: [ MessageSect; 1 ] =
 [   ( "hyoi 2021 - 2022", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
