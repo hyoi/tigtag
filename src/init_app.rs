@@ -30,10 +30,11 @@ impl Plugin for InitApp
     
         //ResourceとEvent
         app
-        .add_state( GameState::Init )           //Stateの初期化
-        .init_resource::<Record>()              //スコア等
-        .init_resource::<CountDown>()           //カウントダウンタイマー
-        .init_resource::<Map>()                 //迷路の情報
+        .add_state( GameState::InitApp )        //Stateの初期化
+        .init_resource::<Record>()              //スコア等の初期化
+        .init_resource::<DemoRecord>()          //デモ用記録の初期化
+        .init_resource::<CountDown>()           //カウントダウンタイマーの初期化
+        .init_resource::<Map>()                 //迷路情報の初期化
         .add_event::<EventClear>()              //ステージクリアイベント
         .add_event::<EventOver>()               //ゲームオーバーイベント
 //      .insert_resource( MarkAfterFetchAssets ( GameState::Debug ) ) //for debug(text UI)
@@ -55,17 +56,17 @@ impl Plugin for InitApp
         //------------------------------------------------------------------------------------------
         app
         .add_system_set
-        (   SystemSet::on_enter( GameState::Init )          //<ENTER>
+        (   SystemSet::on_enter( GameState::InitApp )       //<ENTER>
             .with_system( start_fetching_assets )           //Assetのロード開始
             .with_system( spawn_sprite_now_loading )        //アニメ用スプライトの生成
         )
         .add_system_set
-        (   SystemSet::on_update( GameState::Init )         //<UPDATE>
+        (   SystemSet::on_update( GameState::InitApp )      //<UPDATE>
             .with_system( change_state_after_loading )      //ロード完了か判定しState変更
             .with_system( move_sprite_now_loading )         //ローディングアニメ
         )
         .add_system_set
-        (   SystemSet::on_exit( GameState::Init )           //<EXIT>
+        (   SystemSet::on_exit( GameState::InitApp )        //<EXIT>
             .with_system( despawn_entity::<SpriteTile> )    //アニメ用スプライトの削除
             .with_system( spawn_game_frame )                //ゲームの枠の表示
             .with_system( spawn_text_ui )                   //text UIのspawn
@@ -76,7 +77,7 @@ impl Plugin for InitApp
         #[cfg( debug_assertions )]
         app
         .add_system_set
-        (   SystemSet::on_exit( GameState::Init )           //<EXIT>
+        (   SystemSet::on_exit( GameState::InitApp )        //<EXIT>
             .with_system( spawn_debug_info )                //debug用の情報を表示
         )
         ;
@@ -150,7 +151,7 @@ pub fn spawn_debug_info
             text_ui.y += SCREEN_PIXELS_HEIGHT / 2.0 - PIXELS_PER_GRID;
 
             let mut txt = NUM_TILE_TEXT;
-            let val = format!( "{}:{}", x, y );
+            let val = format!( "{},{}", x, y );
             txt[ 0 ].0 = &val;
 
             cmds
