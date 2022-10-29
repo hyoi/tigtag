@@ -17,7 +17,6 @@ pub struct Record
 {   pub stage   : i32,      //ステージ数
     pub score   : i32,      //スコア
     pub hi_score: i32,      //ハイスコア
-    demo_flag   : bool,     //true:Demo mode, false: Player mode
     pub count   : i32,      //カウントダウンタイマーの初期値
     pub timer   : Timer,    //カウントダウンタイマー用タイマー
 }
@@ -27,27 +26,35 @@ impl Default for Record
         {   stage    : 0,
             score    : 0,
             hi_score : 0,
-            demo_flag: true,
             count: 0,
             timer: Timer::from_seconds( 1.0, false ),
         }
     }
 }
-impl Record
-{   pub fn is_demoplay( &self ) -> bool { self.demo_flag }
-    pub fn set_mode_demo( &mut self ) { self.demo_flag = true  }
-    pub fn set_mode_play( &mut self ) { self.demo_flag = false }
+
+//demoの記録を残すResource
+#[derive(Default)]
+pub struct DemoRecord
+{   pub stage   : i32,  //ステージ数
+    pub hi_score: i32,  //ハイスコア
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ゲームの状態
+#[allow( dead_code )]
 #[derive( Clone, Copy, Eq, PartialEq, Hash, Debug )]
-pub enum GameState { Init, Title, DemoNext, Start, MainLoop, GameOver, Replay, ClearStage, Pause, }
+pub enum GameState
+{   InitApp,
+    TitleDemo, DemoLoop,
+    GameStart, MainLoop, GameOver, ClearStage,
+    Pause, Debug,
+}
 #[allow( dead_code )]
 impl GameState
 {   pub fn is_clearstage( &self ) -> bool { *self == GameState::ClearStage }
     pub fn is_pause     ( &self ) -> bool { *self == GameState::Pause      }
+    pub fn is_demoplay  ( &self ) -> bool { *self == GameState::TitleDemo || *self == GameState::DemoLoop }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,5 +161,8 @@ pub struct LoadedAssets { pub preload: Vec<HandleUntyped> }
 
 //マーカーResource
 pub struct MarkAfterFetchAssets ( pub GameState );
+
+//開発用スプライトのComponent
+#[derive( Component )] pub struct PathFinder;
 
 //End of code.

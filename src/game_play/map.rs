@@ -68,14 +68,19 @@ pub fn make_new_data
 
     //新マップを作ったらステージ数を＋１する
     record.stage += 1;
+
+    //全グリッドに対し、四方の通路の状態をセットする
+    map.init_byways_bit();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+type WithMapEntities = Or< ( With<SpriteWall>, With<SpriteDot> ) >;
+
 //スプライトをspawnしてマップを表示する
 pub fn spawn_sprite
-(   q1: Query<Entity, With<SpriteWall>>,
-    q2: Query<Entity, With<SpriteDot>>,
+(   q1: Query<Entity, WithMapEntities>,
+    q2: Query<( &mut Text, &TextUiNumTile )>,
     mut map: ResMut<Map>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
@@ -84,7 +89,6 @@ pub fn spawn_sprite
 )
 {   //スプライトがあれば削除する
     q1.for_each( | id | cmds.entity( id ).despawn_recursive() );
-    q2.for_each( | id | cmds.entity( id ).despawn_recursive() );
 
     //壁とドットのスプライトを配置する
     let custom_size = Some( Pixel::new( PIXELS_PER_GRID, PIXELS_PER_GRID ) );
@@ -111,8 +115,7 @@ pub fn spawn_sprite
                     material: materials.add( ColorMaterial::from( COLOR_SPRITE_DOT ) ),
                     ..default()
                 };
-                let id =
-                cmds
+                let id = cmds
                 .spawn_bundle( circle )
                 .insert( Transform::from_translation( pixel.extend( DEPTH_SPRITE_DOT ) ) )
                 .insert( SpriteDot )
@@ -122,6 +125,54 @@ pub fn spawn_sprite
                 map.remaining_dots += 1; //ドットを数える
             }
         }
+    }
+
+    //マス目の重みづけ用の値を算出する
+    map.fill_land_values( q2 );
+}
+
+impl Map
+{   //中心の座標をもらい、周囲9マスのドットを数える
+    pub fn count_9squares( &self, center: Grid ) -> i32
+    {   let mut count = 0;
+        for dx in -1..=1
+        {   for dy in -1..=1
+            {   let grid = center + Grid::new( dx, dy );
+                if self.is_passage( grid ) && self.o_entity( grid ).is_some()
+                {   count += 1;
+                }
+            }
+        }
+        count
+    }
+
+    //マス目の重みづけ用の値を算出する
+    fn fill_land_values( &mut self, mut _q: Query<( &mut Text, &TextUiNumTile )> )
+    {   for y in MAP_GRIDS_RANGE_Y
+        {   for x in MAP_GRIDS_RANGE_X
+            {   let grid = Grid::new( x, y );
+                *self.land_values_mut( grid )
+                    = if self.is_passage( grid )
+                    {   self.count_9squares( grid )
+                    }
+                    else
+                    {   0
+                    };
+            }
+        }
+
+        //デバッグ用の表示
+        #[cfg( debug_assertions )]
+        _q.for_each_mut
+        (   | ( mut text, TextUiNumTile( grid ) ) |
+            text.sections[ 0 ].value
+                = if self.is_passage( *grid )
+                {   self.land_values( *grid ).to_string()
+                }
+                else
+                {   "".to_string()
+                }
+        );
     }
 }
 

@@ -1,5 +1,8 @@
 use super::*;
 
+//submodules
+mod demo_algorithm;
+
 //スプライトをspawnして自機を表示する
 pub fn spawn_sprite
 (   q: Query<Entity, With<Player>>,
@@ -39,6 +42,7 @@ pub fn spawn_sprite
         next    : grid,
         px_start: pixel,
         px_end  : pixel,
+        fn_runaway: Some ( demo_algorithm::which_way_player_goes ), //default()に任せるとNone 
         ..default()
     };
     cmds
@@ -52,19 +56,17 @@ pub fn spawn_sprite
 
 //自機の移動
 pub fn move_sprite
-(   mut q: Query<(&mut Player, &mut Transform)>,
-    record: Res<Record>,
+(   ( mut q_player, q_chasers ): ( Query<(&mut Player, &mut Transform)>, Query<&Chaser> ),
     map: Res<Map>,
-    mut ev_clear: EventReader<EventClear>,
-    mut ev_over : EventReader<EventOver>,
-    inkey: Res<Input<KeyCode>>,
-    time : Res<Time>,
+    state: ResMut<State<GameState>>,
+    ( mut ev_clear, mut ev_over ): ( EventReader<EventClear>, EventReader<EventOver> ),
+    ( cmds, inkey, time ): ( Commands, Res<Input<KeyCode>>, Res<Time> ),
 )
 {   //直前の判定でクリア／オーバーしていたらスプライトの表示を変更しない
     if ev_clear.iter().next().is_some() { return }
     if ev_over .iter().next().is_some() { return }
 
-    let ( mut player, mut transform ) = q.get_single_mut().unwrap(); //プレイヤーの情報
+    let ( mut player, mut transform ) = q_player.get_single_mut().unwrap(); //プレイヤーの情報
     let time_delta = time.delta().mul_f32( player.speedup ); //前回からの経過時間×スピードアップ係数
 
     //待ち時間が完了したら
@@ -79,7 +81,7 @@ pub fn move_sprite
         //自機の進行方向を決める
         player.stop = false;
         let mut side = player.side;
-        if ! record.is_demoplay()
+        if ! state.current().is_demoplay()
         {   //demoでなければプレイヤーのキー入力を確認(入力がなければ停止)
                  if inkey.pressed( KeyCode::Up    ) { side = DxDy::Up;    }
             else if inkey.pressed( KeyCode::Down  ) { side = DxDy::Down;  }
@@ -93,37 +95,31 @@ pub fn move_sprite
             }
         }
         else
-        {   //demoなら四方で壁がない方向を確認する（逆走防止付き）
-            let mut sides = Vec::with_capacity( 4 );
-            if map.is_passage( player.next + DxDy::Up    ) && player.side != DxDy::Down  { sides.push( DxDy::Up    ) }
-            if map.is_passage( player.next + DxDy::Down  ) && player.side != DxDy::Up    { sides.push( DxDy::Down  ) }
-            if map.is_passage( player.next + DxDy::Right ) && player.side != DxDy::Left  { sides.push( DxDy::Right ) }
-            if map.is_passage( player.next + DxDy::Left  ) && player.side != DxDy::Right { sides.push( DxDy::Left  ) }
+        {   //四方の脇道を取得する
+            let mut sides = map.get_byways_list( player.next );         //脇道のリスト
+            sides.retain( | side | player.next + side != player.grid ); //戻り路を排除
 
             //demoなのでプレイヤーのキー入力を詐称する
-            let count = sides.len();
-
             use std::cmp::Ordering;
-            match count.cmp( &1 )
-            {   Ordering::Equal =>
-                {   //一本道では道なりに進む
-                    side = sides[ 0 ];
-                },
-                Ordering::Greater =>
-                {   //道が複数あるなら、乱数で決める
-                    let mut rng = rand::thread_rng();
-                    side = sides[ rng.gen_range( 0..sides.len() ) ];
-                },
-                Ordering::Less =>
-                {   //行き止まりでは逆走する(このゲームに行き止まりはないけど)
-                    side = match player.side
+            side = match sides.len().cmp( &1 )
+            {   Ordering::Equal => //一本道 ⇒ 道なりに進む
+                    sides[ 0 ],
+                Ordering::Greater => //三叉路または十字路
+                    if let Some ( fnx ) = player.fn_runaway
+                    {   fnx( &player, q_chasers, map, &sides, state, cmds ) //外部関数で進行方向を決める
+                    }
+                    else
+                    {   let mut rng = rand::thread_rng();
+                        sides[ rng.gen_range( 0..sides.len() ) ] //外部関数がない(None)なら乱数で決める
+                    },
+                Ordering::Less => //行き止まり ⇒ 逆走 (このゲームに行き止まりはないけど)
+                    match player.side
                     {   DxDy::Up    => DxDy::Down ,
                         DxDy::Down  => DxDy::Up   ,
                         DxDy::Right => DxDy::Left ,
                         DxDy::Left  => DxDy::Right,
-                    };
-                },
-            }
+                    },
+            };
         }
 
         //自機の向きが変化したらスプライトを回転させる
@@ -161,25 +157,21 @@ fn rotate_player_sprite
 )
 {   let angle: f32 = match player.side
     {   DxDy::Up =>
-        {        if input == DxDy::Left  {  90.0 }
+                 if input == DxDy::Left  {  90.0 }
             else if input == DxDy::Right { -90.0 }
-            else                         { 180.0 }
-        }
+            else                         { 180.0 },
         DxDy::Down =>
-        {        if input == DxDy::Right {  90.0 }
+                 if input == DxDy::Right {  90.0 }
             else if input == DxDy::Left  { -90.0 }
-            else                         { 180.0 }
-        }
+            else                         { 180.0 },
         DxDy::Right =>
-        {        if input == DxDy::Up    {  90.0 }
+                 if input == DxDy::Up    {  90.0 }
             else if input == DxDy::Down  { -90.0 }
-            else                         { 180.0 }
-        }
+            else                         { 180.0 },
         DxDy::Left =>
-        {        if input == DxDy::Down  {  90.0 }
+                 if input == DxDy::Down  {  90.0 }
             else if input == DxDy::Up    { -90.0 }
-            else                         { 180.0 }
-        }
+            else                         { 180.0 },
     };
 
     let quat = Quat::from_rotation_z( angle.to_radians() );
@@ -190,15 +182,15 @@ fn rotate_player_sprite
 
 //スコアの処理とクリア判定
 pub fn scoring_and_clear_stage
-(   q: Query<&Player>,
+(   q1: Query<&Player>,
+    mut _q2: Query<( &mut Text, &TextUiNumTile )>,
     mut record: ResMut<Record>,
     mut map: ResMut<Map>,
     mut state: ResMut<State<GameState>>,
     mut ev_clear: EventWriter<EventClear>,
-    mut cmds: Commands,
-    ( asset_svr, audio ): ( Res<AssetServer>, Res<Audio> ),
+    ( mut cmds, asset_svr, audio ): ( Commands, Res<AssetServer>, Res<Audio> ),
 )
-{   if let Ok ( player ) = q.get_single()
+{   if let Ok ( player ) = q1.get_single()
     {   //自機の位置にドットがあるなら
         if let Some ( id ) = map.o_entity( player.grid )
         {   //スプライト削除
@@ -212,23 +204,52 @@ pub fn scoring_and_clear_stage
             audio.play( asset_svr.load( ASSETS_SOUND_BEEP ) );
 
             //ハイスコアの更新
-            if ! record.is_demoplay() && record.score > record.hi_score
+            if ! state.current().is_demoplay() && record.score > record.hi_score
             {   record.hi_score = record.score;
             }
 
             //全ドットを拾ったら、Clearへ遷移する
             if map.remaining_dots <= 0
-            {   let next = if record.is_demoplay()
-                {   GameState::DemoNext
-                }
-                else
-                {   GameState::ClearStage
+            {   let next =
+                {   if state.current().is_demoplay()
+                    {   GameState::DemoLoop
+                    }
+                    else
+                    {   GameState::ClearStage
+                    }
                 };
                 let _ = state.overwrite_set( next );
                 ev_clear.send( EventClear );    //後続の処理にクリアを伝える
+            }
+            else
+            {   //クリアではないなら周囲9マスのland_valuesを更新する
+                for dx in -1..=1
+                {   for dy in -1..=1
+                    {   let grid = player.grid + Grid::new( dx, dy );
+                        *map.land_values_mut( grid ) =
+                        {   if map.is_passage( grid ) && map.o_entity( grid ).is_some()
+                            {   map.count_9squares( grid )
+                            }
+                            else
+                            {   0
+                            }
+                        };
+
+                        //デバッグ用の表示
+                        #[cfg( debug_assertions )]
+                        _q2.for_each_mut
+                        (   | ( mut text, TextUiNumTile( x ) ) |
+                            if *x == grid
+                            {   let count = map.land_values( grid );
+                                text.sections[ 0 ].value
+                                    = if count != 0 { count.to_string() } else { "".to_string() }
+                            }
+                        );
+                    }
+                }
             }
         }
     }
 }
 
-//End of code
+//End of code.

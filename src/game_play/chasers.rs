@@ -1,11 +1,10 @@
 use super::*;
 
-//追手のスプライトの色と移動方向決定関数
-pub const COLOR_SPRITE_CHASERS: [ ( Color, Option<FnChasing> ); 4 ] =
-[   ( Color::RED,   Some ( which_way_red_goes   ) ),
-    ( Color::GREEN, Some ( which_way_green_goes ) ),
-    ( Color::PINK,  Some ( which_way_pink_goes  ) ),
-    ( Color::BLUE,  Some ( which_way_blue_goes  ) ),
+const COLOR_SPRITE_CHASERS: [ ( Color, Option<FnChasing> ); 4 ] = 
+[   ( Color::RED,   Some ( which_way_red_goes   ) ), //追手の色と移動方向決定関数
+    ( Color::GREEN, Some ( which_way_green_goes ) ), //追手の色と移動方向決定関数
+    ( Color::PINK,  Some ( which_way_pink_goes  ) ), //追手の色と移動方向決定関数
+    ( Color::BLUE,  Some ( which_way_blue_goes  ) ), //追手の色と移動方向決定関数
 ];
 
 //追手の移動方向を決める(赤)
@@ -71,7 +70,7 @@ pub fn spawn_sprite
     (   | ( i, ( x, y ) ) |
         {   let grid  = Grid::new( x, y );
             let pixel = grid.into_pixel_map();
-            let ( color, fn_chasing ) = COLOR_SPRITE_CHASERS[ ( ( stage + i ) % 4 ) as usize ];
+            let ( color, fn_chasing ) = COLOR_SPRITE_CHASERS[ ( ( stage - 1 + i ) % 4 ) as usize ];
             let chaser = Chaser
             {   grid,
                 next    : grid,
@@ -145,35 +144,28 @@ pub fn move_sprite
             if map.is_passage( chaser.next + DxDy::Left  ) && chaser.side != DxDy::Right { sides.push( DxDy::Left  ) }
 
             //追手の向きを決める（自機のプレーヤーのキー入力に相当）
-            chaser.stop = false;
-            let count = sides.len(); //countは1以上(このゲームのマップには行き止まりが無いので)
-
             use std::cmp::Ordering;
-            match count.cmp( &1 )
-            {   Ordering::Equal =>
-                {   //一本道では道なりに進む
-                    chaser.side = sides[ 0 ];
-                },
-                Ordering::Greater =>
-                {   //道が複数あるなら外部関数で進行方向を決める
-                    if chaser.fn_chasing.is_some()
-                    {   chaser.side = ( chaser.fn_chasing.unwrap() )( &mut chaser, player, &sides );
-                    }
-                    else
-                    {   //外部関数が設定されていなければ停止フラグを立てる
-                        chaser.stop = true;
-                    }
-                },
-                Ordering::Less =>
-                {   //行き止まりでは逆走する(このゲームに行き止まりはないけど)
-                    chaser.side = match chaser.side
-                    {   DxDy::Up    => DxDy::Down ,
-                        DxDy::Down  => DxDy::Up   ,
-                        DxDy::Right => DxDy::Left ,
-                        DxDy::Left  => DxDy::Right,
-                    };
-                },
-            }
+            chaser.stop = false;
+            chaser.side
+                = match sides.len().cmp( &1 ) //sides要素数は1以上(このゲームのマップに行き止まりが無いので)
+                {   Ordering::Equal =>
+                        sides[ 0 ], //一本道なら道なりに進む
+                    Ordering::Greater =>
+                        if let Some ( fnx ) = chaser.fn_chasing
+                        {   fnx( &mut chaser, player, &sides ) //分かれ道なら外部関数で進行方向を決める
+                        }
+                        else
+                        {   chaser.stop = true; //外部関数がない(None)なら停止フラグを立てる
+                            chaser.side
+                        },
+                    Ordering::Less =>
+                        match chaser.side //行き止まりなら逆走する(このゲームに行き止まりはないけど)
+                        {   DxDy::Up    => DxDy::Down ,
+                            DxDy::Down  => DxDy::Up   ,
+                            DxDy::Right => DxDy::Left ,
+                            DxDy::Left  => DxDy::Right,
+                        },
+                };
 
             //現在の位置と次の位置を更新する
             chaser.grid = chaser.next;
@@ -220,19 +212,30 @@ pub fn move_sprite
 pub fn detect_collisions
 (   q_player: Query<&Player>,
     q_chaser: Query<&Chaser>,
-    record: Res<Record>,
     mut state: ResMut<State<GameState>>,
     mut ev_over: EventWriter<EventOver>,
+    mut record: ResMut<Record>,
+    mut demo_record: ResMut<DemoRecord>,
 )
-{   if cfg!( debug_assertions ) { return }   //debugでは無敵
-
-    //クリアしていなければ衝突判定する
+{   //クリアしておらず、且つ衝突判定が真なら、衝突処理する
     if ! state.current().is_clearstage() && is_collision( q_player, q_chaser )
-    {   let next = if record.is_demoplay()
-        {   GameState::DemoNext
-        }
-        else
-        {   GameState::GameOver
+    {   let next =
+        {   if state.current().is_demoplay()
+            {   //Demoの場合、記録を残す
+                if record.score > demo_record.hi_score
+                {   demo_record.hi_score = record.score;
+                    demo_record.stage    = record.stage;
+                }
+
+                //demoの場合、衝突したらrecordゼロクリアする
+                record.score = 0;
+                record.stage = 0;
+
+                GameState::DemoLoop
+            }
+            else
+            {   GameState::GameOver
+            }
         };
         let _ = state.overwrite_set( next );
         ev_over.send( EventOver );    //後続の処理にゲームオーバーを伝える
