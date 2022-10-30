@@ -101,6 +101,25 @@ impl Plugin for GamePlay
         ;
         //------------------------------------------------------------------------------------------
 
+        //GameState::StageClear
+        //------------------------------------------------------------------------------------------
+        app
+        .add_system_set
+        (   SystemSet::on_enter( GameState::StageClear )        //<ENTER>
+            .with_system( show_component::<TextUiClear> )       //text UI（StageClear）表示
+            .with_system( set_countdown_params::<TextUiClear> ) //カウントダウンタイマー初期化
+        )
+        .add_system_set
+        (   SystemSet::on_update( GameState::StageClear )       //<UPDATE>
+            .with_system( countdown_message::<TextUiClear> )    //カウントダウン後⇒StageStart
+        )
+        .add_system_set
+        (   SystemSet::on_exit( GameState::StageClear )         //<EXIT>
+            .with_system( hide_component::<TextUiClear> )       //text UI（StageClear）消去
+        )
+        ;
+        //------------------------------------------------------------------------------------------
+
         //GameState::GameOver
         //------------------------------------------------------------------------------------------
         app
@@ -118,25 +137,6 @@ impl Plugin for GamePlay
         (   SystemSet::on_exit( GameState::GameOver )               //<EXIT>
             .with_system( hide_component::<TextUiOver> )            //text UI（GameOver）消去
             .with_system( init_gameplay_record )                    //プレイ開始時の初期化
-        )
-        ;
-        //------------------------------------------------------------------------------------------
-
-        //GameState::StageClear
-        //------------------------------------------------------------------------------------------
-        app
-        .add_system_set
-        (   SystemSet::on_enter( GameState::StageClear )        //<ENTER>
-            .with_system( show_component::<TextUiClear> )       //text UI（StageClear）表示
-            .with_system( set_countdown_params::<TextUiClear> ) //カウントダウンタイマー初期化
-        )
-        .add_system_set
-        (   SystemSet::on_update( GameState::StageClear )       //<UPDATE>
-            .with_system( countdown_message::<TextUiClear> )    //カウントダウン後⇒StageStart
-        )
-        .add_system_set
-        (   SystemSet::on_exit( GameState::StageClear )         //<EXIT>
-            .with_system( hide_component::<TextUiClear> )       //text UI（StageClear）消去
         )
         ;
         //------------------------------------------------------------------------------------------
