@@ -46,7 +46,7 @@ impl Plugin for GamePlay
         app
         .add_system_set
         (   SystemSet::on_update( GameState::GameStart )        //<UPDATE>
-            .with_system( goto_stage_start )                    //無条件⇒StageStart
+            .with_system( init_gameplay_record )                //初期化後 無条件⇒StageStart
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -136,7 +136,6 @@ impl Plugin for GamePlay
         .add_system_set
         (   SystemSet::on_exit( GameState::GameOver )               //<EXIT>
             .with_system( hide_component::<TextUiOver> )            //text UI（GameOver）消去
-            .with_system( init_gameplay_record )                    //プレイ開始時の初期化
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -145,19 +144,17 @@ impl Plugin for GamePlay
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//無条件でGameState::StageStartへ遷移する
-fn goto_stage_start
-(   mut state: ResMut<State<GameState>>,
-)
-{   let _ = state.overwrite_set( GameState::StageStart );
-}
-
-//プレイ開始時の初期化処理(スコアのゼロクリア等)
+//ゲーム開始時の初期化とStageStartへの無条件遷移
 fn init_gameplay_record
-(   mut record: ResMut<Record>,
+(   mut state: ResMut<State<GameState>>,
+    mut record: ResMut<Record>,
 )
-{   record.score = 0;
+{   //ゲーム開始時の初期化
+    record.score = 0;
     record.stage = 0;
+
+    //ステージ初期化へ進む
+    let _ = state.overwrite_set( GameState::StageStart );
 }
 
 //キーが入力さたらStateを更新する
