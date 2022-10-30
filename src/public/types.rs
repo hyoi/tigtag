@@ -35,24 +35,24 @@ impl Default for Record
 //demoの記録を残すResource
 #[derive(Default)]
 pub struct DemoRecord
-{   pub stage   : i32,  //ステージ数
-    pub hi_score: i32,  //ハイスコア
+{   pub stage   : i32,      //ステージ数
+    pub hi_score: i32,      //ハイスコア
+    pub clear_flag: bool,   //demoでステージクリアすると真、それ以外は偽
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ゲームの状態
-#[allow( dead_code )]
 #[derive( Clone, Copy, Eq, PartialEq, Hash, Debug )]
 pub enum GameState
 {   InitApp,
     TitleDemo, DemoLoop,
-    GameStart, MainLoop, GameOver, ClearStage,
-    Pause, Debug,
+    GameStart, StageStart, MainLoop, StageClear, GameOver,
+    Pause,
 }
 #[allow( dead_code )]
 impl GameState
-{   pub fn is_clearstage( &self ) -> bool { *self == GameState::ClearStage }
+{   pub fn is_stageclear( &self ) -> bool { *self == GameState::StageClear }
     pub fn is_pause     ( &self ) -> bool { *self == GameState::Pause      }
     pub fn is_demoplay  ( &self ) -> bool { *self == GameState::TitleDemo || *self == GameState::DemoLoop }
 }

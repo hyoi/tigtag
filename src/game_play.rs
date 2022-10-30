@@ -45,25 +45,35 @@ impl Plugin for GamePlay
         //------------------------------------------------------------------------------------------
         app
         .add_system_set
-        (   SystemSet::on_enter( GameState::GameStart )         //<ENTER>
+        (   SystemSet::on_update( GameState::GameStart )        //<UPDATE>
+            .with_system( init_gameplay_record )                //初期化後 無条件⇒StageStart
+        )
+        ;
+        //------------------------------------------------------------------------------------------
+
+        //GameState::StageStart
+        //------------------------------------------------------------------------------------------
+        app
+        .add_system_set
+        (   SystemSet::on_enter( GameState::StageStart )        //<ENTER>
             .with_system( show_component::<TextUiStart> )       //text UI（Start）表示
             .with_system( set_countdown_params::<TextUiStart> ) //カウントダウンタイマー初期化
             .label( Mark::MakeMapNewData )                      //<label>
             .with_system( map::make_new_data )                  //新マップのデータ作成
         )
         .add_system_set
-        (   SystemSet::on_enter( GameState::GameStart )         //<ENTER>
+        (   SystemSet::on_enter( GameState::StageStart )        //<ENTER>
             .after( Mark::MakeMapNewData )                      //<after>
             .with_system( map::spawn_sprite )                   //スプライトをspawnする
             .with_system( player::spawn_sprite )                //スプライトをspawnする
             .with_system( chasers::spawn_sprite )               //スプライトをspawnする
         )
         .add_system_set
-        (   SystemSet::on_update( GameState::GameStart )        //<UPDATE>
+        (   SystemSet::on_update( GameState::StageStart )       //<UPDATE>
             .with_system( countdown_message::<TextUiStart> )    //カウントダウン後⇒MainLoop
         )
         .add_system_set
-        (   SystemSet::on_exit( GameState::GameStart )          //<EXIT>
+        (   SystemSet::on_exit( GameState::StageStart )         //<EXIT>
             .with_system( hide_component::<TextUiStart> )       //text UI（Start）消去
         )
         ;
@@ -75,7 +85,7 @@ impl Plugin for GamePlay
         .add_system_set
         (   SystemSet::on_update( GameState::MainLoop )         //<UPDATE>
             .before( Mark::DetectCollisions )                   //<before>
-            .with_system( player::scoring_and_clear_stage )     //スコアリング＆クリア判定⇒ClearStage
+            .with_system( player::scoring_and_clear_stage )     //スコアリング＆クリア判定⇒StageClear
         )
         .add_system_set
         (   SystemSet::on_update( GameState::MainLoop )         //<UPDATE>
@@ -87,6 +97,25 @@ impl Plugin for GamePlay
             .after( Mark::DetectCollisions )                    //<after>
             .with_system( player::move_sprite )                 //スプライト移動
             .with_system( chasers::move_sprite )                //スプライト移動
+        )
+        ;
+        //------------------------------------------------------------------------------------------
+
+        //GameState::StageClear
+        //------------------------------------------------------------------------------------------
+        app
+        .add_system_set
+        (   SystemSet::on_enter( GameState::StageClear )        //<ENTER>
+            .with_system( show_component::<TextUiClear> )       //text UI（StageClear）表示
+            .with_system( set_countdown_params::<TextUiClear> ) //カウントダウンタイマー初期化
+        )
+        .add_system_set
+        (   SystemSet::on_update( GameState::StageClear )       //<UPDATE>
+            .with_system( countdown_message::<TextUiClear> )    //カウントダウン後⇒StageStart
+        )
+        .add_system_set
+        (   SystemSet::on_exit( GameState::StageClear )         //<EXIT>
+            .with_system( hide_component::<TextUiClear> )       //text UI（StageClear）消去
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -107,26 +136,6 @@ impl Plugin for GamePlay
         .add_system_set
         (   SystemSet::on_exit( GameState::GameOver )               //<EXIT>
             .with_system( hide_component::<TextUiOver> )            //text UI（GameOver）消去
-            .with_system( init_gameplay_record )                    //プレイ開始時の初期化
-        )
-        ;
-        //------------------------------------------------------------------------------------------
-
-        //GameState::ClearStage
-        //------------------------------------------------------------------------------------------
-        app
-        .add_system_set
-        (   SystemSet::on_enter( GameState::ClearStage )        //<ENTER>
-            .with_system( show_component::<TextUiClear> )       //text UI（ClearStage）表示
-            .with_system( set_countdown_params::<TextUiClear> ) //カウントダウンタイマー初期化
-        )
-        .add_system_set
-        (   SystemSet::on_update( GameState::ClearStage )       //<UPDATE>
-            .with_system( countdown_message::<TextUiClear> )    //カウントダウン後⇒GameStart
-        )
-        .add_system_set
-        (   SystemSet::on_exit( GameState::ClearStage )         //<EXIT>
-            .with_system( hide_component::<TextUiClear> )       //text UI（ClearStage）消去
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -135,12 +144,17 @@ impl Plugin for GamePlay
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//プレイ開始時の初期化処理(スコアのゼロクリア等)
+//ゲーム開始時の初期化とStageStartへの無条件遷移
 fn init_gameplay_record
-(   mut record: ResMut<Record>,
+(   mut state: ResMut<State<GameState>>,
+    mut record: ResMut<Record>,
 )
-{   record.score = 0;
+{   //ゲーム開始時の初期化
+    record.score = 0;
     record.stage = 0;
+
+    //ステージ初期化へ進む
+    let _ = state.overwrite_set( GameState::StageStart );
 }
 
 //キーが入力さたらStateを更新する
