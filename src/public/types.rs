@@ -35,8 +35,9 @@ impl Default for Record
 //demoの記録を残すResource
 #[derive(Default)]
 pub struct DemoRecord
-{   pub stage   : i32,  //ステージ数
-    pub hi_score: i32,  //ハイスコア
+{   pub stage   : i32,      //ステージ数
+    pub hi_score: i32,      //ハイスコア
+    pub clear_flag: bool,   //demoでステージクリアすると真、それ以外は偽
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

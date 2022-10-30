@@ -214,7 +214,7 @@ pub fn detect_collisions
     q_chaser: Query<&Chaser>,
     mut state: ResMut<State<GameState>>,
     mut ev_over: EventWriter<EventOver>,
-    mut record: ResMut<Record>,
+    record: ResMut<Record>,
     mut demo_record: ResMut<DemoRecord>,
 )
 {   //クリアしておらず、且つ衝突判定が真なら、衝突処理する
@@ -226,10 +226,6 @@ pub fn detect_collisions
                 {   demo_record.hi_score = record.score;
                     demo_record.stage    = record.stage;
                 }
-
-                //demoの場合、衝突したらrecordゼロクリアする
-                record.score = 0;
-                record.stage = 0;
 
                 GameState::DemoLoop
             }

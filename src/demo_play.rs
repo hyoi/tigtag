@@ -9,6 +9,11 @@ impl Plugin for DemoPlay
         app
         .add_system_set
         (   SystemSet::on_enter( GameState::TitleDemo )         //<ENTER>
+            .before( Mark::MakeMapNewData )                     //<label>
+            .with_system( init_demoplay_record )                //demoでのrecordの初期化
+        )
+        .add_system_set
+        (   SystemSet::on_enter( GameState::TitleDemo )         //<ENTER>
             .label( Mark::MakeMapNewData )                      //<label>
             .with_system( map::make_new_data )                  //新マップのデータ作成
         )
@@ -61,6 +66,22 @@ impl Plugin for DemoPlay
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//demoクリアを除き、recordを初期化する
+fn init_demoplay_record
+(   mut record: ResMut<Record>,
+    mut demo_record: ResMut<DemoRecord>,
+)
+{   if ! demo_record.clear_flag
+    {   //GameOver後replayしなかった場合、demoで追手につかまった場合
+        record.score = 0;
+        record.stage = 0;
+    }
+    else
+    {   //demoでステージクリアした場合
+        demo_record.clear_flag = false;
+    }
+}
 
 //無条件でStateを更新⇒TitleDemo
 fn goto_title

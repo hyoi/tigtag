@@ -184,7 +184,7 @@ fn rotate_player_sprite
 pub fn scoring_and_clear_stage
 (   q1: Query<&Player>,
     mut _q2: Query<( &mut Text, &TextUiNumTile )>,
-    mut record: ResMut<Record>,
+    ( mut record, mut demo_record ): ( ResMut<Record>, ResMut<DemoRecord> ),
     mut map: ResMut<Map>,
     mut state: ResMut<State<GameState>>,
     mut ev_clear: EventWriter<EventClear>,
@@ -212,7 +212,8 @@ pub fn scoring_and_clear_stage
             if map.remaining_dots <= 0
             {   let next =
                 {   if state.current().is_demoplay()
-                    {   GameState::DemoLoop
+                    {   demo_record.clear_flag = true;
+                        GameState::DemoLoop
                     }
                     else
                     {   GameState::StageClear
