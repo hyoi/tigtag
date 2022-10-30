@@ -47,12 +47,12 @@ pub struct DemoRecord
 pub enum GameState
 {   InitApp,
     TitleDemo, DemoLoop,
-    GameStart, MainLoop, GameOver, ClearStage,
+    GameStart, MainLoop, GameOver, StageClear,
     Pause, Debug,
 }
 #[allow( dead_code )]
 impl GameState
-{   pub fn is_clearstage( &self ) -> bool { *self == GameState::ClearStage }
+{   pub fn is_stageclear( &self ) -> bool { *self == GameState::StageClear }
     pub fn is_pause     ( &self ) -> bool { *self == GameState::Pause      }
     pub fn is_demoplay  ( &self ) -> bool { *self == GameState::TitleDemo || *self == GameState::DemoLoop }
 }

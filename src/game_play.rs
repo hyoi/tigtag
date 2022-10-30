@@ -75,7 +75,7 @@ impl Plugin for GamePlay
         .add_system_set
         (   SystemSet::on_update( GameState::MainLoop )         //<UPDATE>
             .before( Mark::DetectCollisions )                   //<before>
-            .with_system( player::scoring_and_clear_stage )     //スコアリング＆クリア判定⇒ClearStage
+            .with_system( player::scoring_and_clear_stage )     //スコアリング＆クリア判定⇒StageClear
         )
         .add_system_set
         (   SystemSet::on_update( GameState::MainLoop )         //<UPDATE>
@@ -112,21 +112,21 @@ impl Plugin for GamePlay
         ;
         //------------------------------------------------------------------------------------------
 
-        //GameState::ClearStage
+        //GameState::StageClear
         //------------------------------------------------------------------------------------------
         app
         .add_system_set
-        (   SystemSet::on_enter( GameState::ClearStage )        //<ENTER>
-            .with_system( show_component::<TextUiClear> )       //text UI（ClearStage）表示
+        (   SystemSet::on_enter( GameState::StageClear )        //<ENTER>
+            .with_system( show_component::<TextUiClear> )       //text UI（StageClear）表示
             .with_system( set_countdown_params::<TextUiClear> ) //カウントダウンタイマー初期化
         )
         .add_system_set
-        (   SystemSet::on_update( GameState::ClearStage )       //<UPDATE>
+        (   SystemSet::on_update( GameState::StageClear )       //<UPDATE>
             .with_system( countdown_message::<TextUiClear> )    //カウントダウン後⇒GameStart
         )
         .add_system_set
-        (   SystemSet::on_exit( GameState::ClearStage )         //<EXIT>
-            .with_system( hide_component::<TextUiClear> )       //text UI（ClearStage）消去
+        (   SystemSet::on_exit( GameState::StageClear )         //<EXIT>
+            .with_system( hide_component::<TextUiClear> )       //text UI（StageClear）消去
         )
         ;
         //------------------------------------------------------------------------------------------

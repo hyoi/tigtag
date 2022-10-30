@@ -215,7 +215,7 @@ pub fn scoring_and_clear_stage
                     {   GameState::DemoLoop
                     }
                     else
-                    {   GameState::ClearStage
+                    {   GameState::StageClear
                     }
                 };
                 let _ = state.overwrite_set( next );

@@ -218,7 +218,7 @@ pub fn detect_collisions
     mut demo_record: ResMut<DemoRecord>,
 )
 {   //クリアしておらず、且つ衝突判定が真なら、衝突処理する
-    if ! state.current().is_clearstage() && is_collision( q_player, q_chaser )
+    if ! state.current().is_stageclear() && is_collision( q_player, q_chaser )
     {   let next =
         {   if state.current().is_demoplay()
             {   //Demoの場合、記録を残す
