@@ -39,7 +39,8 @@ cargo install -f wasm-bindgen-cli
 - [Google Fonts](https://fonts.google.com/)
   - [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P)
   - [Orbitron](https://fonts.google.com/specimen/Orbitron)
-  - [Reggae One](https://fonts.google.com/specimen/Reggae+One?subset=japanese)
+  - [Reggae One](https://fonts.google.com/specimen/Reggae+One)
+  - [BIZ UDPGothic](https://fonts.google.com/specimen/BIZ+UDPGothic)
 - [ドット絵ダウンロードサイト DOTOWN](https://dotown.maeda-design-room.net/)
   - Rustだから蟹 <img src="./assets/sprites/kani_DOTOWN.png" width="22" height="16" style="vertical-align: bottom;">
 ## 宿題
