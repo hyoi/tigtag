@@ -42,13 +42,12 @@ pub struct DemoRecord
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ゲームの状態
-#[allow( dead_code )]
 #[derive( Clone, Copy, Eq, PartialEq, Hash, Debug )]
 pub enum GameState
 {   InitApp,
     TitleDemo, DemoLoop,
-    GameStart, MainLoop, GameOver, StageClear,
-    Pause, Debug,
+    GameStart, StageStart, MainLoop, StageClear, GameOver,
+    Pause,
 }
 #[allow( dead_code )]
 impl GameState

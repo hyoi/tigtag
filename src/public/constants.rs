@@ -150,16 +150,6 @@ pub const CENTER_START_TEXT: [ MessageSect; 5 ] =
 pub const TEXT_UI_START: TextUiStart = TextUiStart ( 3, GameState::MainLoop, 4, cd_string_start );
 fn cd_string_start( n: i32 ) -> String { if n == 0 { "Go!!".to_string() } else { n.to_string() } }
 
-pub const CENTER_OVER_TEXT: [ MessageSect; 5 ] =
-[   ( "Game Over\n"    , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 6.0, Color::RED    ),
-    ( "\n"             , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.5, Color::NONE   ),
-    ( "REPLAY?\n\n"    , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
-    ( "Hit SPACE Key\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
-    ( ""               , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::YELLOW ),
-];
-pub const TEXT_UI_OVER: TextUiOver = TextUiOver ( 10, GameState::TitleDemo, 4, cd_string_over, KeyCode::Space, GameState::GameStart );
-fn cd_string_over( n: i32 ) -> String { n.to_string() }
-
 pub const CENTER_CLEAR_TEXT: [ MessageSect; 5 ] =
 [   ( "C L E A R !!\n" , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN   ),
     ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE   ),
@@ -167,8 +157,19 @@ pub const CENTER_CLEAR_TEXT: [ MessageSect; 5 ] =
     ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE   ),
     ( ""               , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::YELLOW ),
 ];
-pub const TEXT_UI_CLEAR: TextUiClear = TextUiClear ( 1, GameState::GameStart, 4, cd_string_clear );
+pub const TEXT_UI_CLEAR: TextUiClear = TextUiClear ( 1, GameState::StageStart, 4, cd_string_clear );
 fn cd_string_clear( n: i32 ) -> String { ( n + 4 ).to_string() }
+
+pub const CENTER_OVER_TEXT: [ MessageSect; 5 ] =
+[   ( "Game Over\n"    , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 6.0, Color::RED    ),
+    ( "\n"             , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.5, Color::NONE   ),
+    ( "REPLAY?\n\n"    , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
+    ( "Hit SPACE Key\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
+    ( ""               , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::YELLOW ),
+];
+pub const TEXT_UI_OVER: TextUiOver
+    = TextUiOver ( 10, GameState::TitleDemo, 4, cd_string_over, KeyCode::Space, GameState::GameStart );
+fn cd_string_over( n: i32 ) -> String { n.to_string() }
 
 pub const CENTER_PAUSE_TEXT: [ MessageSect; 1 ] =
 [   ( "P A U S E", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::SILVER ),
