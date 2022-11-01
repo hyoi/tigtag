@@ -80,6 +80,23 @@ pub fn which_way_player_goes
     }
 }
 
+impl Map
+{   //指定した座標とその四方のドットを数える(結果は0～4)
+    fn land_values( &self, center: Grid ) -> i32
+    {   //指定の座標にドットはあるか
+        let mut count = if self.o_entity( center ).is_some() { 1 } else { 0 };
+
+        //四方にドットはあるか
+        for side in self.get_byways_list( center )
+        {   if self.o_entity( center + side ).is_some()
+            {   count += 1;
+            }
+        }
+
+        count
+    }
+}
+
 //リスクを評価する
 fn check_risk
 (   byway: Grid,
