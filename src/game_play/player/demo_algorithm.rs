@@ -8,8 +8,6 @@ pub fn which_way_player_goes
     q_chasers: Query<&Chaser>,
     map: Res<Map>,
     sides: &[ DxDy ],
-    mut _state: ResMut<State<GameState>>,
-    mut _cmds: Commands,
 ) -> DxDy
 {   let mut rng = rand::thread_rng();
 
@@ -49,7 +47,7 @@ pub fn which_way_player_goes
     let mut risk_none   = Vec::with_capacity( 3 ); //最大で十字路(3)
     for side in sides
     {   let byway = player.next + side;
-        let risk = check_risk( byway, player, &goals, &map, &mut _cmds );
+        let risk = check_risk( byway, player, &goals, &map );
         if risk.is_none()
         {   risk_none.push ( ( side, map.land_values( byway ) ) );
         }
@@ -57,10 +55,6 @@ pub fn which_way_player_goes
         {   risk_rating.push ( ( side, risk ) );
         }
     }
-
-    //devモードで交差点でpauseする仕掛け
-    // #[cfg( debug_assertions )]
-    // let _ = _state.push( GameState::Pause );
 
     if risk_none.is_empty()
     {   //リスク値が低い(値が大きい)順にソートして最大値を求める
@@ -103,7 +97,6 @@ fn check_risk
     player: &Player,
     goals: &[ Grid ],
     map: &Res<Map>,
-    _cmds: &mut Commands,
 ) -> Option<usize>
 {   let mut target    = byway;       //脇道の入口の座標
     let mut previous  = player.next; //戻り路の座標
@@ -168,19 +161,6 @@ fn check_risk
             //一歩進む
             previous = target;
             target   = byway;
-
-            //devモードで経路探索の様子を表示する仕組み
-            // #[cfg( debug_assertions )]
-            // {   let color = COLOR_SPRITE_DEBUG_GRID;
-            //     let custom_size = Some ( Pixel::new( PIXELS_PER_GRID, PIXELS_PER_GRID ) * 0.8 );
-            //     let pixel = previous.into_pixel_map();
-            //     _cmds
-            //     .spawn_bundle( SpriteBundle::default() )
-            //     .insert( Sprite { color, custom_size, ..default() } )
-            //     .insert( Transform::from_translation( pixel.extend( 100.0 ) ) )
-            //     .insert( PathFinder )
-            //     ;
-            // }
         }
         //loop end
 

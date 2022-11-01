@@ -60,7 +60,7 @@ pub fn move_sprite
     map: Res<Map>,
     state: ResMut<State<GameState>>,
     ( mut ev_clear, mut ev_over ): ( EventReader<EventClear>, EventReader<EventOver> ),
-    ( cmds, inkey, time ): ( Commands, Res<Input<KeyCode>>, Res<Time> ),
+    ( inkey, time ): ( Res<Input<KeyCode>>, Res<Time> ),
 )
 {   //直前の判定でクリア／オーバーしていたらスプライトの表示を変更しない
     if ev_clear.iter().next().is_some() { return }
@@ -106,7 +106,7 @@ pub fn move_sprite
                     sides[ 0 ],
                 Ordering::Greater => //三叉路または十字路
                     if let Some ( fnx ) = player.fn_runaway
-                    {   fnx( &player, q_chasers, map, &sides, state, cmds ) //外部関数で進行方向を決める
+                    {   fnx( &player, q_chasers, map, &sides ) //外部関数で進行方向を決める
                     }
                     else
                     {   let mut rng = rand::thread_rng();

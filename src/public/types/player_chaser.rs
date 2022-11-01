@@ -32,7 +32,7 @@ impl Default for Player
 }
 
 //関数ポインタ型((demoplay)自機の移動方向を決める関数)
-type FnRunAway = fn( &Player, Query<&Chaser>, Res<Map>, &[ DxDy ], ResMut<State<GameState>>, Commands ) -> DxDy;
+type FnRunAway = fn( &Player, Query<&Chaser>, Res<Map>, &[ DxDy ] ) -> DxDy;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
