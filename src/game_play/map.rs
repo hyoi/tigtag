@@ -80,7 +80,6 @@ type WithMapEntities = Or< ( With<SpriteWall>, With<SpriteDot> ) >;
 //スプライトをspawnしてマップを表示する
 pub fn spawn_sprite
 (   q1: Query<Entity, WithMapEntities>,
-    q2: Query<( &mut Text, &TextUiNumTile )>,
     mut map: ResMut<Map>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
