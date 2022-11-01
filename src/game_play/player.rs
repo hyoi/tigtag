@@ -60,7 +60,7 @@ pub fn move_sprite
     map: Res<Map>,
     state: ResMut<State<GameState>>,
     ( mut ev_clear, mut ev_over ): ( EventReader<EventClear>, EventReader<EventOver> ),
-    ( cmds, inkey, time ): ( Commands, Res<Input<KeyCode>>, Res<Time> ),
+    ( inkey, time ): ( Res<Input<KeyCode>>, Res<Time> ),
 )
 {   //直前の判定でクリア／オーバーしていたらスプライトの表示を変更しない
     if ev_clear.iter().next().is_some() { return }
@@ -106,7 +106,7 @@ pub fn move_sprite
                     sides[ 0 ],
                 Ordering::Greater => //三叉路または十字路
                     if let Some ( fnx ) = player.fn_runaway
-                    {   fnx( &player, q_chasers, map, &sides, state, cmds ) //外部関数で進行方向を決める
+                    {   fnx( &player, q_chasers, map, &sides ) //外部関数で進行方向を決める
                     }
                     else
                     {   let mut rng = rand::thread_rng();
@@ -221,33 +221,6 @@ pub fn scoring_and_clear_stage
                 };
                 let _ = state.overwrite_set( next );
                 ev_clear.send( EventClear );    //後続の処理にクリアを伝える
-            }
-            else
-            {   //クリアではないなら周囲9マスのland_valuesを更新する
-                for dx in -1..=1
-                {   for dy in -1..=1
-                    {   let grid = player.grid + Grid::new( dx, dy );
-                        *map.land_values_mut( grid ) =
-                        {   if map.is_passage( grid ) && map.o_entity( grid ).is_some()
-                            {   map.count_9squares( grid )
-                            }
-                            else
-                            {   0
-                            }
-                        };
-
-                        //デバッグ用の表示
-                        #[cfg( debug_assertions )]
-                        _q2.for_each_mut
-                        (   | ( mut text, TextUiNumTile( x ) ) |
-                            if *x == grid
-                            {   let count = map.land_values( grid );
-                                text.sections[ 0 ].value
-                                    = if count != 0 { count.to_string() } else { "".to_string() }
-                            }
-                        );
-                    }
-                }
             }
         }
     }
