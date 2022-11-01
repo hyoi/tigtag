@@ -21,7 +21,6 @@ pub struct Map
 {   pub rng            : rand::prelude::StdRng,     //マップ生成専用の乱数生成器(マップに再現性を持たせるため)
     map_bits           : Vec<Vec<usize>>,           //マップの各グリッドの状態をbitで保存
     dot_entities       : Vec<Vec<Option<Entity>>>,  //ドットをdespawnする際に使うEntityIDを保存
-    land_values        : Vec<Vec<i32>>,             //マス目(通路のドット)の重みづけ用
     pub remaining_dots : i32,                       //マップに残っているドットの数
     dummy_o_entity_none: Option<Entity>,            //o_entity_mut()の範囲外アクセスで&mut Noneを返すために使用
 }
@@ -41,7 +40,6 @@ impl Default for Map
         {   rng                : StdRng::seed_from_u64( seed ),
             map_bits           : vec![ vec![ 0   ; MAP_GRIDS_HEIGHT as usize ]; MAP_GRIDS_WIDTH as usize ],
             dot_entities       : vec![ vec![ None; MAP_GRIDS_HEIGHT as usize ]; MAP_GRIDS_WIDTH as usize ],
-            land_values        : vec![ vec![ 0   ; MAP_GRIDS_HEIGHT as usize ]; MAP_GRIDS_WIDTH as usize ],
             remaining_dots     : 0,
             dummy_o_entity_none: None,
         }
@@ -117,9 +115,6 @@ impl Map
         }
         else { &mut self.dummy_o_entity_none } //範囲外は&mut Option::Noneを返す
     }
-
-    pub fn land_values    ( &    self, grid: Grid ) ->      i32 {      self.land_values[ grid.x as usize ][ grid.y as usize ] }
-    pub fn land_values_mut( &mut self, grid: Grid ) -> &mut i32 { &mut self.land_values[ grid.x as usize ][ grid.y as usize ] }
 }
 
 //End of code.

@@ -222,33 +222,6 @@ pub fn scoring_and_clear_stage
                 let _ = state.overwrite_set( next );
                 ev_clear.send( EventClear );    //後続の処理にクリアを伝える
             }
-            else
-            {   //クリアではないなら周囲9マスのland_valuesを更新する
-                for dx in -1..=1
-                {   for dy in -1..=1
-                    {   let grid = player.grid + Grid::new( dx, dy );
-                        *map.land_values_mut( grid ) =
-                        {   if map.is_passage( grid ) && map.o_entity( grid ).is_some()
-                            {   map.count_9squares( grid )
-                            }
-                            else
-                            {   0
-                            }
-                        };
-
-                        //デバッグ用の表示
-                        #[cfg( debug_assertions )]
-                        _q2.for_each_mut
-                        (   | ( mut text, TextUiNumTile( x ) ) |
-                            if *x == grid
-                            {   let count = map.land_values( grid );
-                                text.sections[ 0 ].value
-                                    = if count != 0 { count.to_string() } else { "".to_string() }
-                            }
-                        );
-                    }
-                }
-            }
         }
     }
 }
