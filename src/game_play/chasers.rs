@@ -214,17 +214,16 @@ pub fn detect_collisions
     q_chaser: Query<&Chaser>,
     mut state: ResMut<State<GameState>>,
     mut ev_over: EventWriter<EventOver>,
-    record: ResMut<Record>,
-    mut demo_record: ResMut<DemoRecord>,
+    mut record: ResMut<Record>,
 )
 {   //クリアしておらず、且つ衝突判定が真なら、衝突処理する
     if ! state.current().is_stageclear() && is_collision( q_player, q_chaser )
     {   let next =
         {   if state.current().is_demoplay()
             {   //Demoの場合、記録を残す
-                if record.score > demo_record.hi_score
-                {   demo_record.hi_score = record.score;
-                    demo_record.stage    = record.stage;
+                if record.score > record.demo.hi_score
+                {   record.demo.hi_score = record.score;
+                    record.demo.stage    = record.stage;
                 }
 
                 GameState::DemoLoop

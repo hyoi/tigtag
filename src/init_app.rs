@@ -32,7 +32,6 @@ impl Plugin for InitApp
         app
         .add_state( GameState::InitApp )        //Stateの初期化
         .init_resource::<Record>()              //スコア等の初期化
-        .init_resource::<DemoRecord>()          //デモ用記録の初期化
         .init_resource::<CountDown>()           //カウントダウンタイマーの初期化
         .init_resource::<Map>()                 //迷路情報の初期化
         .add_event::<EventClear>()              //ステージクリアイベント

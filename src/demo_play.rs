@@ -70,16 +70,15 @@ impl Plugin for DemoPlay
 //demoクリアを除き、recordを初期化する
 fn init_demoplay_record
 (   mut record: ResMut<Record>,
-    mut demo_record: ResMut<DemoRecord>,
 )
-{   if ! demo_record.clear_flag
+{   if ! record.demo.clear_flag
     {   //GameOver後replayしなかった場合、demoで追手につかまった場合
         record.score = 0;
         record.stage = 0;
     }
     else
     {   //demoでステージクリアした場合
-        demo_record.clear_flag = false;
+        record.demo.clear_flag = false;
     }
 }
 

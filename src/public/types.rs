@@ -14,29 +14,31 @@ pub use player_chaser::*;
 
 //ゲームの記録のResource
 pub struct Record
-{   pub stage   : i32,      //ステージ数
-    pub score   : i32,      //スコア
-    pub hi_score: i32,      //ハイスコア
-    pub count   : i32,      //カウントダウンタイマーの初期値
-    pub timer   : Timer,    //カウントダウンタイマー用タイマー
+{   pub stage   : i32,        //ステージ数
+    pub score   : i32,        //スコア
+    pub hi_score: i32,        //ハイスコア
+    pub count   : i32,        //カウントダウンタイマーの初期値
+    pub timer   : Timer,      //カウントダウンタイマー用タイマー
+    pub demo    : DemoRecord, //demo用の記録
 }
 impl Default for Record
 {   fn default() -> Self
     {   Self
-        {   stage    : 0,
-            score    : 0,
-            hi_score : 0,
-            count: 0,
-            timer: Timer::from_seconds( 1.0, false ),
+        {   stage   : 0,
+            score   : 0,
+            hi_score: 0,
+            count   : 0,
+            timer   : Timer::from_seconds( 1.0, false ),
+            demo    : DemoRecord::default(),
         }
     }
 }
 
-//demoの記録を残すResource
+//demo用の記録
 #[derive(Default)]
 pub struct DemoRecord
-{   pub stage   : i32,      //ステージ数
-    pub hi_score: i32,      //ハイスコア
+{   pub stage     : i32,    //ステージ数
+    pub hi_score  : i32,    //ハイスコア
     pub clear_flag: bool,   //demoでステージクリアすると真、それ以外は偽
 }
 

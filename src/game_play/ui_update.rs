@@ -24,7 +24,7 @@ impl Plugin for UiUpdate
 fn footer_left
 (   mut q: Query<&mut Text, With<FooterLeft>>,
     diag: Res<Diagnostics>,
-    o_demo_record: Option<Res<DemoRecord>>,
+    o_record: Option<Res<Record>>,
 )
 {   if let Ok( mut ui ) = q.get_single_mut()
     {   let fps_avr = diag.get( FrameTimeDiagnosticsPlugin::FPS ).map_or
@@ -33,8 +33,11 @@ fn footer_left
         );
         ui.sections[ 1 ].value = fps_avr;
 
-        let x = o_demo_record.map_or( NA2_5.to_string(), | x | format!( "{:02}-{:05}", x.stage, x.hi_score ) );
-        ui.sections[ 3 ].value = x;
+        let stage_hi_score = o_record.map_or
+        (   NA2_5.to_string(),
+            | record | format!( "{:02}-{:05}", record.demo.stage, record.demo.hi_score )
+        );
+        ui.sections[ 3 ].value = stage_hi_score;
     }
 }
 
