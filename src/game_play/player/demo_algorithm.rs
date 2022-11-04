@@ -7,23 +7,27 @@ pub fn which_way_player_goes
 (   player: &Player,
     q_chasers: Query<&Chaser>,
     map: Res<Map>,
-    sides: &[ DxDy ],
+    org_sides: &[ DxDy ], //交差点が前提なので、要素数は2(三叉路)～3(十字路)
 ) -> DxDy
-{   let mut rng = rand::thread_rng();
+{   let mut sides = Vec::from( org_sides );
+    let mut goals = Vec::with_capacity( q_chasers.iter().len() );
 
-    //同じマスに居るがまだ衝突だと確定していない場合
-    for chaser in q_chasers.iter()
-    {   //同じマスに居る追手を特定する
-        if chaser.next == player.next
-        {   //追手とぶつかる向きの判定
+    //終点(追手の座標)のリストを作る
+    q_chasers.for_each
+    (   | chaser |
+        //衝突寸前の追手は終点リストに含めない
+        if chaser.next != player.next
+        {   goals.push( chaser.next );
+        }
+        else
+        {   //衝突寸前で緊急回避が必要な場合
+            //ぶつかる向き(bad_move)を調べてsidesから除く
             let bad_move =
             {   if chaser.side == player.side
-                {   //そのまま進むと追突するので
-                    player.side
+                {   player.side
                 }
                 else
-                {   //自機と追手が違う向きなら
-                    match chaser.side
+                {   match chaser.side
                     {   DxDy::Right => DxDy::Left ,
                         DxDy::Left  => DxDy::Right,
                         DxDy::Down  => DxDy::Up   ,
@@ -31,61 +35,73 @@ pub fn which_way_player_goes
                     }
                 }
             };
-
-            let mut sides = Vec::from( sides );
             sides.retain( | side | *side != bad_move );
-            return sides[ rng.gen_range( 0..sides.len() ) ]
         }
+    );
+
+    //sidesが空なら運任せ
+    if sides.is_empty()
+    {   let mut rng = rand::thread_rng();
+        return org_sides[ rng.gen_range( 0..org_sides.len() ) ]
     }
 
-    //終点(追手の座標)のリストを作る
-    let mut goals = Vec::with_capacity( q_chasers.iter().len() );
-    q_chasers.for_each( | chaser | goals.push( chaser.next ) );
+    //sidesの要素数が１なら
+    if sides.len() == 1
+    {   return sides[ 0 ]
+    }
 
-    //脇道毎にリスクを評価する
+    //sidesの要素数が２以上なら、リスクを評価する
     let mut risk_rating = Vec::with_capacity( 3 ); //最大で十字路(3)
     let mut risk_none   = Vec::with_capacity( 3 ); //最大で十字路(3)
     for side in sides
-    {   let byway = player.next + side;
+    {   let byway = player.next + side; //わき道の座標
         let risk = check_risk( byway, player, &goals, &map );
-        if risk.is_none()
-        {   risk_none.push ( ( side, map.land_values( byway ) ) );
+
+        if let Some ( risk ) = risk
+        {   risk_rating.push ( ( side, risk as i32 ) );
         }
         else
-        {   risk_rating.push ( ( side, risk ) );
+        {   //リスクがないと判定されたら、ドットを数える
+            risk_none.push ( ( side, map.count_dots_4sides( byway ) ) );
         }
     }
 
-    if risk_none.is_empty()
-    {   //リスク値が低い(値が大きい)順にソートして最大値を求める
-        risk_rating.sort_by( | a, b | b.1.cmp( &a.1 ) );
-        let max_val = risk_rating[ 0 ].1;
-        risk_rating.retain( | x | x.1 >= max_val );
-
-        *risk_rating[ rng.gen_range( 0..risk_rating.len() ) ].0
-    }
-    else
-    {   //dotの価値の高い順にソートして最大値を求める
-        risk_none.sort_by( | a, b | b.1.cmp( &a.1 ) );
-        let max_val = risk_none[ 0 ].1;
-        risk_none.retain( | x | x.1 >= max_val );
-
-        *risk_none[ rng.gen_range( 0..risk_none.len() ) ].0
-    }
+    //進む道を決める
+    let which_way = 
+    | ptr_sides: &mut Vec< ( DxDy, i32 ) > |
+    {   if ptr_sides.len() == 1
+        {   //道が１つだけの場合
+            ptr_sides[ 0 ].0
+        }
+        else
+        {   //道が複数ある場合(２～３)
+            ptr_sides.sort_by( | a, b | b.1.cmp( &a.1 ) ); //大きい順にソート
+            let max_val = ptr_sides[ 0 ].1;                //先頭の最大値
+            ptr_sides.retain( | x | x.1 >= max_val );      //最大値だけのリストにする
+    
+            if ptr_sides.len() == 1
+            {   ptr_sides[ 0 ].0
+            }
+            else
+            {   let mut rng = rand::thread_rng();
+                ptr_sides[ rng.gen_range( 0..ptr_sides.len() ) ].0
+            }
+        }
+    };
+    which_way( if risk_none.is_empty() { &mut risk_rating } else { &mut risk_none } )
 }
 
 impl Map
 {   //指定した座標とその四方のドットを数える(結果は0～4)
-    fn land_values( &self, center: Grid ) -> i32
+    fn count_dots_4sides( &self, center: Grid ) -> i32
     {   //指定の座標にドットはあるか
-        let mut count = if self.o_entity( center ).is_some() { 1 } else { 0 };
+        let mut count = i32::from( self.o_entity( center ).is_some() ); //true:1,false:0
 
         //四方にドットはあるか
-        for side in self.get_byways_list( center )
-        {   if self.o_entity( center + side ).is_some()
-            {   count += 1;
-            }
-        }
+        self.get_byways_list( center ).iter().for_each
+        (   | side |
+            count += i32::from( self.o_entity( center + side ).is_some() ) //true:1,false:0
+        );
 
         count
     }
@@ -98,7 +114,10 @@ fn check_risk
     goals: &[ Grid ],
     map: &Res<Map>,
 ) -> Option<usize>
-{   let mut target    = byway;       //脇道の入口の座標
+{   //goalsが空の場合(全ての追手が目前にいる場合)、わき道はリスクがない
+    if goals.is_empty() { return None }
+
+    let mut target    = byway;       //脇道の入口の座標
     let mut previous  = player.next; //戻り路の座標
     let mut path_open = VecDeque::from( [ Vec::from( [ previous, target ] ) ] );
     let mut crossing: Option<_> = None;
