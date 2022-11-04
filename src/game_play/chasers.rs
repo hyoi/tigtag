@@ -136,12 +136,9 @@ pub fn move_sprite
                 transform.translation = chaser.px_end.extend( DEPTH_SPRITE_CHASER );
             }
     
-            //四方で壁がない方向を確認する（逆走防止付き）
-            let mut sides = Vec::with_capacity( 4 );
-            if map.is_passage( chaser.next + DxDy::Up    ) && chaser.side != DxDy::Down  { sides.push( DxDy::Up    ) }
-            if map.is_passage( chaser.next + DxDy::Down  ) && chaser.side != DxDy::Up    { sides.push( DxDy::Down  ) }
-            if map.is_passage( chaser.next + DxDy::Right ) && chaser.side != DxDy::Left  { sides.push( DxDy::Right ) }
-            if map.is_passage( chaser.next + DxDy::Left  ) && chaser.side != DxDy::Right { sides.push( DxDy::Left  ) }
+            //四方の脇道を取得する
+            let mut sides = map.get_byways_list( chaser.next );         //脇道のリスト
+            sides.retain( | side | chaser.next + side != chaser.grid ); //戻り路を排除
 
             //追手の向きを決める（自機のプレーヤーのキー入力に相当）
             use std::cmp::Ordering;
