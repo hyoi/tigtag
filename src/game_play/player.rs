@@ -46,9 +46,8 @@ pub fn spawn_sprite
         ..default()
     };
     cmds
-    .spawn_bundle( triangle )
+    .spawn( ( triangle, player ) )
     .insert( Transform::from_translation( pixel.extend( DEPTH_SPRITE_PLAYER ) ) )
-    .insert( player )
     ;
 }
 
@@ -188,7 +187,8 @@ pub fn scoring_and_clear_stage
     mut map: ResMut<Map>,
     mut state: ResMut<State<GameState>>,
     mut ev_clear: EventWriter<EventClear>,
-    ( mut cmds, asset_svr, audio ): ( Commands, Res<AssetServer>, Res<Audio> ),
+    // ( mut cmds, asset_svr, audio ): ( Commands, Res<AssetServer>, Res<Audio> ),
+    ( mut cmds, asset_svr, ): ( Commands, Res<AssetServer>, ),
 )
 {   if let Ok ( player ) = q1.get_single()
     {   //自機の位置にドットがあるなら
@@ -200,8 +200,8 @@ pub fn scoring_and_clear_stage
             //スコア更新
             record.score += 1;
             map.remaining_dots -= 1;
-            audio.set_volume( VOLUME_SOUND_BEEP );
-            audio.play( asset_svr.load( ASSETS_SOUND_BEEP ) );
+            // audio.set_volume( VOLUME_SOUND_BEEP );
+            // audio.play( asset_svr.load( ASSETS_SOUND_BEEP ) );
 
             //ハイスコアの更新
             if ! state.current().is_demoplay() && record.score > record.hi_score

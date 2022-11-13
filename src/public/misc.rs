@@ -2,7 +2,7 @@ use super::*;
 
 //bevyのカメラを設置する
 pub fn spawn_camera( mut cmds: Commands )
-{   cmds.spawn_bundle( Camera2dBundle::default() );
+{   cmds.spawn( Camera2dBundle::default() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

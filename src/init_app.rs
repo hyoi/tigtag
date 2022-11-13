@@ -12,7 +12,7 @@ pub struct InitApp;
 impl Plugin for InitApp
 {   fn build( &self, app: &mut App )
     {   //メインウィンドウ、背景色、アンチエイリアシング、プラグイン
-        let main_window = WindowDescriptor
+        let window = WindowDescriptor
         {   title    : APP_TITLE.to_string(),
             width    : SCREEN_PIXELS_WIDTH,
             height   : SCREEN_PIXELS_HEIGHT,
@@ -21,13 +21,12 @@ impl Plugin for InitApp
             ..default()
         };
         app
-        .insert_resource( main_window )
         .insert_resource( ClearColor( SCREEN_BACKGROUND_COLOR ) )
         .insert_resource( Msaa { samples: 4 } )
-        .add_plugins( DefaultPlugins )  // bevy default
-        .add_plugin( AudioPlugin )      // bevy_kira_audio
+        .add_plugins( DefaultPlugins.set( WindowPlugin { window, ..default() } ) ) // bevy default
+        // .add_plugin( AudioPlugin )      // bevy_kira_audio
         ;
-    
+
         //ResourceとEvent
         app
         .add_state( GameState::InitApp )        //Stateの初期化
@@ -104,7 +103,7 @@ fn spawn_game_frame
         {   if char == '#'
             {   let pixel_xy = Grid::new( x as i32, y as i32 ).into_pixel_screen();
                 cmds
-                .spawn_bundle( SpriteBundle::default() )
+                .spawn( SpriteBundle::default() )
                 .insert( Sprite { custom_size, ..default() } )
                 .insert( Transform::from_translation( pixel_xy.extend( DEPTH_SPRITE_GAME_FRAME ) ) )
                 .insert( asset_svr.load( sprite_file ) as Handle<Image> )
@@ -130,7 +129,7 @@ pub fn spawn_debug_info
     {   for y in SCREEN_GRIDS_RANGE_Y
         {   let pixel_xy = Grid::new( x, y ).into_pixel_screen();
             cmds
-            .spawn_bundle( SpriteBundle::default() )
+            .spawn( SpriteBundle::default() )
             .insert( Sprite { custom_size, color, ..default() } )
             .insert( Transform::from_translation( pixel_xy.extend( DEPTH_SPRITE_DEBUG_GRID ) ) )
             .insert( asset_svr.load( ASSETS_SPRITE_DEBUG_GRID ) as Handle<Image> )
@@ -154,8 +153,7 @@ pub fn spawn_debug_info
             txt[ 0 ].0 = &val;
 
             cmds
-            .spawn_bundle( text_ui_num_tile( text_ui, &txt, &asset_svr ) )
-            .insert( TextUiNumTile ( grid ) )
+            .spawn( ( text_ui_num_tile( text_ui, &txt, &asset_svr ), TextUiNumTile ( grid ) ) )
             ;
         }
     }

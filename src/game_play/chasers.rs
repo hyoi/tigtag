@@ -82,10 +82,9 @@ pub fn spawn_sprite
             };
 
             cmds
-            .spawn_bundle( SpriteBundle::default() )
+            .spawn( ( SpriteBundle::default(), chaser ) )
             .insert( Sprite { color, custom_size, ..default() } )
             .insert( Transform::from_translation( pixel.extend( DEPTH_SPRITE_CHASER ) ) )
-            .insert( chaser )
             ;
         }
     );

@@ -23,7 +23,7 @@ pub fn spawn_text_ui
         {   size           : Size::new( width, height ),
             position_type  : PositionType::Absolute,
             flex_direction : FlexDirection::Column,
-            justify_content: JustifyContent::FlexEnd, //画面の上端
+            justify_content: JustifyContent::FlexStart, //画面の上端
             ..default()
         }
     );
@@ -32,7 +32,7 @@ pub fn spawn_text_ui
         {   size           : Size::new( width, height ),
             position_type  : PositionType::Absolute,
             flex_direction : FlexDirection::Column,
-            justify_content: JustifyContent::FlexStart, //画面の下端
+            justify_content: JustifyContent::FlexEnd, //画面の下端
             ..default()
         }
     );
@@ -79,30 +79,30 @@ pub fn spawn_text_ui
     ui_footer_right.text.alignment.horizontal = HorizontalAlign::Right;
 
     //隠しフレームの上に子要素を作成する
-    cmds.spawn_bundle( center_frame ).with_children
+    cmds.spawn( center_frame ).with_children
     (   | cmds |
         {   //中央
-            cmds.spawn_bundle( ui_title ).insert( TEXT_UI_TITLE );
-            cmds.spawn_bundle( ui_start ).insert( TEXT_UI_START );
-            cmds.spawn_bundle( ui_over  ).insert( TEXT_UI_OVER  );
-            cmds.spawn_bundle( ui_clear ).insert( TEXT_UI_CLEAR );
-            cmds.spawn_bundle( ui_pause ).insert( TextUiPause   );
+            cmds.spawn( ( ui_title, TEXT_UI_TITLE ) );
+            cmds.spawn( ( ui_start, TEXT_UI_START ) );
+            cmds.spawn( ( ui_over , TEXT_UI_OVER  ) );
+            cmds.spawn( ( ui_clear, TEXT_UI_CLEAR ) );
+            cmds.spawn( ( ui_pause, TextUiPause   ) );
 
             //ヘッダー
-            cmds.spawn_bundle( header_frame ).with_children
+            cmds.spawn( header_frame ).with_children
             (   | cmds |
-                {   cmds.spawn_bundle( ui_header_left   ).insert( HeaderLeft   );
-                    cmds.spawn_bundle( ui_header_center ).insert( HeaderCenter );
-                    cmds.spawn_bundle( ui_header_right  ).insert( HeaderRight  );
+                {   cmds.spawn( ( ui_header_left  , HeaderLeft   ) );
+                    cmds.spawn( ( ui_header_center, HeaderCenter ) );
+                    cmds.spawn( ( ui_header_right , HeaderRight  ) );
                 }
             );
 
             //フッター
-            cmds.spawn_bundle( footer_frame ).with_children
+            cmds.spawn( footer_frame ).with_children
             (   | cmds |
-                {   cmds.spawn_bundle( ui_footer_left   ).insert( FooterLeft   );
-                    cmds.spawn_bundle( ui_footer_center ).insert( FooterCenter );
-                    cmds.spawn_bundle( ui_footer_right  ).insert( FooterRight  );
+                {   cmds.spawn( ( ui_footer_left  , FooterLeft   ) );
+                    cmds.spawn( ( ui_footer_center, FooterCenter ) );
+                    cmds.spawn( ( ui_footer_right , FooterRight  ) );
                 }
             );
         }
@@ -112,7 +112,7 @@ pub fn spawn_text_ui
     let pixel = Grid::new( SCREEN_GRIDS_WIDTH - 4, SCREEN_GRIDS_HEIGHT - 1 ).into_pixel_screen();
     let custom_size = Some ( Pixel::new( PIXELS_PER_GRID, PIXELS_PER_GRID ) * MAGNIFY_SPRITE_KANI );
     cmds
-    .spawn_bundle( SpriteBundle::default() )
+    .spawn( SpriteBundle::default() )
     .insert( Sprite { custom_size, ..default() } )
     .insert( asset_svr.load( ASSETS_SPRITE_KANI_DOTOWN ) as Handle<Image> )
     .insert( Transform::from_translation( pixel.extend( DEPTH_SPRITE_KANI_DOTOWN ) ) )
@@ -123,8 +123,8 @@ pub fn spawn_text_ui
 fn hidden_frame
 (   style: Style,
 ) -> NodeBundle
-{   let color = UiColor ( Color::NONE );
-    NodeBundle { style, color, ..default() }
+{   let background_color = BackgroundColor ( Color::NONE );
+    NodeBundle { style, background_color, ..default() }
 }
 
 //text UI用にTextBundleを作る

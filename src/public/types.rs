@@ -13,6 +13,7 @@ pub use player_chaser::*;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ゲームの記録のResource
+#[derive( Resource )]
 pub struct Record
 {   pub stage   : i32,        //ステージ数
     pub score   : i32,        //スコア
@@ -28,14 +29,14 @@ impl Default for Record
             score   : 0,
             hi_score: 0,
             count   : 0,
-            timer   : Timer::from_seconds( 1.0, false ),
+            timer   : Timer::from_seconds( 1.0, TimerMode::Once ),
             demo    : DemoRecord::default(),
         }
     }
 }
 
 //demo用の記録
-#[derive(Default)]
+#[derive( Default )]
 pub struct DemoRecord
 {   pub stage     : i32,    //ステージ数
     pub hi_score  : i32,    //ハイスコア
@@ -45,12 +46,13 @@ pub struct DemoRecord
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ゲームの状態
+#[allow( dead_code )]
 #[derive( Clone, Copy, Eq, PartialEq, Hash, Debug )]
 pub enum GameState
 {   InitApp,
     TitleDemo, DemoLoop,
     GameStart, StageStart, MainLoop, StageClear, GameOver,
-    Pause,
+    Pause, Debug,
 }
 #[allow( dead_code )]
 impl GameState
@@ -140,6 +142,7 @@ impl TextUiWithHitKey for TextUiOver
 }
 
 //カウントダウンタイマー用のResource
+#[derive( Resource )]
 pub struct CountDown
 {   pub count: i32,   //カウントダウンタイマーの初期値
     pub timer: Timer, //カウントダウンタイマー用タイマー
@@ -148,7 +151,7 @@ impl Default for CountDown
 {   fn default() -> Self
     {   Self
         {   count: 0,
-            timer: Timer::from_seconds( 1.0, false ),
+            timer: Timer::from_seconds( 1.0, TimerMode::Once ),
         }
     }
 }
@@ -156,15 +159,19 @@ impl Default for CountDown
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ロードしたAssetsのハンドルの保存先
+#[derive( Resource )]
 pub struct LoadedAssets { pub preload: Vec<HandleUntyped> }
 
 //ローディングアニメ用スプライトのComponent
-#[derive( Component )] pub struct SpriteTile ( pub Grid );
+#[derive( Component )]
+pub struct SpriteTile ( pub Grid );
 
 //マーカーResource
+#[derive( Resource )]
 pub struct MarkAfterFetchAssets ( pub GameState );
 
 //開発用スプライトのComponent
-#[derive( Component )] pub struct PathFinder;
+#[derive( Component )]
+pub struct PathFinder;
 
 //End of code.
