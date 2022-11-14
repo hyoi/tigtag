@@ -51,14 +51,14 @@ pub fn change_state_after_loading
     o_marker : Option<Res<MarkAfterFetchAssets>>,
 )
 {   //プリロードが完了したか？
-    // for handle in assets.preload.iter()
-    // {   use bevy::asset::LoadState::*;
-    //     match asset_svr.get_load_state( handle )
-    //     {   Loaded => {} //完了
-    //         Failed => panic!( "Can't load assets" ), //ロード失敗⇒パニック
-    //         _      => return, //on_update()の中なので関数は繰り返し呼び出される
-    //     }
-    // }
+    for handle in assets.preload.iter()
+    {   use bevy::asset::LoadState::*;
+        match asset_svr.get_load_state( handle )
+        {   Loaded => {} //完了
+            Failed => panic!( "Can't load assets" ), //ロード失敗⇒パニック
+            _      => return, //on_update()の中なので関数は繰り返し呼び出される
+        }
+    }
 
     //次のStateへ遷移する
     if let Some ( x ) = o_marker
