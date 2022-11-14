@@ -25,6 +25,6 @@ features = [
 
 [dependencies]
 #bevy = "0.9"
-bevy_kira_audio = "0"
+bevy_kira_audio = "0.13"
 once_cell = "1"
 rand = "0.8"
