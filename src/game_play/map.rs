@@ -100,11 +100,10 @@ pub fn spawn_sprite
 
             if map.is_wall( grid )
             {   cmds
-                .spawn_bundle( SpriteBundle::default() )
+                .spawn( ( SpriteBundle::default(), SpriteWall ) )
                 .insert( Sprite { custom_size, ..default() } )
                 .insert( asset_svr.load( ASSETS_SPRITE_BRICK_WALL ) as Handle<Image> )
                 .insert( Transform::from_translation( pixel.extend( DEPTH_SPRITE_BRICK_WALL ) ) )
-                .insert( SpriteWall )
                 ;
             }
 
@@ -115,9 +114,8 @@ pub fn spawn_sprite
                     ..default()
                 };
                 let id = cmds
-                .spawn_bundle( circle )
+                .spawn( ( circle, SpriteDot ) )
                 .insert( Transform::from_translation( pixel.extend( DEPTH_SPRITE_DOT ) ) )
-                .insert( SpriteDot )
                 .id()
                 ;
                 *map.o_entity_mut( grid ) = Some ( id ); //idを保存(プレー中にdespawnするため)

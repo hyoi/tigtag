@@ -33,10 +33,9 @@ pub fn spawn_sprite_now_loading
 
             //スプライトを作成する
             cmds
-            .spawn_bundle( SpriteBundle::default() )
+            .spawn( ( SpriteBundle::default(), SpriteTile ( goal ) ) )
             .insert( Sprite { color, custom_size, ..default() } )
             .insert( Transform::from_translation( start.extend( DEPTH_SPRITE_TILE ) ) )
-            .insert( SpriteTile ( goal ) )
             ;
         } 
     }

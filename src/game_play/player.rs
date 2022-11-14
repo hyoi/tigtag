@@ -46,9 +46,8 @@ pub fn spawn_sprite
         ..default()
     };
     cmds
-    .spawn_bundle( triangle )
+    .spawn( ( triangle, player ) )
     .insert( Transform::from_translation( pixel.extend( DEPTH_SPRITE_PLAYER ) ) )
-    .insert( player )
     ;
 }
 
