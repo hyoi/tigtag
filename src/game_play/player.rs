@@ -39,10 +39,10 @@ pub fn spawn_sprite
     };
     let player = Player
     {   grid,
-        next    : grid,
-        px_start: pixel,
-        px_end  : pixel,
-        fn_runaway: Some ( demo_algorithm::which_way_player_goes ), //default()に任せるとNone 
+        next        : grid,
+        px_start    : pixel,
+        px_end      : pixel,
+        o_fn_runaway: Some ( demo_algorithm::which_way_player_goes ), //default()に任せるとNone 
         ..default()
     };
     cmds
@@ -78,14 +78,13 @@ pub fn move_sprite
         }
 
         //自機の進行方向を決める
-        player.stop = false;
         let mut side = player.side;
         if ! state.current().is_demoplay()
         {   //demoでなければプレイヤーのキー入力を確認(入力がなければ停止)
-                 if inkey.pressed( KeyCode::Up    ) { side = DxDy::Up;    }
-            else if inkey.pressed( KeyCode::Down  ) { side = DxDy::Down;  }
-            else if inkey.pressed( KeyCode::Right ) { side = DxDy::Right; }
-            else if inkey.pressed( KeyCode::Left  ) { side = DxDy::Left;  }
+                 if inkey.pressed( KeyCode::Up    ) { side = DxDy::Up;    player.stop = false; }
+            else if inkey.pressed( KeyCode::Down  ) { side = DxDy::Down;  player.stop = false; }
+            else if inkey.pressed( KeyCode::Right ) { side = DxDy::Right; player.stop = false; }
+            else if inkey.pressed( KeyCode::Left  ) { side = DxDy::Left;  player.stop = false; }
             else { player.stop = true }
 
             //キー入力があってもその向きに壁があれば停止
@@ -99,12 +98,13 @@ pub fn move_sprite
             sides.retain( | side | player.next + side != player.grid ); //戻り路を排除
 
             //demoなのでプレイヤーのキー入力を詐称する
+            player.stop = false;
             use std::cmp::Ordering;
             side = match sides.len().cmp( &1 )
             {   Ordering::Equal => //一本道 ⇒ 道なりに進む
                     sides[ 0 ],
                 Ordering::Greater => //三叉路または十字路
-                    if let Some ( fnx ) = player.fn_runaway
+                    if let Some ( fnx ) = player.o_fn_runaway
                     {   fnx( &player, q_chasers, map, &sides ) //外部関数で進行方向を決める
                     }
                     else
