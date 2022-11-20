@@ -7,34 +7,48 @@ pub fn spawn_camera( mut cmds: Commands )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//[Alt]+[Enter]でウィンドウとフルスクリーンを切り替える
+//ウィンドウとフルスクリーンを切り替える
 #[cfg( not( target_arch = "wasm32" ) )]
 pub fn toggle_window_mode
 (   inkey: Res<Input<KeyCode>>,
+    inbtn: Res<Input<GamepadButton>>,
     mut window: ResMut<Windows>,
 )
-{   let is_alt_return = ( inkey.pressed( KeyCode::LAlt ) || inkey.pressed( KeyCode::RAlt ) )
-                        && inkey.just_pressed( KeyCode::Return );
+{   //パッドのボタンの状態
+    let btn_fullscreen = GamepadButton::new( GAMEPAD, BUTTON_FULLSCREEN );
+    let is_btn_fullscreen = inbtn.just_pressed( btn_fullscreen );
 
-    if is_alt_return
-    {   use bevy::window::WindowMode::*;
-        if let Some( window ) = window.get_primary_mut()
-        {   let mode = if window.mode() == Windowed { SizedFullscreen } else { Windowed };
-            window.set_mode( mode );
-        }
+    //Alt＋Enterキーの状態
+    let is_key_fullscreen =
+    ( inkey.pressed( KEY_ALT_RIGHT ) || inkey.pressed( KEY_ALT_LEFT ) )
+    && inkey.just_pressed( KEY_FULLSCREEN );
+
+    //入力がないなら関数脱出
+    if ! is_key_fullscreen && ! is_btn_fullscreen { return }
+
+    use bevy::window::WindowMode::*;
+    if let Some( window ) = window.get_primary_mut()
+    {   let mode = if window.mode() == Windowed { SizedFullscreen } else { Windowed };
+        window.set_mode( mode );
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//ESCキーが入力さたら一時停止する
+//一時停止する
 pub fn pause_with_esc_key
 (   q: Query<&mut Visibility, With<TextUiPause>>,
-    mut inkey: ResMut<Input<KeyCode>>,
     mut state: ResMut<State<GameState>>,
+    mut inkey: ResMut<Input<KeyCode>>,
+    inbtn: Res<Input<GamepadButton>>,
 )
-{   if ! inkey.just_pressed( KeyCode::Escape ) { return }
+{   //パッドのボタン
+    let btn_pause = GamepadButton::new( GAMEPAD, BUTTON_PAUSE );
 
+    //入力がないなら関数脱出
+    if ! inkey.just_pressed( KEY_PAUSE ) && ! inbtn.just_pressed( btn_pause ) { return }
+
+    //PAUSEのトグル処理
     if state.current().is_pause()
     {   hide_component( q );
         let _ = state.pop();

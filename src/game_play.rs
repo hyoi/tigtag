@@ -163,9 +163,13 @@ fn into_next_state_with_key<T: Component + TextUiWithHitKey>
     mut record: ResMut<Record>,
     mut state: ResMut<State<GameState>>,
     mut inkey: ResMut<Input<KeyCode>>,
+    inbtn: Res<Input<GamepadButton>>,
 )
 {   if let Ok ( target ) = q.get_single_mut()
-    {   if ! inkey.just_pressed( target.key_code() ) { return }
+    {   //入力がないなら関数脱出
+        if ! inkey.just_pressed( target.key_code() ) 
+        && ! inbtn.just_pressed( target.btn_code() )
+        { return }
 
         //GameState::GameStartへ遷移する前にゼロクリアする
         let current = state.current();

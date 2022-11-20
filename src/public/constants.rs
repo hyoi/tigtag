@@ -78,6 +78,25 @@ pub const FETCH_ASSETS: [ &str; 8 ] =
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//ゲームパッドのID
+pub const GAMEPAD: Gamepad = Gamepad { id: 0 }; //Todo: pad 0番決め打ちでいいいのか？
+
+//PAUSEのキーとパッドボタン
+pub const KEY_PAUSE: KeyCode = KeyCode::Escape;
+pub const BUTTON_PAUSE: GamepadButtonType = GamepadButtonType::Start; //PS4のOPTIONSボタン
+
+//FULLSCREENのキーとパッドボタン
+pub const KEY_ALT_RIGHT: KeyCode = KeyCode::RAlt;
+pub const KEY_ALT_LEFT : KeyCode = KeyCode::LAlt;
+pub const KEY_FULLSCREEN: KeyCode = KeyCode::Return;
+pub const BUTTON_FULLSCREEN: GamepadButtonType = GamepadButtonType::Select; //PS4のSHAREボタン
+
+//「HIT SPACE KEY」のキーとパッドボタン
+pub const KEY_SPACE: KeyCode = KeyCode::Space;
+pub const BUTTON_SPACE: GamepadButtonType = GamepadButtonType::East; //PS4の◯ボタン
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #[allow( dead_code )]
 pub const DEPTH_SPRITE_DEBUG_GRID : f32 = 200.0; //スプライト重なり順
 pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 150.0; //スプライト重なり順
@@ -138,7 +157,7 @@ pub const CENTER_TITLE_TEXT: [ MessageSect; 3 ] =
     ( "\nD E M O\n\n\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::YELLOW ),
     ( "Hit SPACE Key"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
 ];
-pub const TEXT_UI_TITLE: TextUiTitle = TextUiTitle ( KeyCode::Space, GameState::GameStart );
+pub const TEXT_UI_TITLE: TextUiTitle = TextUiTitle( GameState::GameStart, KEY_SPACE, BUTTON_SPACE );
 
 pub const CENTER_START_TEXT: [ MessageSect; 5 ] =
 [   ( "Game Start\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN   ),
@@ -168,7 +187,7 @@ pub const CENTER_OVER_TEXT: [ MessageSect; 5 ] =
     ( ""               , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::YELLOW ),
 ];
 pub const TEXT_UI_OVER: TextUiOver
-    = TextUiOver ( 10, GameState::TitleDemo, 4, cd_string_over, KeyCode::Space, GameState::GameStart );
+    = TextUiOver( 10, GameState::TitleDemo, 4, cd_string_over, GameState::GameStart, KEY_SPACE, BUTTON_SPACE );
 fn cd_string_over( n: i32 ) -> String { n.to_string() }
 
 pub const CENTER_PAUSE_TEXT: [ MessageSect; 1 ] =
