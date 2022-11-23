@@ -15,13 +15,13 @@ pub fn toggle_window_mode
     mut window: ResMut<Windows>,
 )
 {   //パッドのボタンの状態
-    let btn_fullscreen = GamepadButton::new( GAMEPAD, BUTTON_FULLSCREEN );
+    let btn_fullscreen = GamepadButton::new( GAMEPAD, _BUTTON_FULLSCREEN );
     let is_btn_fullscreen = inbtn.just_pressed( btn_fullscreen );
 
     //Alt＋Enterキーの状態
     let is_key_fullscreen =
-    ( inkey.pressed( KEY_ALT_RIGHT ) || inkey.pressed( KEY_ALT_LEFT ) )
-    && inkey.just_pressed( KEY_FULLSCREEN );
+    ( inkey.pressed( _KEY_ALT_RIGHT ) || inkey.pressed( _KEY_ALT_LEFT ) )
+    && inkey.just_pressed( _KEY_FULLSCREEN );
 
     //入力がないなら関数脱出
     if ! is_key_fullscreen && ! is_btn_fullscreen { return }

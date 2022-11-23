@@ -81,15 +81,26 @@ pub const FETCH_ASSETS: [ &str; 8 ] =
 //ゲームパッドのID
 pub const GAMEPAD: Gamepad = Gamepad { id: 0 }; //Todo: pad 0番決め打ちでいいいのか？
 
+//パッドの十字ボタンチェック用
+use std::collections::HashSet;
+pub static CROSS_BUTTON_SET: Lazy<HashSet<GamepadButtonType>> = Lazy::new
+(   ||
+    HashSet::from
+    (   [   GamepadButtonType::DPadRight, GamepadButtonType::DPadLeft,
+            GamepadButtonType::DPadDown,  GamepadButtonType::DPadUp,
+        ]
+    )
+);
+
 //PAUSEのキーとパッドボタン
 pub const KEY_PAUSE: KeyCode = KeyCode::Escape;
-pub const BUTTON_PAUSE: GamepadButtonType = GamepadButtonType::Start; //PS4のOPTIONSボタン
+pub const BUTTON_PAUSE: GamepadButtonType = GamepadButtonType::North; //PS4の△ボタン
 
 //FULLSCREENのキーとパッドボタン
-pub const KEY_ALT_RIGHT: KeyCode = KeyCode::RAlt;
-pub const KEY_ALT_LEFT : KeyCode = KeyCode::LAlt;
-pub const KEY_FULLSCREEN: KeyCode = KeyCode::Return;
-pub const BUTTON_FULLSCREEN: GamepadButtonType = GamepadButtonType::Select; //PS4のSHAREボタン
+pub const _KEY_ALT_RIGHT: KeyCode = KeyCode::RAlt;
+pub const _KEY_ALT_LEFT : KeyCode = KeyCode::LAlt;
+pub const _KEY_FULLSCREEN: KeyCode = KeyCode::Return;
+pub const _BUTTON_FULLSCREEN: GamepadButtonType = GamepadButtonType::West; //PS4の□ボタン
 
 //「HIT SPACE KEY」のキーとパッドボタン
 pub const KEY_SPACE: KeyCode = KeyCode::Space;
@@ -152,10 +163,11 @@ pub const NA5  : &str = "#####";
 pub const NA2_5: &str = "##-#####";
 
 //中央に表示するtext UI
-pub const CENTER_TITLE_TEXT: [ MessageSect; 3 ] =
+pub const CENTER_TITLE_TEXT: [ MessageSect; 4 ] =
 [   ( "TigTag\n"       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, Color::rgba( 0.6, 1.0, 0.4, 0.75 ) ),
     ( "\nD E M O\n\n\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::YELLOW ),
     ( "Hit SPACE Key"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
+    ( "\nor A Button"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::CYAN   ),
 ];
 pub const TEXT_UI_TITLE: TextUiTitle = TextUiTitle( GameState::GameStart, KEY_SPACE, BUTTON_SPACE );
 
@@ -179,15 +191,16 @@ pub const CENTER_CLEAR_TEXT: [ MessageSect; 5 ] =
 pub const TEXT_UI_CLEAR: TextUiClear = TextUiClear ( 1, GameState::StageStart, 4, cd_string_clear );
 fn cd_string_clear( n: i32 ) -> String { ( n + 4 ).to_string() }
 
-pub const CENTER_OVER_TEXT: [ MessageSect; 5 ] =
+pub const CENTER_OVER_TEXT: [ MessageSect; 6 ] =
 [   ( "Game Over\n"    , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 6.0, Color::RED    ),
     ( "\n"             , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.5, Color::NONE   ),
     ( "REPLAY?\n\n"    , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
-    ( "Hit SPACE Key\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
+    ( "Hit SPACE Key"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
+    ( "\nor A Button\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::CYAN   ),
     ( ""               , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::YELLOW ),
 ];
 pub const TEXT_UI_OVER: TextUiOver
-    = TextUiOver( 10, GameState::TitleDemo, 4, cd_string_over, GameState::GameStart, KEY_SPACE, BUTTON_SPACE );
+    = TextUiOver( 10, GameState::TitleDemo, 5, cd_string_over, GameState::GameStart, KEY_SPACE, BUTTON_SPACE );
 fn cd_string_over( n: i32 ) -> String { n.to_string() }
 
 pub const CENTER_PAUSE_TEXT: [ MessageSect; 1 ] =

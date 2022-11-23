@@ -12,6 +12,9 @@ pub use map::*;     //pub必須(demoplayモジュールから呼び出すため)
 pub use player::*;  //pub必須(demoplayモジュールから呼び出すため)
 pub use chasers::*; //pub必須(demoplayモジュールから呼び出すため)
 
+mod cross_button;    //ゲームパッドの十字キー入力
+use cross_button::*; //プラグイン
+
 //プラグインの設定
 pub struct GamePlay;
 impl Plugin for GamePlay
@@ -21,6 +24,7 @@ impl Plugin for GamePlay
         .add_plugin( UiUpdate )                                           //header & footer UIの表示更新
         .add_system( chasers::rotate_sprite )                             //追手スプライトがあれば回転させる
         .insert_resource( MarkAfterFetchAssets ( GameState::TitleDemo ) ) //Assetsロード後のState変更先
+        .add_plugin( CrossButton )                                        //ゲームパッドの十字キー入力
         ;
 
         //GameState::TitleDemo
