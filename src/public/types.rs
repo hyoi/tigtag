@@ -87,9 +87,9 @@ pub type MessageSect<'a> =
 );
 
 //text UIのComponent
-#[derive( Component )] pub struct TextUiTitle ( pub KeyCode, pub GameState );
+#[derive( Component )] pub struct TextUiTitle ( pub GameState, pub KeyCode, pub GamepadButtonType, );
 #[derive( Component )] pub struct TextUiStart ( pub i32, pub GameState, pub usize, pub fn ( i32 ) -> String );
-#[derive( Component )] pub struct TextUiOver  ( pub i32, pub GameState, pub usize, pub fn ( i32 ) -> String, pub KeyCode, pub GameState );
+#[derive( Component )] pub struct TextUiOver  ( pub i32, pub GameState, pub usize, pub fn ( i32 ) -> String, pub GameState, pub KeyCode, pub GamepadButtonType, );
 #[derive( Component )] pub struct TextUiClear ( pub i32, pub GameState, pub usize, pub fn ( i32 ) -> String );
 #[derive( Component )] pub struct TextUiPause;
 
@@ -129,16 +129,19 @@ impl TextUiWithCountDown for TextUiOver
 
 //キー入力でstateを変更するSystemでトレイト境界を使う準備
 pub trait TextUiWithHitKey
-{   fn key_code  ( &self ) -> KeyCode;
-    fn next_state( &self ) -> GameState;
+{   fn next_state( &self ) -> GameState;
+    fn key_code  ( &self ) -> KeyCode;
+    fn btn_code  ( &self ) -> GamepadButton;
 }
 impl TextUiWithHitKey for TextUiTitle
-{   fn key_code  ( &self ) -> KeyCode   { self.0 }
-    fn next_state( &self ) -> GameState { self.1 }
+{   fn next_state( &self ) -> GameState { self.0 }
+    fn key_code  ( &self ) -> KeyCode   { self.1 }
+    fn btn_code  ( &self ) -> GamepadButton { GamepadButton::new( GAMEPAD, self.2 ) }
 }
 impl TextUiWithHitKey for TextUiOver
-{   fn key_code  ( &self ) -> KeyCode   { self.4 }
-    fn next_state( &self ) -> GameState { self.5 }
+{   fn next_state( &self ) -> GameState { self.4 }
+    fn key_code  ( &self ) -> KeyCode   { self.5 }
+    fn btn_code  ( &self ) -> GamepadButton { GamepadButton::new( GAMEPAD, self.6 ) }
 }
 
 //カウントダウンタイマー用のResource

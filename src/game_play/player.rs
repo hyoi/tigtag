@@ -39,10 +39,10 @@ pub fn spawn_sprite
     };
     let player = Player
     {   grid,
-        next    : grid,
-        px_start: pixel,
-        px_end  : pixel,
-        fn_runaway: Some ( demo_algorithm::which_way_player_goes ), //default()に任せるとNone 
+        next        : grid,
+        px_start    : pixel,
+        px_end      : pixel,
+        o_fn_runaway: Some ( demo_algorithm::which_way_player_goes ), //default()に任せるとNone 
         ..default()
     };
     cmds
@@ -60,6 +60,7 @@ pub fn move_sprite
     state: ResMut<State<GameState>>,
     ( mut ev_clear, mut ev_over ): ( EventReader<EventClear>, EventReader<EventOver> ),
     ( inkey, time ): ( Res<Input<KeyCode>>, Res<Time> ),
+    cross_button: Res<GamepadCrossButton>,
 )
 {   //直前の判定でクリア／オーバーしていたらスプライトの表示を変更しない
     if ev_clear.iter().next().is_some() { return }
@@ -78,33 +79,52 @@ pub fn move_sprite
         }
 
         //自機の進行方向を決める
-        player.stop = false;
-        let mut side = player.side;
-        if ! state.current().is_demoplay()
-        {   //demoでなければプレイヤーのキー入力を確認(入力がなければ停止)
-                 if inkey.pressed( KeyCode::Up    ) { side = DxDy::Up;    }
-            else if inkey.pressed( KeyCode::Down  ) { side = DxDy::Down;  }
-            else if inkey.pressed( KeyCode::Right ) { side = DxDy::Right; }
-            else if inkey.pressed( KeyCode::Left  ) { side = DxDy::Left;  }
-            else { player.stop = true }
+        let mut new_side = player.side;
+        player.stop = true; //停止フラグを立てる
 
-            //キー入力があってもその向きに壁があれば停止
-            if ! player.stop
-            {   player.stop = map.is_wall( player.next + side )
+        if ! state.current().is_demoplay() //demoでないなら
+        {   if ! cross_button.is_empty() //パッド十字キー入力があるなら
+            {   let cross_button = cross_button.sides_list();
+                for &side in cross_button
+                {   //道なら
+                    if map.is_passage( player.next + side )
+                    {   new_side = side;
+                        player.stop = false;
+                        break;
+                    }
+
+                    //上でbrakeしない場合でも、向きだけは変える
+                    if side == cross_button[ 0 ]
+                    {   new_side = side;
+                    }
+                }
+            }
+            else
+            {   //キー入力を確認(入力がなければ停止)
+                     if inkey.pressed( KeyCode::Up    ) { new_side = DxDy::Up;    player.stop = false; }
+                else if inkey.pressed( KeyCode::Down  ) { new_side = DxDy::Down;  player.stop = false; }
+                else if inkey.pressed( KeyCode::Right ) { new_side = DxDy::Right; player.stop = false; }
+                else if inkey.pressed( KeyCode::Left  ) { new_side = DxDy::Left;  player.stop = false; }
+
+                //キー入力があっても壁があれば停止
+                if ! player.stop
+                {   player.stop = map.is_wall( player.next + new_side )
+                }
             }
         }
         else
-        {   //四方の脇道を取得する
+        {   //demoの場合
             let mut sides = map.get_byways_list( player.next );         //脇道のリスト
             sides.retain( | side | player.next + side != player.grid ); //戻り路を排除
 
             //demoなのでプレイヤーのキー入力を詐称する
+            player.stop = false;
             use std::cmp::Ordering;
-            side = match sides.len().cmp( &1 )
+            new_side = match sides.len().cmp( &1 )
             {   Ordering::Equal => //一本道 ⇒ 道なりに進む
                     sides[ 0 ],
                 Ordering::Greater => //三叉路または十字路
-                    if let Some ( fnx ) = player.fn_runaway
+                    if let Some ( fnx ) = player.o_fn_runaway
                     {   fnx( &player, q_chasers, map, &sides ) //外部関数で進行方向を決める
                     }
                     else
@@ -122,14 +142,14 @@ pub fn move_sprite
         }
 
         //自機の向きが変化したらスプライトを回転させる
-        if player.side != side
-        {   rotate_player_sprite( &player, &mut transform, side );
-            player.side = side;
+        if player.side != new_side
+        {   rotate_player_sprite( &player, &mut transform, new_side );
+            player.side = new_side;
         }
 
         //現在の位置と次の位置を更新する
         player.grid = player.next;
-        if ! player.stop { player.next += side; }
+        if ! player.stop { player.next += new_side; }
 
         //waitをリセットする
         player.wait.reset();
