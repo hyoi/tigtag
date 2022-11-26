@@ -56,28 +56,35 @@ impl Map
 {   fn bits    ( &    self, grid: Grid ) ->      usize {      self.map_bits[ grid.x as usize ][ grid.y as usize ] }
     fn bits_mut( &mut self, grid: Grid ) -> &mut usize { &mut self.map_bits[ grid.x as usize ][ grid.y as usize ] }
 
+    fn is_inside( &self, grid: Grid ) -> bool
+    {   MAP_GRIDS_RANGE_X.contains( &grid.x ) && MAP_GRIDS_RANGE_Y.contains( &grid.y )
+    }
+
     pub fn set_wall( &mut self, grid: Grid )
-    {   if MAP_GRIDS_RANGE_X.contains( &grid.x ) && MAP_GRIDS_RANGE_Y.contains( &grid.y )
-        {   *self.bits_mut( grid ) |= BIT_WALL; //壁フラグON
-        }
+    {   if ! self.is_inside( grid ) { return }
+        *self.bits_mut( grid ) |=   BIT_WALL; //壁フラグON
     }
     pub fn set_passage( &mut self, grid: Grid )
-    {   if MAP_GRIDS_RANGE_X.contains( &grid.x ) && MAP_GRIDS_RANGE_Y.contains( &grid.y )
-        {   *self.bits_mut( grid ) &= ! BIT_WALL; //壁フラグOFF
-        }
+    {   if ! self.is_inside( grid ) { return }
+        *self.bits_mut( grid ) &= ! BIT_WALL; //壁フラグOFF
     }
 
     pub fn is_wall( &self, grid: Grid ) -> bool
-    {   if MAP_GRIDS_RANGE_X.contains( &grid.x ) && MAP_GRIDS_RANGE_Y.contains( &grid.y )
-        {   self.bits( grid ) & BIT_WALL != 0
-        }
-        else { true } //範囲外は壁
+    {   if ! self.is_inside( grid ) { return true } //範囲外は壁
+        self.bits( grid ) & BIT_WALL != 0
     }
     pub fn is_passage( &self, grid: Grid ) -> bool
-    {   if MAP_GRIDS_RANGE_X.contains( &grid.x ) && MAP_GRIDS_RANGE_Y.contains( &grid.y )
-        {   self.bits( grid ) & BIT_WALL == 0
-        }
-        else { false } //範囲外は通路ではない
+    {   if ! self.is_inside( grid ) { return false } //範囲外は通路ではない
+        self.bits( grid ) & BIT_WALL == 0
+    }
+
+    pub fn o_entity( &self, grid: Grid ) -> Option<Entity>
+    {   if ! self.is_inside( grid ) { return None } //範囲外はOption::Noneを返す
+        self.dot_entities[ grid.x as usize ][ grid.y as usize ]
+    }
+    pub fn o_entity_mut( &mut self, grid: Grid ) -> &mut Option<Entity>
+    {   if ! self.is_inside( grid ) { return &mut self.dummy_o_entity_none } //範囲外は&mut Option::Noneを返す
+        &mut self.dot_entities[ grid.x as usize ][ grid.y as usize ]
     }
 
     pub fn init_byways_bit( &mut self )
@@ -94,7 +101,7 @@ impl Map
 
     pub fn get_byways_list( &self, grid: Grid ) -> Vec<DxDy>
     {   let mut vec = Vec::<DxDy>::with_capacity( 4 );
-        if MAP_GRIDS_RANGE_X.contains( &grid.x ) && MAP_GRIDS_RANGE_Y.contains( &grid.y )
+        if self.is_inside( grid )
         {   let bits = self.bits( grid );
             if bits & BIT_WAY_RIGHT != 0 { vec.push( DxDy::Right ) }
             if bits & BIT_WAY_LEFT  != 0 { vec.push( DxDy::Left  ) }
@@ -102,19 +109,6 @@ impl Map
             if bits & BIT_WAY_UP    != 0 { vec.push( DxDy::Up    ) }
         }
         vec //範囲外は空になる（最外壁の外の座標だから上下左右に道はない）
-    }
-
-    pub fn o_entity( &self, grid: Grid ) -> Option<Entity>
-    {   if MAP_GRIDS_RANGE_X.contains( &grid.x ) && MAP_GRIDS_RANGE_Y.contains( &grid.y )
-        {   self.dot_entities[ grid.x as usize ][ grid.y as usize ]
-        }
-        else { None } //範囲外はOption::Noneを返す
-    }
-    pub fn o_entity_mut( &mut self, grid: Grid ) -> &mut Option<Entity>
-    {   if MAP_GRIDS_RANGE_X.contains( &grid.x ) && MAP_GRIDS_RANGE_Y.contains( &grid.y )
-        {   &mut self.dot_entities[ grid.x as usize ][ grid.y as usize ]
-        }
-        else { &mut self.dummy_o_entity_none } //範囲外は&mut Option::Noneを返す
     }
 }
 
