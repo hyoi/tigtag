@@ -2,6 +2,7 @@ use super::*;
 
 //submodules
 mod demo_algorithm;
+use demo_algorithm::*;
 
 //スプライトをspawnして自機を表示する
 pub fn spawn_sprite
@@ -42,7 +43,7 @@ pub fn spawn_sprite
         next        : grid,
         px_start    : pixel,
         px_end      : pixel,
-        o_fn_runaway: Some ( demo_algorithm::which_way_player_goes ), //default()に任せるとNone 
+        o_fn_runaway: Some ( which_way_player_goes ), //default()に任せるとNone 
         ..default()
     };
     cmds
@@ -215,6 +216,9 @@ pub fn scoring_and_clear_stage
         {   //スプライト削除
             cmds.entity( id ).despawn();
             *map.o_entity_mut( player.grid ) = None;
+
+            //スプライト削除後(EntityにNone代入後)に数えなおす
+            map.update_demo_params( player.grid );
 
             //スコア更新
             record.score += 1;
