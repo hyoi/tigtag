@@ -191,7 +191,9 @@ impl Map
         self.demo.dots_rect.max.y = i;
     }
 
-    pub fn pixel_demo_rect( &self ) -> ( f32, f32, f32, f32 )
+    //debug用スプライトの表示座標等を算出する
+    #[cfg( debug_assertions )]
+    pub fn debug_pixel_demo_rect( &self ) -> ( f32, f32, f32, f32 )
     {   let px_min = self.demo.dots_rect.min.into_pixel_map();
         let px_max = self.demo.dots_rect.max.into_pixel_map();
 

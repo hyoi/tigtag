@@ -47,9 +47,18 @@ impl Plugin for DemoPlay
         #[cfg( debug_assertions )]
         app
         .add_system_set
+        (   SystemSet::on_enter( GameState::TitleDemo )         //<ENTER>
+            .after( Mark::MakeMapNewData )                      //<after>
+            .with_system( spawn_debug_sprite )                  //スプライトをspawnする
+        )
+        .add_system_set
         (   SystemSet::on_update( GameState::TitleDemo )        //<UPDATE>
-            .before( Mark::DetectCollisions )                   //<before>
-            .with_system( despawn_entity::<PathFinder> )        //スプライト削除
+            .after( Mark::DetectCollisions )                    //<after>
+            .with_system( update_debug_sprite )                 //スプライト移動
+        )
+        .add_system_set
+        (   SystemSet::on_exit( GameState::TitleDemo )          //<EXIT>
+            .with_system( despawn_entity::<DotsRect> )          //スプライト削除
         )
         ;
 
@@ -87,6 +96,42 @@ fn goto_title
 (   mut state: ResMut<State<GameState>>,
 )
 {   let _ = state.overwrite_set( GameState::TitleDemo );
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//debug用スプライトをspawnする
+#[cfg( debug_assertions )]
+fn spawn_debug_sprite
+(   map: ResMut<Map>,
+    mut cmds: Commands,
+)
+{   let ( x, y, w, h ) = map.debug_pixel_demo_rect();
+    let custom_size = Some ( Pixel::new( w, h ) );
+    let color = _COLOR_SPRITE_DEBUG_RECT;
+    let pixel3 = Pixel::new( x, y ).extend( _DEPTH_SPRITE_DEBUG_RECT );
+
+    cmds
+    .spawn( ( SpriteBundle::default(), DotsRect ) )
+    .insert( Sprite { color, custom_size, ..default() } )
+    .insert( Transform::from_translation( pixel3 ) )
+    ;
+}
+
+//debug用スプライトの表示を更新する
+#[cfg( debug_assertions )]
+fn update_debug_sprite
+(   mut q: Query<( &mut Transform, &mut Sprite ), With<DotsRect>>,
+    map: Res<Map>,
+)
+{   let Ok ( ( mut transform, mut sprite ) ) = q.get_single_mut() else { return };
+
+    let ( x, y, w, h ) = map.debug_pixel_demo_rect();
+    let custom_size = Some ( Pixel::new( w, h ) );
+    let pixel3 = Pixel::new( x, y ).extend( _DEPTH_SPRITE_DEBUG_RECT );
+
+    transform.translation = pixel3;
+    sprite.custom_size = custom_size;
 }
 
 //End of code.
