@@ -1,6 +1,6 @@
-use std::collections::VecDeque;
-
 use super::*;
+
+use std::collections::VecDeque;
 
 //demoplay用の自機の移動方向を決める関数
 pub fn which_way_player_goes
@@ -11,23 +11,22 @@ pub fn which_way_player_goes
 ) -> DxDy
 {   let mut sides = Vec::from( org_sides );
     let mut goals = Vec::with_capacity( q_chasers.iter().len() );
-
-    //終点(追手の座標)のリストを作る
     q_chasers.for_each
     (   | chaser |
-        //衝突寸前の追手は終点リストに含めない
         if chaser.next != player.next
-        {   goals.push( chaser.next );
+        {   //追手が遠くにいる場合、終点(追手の座標)のリストを作る
+            goals.push( chaser.next );
         }
         else
         {   //衝突寸前で緊急回避が必要な場合
-            //ぶつかる向き(bad_move)を調べてsidesから除く
             let bad_move =
             {   if chaser.side == player.side
-                {   player.side
+                {   //進行方向が同じなら追突を避ける
+                    player.side
                 }
                 else
-                {   match chaser.side
+                {   //追手に対し正面衝突する方向を避ける
+                    match chaser.side
                     {   DxDy::Right => DxDy::Left ,
                         DxDy::Left  => DxDy::Right,
                         DxDy::Down  => DxDy::Up   ,
@@ -35,6 +34,7 @@ pub fn which_way_player_goes
                     }
                 }
             };
+            //bad_moveを除く
             sides.retain( | side | *side != bad_move );
         }
     );
@@ -58,37 +58,48 @@ pub fn which_way_player_goes
         let risk = check_risk( byway, player, &goals, &map );
 
         if let Some ( risk ) = risk
-        {   risk_rating.push ( ( side, risk as i32 ) );
+        {   //リスクがある場合
+            risk_rating.push ( ( side, risk as i32 ) );
         }
         else
-        {   //リスクがないと判定されたら、ドットを数える
+        {   //リスクがないと判定されたら、隣接するマス目四方のドットを数える
             risk_none.push ( ( side, map.count_dots_4sides( byway ) ) );
         }
     }
 
+    //リスクなしの道があるか？によって対象を変える
+    let ptr_sides =
+    {   if risk_none.is_empty()
+        {   //全ての道にリスクありなら
+            &mut risk_rating
+        }
+        else
+        {   //リスクなしの道があるなら
+            &mut risk_none
+        }
+    };
+
     //進む道を決める
-    let which_way = 
-    | ptr_sides: &mut Vec< ( DxDy, i32 ) > |
-    {   if ptr_sides.len() == 1
+    if ptr_sides.len() == 1
+    {   //道が１つだけの場合
+        ptr_sides[ 0 ].0
+    }
+    else
+    {   //道が複数ある場合(２～３)
+        ptr_sides.sort_by( | a, b | b.1.cmp( &a.1 ) ); //大きい順にソート
+        let max_val = ptr_sides[ 0 ].1;                //先頭の最大値
+        ptr_sides.retain( | x | x.1 >= max_val );      //最大値だけのリストにする
+
+        if ptr_sides.len() == 1
         {   //道が１つだけの場合
             ptr_sides[ 0 ].0
         }
         else
-        {   //道が複数ある場合(２～３)
-            ptr_sides.sort_by( | a, b | b.1.cmp( &a.1 ) ); //大きい順にソート
-            let max_val = ptr_sides[ 0 ].1;                //先頭の最大値
-            ptr_sides.retain( | x | x.1 >= max_val );      //最大値だけのリストにする
-    
-            if ptr_sides.len() == 1
-            {   ptr_sides[ 0 ].0
-            }
-            else
-            {   let mut rng = rand::thread_rng();
-                ptr_sides[ rng.gen_range( 0..ptr_sides.len() ) ].0
-            }
+        {   //道が複数ある場合
+            let mut rng = rand::thread_rng();
+            ptr_sides[ rng.gen_range( 0..ptr_sides.len() ) ].0
         }
-    };
-    which_way( if risk_none.is_empty() { &mut risk_rating } else { &mut risk_none } )
+    }
 }
 
 impl Map
