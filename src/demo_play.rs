@@ -43,7 +43,7 @@ impl Plugin for DemoPlay
         ;
         //------------------------------------------------------------------------------------------
 
-        //debugで表示するスプライトの削除
+        //debugy用スプライトの制御
         #[cfg( debug_assertions )]
         app
         .add_system_set
