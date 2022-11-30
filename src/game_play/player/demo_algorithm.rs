@@ -96,10 +96,37 @@ pub fn which_way_player_goes
         }
         else
         {   //道が複数ある場合
+            if ! map.is_inside_dots_rect( player.next )
+            {   //自機が残dotsを含む最小の矩形の外にいる場合
+                if let Some ( side ) = heuristic_dots_rect( player.next, ptr_sides, map )
+                {   return side
+                }
+            }
+
+            //自機が残dotsを含む最小の矩形の中にいる場合、運頼み
             let mut rng = rand::thread_rng();
             ptr_sides[ rng.gen_range( 0..ptr_sides.len() ) ].0
         }
     }
+}
+
+fn heuristic_dots_rect
+(   grid: Grid,
+    sides: &[ ( DxDy, i32 ) ],
+    map: Res<Map>,
+) -> Option<DxDy>
+{   let mut vec = Vec::with_capacity( 3 );
+
+    for &( dxdy, _ ) in sides
+    {   let side = grid + dxdy;
+        let count = map.how_far_to_dots_rect( side );
+        vec.push( ( dxdy, count ) );
+    }
+    vec.sort_by( | a, b | a.1.cmp( &b.1 ) ); //小さい順にソート
+    let min_val = vec[ 0 ].1;                //先頭の最小値
+    vec.retain( | x | x.1 <= min_val );      //最小値だけのリストにする
+
+    if vec.len() == 1 { Some ( vec[ 0 ].0 ) } else { None }
 }
 
 impl Map
@@ -142,9 +169,9 @@ fn check_risk
                 if risk.is_none() || risk.unwrap() > path_open[ 0 ].len()
                 {   risk = Some ( path_open[ 0 ].len() );
 
-                    //先頭から交差点を探し、あればその距離を記録する
+                    //交差点を探し、あればその距離を記録する
                     let mut work: Option<_> = None;
-                    for i in 1..path_open[ 0 ].len() //[0]はplayer.nextなので[1]から調べる
+                    for i in 2..path_open[ 0 ].len() //２×２領域で回り続けないよう、[2]から調べる
                     {   let count_byways = map.get_byways_list( path_open[ 0 ][ i ] ).len();
                         if count_byways >= 3
                         {   work = Some ( i );

@@ -151,17 +151,9 @@ impl Map
     }
 
     pub fn update_demo_params( &mut self, grid: Grid )
-    {   //プレイヤーの位置の列・行のdotsを数えなおす
-        self.demo.dots_sum_y[ grid.y as usize ] =
-        {   MAP_GRIDS_RANGE_X
-            .filter( | &x | self.o_entity( Grid::new( x, grid.y ) ).is_some() )
-            .count() as i32
-        };
-        self.demo.dots_sum_x[ grid.x as usize ] =
-        {   MAP_GRIDS_RANGE_Y
-            .filter( | &y | self.o_entity( Grid::new( grid.x, y ) ).is_some() )
-            .count() as i32
-        };
+    {   //プレイヤーの位置の列・行のdotsを減らす
+        self.demo.dots_sum_x[ grid.x as usize ] -= 1;
+        self.demo.dots_sum_y[ grid.y as usize ] -= 1;
 
         //dotsを内包する最小の矩形を更新する
         let mut i = 0;
@@ -189,6 +181,23 @@ impl Map
             i -= 1;
         }
         self.demo.dots_rect.max.y = i;
+    }
+
+    pub fn is_inside_dots_rect( &self, grid: Grid ) -> bool
+    {   let Grid { x: x1, y: y1 } = self.demo.dots_rect.min;
+        let Grid { x: x2, y: y2 } = self.demo.dots_rect.max;
+
+        ( x1..=x2 ).contains( &grid.x ) && ( y1..=y2 ).contains( &grid.y )
+    }
+
+    pub fn how_far_to_dots_rect( &self, grid: Grid ) -> i32
+    {   let Grid { x: x1, y: y1 } = self.demo.dots_rect.min;
+        let Grid { x: x2, y: y2 } = self.demo.dots_rect.max;
+
+        let dx = if grid.x < x1 { x1 - grid.x } else if grid.x > x2 { grid.x - x2 } else { 0 };
+        let dy = if grid.y < y1 { y1 - grid.y } else if grid.y > y2 { grid.y - y2 } else { 0 };
+
+        dx + dy
     }
 
     //debug用スプライトの表示座標等を算出する
