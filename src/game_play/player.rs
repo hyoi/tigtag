@@ -2,6 +2,7 @@ use super::*;
 
 //submodules
 mod demo_algorithm;
+use demo_algorithm::*;
 
 //スプライトをspawnして自機を表示する
 pub fn spawn_sprite
@@ -42,7 +43,7 @@ pub fn spawn_sprite
         next        : grid,
         px_start    : pixel,
         px_end      : pixel,
-        o_fn_runaway: Some ( demo_algorithm::which_way_player_goes ), //default()に任せるとNone 
+        o_fn_runaway: Some ( which_way_player_goes ), //default()に任せるとNone 
         ..default()
     };
     cmds
@@ -216,6 +217,9 @@ pub fn scoring_and_clear_stage
             cmds.entity( id ).despawn();
             *map.o_entity_mut( player.grid ) = None;
 
+            //スプライト削除後(EntityにNone代入後)にdemo用情報を更新する
+            map.demo.update_params( player.grid );
+
             //スコア更新
             record.score += 1;
             map.remaining_dots -= 1;
@@ -242,6 +246,35 @@ pub fn scoring_and_clear_stage
                 ev_clear.send( EventClear );    //後続の処理にクリアを伝える
             }
         }
+    }
+}
+
+impl DemoParams
+{   //自機がdotを食べたらdemo用パラメータを更新する
+    pub fn update_params( &mut self, grid: Grid )
+    {   //プレイヤーの位置の列・行のdotsを減らす
+        *self.dots_sum_x_mut( grid.x ) -= 1;
+        *self.dots_sum_y_mut( grid.y ) -= 1;
+
+        //dotsを内包する最小の矩形のminを更新する
+        let ( mut x, mut y ) = ( 0, 0 );
+        for _ in MAP_GRIDS_RANGE_X
+        {   if self.dots_sum_x( x ) != 0 { break } else { x += 1; }
+        }
+        for _ in MAP_GRIDS_RANGE_Y
+        {   if self.dots_sum_y( y ) != 0 { break } else { y += 1; }
+        }
+        *self.dots_rect_min_mut() = Grid::new( x, y );
+
+        //dotsを内包する最小の矩形のmaxを更新する
+        ( x, y ) = ( MAP_GRIDS_WIDTH - 1, MAP_GRIDS_HEIGHT - 1 );
+        for _ in MAP_GRIDS_RANGE_X
+        {   if self.dots_sum_x( x ) != 0 { break } else { x -= 1; }
+        }
+        for _ in MAP_GRIDS_RANGE_Y
+        {   if self.dots_sum_y( y ) != 0 { break } else { y -= 1; }
+        }
+        *self.dots_rect_max_mut() = Grid::new( x, y );
     }
 }
 

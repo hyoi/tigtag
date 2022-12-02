@@ -175,6 +175,6 @@ pub struct MarkAfterFetchAssets ( pub GameState );
 
 //開発用スプライトのComponent
 #[derive( Component )]
-pub struct PathFinder;
+pub struct DotsRect;
 
 //End of code.

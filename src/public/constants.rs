@@ -109,20 +109,22 @@ pub const BUTTON_SPACE: GamepadButtonType = GamepadButtonType::East; //PS4の◯
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #[allow( dead_code )]
-pub const DEPTH_SPRITE_DEBUG_GRID : f32 = 200.0; //スプライト重なり順
-pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 150.0; //スプライト重なり順
-pub const DEPTH_SPRITE_GAME_FRAME : f32 = 100.0; //スプライト重なり順
-pub const DEPTH_SPRITE_CHASER     : f32 = 40.0;  //スプライト重なり順
-pub const DEPTH_SPRITE_PLAYER     : f32 = 30.0;  //スプライト重なり順
-pub const DEPTH_SPRITE_DOT        : f32 = 20.0;  //スプライト重なり順
-pub const DEPTH_SPRITE_BRICK_WALL : f32 = 10.0;  //スプライト重なり順
-pub const DEPTH_SPRITE_TILE       : f32 = 0.0;   //スプライト重なり順
+pub const  DEPTH_SPRITE_DEBUG_GRID : f32 = 200.0; //スプライト重なり順
+pub const  DEPTH_SPRITE_KANI_DOTOWN: f32 = 150.0; //スプライト重なり順
+pub const  DEPTH_SPRITE_GAME_FRAME : f32 = 100.0; //スプライト重なり順
+pub const  DEPTH_SPRITE_CHASER     : f32 = 40.0;  //スプライト重なり順
+pub const  DEPTH_SPRITE_PLAYER     : f32 = 30.0;  //スプライト重なり順
+pub const  DEPTH_SPRITE_DOT        : f32 = 20.0;  //スプライト重なり順
+pub const  DEPTH_SPRITE_BRICK_WALL : f32 = 10.0;  //スプライト重なり順
+pub const  DEPTH_SPRITE_TILE       : f32 = 0.0;   //スプライト重なり順
+pub const _DEPTH_SPRITE_DEBUG_RECT : f32 = 0.0;   //スプライト重なり順
 
 #[allow( dead_code )]
-pub const COLOR_SPRITE_DEBUG_GRID: Color = Color::rgba( 0.8, 0.8, 0.8, 0.1 );   //スプライト色(透過)
-pub const COLOR_SPRITE_DOT       : Color = Color::rgba( 1.0, 1.0, 0.7, 1.0 );   //スプライト色
-pub const COLOR_SPRITE_PLAYER    : Color = Color::YELLOW;                       //スプライト色
-pub const COLOR_SPRITE_TILE      : Color = Color::YELLOW;                       //スプライト色
+pub const  COLOR_SPRITE_DEBUG_GRID: Color = Color::rgba( 0.8, 0.8, 0.8, 0.1 );  //スプライト色(透過)
+pub const  COLOR_SPRITE_DOT       : Color = Color::rgba( 1.0, 1.0, 0.7, 1.0 );  //スプライト色
+pub const  COLOR_SPRITE_PLAYER    : Color = Color::YELLOW;                      //スプライト色
+pub const  COLOR_SPRITE_TILE      : Color = Color::YELLOW;                      //スプライト色
+pub const _COLOR_SPRITE_DEBUG_RECT: Color = Color::rgba( 0.0, 0.6, 0.0, 0.1 );  //スプライト色(透過)
 
 pub const MAGNIFY_SPRITE_DOT   : f32 = 0.08;    //スプライト拡縮率
 pub const MAGNIFY_SPRITE_PLAYER: f32 = 0.4;     //スプライト拡縮率
