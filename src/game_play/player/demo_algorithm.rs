@@ -62,7 +62,7 @@ pub fn which_way_player_goes
             risk_rating.push ( ( side, risk as i32 ) );
         }
         else
-        {   //リスクがないと判定されたら、隣接するマス目四方のドットを数える
+        {   //リスクがないと判定されたら、隣接するマス目四方のドットを数える（高得点を狙うのに使う）
             risk_none.push ( ( side, map.count_dots_4sides( byway ) ) );
         }
     }
@@ -70,7 +70,7 @@ pub fn which_way_player_goes
     //リスクなしの道があるか？によって対象を変える
     let ptr_sides =
     {   if risk_none.is_empty()
-        {   //全ての道にリスクありなら
+        {   //全ての道にリスクがあるなら
             &mut risk_rating
         }
         else
@@ -96,7 +96,7 @@ pub fn which_way_player_goes
         }
         else
         {   //道が複数ある場合
-            if ! map.is_inside_dots_rect( player.next )
+            if ! map.demo.is_inside_rect( player.next )
             {   //自機が残dotsを含む最小の矩形の外にいる場合
                 if let Some ( side ) = heuristic_dots_rect( player.next, ptr_sides, map )
                 {   return side
@@ -110,22 +110,26 @@ pub fn which_way_player_goes
     }
 }
 
+//自機が残dotsを含む最小の矩形の外にいる場合のheuristic関数
 fn heuristic_dots_rect
 (   grid: Grid,
     sides: &[ ( DxDy, i32 ) ],
     map: Res<Map>,
 ) -> Option<DxDy>
-{   let mut vec = Vec::with_capacity( 3 );
-
+{   //脇道ごとにdots_rectまでの単純距離(dx+dy)を求める
+    let mut vec = Vec::with_capacity( 3 );
     for &( dxdy, _ ) in sides
     {   let side = grid + dxdy;
-        let count = map.how_far_to_dots_rect( side );
+        let count = map.demo.how_far_to_rect( side );
         vec.push( ( dxdy, count ) );
     }
+
+    //単純距離が最短の脇道を探す
     vec.sort_by( | a, b | a.1.cmp( &b.1 ) ); //小さい順にソート
     let min_val = vec[ 0 ].1;                //先頭の最小値
     vec.retain( | x | x.1 <= min_val );      //最小値だけのリストにする
 
+    //脇道が1つだけならそれを、そうでないならNoneを返す
     if vec.len() == 1 { Some ( vec[ 0 ].0 ) } else { None }
 }
 
@@ -142,6 +146,27 @@ impl Map
         );
 
         count
+    }
+}
+
+impl DemoParams
+{   //指定のマスが、残dotsを含む最小の矩形の中か？
+    fn is_inside_rect( &self, grid: Grid ) -> bool
+    {   let Grid { x: x1, y: y1 } = self.dots_rect_min();
+        let Grid { x: x2, y: y2 } = self.dots_rect_max();
+
+        ( x1..=x2 ).contains( &grid.x ) && ( y1..=y2 ).contains( &grid.y )
+    }
+
+    //指定のマスから残dotsを含む最小の矩形までの単純距離(dx+dy)を求める
+    fn how_far_to_rect( &self, grid: Grid ) -> i32
+    {   let Grid { x: x1, y: y1 } = self.dots_rect_min();
+        let Grid { x: x2, y: y2 } = self.dots_rect_max();
+
+        let dx = if grid.x < x1 { x1 - grid.x } else if grid.x > x2 { grid.x - x2 } else { 0 };
+        let dy = if grid.y < y1 { y1 - grid.y } else if grid.y > y2 { grid.y - y2 } else { 0 };
+
+        dx + dy
     }
 }
 

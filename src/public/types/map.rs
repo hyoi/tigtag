@@ -24,11 +24,11 @@ pub struct Map
     dot_entities       : Vec<Vec<Option<Entity>>>,  //ドットをdespawnする際に使うEntityIDを保存
     pub remaining_dots : i32,                       //マップに残っているドットの数
     dummy_o_entity_none: Option<Entity>,            //o_entity_mut()の範囲外アクセスで&mut Noneを返すために使用
-    demo               : DemoParams,                //demo用の情報
+    pub demo           : DemoParams,                //demo用の情報
 }
 #[derive( Default )]
-struct DemoParams
-{   dots_rect : GridRect,                               //dotsを内包する最小の矩形
+pub struct DemoParams
+{   dots_rect : GridRect,                           //dotsを内包する最小の矩形
     dots_sum_x: [ i32; MAP_GRIDS_WIDTH  as usize ], //列に残っているdotsを数えた配列
     dots_sum_y: [ i32; MAP_GRIDS_HEIGHT as usize ], //行に残っているdotsを数えた配列
 }
@@ -123,96 +123,18 @@ impl Map
         }
         vec //範囲外は空になる（最外壁の外の座標だから上下左右に道はない）
     }
+}
 
-    pub fn init_demo_params( &mut self )
-    {   //init時はdotのEntityがspawnされていないかもなので、数える対象は道にする
-        MAP_GRIDS_RANGE_Y.for_each
-        (   | y |
-            self.demo.dots_sum_y[ y as usize ] =
-            {   MAP_GRIDS_RANGE_X
-                .filter( | &x | self.is_passage( Grid::new( x, y ) ) )
-                .count() as i32
-            }
-        );
-        MAP_GRIDS_RANGE_X.for_each
-        (   | x |
-            self.demo.dots_sum_x[ x as usize ] =
-            {   MAP_GRIDS_RANGE_Y
-                .filter( | &y | self.is_passage( Grid::new( x, y ) ) )
-                .count() as i32
-            }
-        );
+impl DemoParams
+{   pub fn dots_sum_x( &self, x: i32 ) -> i32 { self.dots_sum_x[ x as usize ] }
+    pub fn dots_sum_y( &self, y: i32 ) -> i32 { self.dots_sum_y[ y as usize ] }
+    pub fn dots_sum_x_mut( &mut self, x: i32 ) -> &mut i32 { &mut self.dots_sum_x[ x as usize ] }
+    pub fn dots_sum_y_mut( &mut self, y: i32 ) -> &mut i32 { &mut self.dots_sum_y[ y as usize ] }
 
-        //dotsを内包する最小の矩形は決め打ちでいい(Mapをそう作っているから)
-        self.demo.dots_rect = GridRect
-        {   min: Grid::new( 1, 1 ),
-            max: Grid::new( MAP_GRIDS_WIDTH - 2, MAP_GRIDS_HEIGHT - 2 ),
-        };
-    }
-
-    pub fn update_demo_params( &mut self, grid: Grid )
-    {   //プレイヤーの位置の列・行のdotsを減らす
-        self.demo.dots_sum_x[ grid.x as usize ] -= 1;
-        self.demo.dots_sum_y[ grid.y as usize ] -= 1;
-
-        //dotsを内包する最小の矩形を更新する
-        let mut i = 0;
-        for _ in MAP_GRIDS_RANGE_X
-        {   if self.demo.dots_sum_x[ i as usize ] != 0 { break }
-            i += 1;
-        }
-        self.demo.dots_rect.min.x = i;
-        i = 0;
-        for _ in MAP_GRIDS_RANGE_Y
-        {   if self.demo.dots_sum_y[ i as usize ] != 0 { break }
-            i += 1;
-        }
-        self.demo.dots_rect.min.y = i;
-
-        i = MAP_GRIDS_WIDTH - 1;
-        for _ in MAP_GRIDS_RANGE_X
-        {   if self.demo.dots_sum_x[ i as usize ] != 0 { break }
-            i -= 1;
-        }
-        self.demo.dots_rect.max.x = i;
-        i = MAP_GRIDS_HEIGHT - 1;
-        for _ in MAP_GRIDS_RANGE_Y
-        {   if self.demo.dots_sum_y[ i as usize ] != 0 { break }
-            i -= 1;
-        }
-        self.demo.dots_rect.max.y = i;
-    }
-
-    pub fn is_inside_dots_rect( &self, grid: Grid ) -> bool
-    {   let Grid { x: x1, y: y1 } = self.demo.dots_rect.min;
-        let Grid { x: x2, y: y2 } = self.demo.dots_rect.max;
-
-        ( x1..=x2 ).contains( &grid.x ) && ( y1..=y2 ).contains( &grid.y )
-    }
-
-    pub fn how_far_to_dots_rect( &self, grid: Grid ) -> i32
-    {   let Grid { x: x1, y: y1 } = self.demo.dots_rect.min;
-        let Grid { x: x2, y: y2 } = self.demo.dots_rect.max;
-
-        let dx = if grid.x < x1 { x1 - grid.x } else if grid.x > x2 { grid.x - x2 } else { 0 };
-        let dy = if grid.y < y1 { y1 - grid.y } else if grid.y > y2 { grid.y - y2 } else { 0 };
-
-        dx + dy
-    }
-
-    //debug用スプライトの表示座標等を算出する
-    #[cfg( debug_assertions )]
-    pub fn debug_pixel_demo_rect( &self ) -> ( f32, f32, f32, f32 )
-    {   let px_min = self.demo.dots_rect.min.into_pixel_map();
-        let px_max = self.demo.dots_rect.max.into_pixel_map();
-
-        let px_w = px_max.x - px_min.x;
-        let px_h = px_min.y - px_max.y; //pixelはY軸が逆向き
-        let px_x = px_min.x + px_w / 2.0;
-        let px_y = px_max.y + px_h / 2.0; //pixelはY軸が逆向き
-
-        ( px_x, px_y, px_w + PIXELS_PER_GRID, px_h + PIXELS_PER_GRID )
-    }
+    pub fn dots_rect_min( &self ) ->  Grid { self.dots_rect.min }
+    pub fn dots_rect_max( &self ) ->  Grid { self.dots_rect.max }
+    pub fn dots_rect_min_mut( &mut self ) ->  &mut Grid { &mut self.dots_rect.min }
+    pub fn dots_rect_max_mut( &mut self ) ->  &mut Grid { &mut self.dots_rect.max }
 }
 
 //End of code.

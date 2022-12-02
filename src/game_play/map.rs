@@ -72,6 +72,33 @@ pub fn make_new_data
     map.init_demo_params(); //demo用の情報を準備する
 }
 
+impl Map
+{   //マップ作成時にdemo用パラメータを初期化する
+    pub fn init_demo_params( &mut self )
+    {   //dotではなく道を数える(初期状態では必ず道にdotがある)
+        MAP_GRIDS_RANGE_Y.for_each
+        (   | y |
+            *self.demo.dots_sum_y_mut( y ) =
+            {   MAP_GRIDS_RANGE_X
+                .filter( | &x | self.is_passage( Grid::new( x, y ) ) )
+                .count() as i32
+            }
+        );
+        MAP_GRIDS_RANGE_X.for_each
+        (   | x |
+            *self.demo.dots_sum_x_mut( x ) =
+            {   MAP_GRIDS_RANGE_Y
+                .filter( | &y | self.is_passage( Grid::new( x, y ) ) )
+                .count() as i32
+            }
+        );
+
+        //dotsを内包する最小の矩形は決め打ちでいい(Mapをそう作っているから)
+        *self.demo.dots_rect_min_mut() = Grid::new( 1, 1 );
+        *self.demo.dots_rect_max_mut() = Grid::new( MAP_GRIDS_WIDTH - 2, MAP_GRIDS_HEIGHT - 2 );
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 type WithMapEntities = Or< ( With<SpriteWall>, With<SpriteDot> ) >;

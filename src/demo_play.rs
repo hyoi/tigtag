@@ -106,10 +106,10 @@ fn spawn_debug_sprite
 (   map: ResMut<Map>,
     mut cmds: Commands,
 )
-{   let ( x, y, w, h ) = map.debug_pixel_demo_rect();
+{   let ( x, y, w, h ) = map.demo.debug_pixel_rect();
     let custom_size = Some ( Pixel::new( w, h ) );
-    let color = _COLOR_SPRITE_DEBUG_RECT;
     let pixel3 = Pixel::new( x, y ).extend( _DEPTH_SPRITE_DEBUG_RECT );
+    let color = _COLOR_SPRITE_DEBUG_RECT;
 
     cmds
     .spawn( ( SpriteBundle::default(), DotsRect ) )
@@ -126,12 +126,28 @@ fn update_debug_sprite
 )
 {   let Ok ( ( mut transform, mut sprite ) ) = q.get_single_mut() else { return };
 
-    let ( x, y, w, h ) = map.debug_pixel_demo_rect();
+    let ( x, y, w, h ) = map.demo.debug_pixel_rect();
     let custom_size = Some ( Pixel::new( w, h ) );
     let pixel3 = Pixel::new( x, y ).extend( _DEPTH_SPRITE_DEBUG_RECT );
 
     transform.translation = pixel3;
     sprite.custom_size = custom_size;
+}
+
+//debug用スプライトのpixel座標を求める
+#[cfg( debug_assertions )]
+impl DemoParams
+{   pub fn debug_pixel_rect( &self ) -> ( f32, f32, f32, f32 )
+    {   let px_min = self.dots_rect_min().into_pixel_map();
+        let px_max = self.dots_rect_max().into_pixel_map();
+
+        let px_w = px_max.x - px_min.x;
+        let px_h = px_min.y - px_max.y; //pixelはY軸が逆向き
+        let px_x = px_min.x + px_w / 2.0;
+        let px_y = px_max.y + px_h / 2.0; //pixelはY軸が逆向き
+
+        ( px_x, px_y, px_w + PIXELS_PER_GRID, px_h + PIXELS_PER_GRID )
+    }
 }
 
 //End of code.
