@@ -18,6 +18,14 @@ pub fn spawn_text_ui
             ..default()
         }
     );
+    let title_frame = hidden_frame
+    (   Style
+        {   flex_direction: FlexDirection::Column,
+            align_items   : AlignItems::Center,
+            ..default()
+        }
+    );
+
     let header_frame = hidden_frame
     (   Style
         {   size           : Size::new( width, height ),
@@ -38,22 +46,27 @@ pub fn spawn_text_ui
     );
 
     //中央
-    let mut ui_title = text_ui( &CENTER_TITLE_TEXT, &asset_svr );
-    let mut ui_start = text_ui( &CENTER_START_TEXT, &asset_svr );
-    let mut ui_over  = text_ui( &CENTER_OVER_TEXT , &asset_svr );
-    let mut ui_clear = text_ui( &CENTER_CLEAR_TEXT, &asset_svr );
-    let mut ui_pause = text_ui( &CENTER_PAUSE_TEXT, &asset_svr );
+    let mut ui_title = text_ui( &CENTER_TITLE_TEXT, HorizontalAlign::Right , &asset_svr );
+    let mut ui_demo  = text_ui( &CENTER_DEMO_TEXT , HorizontalAlign::Center, &asset_svr );
+    let mut ui_start = text_ui( &CENTER_START_TEXT, HorizontalAlign::Center, &asset_svr );
+    let mut ui_over  = text_ui( &CENTER_OVER_TEXT , HorizontalAlign::Center, &asset_svr );
+    let mut ui_clear = text_ui( &CENTER_CLEAR_TEXT, HorizontalAlign::Center, &asset_svr );
+    let mut ui_pause = text_ui( &CENTER_PAUSE_TEXT, HorizontalAlign::Center, &asset_svr );
 
-    ui_title.visibility.is_visible = false;
+    ui_title.style.position_type = PositionType::Relative;
+    ui_demo.style.position_type  = PositionType::Relative;
+
+    ui_title.visibility.is_visible = true; //親のvisibility.is_visibleで表示を制御する
+    ui_demo.visibility.is_visible  = true; //親のvisibility.is_visibleで表示を制御する
     ui_start.visibility.is_visible = false;
     ui_over.visibility.is_visible  = false;
     ui_clear.visibility.is_visible = false;
     ui_pause.visibility.is_visible = false;
 
     //ヘッダー
-    let mut ui_header_left   = text_ui( &HEADER_LEFT_TEXT  , &asset_svr );
-    let mut ui_header_center = text_ui( &HEADER_CENTER_TEXT, &asset_svr );
-    let mut ui_header_right  = text_ui( &HEADER_RIGHT_TEXT , &asset_svr );
+    let mut ui_header_left   = text_ui( &HEADER_LEFT_TEXT  , HorizontalAlign::Center, &asset_svr );
+    let mut ui_header_center = text_ui( &HEADER_CENTER_TEXT, HorizontalAlign::Center, &asset_svr );
+    let mut ui_header_right  = text_ui( &HEADER_RIGHT_TEXT , HorizontalAlign::Center, &asset_svr );
 
     ui_header_left.style.align_self = AlignSelf::FlexStart;
     ui_header_left.text.alignment.horizontal = HorizontalAlign::Left;
@@ -65,9 +78,9 @@ pub fn spawn_text_ui
     ui_header_right.text.alignment.horizontal = HorizontalAlign::Right;
 
     //フッター
-    let mut ui_footer_left   = text_ui( &FOOTER_LEFT_TEXT  , &asset_svr );
-    let mut ui_footer_center = text_ui( &FOOTER_CENTER_TEXT, &asset_svr );
-    let mut ui_footer_right  = text_ui( &FOOTER_RIGHT_TEXT , &asset_svr );
+    let mut ui_footer_left   = text_ui( &FOOTER_LEFT_TEXT  , HorizontalAlign::Center, &asset_svr );
+    let mut ui_footer_center = text_ui( &FOOTER_CENTER_TEXT, HorizontalAlign::Center, &asset_svr );
+    let mut ui_footer_right  = text_ui( &FOOTER_RIGHT_TEXT , HorizontalAlign::Center, &asset_svr );
 
     ui_footer_left.style.align_self = AlignSelf::FlexStart;
     ui_footer_left.text.alignment.horizontal = HorizontalAlign::Left;
@@ -82,7 +95,12 @@ pub fn spawn_text_ui
     cmds.spawn( center_frame ).with_children
     (   | cmds |
         {   //中央
-            cmds.spawn( ( ui_title, TEXT_UI_TITLE ) );
+            cmds.spawn( ( title_frame, TEXT_UI_TITLE ) ).with_children
+            (   | cmds |
+                {   cmds.spawn( ui_title );
+                    cmds.spawn( ui_demo  );
+                }
+            );
             cmds.spawn( ( ui_start, TEXT_UI_START ) );
             cmds.spawn( ( ui_over , TEXT_UI_OVER  ) );
             cmds.spawn( ( ui_clear, TEXT_UI_CLEAR ) );
@@ -130,6 +148,7 @@ fn hidden_frame
 //text UI用にTextBundleを作る
 fn text_ui
 (   message: &[ MessageSect ],
+    horizontal: HorizontalAlign,
     asset_svr: &Res<AssetServer>,
 ) -> TextBundle
 {   let mut sections = Vec::new();
@@ -144,7 +163,7 @@ fn text_ui
     }
     let alignment = TextAlignment
     {   vertical  : VerticalAlign::Center,
-        horizontal: HorizontalAlign::Center,
+        horizontal,
     };
     let position_type = PositionType::Absolute;
 

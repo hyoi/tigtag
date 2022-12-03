@@ -1,6 +1,7 @@
 use super::*;
 
-pub const APP_TITLE: &str = "tigtag";                           //アプリタイトル
+pub const APP_TITLE: &str = "TigTag";                           //アプリタイトル
+pub const CARGO_VER: &str = env!( "CARGO_PKG_VERSION" );        //cargo.ttomlの[package]version
 
 pub const SCREEN_GRIDS_WIDTH : i32 = 25; //21,27,33,43          //ウィンドウ横幅(Grid)
 pub const SCREEN_GRIDS_HEIGHT: i32 = 19; //16,20,25,32          //ウインドウ縦幅(Grid)
@@ -165,11 +166,18 @@ pub const NA5  : &str = "#####";
 pub const NA2_5: &str = "##-#####";
 
 //中央に表示するtext UI
-pub const CENTER_TITLE_TEXT: [ MessageSect; 4 ] =
-[   ( "TigTag\n"       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, Color::rgba( 0.6, 1.0, 0.4, 0.75 ) ),
-    ( "\nD E M O\n\n\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::YELLOW ),
-    ( "Hit SPACE Key"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
-    ( "\nor A Button"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::CYAN   ),
+pub const CENTER_TITLE_TEXT: [ MessageSect; 5 ] =
+[   ( APP_TITLE, ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, Color::rgba( 0.6, 1.0, 0.4, 0.75 ) ),
+    ( "\n "    , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::rgba( 0.6, 1.0, 0.4, 0.75 ) ),
+    ( "v"      , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, Color::rgba( 0.5, 1.0, 0.4, 0.75 ) ),
+    ( CARGO_VER, ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, Color::rgba( 0.5, 1.0, 0.4, 0.75 ) ),
+    ( "    "   , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, Color::rgba( 0.5, 1.0, 0.4, 0.75 ) ),
+];
+pub const CENTER_DEMO_TEXT: [ MessageSect; 4 ] =
+[   ( " "            , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, Color::YELLOW ),
+    ( "\nD E M O\n\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::YELLOW ),
+    ( "Hit SPACE Key", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
+    ( "\nor A Button", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::CYAN   ),
 ];
 pub const TEXT_UI_TITLE: TextUiTitle = TextUiTitle( GameState::GameStart, KEY_SPACE, BUTTON_SPACE );
 
