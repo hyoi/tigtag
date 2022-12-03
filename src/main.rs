@@ -18,9 +18,7 @@ use demo_play::*;
 fn main()
 {   //bevy_kira_audioが標準出力へInfoを出力するのを抑止
     #[cfg( not( target_arch = "wasm32" ) )]
-    {   use std::env;
-        env::set_var( "RUST_LOG", "OFF" );
-    }
+    std::env::set_var( "RUST_LOG", "OFF" );
 
     //アプリの実行
     App::new()
