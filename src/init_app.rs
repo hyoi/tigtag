@@ -1,11 +1,11 @@
 use super::*;
 
 //submodules
-mod spawn_text_ui;
 mod fetch_assets;
+mod spawn_text_ui;
 
-use spawn_text_ui::*;
 use fetch_assets::*;
+use spawn_text_ui::*;
 
 //プラグインの設定
 pub struct InitApp;
@@ -138,8 +138,8 @@ pub fn spawn_debug_info
     }
 
     //Map内に数値用のText UIを表示する
-    for x in MAP_GRIDS_RANGE_X
-    {   for y in MAP_GRIDS_RANGE_Y
+    for x in SCREEN_GRIDS_RANGE_X
+    {   for y in SCREEN_GRIDS_RANGE_Y
         {   let grid = Grid::new( x, y );
             let pixel = grid.into_pixel_map();
 
