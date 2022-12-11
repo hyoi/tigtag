@@ -12,6 +12,7 @@ impl Plugin for SpawnTextUi
             .with_system( spawn_text_ui )                   //text UIのspawn
         )
         ;
+        //------------------------------------------------------------------------------------------
     }
 }
 
