@@ -35,7 +35,6 @@ impl Plugin for InitApp
         .init_resource::<Map>()                 //迷路情報の初期化
         .add_event::<EventClear>()              //ステージクリアイベント
         .add_event::<EventOver>()               //ゲームオーバーイベント
-//      .insert_resource( MarkAfterFetchAssets ( GameState::Debug ) ) //for debug(text UI)
         ;
 
         //共通のSystem
@@ -53,24 +52,9 @@ impl Plugin for InitApp
         //GameState::Init
         //------------------------------------------------------------------------------------------
         app
-        .add_system_set
-        (   SystemSet::on_enter( GameState::InitApp )       //<ENTER>
-            .with_system( start_fetching_assets )           //Assetのロード開始
-            .with_system( spawn_sprite_now_loading )        //アニメ用スプライトの生成
-        )
-        .add_system_set
-        (   SystemSet::on_update( GameState::InitApp )      //<UPDATE>
-            .with_system( change_state_after_loading )      //ロード完了か判定しState変更
-            .with_system( move_sprite_now_loading )         //ローディングアニメ
-        )
-        .add_system_set
-        (   SystemSet::on_exit( GameState::InitApp )        //<EXIT>
-            .with_system( despawn_entity::<SpriteTile> )    //アニメ用スプライトの削除
-            .with_system( spawn_game_frame )                //ゲームの枠の表示
-            .with_system( spawn_text_ui )                   //text UIのspawn
-        )
+        .add_plugin( FetchAssets )              //Fonts、Sprites等のプリロード
+        .add_plugin( SpawnTextUi )              //Text UIのspawn
         ;
-
         //デバッグ用System
         #[cfg( debug_assertions )]
         app

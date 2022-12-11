@@ -161,14 +161,6 @@ impl Default for CountDown
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//ロードしたAssetsのハンドルの保存先
-#[derive( Resource )]
-pub struct LoadedAssets { pub preload: Vec<HandleUntyped> }
-
-//ローディングアニメ用スプライトのComponent
-#[derive( Component )]
-pub struct SpriteTile ( pub Grid );
-
 //マーカーResource
 #[derive( Resource )]
 pub struct MarkAfterFetchAssets ( pub GameState );

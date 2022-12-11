@@ -1,7 +1,44 @@
 use super::*;
 
+//プラグインの設定
+pub struct FetchAssets;
+impl Plugin for FetchAssets
+{   fn build( &self, app: &mut App )
+    {   //GameState::Init
+        //------------------------------------------------------------------------------------------
+        app
+//      .insert_resource( MarkAfterFetchAssets ( GameState::Debug ) ) //for debug(text UI)
+        .add_system_set
+        (   SystemSet::on_enter( GameState::InitApp )       //<ENTER>
+            .with_system( start_fetching_assets )           //Assetのロード開始
+            .with_system( spawn_sprite_now_loading )        //アニメ用スプライトの生成
+        )
+        .add_system_set
+        (   SystemSet::on_update( GameState::InitApp )      //<UPDATE>
+            .with_system( change_state_after_loading )      //ロード完了か判定しState変更
+            .with_system( move_sprite_now_loading )         //ローディングアニメ
+        )
+        .add_system_set
+        (   SystemSet::on_exit( GameState::InitApp )        //<EXIT>
+            .with_system( despawn_entity::<SpriteTile> )    //アニメ用スプライトの削除
+            .with_system( spawn_game_frame )                //ゲームの枠の表示
+        )
+        ;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//ロードしたAssetsのハンドルの保存先
+#[derive( Resource )]
+struct LoadedAssets { preload: Vec<HandleUntyped> }
+
+//ローディングアニメ用スプライトのComponent
+#[derive( Component )]
+struct SpriteTile ( Grid );
+
 //Assetsのロードを開始する
-pub fn start_fetching_assets
+fn start_fetching_assets
 (   mut cmds: Commands,
     asset_svr: Res<AssetServer>,
 )
@@ -14,7 +51,7 @@ pub fn start_fetching_assets
 }
 
 //ローディングアニメ用スプライトを生成する
-pub fn spawn_sprite_now_loading
+fn spawn_sprite_now_loading
 (   mut cmds: Commands,
 )
 {   let mut rng = rand::thread_rng();
@@ -44,7 +81,7 @@ pub fn spawn_sprite_now_loading
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Assetsのロードが完了したら、Stateを変更する
-pub fn change_state_after_loading
+fn change_state_after_loading
 (   assets   : Res<LoadedAssets>,
     mut state: ResMut<State<GameState>>,
     asset_svr: Res<AssetServer>,
@@ -67,7 +104,7 @@ pub fn change_state_after_loading
 }
 
 //スプライトを動かしてローディングアニメを見せる
-pub fn move_sprite_now_loading
+fn move_sprite_now_loading
 (   mut q: Query<( &mut Transform, &SpriteTile )>,
     time : Res<Time>,
 )

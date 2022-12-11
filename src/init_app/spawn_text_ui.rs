@@ -1,7 +1,24 @@
 use super::*;
 
+//プラグインの設定
+pub struct SpawnTextUi;
+impl Plugin for SpawnTextUi
+{   fn build( &self, app: &mut App )
+    {   //GameState::Init
+        //------------------------------------------------------------------------------------------
+        app
+        .add_system_set
+        (   SystemSet::on_exit( GameState::InitApp )        //<EXIT>
+            .with_system( spawn_text_ui )                   //text UIのspawn
+        )
+        ;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //text UIを配置する
-pub fn spawn_text_ui
+fn spawn_text_ui
 (   mut cmds: Commands,
     asset_svr: Res<AssetServer>,
 )
