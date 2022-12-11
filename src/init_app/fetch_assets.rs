@@ -92,9 +92,17 @@ fn change_state_after_loading
     for handle in assets.preload.iter()
     {   use bevy::asset::LoadState::*;
         match asset_svr.get_load_state( handle )
-        {   Loaded => {} //完了
-            Failed => panic!( "Can't load assets" ), //ロード失敗⇒パニック
-            _      => return, //on_update()の中なので関数は繰り返し呼び出される
+        {   Loaded => {} //ロード完了
+            Failed =>    //ロード失敗⇒パニック
+            {   let mut filename = "Unknown".to_string();
+                if let Some ( asset_path ) = asset_svr.get_handle_path( handle )
+                {   if let Some ( s ) = asset_path.path().to_str()
+                    {   filename = s.to_string();
+                    }
+                }
+                panic!( "Can't load asset file \"{}\"", filename )
+            },
+            _ => return, //on_update()の中なので関数は繰り返し呼び出される
         }
     }
 
