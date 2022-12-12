@@ -109,8 +109,7 @@ pub const BUTTON_SPACE: GamepadButtonType = GamepadButtonType::East; //PS4の◯
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#[allow( dead_code )]
-pub const  DEPTH_SPRITE_DEBUG_GRID : f32 = 200.0; //スプライト重なり順
+pub const _DEPTH_SPRITE_DEBUG_GRID : f32 = 200.0; //スプライト重なり順
 pub const  DEPTH_SPRITE_KANI_DOTOWN: f32 = 150.0; //スプライト重なり順
 pub const  DEPTH_SPRITE_GAME_FRAME : f32 = 100.0; //スプライト重なり順
 pub const  DEPTH_SPRITE_CHASER     : f32 = 40.0;  //スプライト重なり順
@@ -120,8 +119,7 @@ pub const  DEPTH_SPRITE_BRICK_WALL : f32 = 10.0;  //スプライト重なり順
 pub const  DEPTH_SPRITE_TILE       : f32 = 0.0;   //スプライト重なり順
 pub const _DEPTH_SPRITE_DEBUG_RECT : f32 = 0.0;   //スプライト重なり順
 
-#[allow( dead_code )]
-pub const  COLOR_SPRITE_DEBUG_GRID: Color = Color::rgba( 0.8, 0.8, 0.8, 0.1 );  //スプライト色(透過)
+pub const _COLOR_SPRITE_DEBUG_GRID: Color = Color::rgba( 0.8, 0.8, 0.8, 0.1 );  //スプライト色(透過)
 pub const  COLOR_SPRITE_DOT       : Color = Color::rgba( 1.0, 1.0, 0.7, 1.0 );  //スプライト色
 pub const  COLOR_SPRITE_PLAYER    : Color = Color::YELLOW;                      //スプライト色
 pub const  COLOR_SPRITE_TILE      : Color = Color::YELLOW;                      //スプライト色
@@ -250,26 +248,6 @@ pub const FOOTER_RIGHT_TEXT: [ MessageSect; 1 ] =
 #[cfg( debug_assertions )]
 pub const NUM_TILE_TEXT: [ MessageSect; 1 ] =
 [   ( "", ASSETS_FONT_BIZUDPGOTHIC_REGULAR, PIXELS_PER_GRID * 0.3, Color::rgba( 1.0, 1.0, 1.0, 0.3 ) ),
-];
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//ローディングメッセージ
-pub const DESIGN_NOWLOADING_MESSAGE: [ &str; 13 ] = 
-[//   0123456789 123456789 123456789 123456789 12345
-    " ##  #           #                            ", //0
-    " ##  # ### #   # #    ###  #  ##  # #  #  ##  ", //1
-    " # # # # # # # # #    # # # # # #   ## # #    ", //2
-    " # # # # # # # # #    # # # # # # # #### # ## ", //3
-    " #  ## # #  # #  #    # # ### # # # # ## #  # ", //4
-    " #  ## ###  # #  #### ### # # ##  # #  #  ##  ", //5
-    "",                                               //6
-    " ###                      #   #           # # ", //7
-    " #  # #   ###  #  ### ### # # #  #  # ### # # ", //8
-    " #  # #   #   # # #   #   # # # # #    #  # # ", //9
-    " ###  #   ### # # ### ### # # # # # #  #  # # ", //10
-    " #    #   #   ###   # #    # #  ### #  #      ", //11
-    " #    ### ### # # ### ###  # #  # # #  #  # # ", //12
 ];
 
 //End of code.

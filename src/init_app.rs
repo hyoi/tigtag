@@ -106,7 +106,7 @@ pub fn spawn_debug_info
     asset_svr: Res<AssetServer>,
 )
 {   let custom_size = Some ( Pixel::new( PIXELS_PER_GRID, PIXELS_PER_GRID ) );
-    let color = COLOR_SPRITE_DEBUG_GRID;
+    let color = _COLOR_SPRITE_DEBUG_GRID;
 
     //方眼を表示する
     for x in SCREEN_GRIDS_RANGE_X
@@ -115,7 +115,7 @@ pub fn spawn_debug_info
             cmds
             .spawn( SpriteBundle::default() )
             .insert( Sprite { custom_size, color, ..default() } )
-            .insert( Transform::from_translation( pixel_xy.extend( DEPTH_SPRITE_DEBUG_GRID ) ) )
+            .insert( Transform::from_translation( pixel_xy.extend( _DEPTH_SPRITE_DEBUG_GRID ) ) )
             .insert( asset_svr.load( ASSETS_SPRITE_DEBUG_GRID ) as Handle<Image> )
             ;
         }
