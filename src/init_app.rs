@@ -133,7 +133,7 @@ pub fn spawn_debug_info
             text_ui.y += SCREEN_PIXELS_HEIGHT / 2.0 - PIXELS_PER_GRID;
 
             let mut txt = NUM_TILE_TEXT;
-            let val = format!( "{},{}", x, y );
+            let val = format!( "{x},{y}" );
             txt[ 0 ].0 = &val;
 
             cmds

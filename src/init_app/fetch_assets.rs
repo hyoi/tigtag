@@ -120,7 +120,7 @@ fn change_state_after_loading
                     {   filename = s.to_string();
                     }
                 }
-                panic!( "Can't load asset file \"{}\"", filename )
+                panic!( "Can't load asset file \"{filename}\"" )
             },
             _ => return, //on_update()の中なので関数は繰り返し呼び出される
         }

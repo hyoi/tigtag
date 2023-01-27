@@ -29,7 +29,7 @@ fn footer_left
 {   if let Ok( mut ui ) = q.get_single_mut()
     {   let fps_avr = diag.get( FrameTimeDiagnosticsPlugin::FPS ).map_or
         (   NA2_2.to_string(),
-            | fps | fps.average().map_or( NA2_2.to_string(), | avg | format!( "{:02.02}", avg ) )
+            | fps | fps.average().map_or( NA2_2.to_string(), | avg | format!( "{avg:02.02}" ) )
         );
         ui.sections[ 1 ].value = fps_avr;
 
