@@ -1,35 +1,35 @@
 use super::*;
 
 //submodules
-mod fetch_assets;
-mod spawn_text_ui;
+// mod fetch_assets;
+// mod spawn_text_ui;
 
-use fetch_assets::*;
-use spawn_text_ui::*;
+// use fetch_assets::*;
+// use spawn_text_ui::*;
 
 //プラグインの設定
 pub struct InitApp;
 impl Plugin for InitApp
 {   fn build( &self, app: &mut App )
     {   //メインウィンドウ、背景色、アンチエイリアシング、プラグイン
-        let window = WindowDescriptor
-        {   title    : APP_TITLE.to_string(),
-            width    : SCREEN_PIXELS_WIDTH,
-            height   : SCREEN_PIXELS_HEIGHT,
-            resizable: false,
+        let window = Window
+        {   title     : APP_TITLE.to_string(),
+            resolution: ( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT ).into(),
+            resizable : false,
             // fit_canvas_to_parent: true, //FIX v0.6.1: Android Chromeで発生する不具合を回避
             ..default()
         };
+        let primary_window = Some( window );
         app
         .insert_resource( ClearColor( SCREEN_BACKGROUND_COLOR ) )
-        .insert_resource( Msaa { samples: 4 } )
-        .add_plugins( DefaultPlugins.set( WindowPlugin { window, ..default() } ) )
+        .insert_resource( Msaa::Sample4 )
+        .add_plugins( DefaultPlugins.set( WindowPlugin { primary_window, ..default() } ) )
 //#     .add_plugin( AudioPlugin ) // bevy_kira_audio
         ;
 
         //ResourceとEvent
         app
-        .add_state( GameState::InitApp )        //Stateの初期化
+        .add_state::<GameState>()               //Stateの初期化
         .init_resource::<Record>()              //スコア等の初期化
         .init_resource::<CountDown>()           //カウントダウンタイマーの初期化
         .init_resource::<Map>()                 //迷路情報の初期化
@@ -37,33 +37,33 @@ impl Plugin for InitApp
         .add_event::<EventOver>()               //ゲームオーバーイベント
         ;
 
-        //共通のSystem
-        app
-        .add_startup_system( spawn_camera )     //bevyのカメラ
-        .add_system( pause_with_esc_key )       //[Esc]でPause
-        ;
+        // //共通のSystem
+        // app
+        // .add_startup_system( spawn_camera )     //bevyのカメラ
+        // .add_system( pause_with_esc_key )       //[Esc]でPause
+        // ;
 
-        //Not WASM用System
-        #[cfg( not( target_arch = "wasm32" ) )]
-        app
-        .add_system( toggle_window_mode )       //[Alt]+[Enter]でフルスクリーン
-        ;
+        // //Not WASM用System
+        // #[cfg( not( target_arch = "wasm32" ) )]
+        // app
+        // .add_system( toggle_window_mode )       //[Alt]+[Enter]でフルスクリーン
+        // ;
 
-        //GameState::Init
-        //------------------------------------------------------------------------------------------
-        app
-        .add_plugin( FetchAssets )              //Fonts、Sprites等のプリロード
-        .add_plugin( SpawnTextUi )              //Text UIのspawn
-        ;
-        //デバッグ用System
-        #[cfg( debug_assertions )]
-        app
-        .add_system_set
-        (   SystemSet::on_exit( GameState::InitApp )        //<EXIT>
-            .with_system( spawn_debug_info )                //debug用の情報を表示
-        )
-        ;
-        //------------------------------------------------------------------------------------------
+        // //GameState::Init
+        // //------------------------------------------------------------------------------------------
+        // app
+        // .add_plugin( FetchAssets )              //Fonts、Sprites等のプリロード
+        // .add_plugin( SpawnTextUi )              //Text UIのspawn
+        // ;
+        // //デバッグ用System
+        // #[cfg( debug_assertions )]
+        // app
+        // .add_system_set
+        // (   SystemSet::on_exit( GameState::InitApp )        //<EXIT>
+        //     .with_system( spawn_debug_info )                //debug用の情報を表示
+        // )
+        // ;
+        // //------------------------------------------------------------------------------------------
     }
 }
 
