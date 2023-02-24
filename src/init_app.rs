@@ -24,7 +24,7 @@ impl Plugin for InitApp
         .insert_resource( ClearColor( SCREEN_BACKGROUND_COLOR ) )
         .insert_resource( Msaa { samples: 4 } )
         .add_plugins( DefaultPlugins.set( WindowPlugin { window, ..default() } ) )
-        .add_plugin( AudioPlugin ) // bevy_kira_audio
+//#     .add_plugin( AudioPlugin ) // bevy_kira_audio
         ;
 
         //ResourceとEvent
