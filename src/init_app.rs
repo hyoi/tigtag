@@ -43,11 +43,11 @@ impl Plugin for InitApp
         // .add_system( pause_with_esc_key )       //[Esc]でPause
         ;
 
-        // //Not WASM用System
-        // #[cfg( not( target_arch = "wasm32" ) )]
-        // app
-        // .add_system( toggle_window_mode )       //[Alt]+[Enter]でフルスクリーン
-        // ;
+        //Not WASM用System
+        #[cfg( not( target_arch = "wasm32" ) )]
+        app
+        .add_system( toggle_window_mode )       //[Alt]+[Enter]でフルスクリーン
+        ;
 
         // //GameState::Init
         // //------------------------------------------------------------------------------------------

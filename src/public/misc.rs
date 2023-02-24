@@ -6,15 +6,18 @@ pub fn spawn_camera( mut cmds: Commands )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
+
 //ウィンドウとフルスクリーンを切り替える
 #[cfg( not( target_arch = "wasm32" ) )]
 pub fn toggle_window_mode
-(   inkey: Res<Input<KeyCode>>,
+(   mut windows: Query<&mut Window>,
+    inkey: Res<Input<KeyCode>>,
     inbtn: Res<Input<GamepadButton>>,
-    mut window: ResMut<Windows>,
 )
-{   //パッドのボタンの状態
+{   //ウィンドウが見つからなければ関数脱出
+    let Ok( mut window ) = windows.get_single_mut() else { return };
+
+   //パッドのボタンの状態
     let btn_fullscreen = GamepadButton::new( GAMEPAD, _BUTTON_FULLSCREEN );
     let is_btn_fullscreen = inbtn.just_pressed( btn_fullscreen );
 
@@ -26,15 +29,14 @@ pub fn toggle_window_mode
     //入力がないなら関数脱出
     if ! is_key_fullscreen && ! is_btn_fullscreen { return }
 
+    //ウィンドウとフルスクリーンを切り替える
     use bevy::window::WindowMode::*;
-    if let Some( window ) = window.get_primary_mut()
-    {   let mode = if window.mode() == Windowed { SizedFullscreen } else { Windowed };
-        window.set_mode( mode );
-    }
+    let mode = if window.mode == Windowed { SizedFullscreen } else { Windowed };
+    window.mode = mode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 //一時停止する
 pub fn pause_with_esc_key
 (   q: Query<&mut Visibility, With<TextUiPause>>,
