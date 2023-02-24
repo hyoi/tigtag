@@ -37,11 +37,11 @@ impl Plugin for InitApp
         .add_event::<EventOver>()               //ゲームオーバーイベント
         ;
 
-        // //共通のSystem
-        // app
-        // .add_startup_system( spawn_camera )     //bevyのカメラ
+        //共通のSystem
+        app
+        .add_startup_system( spawn_camera )     //bevyのカメラ
         // .add_system( pause_with_esc_key )       //[Esc]でPause
-        // ;
+        ;
 
         // //Not WASM用System
         // #[cfg( not( target_arch = "wasm32" ) )]

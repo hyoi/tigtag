@@ -6,7 +6,7 @@ pub fn spawn_camera( mut cmds: Commands )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 //ウィンドウとフルスクリーンを切り替える
 #[cfg( not( target_arch = "wasm32" ) )]
 pub fn toggle_window_mode
@@ -87,5 +87,5 @@ pub fn despawn_entity<T: Component>
 )
 {   q.for_each( | id | cmds.entity( id ).despawn_recursive() );
 }
-
+*/
 //End of cooe.

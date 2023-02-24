@@ -3,11 +3,11 @@ use super::*;
 //submodules
 mod types;
 mod constants;
-// mod misc;
+mod misc;
 
 //re-export
 pub use types::*;
 pub use constants::*;
-// pub use misc::*;
+pub use misc::*;
 
 //End of code.
