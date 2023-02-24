@@ -47,9 +47,10 @@ pub struct DemoRecord
 
 //ゲームの状態
 #[allow( dead_code )]
-#[derive( Clone, Copy, Eq, PartialEq, Hash, Debug )]
+#[derive( Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States )]
 pub enum GameState
-{   InitApp,
+{   #[default]
+    InitApp,
     TitleDemo, DemoLoop,
     GameStart, StageStart, MainLoop, StageClear, GameOver,
     Pause, Debug,
@@ -64,7 +65,7 @@ impl GameState
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //System Set内で実行順を制御するためのLabel
-#[derive( SystemLabel, Clone )]
+#[derive( SystemSet, Clone, Debug, PartialEq, Eq, Hash )]
 pub enum Mark
 {   MakeMapNewData,   //マップデータ作成処理の目印
     DetectCollisions, //衝突判定処理の目印

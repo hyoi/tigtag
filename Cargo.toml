@@ -24,8 +24,8 @@ edition = "2021"
 #!# ]
 
 [dependencies]
-bevy = "0.9"
+#!# #bevy = "0.9"
 #!# bevy_kira_audio = "0.13"
-#!# bevy = { git = "https://github.com/bevyengine/bevy" }
+bevy = { git = "https://github.com/bevyengine/bevy" }
 once_cell = "1"
 rand = "0.8"

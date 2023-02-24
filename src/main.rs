@@ -6,14 +6,14 @@ use rand::prelude::*;
 
 //internal submodules
 mod public;
-mod init_app;
-mod game_play;
-mod demo_play;
+// mod init_app;
+// mod game_play;
+// mod demo_play;
 
 use public::*;
-use init_app::*;
-use game_play::*;
-use demo_play::*;
+// use init_app::*;
+// use game_play::*;
+// use demo_play::*;
 
 fn main()
 {   //bevy_kira_audioが標準出力へInfoを出力するのを抑止
@@ -22,9 +22,9 @@ fn main()
 
     //アプリの実行
     App::new()
-    .add_plugin( InitApp  )
-    .add_plugin( GamePlay )
-    .add_plugin( DemoPlay )
+    // .add_plugin( InitApp  )
+    // .add_plugin( GamePlay )
+    // .add_plugin( DemoPlay )
     .run()
     ;
 }
