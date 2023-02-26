@@ -55,14 +55,11 @@ impl Plugin for InitApp
         .add_plugin( FetchAssets )              //Fonts、Sprites等のプリロード
         .add_plugin( SpawnTextUi )              //Text UIのspawn
         ;
-        // //デバッグ用System
-        // #[cfg( debug_assertions )]
-        // app
-        // .add_system_set
-        // (   SystemSet::on_exit( GameState::InitApp )        //<EXIT>
-        //     .with_system( spawn_debug_info )                //debug用の情報を表示
-        // )
-        // ;
+        //デバッグ用System
+        #[cfg( debug_assertions )]
+        app
+        .add_system( spawn_debug_info.in_schedule( OnExit( GameState::InitApp ) ) ) //debug用の情報を表示
+        ;
         // //------------------------------------------------------------------------------------------
     }
 }
