@@ -83,7 +83,7 @@ pub fn move_sprite
         let mut new_side = player.side;
         player.stop = true; //停止フラグを立てる
 
-        if ! state.current().is_demoplay() //demoでないなら
+        if ! state.0.is_demoplay() //demoでないなら
         {   if ! cross_button.is_empty() //パッド十字キー入力があるなら
             {   let cross_button = cross_button.sides_list();
                 for &side in cross_button
@@ -206,7 +206,7 @@ pub fn scoring_and_clear_stage
     mut _q2: Query<( &mut Text, &TextUiNumTile )>,
     mut record: ResMut<Record>,
     mut map: ResMut<Map>,
-    mut state: ResMut<State<GameState>>,
+    ( state, mut next_state ): ( Res<State<GameState>>, ResMut<NextState<GameState>> ),
     mut ev_clear: EventWriter<EventClear>,
 //# ( mut cmds, asset_svr, audio ): ( Commands, Res<AssetServer>, Res<Audio> ),
     ( mut cmds,                  ): ( Commands,                              ),
@@ -228,14 +228,14 @@ pub fn scoring_and_clear_stage
 //#         audio.play( asset_svr.load( ASSETS_SOUND_BEEP ) );
 
             //ハイスコアの更新
-            if ! state.current().is_demoplay() && record.score > record.hi_score
+            if ! state.0.is_demoplay() && record.score > record.hi_score
             {   record.hi_score = record.score;
             }
 
             //全ドットを拾ったら、Clearへ遷移する
             if map.remaining_dots <= 0
             {   let next =
-                {   if state.current().is_demoplay()
+                {   if state.0.is_demoplay()
                     {   record.demo.clear_flag = true;
                         GameState::DemoLoop
                     }
@@ -243,7 +243,8 @@ pub fn scoring_and_clear_stage
                     {   GameState::StageClear
                     }
                 };
-                let _ = state.overwrite_set( next );
+//              let _ = state.overwrite_set( next );
+                next_state.set( next );
                 ev_clear.send( EventClear );    //後続の処理にクリアを伝える
             }
         }

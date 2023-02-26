@@ -66,7 +66,7 @@ pub fn pause_with_esc_key
     //NOTE: https://bevy-cheatbook.github.io/programming/states.html#with-input
     inkey.reset( KeyCode::Escape );
 }
-
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Componentを見せる
@@ -82,7 +82,7 @@ pub fn hide_component<T: Component>
 )
 {   let _ = q.get_single_mut().map( | mut ui | *ui = Visibility::Hidden );
 }
-*/
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ComponentでQueryしたEnityを再帰的に削除する
