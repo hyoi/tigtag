@@ -4,25 +4,16 @@ use super::*;
 pub struct FetchAssets;
 impl Plugin for FetchAssets
 {   fn build( &self, app: &mut App )
-    {   //GameState::Init
+    {   //GameState::InitApp
         //------------------------------------------------------------------------------------------
         app
 //      .insert_resource( MarkAfterFetchAssets ( GameState::Debug ) ) //for debug(text UI)
-        .add_system_set
-        (   SystemSet::on_enter( GameState::InitApp )       //<ENTER>
-            .with_system( start_fetching_assets )           //Assetのロード開始
-            .with_system( spawn_sprite_now_loading )        //アニメ用スプライトの生成
-        )
-        .add_system_set
-        (   SystemSet::on_update( GameState::InitApp )      //<UPDATE>
-            .with_system( change_state_after_loading )      //ロード完了か判定しState変更
-            .with_system( move_sprite_now_loading )         //ローディングアニメ
-        )
-        .add_system_set
-        (   SystemSet::on_exit( GameState::InitApp )        //<EXIT>
-            .with_system( despawn_entity::<SpriteTile> )    //アニメ用スプライトの削除
-            .with_system( spawn_game_frame )                //ゲームの枠の表示
-        )
+        .add_system( start_fetching_assets        .in_schedule( OnEnter( GameState::InitApp ) ) ) //Assetのロード開始
+        .add_system( spawn_sprite_now_loading     .in_schedule( OnEnter( GameState::InitApp ) ) ) //アニメ用スプライトの生成
+        .add_system( change_state_after_loading   .in_set( OnUpdate( GameState::InitApp ) ) )     //ロード完了か判定しState変更
+        .add_system( move_sprite_now_loading      .in_set( OnUpdate( GameState::InitApp ) ) )     //ローディングアニメ
+        .add_system( despawn_entity::<SpriteTile> .in_schedule( OnExit( GameState::InitApp ) ) )  //アニメ用スプライトの削除
+        .add_system( spawn_game_frame             .in_schedule( OnExit( GameState::InitApp ) ) )  //ゲームの枠の表示
         ;
         //------------------------------------------------------------------------------------------
     }
@@ -104,7 +95,7 @@ fn spawn_sprite_now_loading
 //Assetsのロードが完了したら、Stateを変更する
 fn change_state_after_loading
 (   assets   : Res<LoadedAssets>,
-    mut state: ResMut<State<GameState>>,
+    mut state: ResMut<NextState<GameState>>,
     asset_svr: Res<AssetServer>,
     o_marker : Option<Res<MarkAfterFetchAssets>>,
 )
@@ -127,9 +118,8 @@ fn change_state_after_loading
     }
 
     //次のStateへ遷移する
-    if let Some ( x ) = o_marker
-    {   let _ = state.overwrite_set( x.0 );
-    }
+    let Some ( x ) = o_marker else { return };
+    state.set( x.0 );
 }
 
 //スプライトを動かしてローディングアニメを見せる

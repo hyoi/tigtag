@@ -40,9 +40,11 @@ pub fn toggle_window_mode
 //一時停止する
 pub fn pause_with_esc_key
 (   q: Query<&mut Visibility, With<TextUiPause>>,
-    mut state: ResMut<State<GameState>>,
+    state: Res<State<GameState>>,
+    mut next_state: ResMut<NextState<GameState>>,
     mut inkey: ResMut<Input<KeyCode>>,
     inbtn: Res<Input<GamepadButton>>,
+    mut old_state: Local<GameState>,
 )
 {   //パッドのボタン
     let btn_pause = GamepadButton::new( GAMEPAD, BUTTON_PAUSE );
@@ -51,13 +53,14 @@ pub fn pause_with_esc_key
     if ! inkey.just_pressed( KEY_PAUSE ) && ! inbtn.just_pressed( btn_pause ) { return }
 
     //PAUSEのトグル処理
-    if state.current().is_pause()
+    if state.0.is_pause()
     {   hide_component( q );
-        let _ = state.pop();
+        next_state.set( *old_state );
     }
     else
     {   show_component( q );
-        let _ = state.push( GameState::Pause );
+        *old_state = state.0;
+        next_state.set( GameState::Pause );
     }
 
     //NOTE: https://bevy-cheatbook.github.io/programming/states.html#with-input
@@ -70,16 +73,16 @@ pub fn pause_with_esc_key
 pub fn show_component<T: Component>
 (   mut q: Query<&mut Visibility, With<T>>,
 )
-{   let _ = q.get_single_mut().map( | mut ui | ui.is_visible = true );
+{   let _ = q.get_single_mut().map( | mut ui | *ui = Visibility::Inherited );
 }
 
 //Componentを隠す
 pub fn hide_component<T: Component>
 (   mut q: Query<&mut Visibility, With<T>>,
 )
-{   let _ = q.get_single_mut().map( | mut ui | ui.is_visible = false );
+{   let _ = q.get_single_mut().map( | mut ui | *ui = Visibility::Hidden );
 }
-
+*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //ComponentでQueryしたEnityを再帰的に削除する
@@ -89,5 +92,5 @@ pub fn despawn_entity<T: Component>
 )
 {   q.for_each( | id | cmds.entity( id ).despawn_recursive() );
 }
-*/
+
 //End of cooe.

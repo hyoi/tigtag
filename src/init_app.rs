@@ -1,11 +1,11 @@
 use super::*;
 
 //submodules
-// mod fetch_assets;
-// mod spawn_text_ui;
+mod fetch_assets;
+mod spawn_text_ui;
 
-// use fetch_assets::*;
-// use spawn_text_ui::*;
+use fetch_assets::*;
+use spawn_text_ui::*;
 
 //プラグインの設定
 pub struct InitApp;
@@ -49,12 +49,12 @@ impl Plugin for InitApp
         .add_system( toggle_window_mode )       //[Alt]+[Enter]でフルスクリーン
         ;
 
-        // //GameState::Init
-        // //------------------------------------------------------------------------------------------
-        // app
-        // .add_plugin( FetchAssets )              //Fonts、Sprites等のプリロード
-        // .add_plugin( SpawnTextUi )              //Text UIのspawn
-        // ;
+        //GameState::Init
+        //------------------------------------------------------------------------------------------
+        app
+        .add_plugin( FetchAssets )              //Fonts、Sprites等のプリロード
+        .add_plugin( SpawnTextUi )              //Text UIのspawn
+        ;
         // //デバッグ用System
         // #[cfg( debug_assertions )]
         // app
