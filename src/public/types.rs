@@ -49,8 +49,7 @@ pub struct DemoRecord
 #[allow( dead_code )]
 #[derive( Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States )]
 pub enum GameState
-{   #[default]
-    InitApp,
+{   #[default] InitApp,
     TitleDemo, DemoLoop,
     GameStart, StageStart, MainLoop, StageClear, GameOver,
     Pause, Debug,
