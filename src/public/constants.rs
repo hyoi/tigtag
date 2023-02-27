@@ -238,7 +238,7 @@ pub const FOOTER_LEFT_TEXT: [ MessageSect; 4 ] =
     ( NA2_5   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4, Color::SILVER ),
 ];
 pub const FOOTER_CENTER_TEXT: [ MessageSect; 1 ] =
-[   ( "hyoi 2021 - 2022", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
+[   ( "hyoi 2021 - 2023", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
 ];
 pub const FOOTER_RIGHT_TEXT: [ MessageSect; 1 ] =
 [   ( "Powered by RUST & BEVY ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
