@@ -8,12 +8,12 @@ use rand::prelude::*;
 mod public;
 mod init_app;
 mod game_play;
-// mod demo_play;
+mod demo_play;
 
 use public::*;
 use init_app::*;
 use game_play::*;
-// use demo_play::*;
+use demo_play::*;
 
 fn main()
 {   //bevy_kira_audioが標準出力へInfoを出力するのを抑止
@@ -24,7 +24,7 @@ fn main()
     App::new()
     .add_plugin( InitApp  )
     .add_plugin( GamePlay )
-    // .add_plugin( DemoPlay )
+    .add_plugin( DemoPlay )
     .run()
     ;
 }
