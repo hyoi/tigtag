@@ -58,7 +58,10 @@ impl Plugin for InitApp
         //デバッグ用System
         #[cfg( debug_assertions )]
         app
-        .add_system( spawn_debug_info.in_schedule( OnExit( GameState::InitApp ) ) ) //debug用の情報を表示
+        .add_system
+        (   spawn_debug_info                    //debug用の情報を表示
+            .in_schedule( OnExit( GameState::InitApp ) )
+        )
         ;
         // //------------------------------------------------------------------------------------------
     }
