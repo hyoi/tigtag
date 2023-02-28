@@ -13,28 +13,30 @@ pub static MAP_PIXELS_DISPLAY_OFFSET: Lazy<Pixel> = Lazy::new   //マップ表�
 (   || Pixel::new( 0.0, -1.0 ) * PIXELS_PER_GRID                //　Pixel::new()がconst fnではないのでLazyに頼った
 );
 
-pub const DESIGN_GAME_FRAME: [ &str; SCREEN_GRIDS_HEIGHT as usize ] = //画面デザイン(枠)
-//   0123456789 123456789 123456789
-[   "                         ", //0----
-    "#########################", //1
-    "#                       #", //2
-    "#                       #", //3
-    "#                       #", //4
-    "#                       #", //5
-    "#                       #", //6
-    "#                       #", //7
-    "#                       #", //8
-    "#                       #", //9
-    "#                       #", //10---
-    "#                       #", //11
-    "#                       #", //12
-    "#                       #", //13
-    "#                       #", //14
-    "#                       #", //15
-    "#                       #", //16
-    "#########################", //17
-    "                         ", //18
-]; //0123456789 123456789 123456789
+counted_array!
+(   pub const DESIGN_GAME_FRAME: [ &str; _ ] = //画面デザイン(枠)
+    //   0123456789 123456789 123456789
+    [   "                         ", //0----
+        "#########################", //1
+        "#                       #", //2
+        "#                       #", //3
+        "#                       #", //4
+        "#                       #", //5
+        "#                       #", //6
+        "#                       #", //7
+        "#                       #", //8
+        "#                       #", //9
+        "#                       #", //10---
+        "#                       #", //11
+        "#                       #", //12
+        "#                       #", //13
+        "#                       #", //14
+        "#                       #", //15
+        "#                       #", //16
+        "#########################", //17
+        "                         ", //18
+    ]  //0123456789 123456789 123456789
+);
 
 const SCREEN_SCALING      : f32 = 4.0;
 const BASE_PIXELS_PER_GRID: i32 = 8;
@@ -66,16 +68,18 @@ pub const ASSETS_SPRITE_KANI_DOTOWN       : &str = "sprites/kani_DOTOWN.png";   
 pub const ASSETS_SOUND_BEEP               : &str = "audio/sounds/beep.ogg";          //サウンド
 
 //事前ロード対象のAsset
-pub const FETCH_ASSETS: [ &str; 8 ] =
-[   ASSETS_FONT_ORBITRON_BLACK,
-    ASSETS_FONT_REGGAEONE_REGULAR,
-    ASSETS_FONT_PRESSSTART2P_REGULAR,
-    ASSETS_FONT_BIZUDPGOTHIC_REGULAR,
-    ASSETS_SPRITE_DEBUG_GRID,
-    ASSETS_SPRITE_BRICK_WALL,
-    ASSETS_SPRITE_KANI_DOTOWN,
-    ASSETS_SOUND_BEEP,
-];
+counted_array!
+(   pub const FETCH_ASSETS: [ &str; _ ] =
+    [   ASSETS_FONT_ORBITRON_BLACK,
+        ASSETS_FONT_REGGAEONE_REGULAR,
+        ASSETS_FONT_PRESSSTART2P_REGULAR,
+        ASSETS_FONT_BIZUDPGOTHIC_REGULAR,
+        ASSETS_SPRITE_DEBUG_GRID,
+        ASSETS_SPRITE_BRICK_WALL,
+        ASSETS_SPRITE_KANI_DOTOWN,
+        ASSETS_SOUND_BEEP,
+    ]
+);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -164,90 +168,119 @@ pub const NA5  : &str = "#####";
 pub const NA2_5: &str = "##-#####";
 
 //中央に表示するtext UI
-pub const CENTER_TITLE_TEXT: [ MessageSect; 5 ] =
-[   ( APP_TITLE, ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, Color::rgba( 0.6, 1.0, 0.4, 0.75 ) ),
-    ( "\n "    , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::rgba( 0.6, 1.0, 0.4, 0.75 ) ),
-    ( "v"      , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, Color::rgba( 0.5, 1.0, 0.4, 0.75 ) ),
-    ( CARGO_VER, ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, Color::rgba( 0.5, 1.0, 0.4, 0.75 ) ),
-    ( "    "   , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, Color::rgba( 0.5, 1.0, 0.4, 0.75 ) ),
-];
-pub const CENTER_DEMO_TEXT: [ MessageSect; 4 ] =
-[   ( " "            , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, Color::YELLOW ),
-    ( "\nD E M O\n\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::YELLOW ),
-    ( "Hit SPACE Key", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
-    ( "\nor A Button", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::CYAN   ),
-];
+const TITLE_COLOR1: Color = Color::rgba( 0.6, 1.0, 0.4, 0.75 );
+const TITLE_COLOR2: Color = Color::rgba( 0.0, 0.7, 0.5, 0.75 );
+counted_array!
+(   pub const CENTER_TITLE_TEXT: [ MessageSect; _ ] =
+    [   ( APP_TITLE, ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, TITLE_COLOR1 ),
+        ( "\n "    , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, TITLE_COLOR1 ),
+        ( "v"      , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, TITLE_COLOR2 ),
+        ( CARGO_VER, ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, TITLE_COLOR2 ),
+        ( "    "   , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, TITLE_COLOR2 ),
+    ]
+);
+
+counted_array!
+(   pub const CENTER_DEMO_TEXT: [ MessageSect; _ ] =
+    [   ( " "            , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, Color::YELLOW ),
+        ( "\nD E M O\n\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::YELLOW ),
+        ( "Hit SPACE Key", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
+        ( "\nor A Button", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::CYAN   ),
+    ]
+);
 pub const TEXT_UI_TITLE: TextUiTitle = TextUiTitle( GameState::GameStart, KEY_SPACE, BUTTON_SPACE );
 
-pub const CENTER_START_TEXT: [ MessageSect; 5 ] =
-[   ( "Game Start\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN   ),
-    ( "\n"          , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE   ),
-    ( "Ready...\n"  , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.0, Color::YELLOW ),
-    ( "\n"          , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE   ),
-    ( ""            , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::YELLOW ),
-];
+counted_array!
+(   pub const CENTER_START_TEXT: [ MessageSect; _ ] =
+    [   ( "Game Start\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN   ),
+        ( "\n"          , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE   ),
+        ( "Ready...\n"  , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.0, Color::YELLOW ),
+        ( "\n"          , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE   ),
+        ( ""            , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::YELLOW ),
+    ]
+);
 pub const TEXT_UI_START: TextUiStart = TextUiStart ( 3, GameState::MainLoop, 4, cd_string_start );
 fn cd_string_start( n: i32 ) -> String { if n == 0 { "Go!!".to_string() } else { n.to_string() } }
 
-pub const CENTER_CLEAR_TEXT: [ MessageSect; 5 ] =
-[   ( "C L E A R !!\n" , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN   ),
-    ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE   ),
-    ( "Next stage...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.0, Color::YELLOW ),
-    ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE   ),
-    ( ""               , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::YELLOW ),
-];
+counted_array!
+(   pub const CENTER_CLEAR_TEXT: [ MessageSect; _ ] =
+    [   ( "C L E A R !!\n" , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN   ),
+        ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE   ),
+        ( "Next stage...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.0, Color::YELLOW ),
+        ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE   ),
+        ( ""               , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::YELLOW ),
+    ]
+);
 pub const TEXT_UI_CLEAR: TextUiClear = TextUiClear ( 1, GameState::StageStart, 4, cd_string_clear );
 fn cd_string_clear( n: i32 ) -> String { ( n + 4 ).to_string() }
 
-pub const CENTER_OVER_TEXT: [ MessageSect; 6 ] =
-[   ( "Game Over\n"    , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 6.0, Color::RED    ),
-    ( "\n"             , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.5, Color::NONE   ),
-    ( "REPLAY?\n\n"    , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
-    ( "Hit SPACE Key"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
-    ( "\nor A Button\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::CYAN   ),
-    ( ""               , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::YELLOW ),
-];
+counted_array!
+(   pub const CENTER_OVER_TEXT: [ MessageSect; _ ] =
+    [   ( "Game Over\n"    , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 6.0, Color::RED    ),
+        ( "\n"             , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.5, Color::NONE   ),
+        ( "REPLAY?\n\n"    , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
+        ( "Hit SPACE Key"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, Color::CYAN   ),
+        ( "\nor A Button\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::CYAN   ),
+        ( ""               , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::YELLOW ),
+    ]
+);
 pub const TEXT_UI_OVER: TextUiOver
     = TextUiOver( 10, GameState::TitleDemo, 5, cd_string_over, GameState::GameStart, KEY_SPACE, BUTTON_SPACE );
 fn cd_string_over( n: i32 ) -> String { n.to_string() }
 
-pub const CENTER_PAUSE_TEXT: [ MessageSect; 1 ] =
-[   ( "P A U S E", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::SILVER ),
-];
+counted_array!
+(   pub const CENTER_PAUSE_TEXT: [ MessageSect; _ ] =
+    [   ( "P A U S E", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::SILVER ),
+    ]
+);
 
 //ヘッダーに表示するtext UI
-pub const HEADER_LEFT_TEXT: [ MessageSect; 2 ] =
-[   ( " STAGE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
-    ( NA2      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
-];
-pub const HEADER_CENTER_TEXT: [ MessageSect; 3 ] =
-[   ( " SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD   ),
-    ( NA5      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE  ),
-    ( ""       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.5, Color::SILVER ),  //placeholder for debug
-];
-pub const HEADER_RIGHT_TEXT: [ MessageSect; 2 ] =
-[   ( " Hi-SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
-    ( NA5         , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
-];
+counted_array!
+(   pub const HEADER_LEFT_TEXT: [ MessageSect; _ ] =
+    [   ( " STAGE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
+        ( NA2      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
+    ]
+);
+counted_array!
+(   pub const HEADER_CENTER_TEXT: [ MessageSect; _ ] =
+    [   ( " SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD   ),
+        ( NA5      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE  ),
+        ( ""       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.5, Color::SILVER ),  //placeholder for debug
+    ]
+);
+counted_array!
+(   pub const HEADER_RIGHT_TEXT: [ MessageSect; _ ] =
+    [   ( " Hi-SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
+        ( NA5         , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
+    ]
+);
 
 //フッターに表示するtext UI
-pub const FOOTER_LEFT_TEXT: [ MessageSect; 4 ] =
-[   ( " FPS " , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID       * 0.6, Color::TEAL   ),
-    ( NA2_2   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4, Color::SILVER ),
-    ( " demo ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID       * 0.6, Color::TEAL   ),
-    ( NA2_5   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4, Color::SILVER ),
-];
-pub const FOOTER_CENTER_TEXT: [ MessageSect; 1 ] =
-[   ( "hyoi 2021 - 2023", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
-];
-pub const FOOTER_RIGHT_TEXT: [ MessageSect; 1 ] =
-[   ( "Powered by RUST & BEVY ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
-];
+counted_array!
+(   pub const FOOTER_LEFT_TEXT: [ MessageSect; _ ] =
+    [   ( " FPS " , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID       * 0.6, Color::TEAL   ),
+        ( NA2_2   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4, Color::SILVER ),
+        ( " demo ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID       * 0.6, Color::TEAL   ),
+        ( NA2_5   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4, Color::SILVER ),
+    ]
+);
+counted_array!
+(   pub const FOOTER_CENTER_TEXT: [ MessageSect; _ ] =
+    [   ( "hyoi 2021 - 2023", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
+    ]
+);
+counted_array!
+(   pub const FOOTER_RIGHT_TEXT: [ MessageSect; _ ] =
+    [   ( "Powered by RUST & BEVY ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
+    ]
+);
 
 //debug用数字タイル
 #[cfg( debug_assertions )]
-pub const NUM_TILE_TEXT: [ MessageSect; 1 ] =
-[   ( "", ASSETS_FONT_BIZUDPGOTHIC_REGULAR, PIXELS_PER_GRID * 0.3, Color::rgba( 1.0, 1.0, 1.0, 0.3 ) ),
-];
+counted_array!
+(   pub const NUM_TILE_TEXT: [ MessageSect; _ ] =
+    [   ( "", ASSETS_FONT_BIZUDPGOTHIC_REGULAR, PIXELS_PER_GRID * 0.3, Color::rgba( 1.0, 1.0, 1.0, 0.3 ) ),
+    ]
+);
 
 //End of code.
