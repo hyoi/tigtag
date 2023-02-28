@@ -27,5 +27,6 @@ edition = "2021"
 #!# #bevy = "0.9"
 #!# bevy_kira_audio = "0.13"
 bevy = { git = "https://github.com/bevyengine/bevy" }
+counted-array = "0.1"
 once_cell = "1"
 rand = "0.8"
