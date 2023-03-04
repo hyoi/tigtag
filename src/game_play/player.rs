@@ -58,7 +58,7 @@ pub fn spawn_sprite
 pub fn move_sprite
 (   ( mut q_player, q_chasers ): ( Query<(&mut Player, &mut Transform)>, Query<&Chaser> ),
     map: Res<Map>,
-    state: ResMut<State<GameState>>,
+    state: ResMut<State<MyState>>,
     ( mut ev_clear, mut ev_over ): ( EventReader<EventClear>, EventReader<EventOver> ),
     ( inkey, time ): ( Res<Input<KeyCode>>, Res<Time> ),
     cross_button: Res<GamepadCrossButton>,
@@ -206,7 +206,7 @@ pub fn scoring_and_clear_stage
     mut _q2: Query<( &mut Text, &TextUiNumTile )>,
     mut record: ResMut<Record>,
     mut map: ResMut<Map>,
-    ( state, mut next_state ): ( Res<State<GameState>>, ResMut<NextState<GameState>> ),
+    ( state, mut next_state ): ( Res<State<MyState>>, ResMut<NextState<MyState>> ),
     mut ev_clear: EventWriter<EventClear>,
 //# ( mut cmds, asset_svr, audio ): ( Commands, Res<AssetServer>, Res<Audio> ),
     ( mut cmds,                  ): ( Commands,                              ),
@@ -237,13 +237,12 @@ pub fn scoring_and_clear_stage
             {   let next =
                 {   if state.0.is_demoplay()
                     {   record.demo.clear_flag = true;
-                        GameState::DemoLoop
+                        MyState::DemoLoop
                     }
                     else
-                    {   GameState::StageClear
+                    {   MyState::StageClear
                     }
                 };
-//              let _ = state.overwrite_set( next );
                 next_state.set( next );
                 ev_clear.send( EventClear );    //後続の処理にクリアを伝える
             }

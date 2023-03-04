@@ -188,7 +188,7 @@ counted_array!
         ( "\nor A Button", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::CYAN   ),
     ]
 );
-pub const TEXT_UI_TITLE: TextUiTitle = TextUiTitle( GameState::GameStart, KEY_SPACE, BUTTON_SPACE );
+pub const TEXT_UI_TITLE: TextUiTitle = TextUiTitle( MyState::GameStart, KEY_SPACE, BUTTON_SPACE );
 
 counted_array!
 (   pub const CENTER_START_TEXT: [ MessageSect; _ ] =
@@ -199,7 +199,7 @@ counted_array!
         ( ""            , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::YELLOW ),
     ]
 );
-pub const TEXT_UI_START: TextUiStart = TextUiStart ( 3, GameState::MainLoop, 4, cd_string_start );
+pub const TEXT_UI_START: TextUiStart = TextUiStart ( 3, MyState::MainLoop, 4, cd_string_start );
 fn cd_string_start( n: i32 ) -> String { if n == 0 { "Go!!".to_string() } else { n.to_string() } }
 
 counted_array!
@@ -211,7 +211,7 @@ counted_array!
         ( ""               , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::YELLOW ),
     ]
 );
-pub const TEXT_UI_CLEAR: TextUiClear = TextUiClear ( 1, GameState::StageStart, 4, cd_string_clear );
+pub const TEXT_UI_CLEAR: TextUiClear = TextUiClear ( 1, MyState::StageStart, 4, cd_string_clear );
 fn cd_string_clear( n: i32 ) -> String { ( n + 4 ).to_string() }
 
 counted_array!
@@ -225,7 +225,7 @@ counted_array!
     ]
 );
 pub const TEXT_UI_OVER: TextUiOver
-    = TextUiOver( 10, GameState::TitleDemo, 5, cd_string_over, GameState::GameStart, KEY_SPACE, BUTTON_SPACE );
+    = TextUiOver( 10, MyState::TitleDemo, 5, cd_string_over, MyState::GameStart, KEY_SPACE, BUTTON_SPACE );
 fn cd_string_over( n: i32 ) -> String { n.to_string() }
 
 counted_array!

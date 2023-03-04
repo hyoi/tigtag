@@ -40,10 +40,10 @@ pub fn toggle_window_mode
 //一時停止する
 pub fn pause_with_esc_key
 (   q: Query<&mut Visibility, With<TextUiPause>>,
-    mut state: ResMut<State<GameState>>,
+    mut state: ResMut<State<MyState>>,
     mut inkey: ResMut<Input<KeyCode>>,
     inbtn: Res<Input<GamepadButton>>,
-    mut old_state: Local<GameState>,
+    mut old_state: Local<MyState>,
 )
 {   //パッドのボタン
     let btn_pause = GamepadButton::new( GAMEPAD, BUTTON_PAUSE );
@@ -59,7 +59,7 @@ pub fn pause_with_esc_key
     else
     {   show_component( q );
         *old_state = state.0;
-        state.0 = GameState::Pause;
+        state.0 = MyState::Pause;
     }
 
     //NOTE: https://bevy-cheatbook.github.io/programming/states.html#with-input

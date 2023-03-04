@@ -29,7 +29,7 @@ impl Plugin for InitApp
 
         //ResourceとEvent
         app
-        .add_state::<GameState>()               //Stateの初期化
+        .add_state::<MyState>()                 //Stateの初期化
         .init_resource::<Record>()              //スコア等の初期化
         .init_resource::<CountDown>()           //カウントダウンタイマーの初期化
         .init_resource::<Map>()                 //迷路情報の初期化
@@ -49,7 +49,7 @@ impl Plugin for InitApp
         .add_system( toggle_window_mode )       //[Alt]+[Enter]でフルスクリーン
         ;
 
-        //GameState::Init
+        //MyState::Init
         //------------------------------------------------------------------------------------------
         app
         .add_plugin( FetchAssets )              //Fonts、Sprites等のプリロード
@@ -60,7 +60,7 @@ impl Plugin for InitApp
         app
         .add_system
         (   spawn_debug_info                    //debug用の情報を表示
-            .in_schedule( OnExit( GameState::InitApp ) )
+            .in_schedule( OnExit( MyState::InitApp ) )
         )
         ;
         // //------------------------------------------------------------------------------------------

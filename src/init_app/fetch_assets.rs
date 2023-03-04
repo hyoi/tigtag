@@ -4,16 +4,16 @@ use super::*;
 pub struct FetchAssets;
 impl Plugin for FetchAssets
 {   fn build( &self, app: &mut App )
-    {   //GameState::InitApp
+    {   //MyState::InitApp
         //------------------------------------------------------------------------------------------
         app
-//      .insert_resource( MarkAfterFetchAssets ( GameState::Debug ) ) //for debug(text UI)
-        .add_system( start_fetching_assets        .in_schedule( OnEnter( GameState::InitApp ) ) ) //Assetのロード開始
-        .add_system( spawn_sprite_now_loading     .in_schedule( OnEnter( GameState::InitApp ) ) ) //アニメ用スプライトの生成
-        .add_system( change_state_after_loading   .in_set( OnUpdate( GameState::InitApp ) ) )     //ロード完了か判定しState変更
-        .add_system( move_sprite_now_loading      .in_set( OnUpdate( GameState::InitApp ) ) )     //ローディングアニメ
-        .add_system( despawn_entity::<SpriteTile> .in_schedule( OnExit( GameState::InitApp ) ) )  //アニメ用スプライトの削除
-        .add_system( spawn_game_frame             .in_schedule( OnExit( GameState::InitApp ) ) )  //ゲームの枠の表示
+//      .insert_resource( MarkAfterFetchAssets ( MyState::Debug ) ) //for debug(text UI)
+        .add_system( start_fetching_assets        .in_schedule( OnEnter( MyState::InitApp ) ) ) //Assetのロード開始
+        .add_system( spawn_sprite_now_loading     .in_schedule( OnEnter( MyState::InitApp ) ) ) //アニメ用スプライトの生成
+        .add_system( change_state_after_loading   .in_set( OnUpdate( MyState::InitApp ) ) )     //ロード完了か判定しState変更
+        .add_system( move_sprite_now_loading      .in_set( OnUpdate( MyState::InitApp ) ) )     //ローディングアニメ
+        .add_system( despawn_entity::<SpriteTile> .in_schedule( OnExit( MyState::InitApp ) ) )  //アニメ用スプライトの削除
+        .add_system( spawn_game_frame             .in_schedule( OnExit( MyState::InitApp ) ) )  //ゲームの枠の表示
         ;
         //------------------------------------------------------------------------------------------
     }
@@ -97,7 +97,7 @@ fn spawn_sprite_now_loading
 //Assetsのロードが完了したら、Stateを変更する
 fn change_state_after_loading
 (   assets   : Res<LoadedAssets>,
-    mut state: ResMut<NextState<GameState>>,
+    mut state: ResMut<NextState<MyState>>,
     asset_svr: Res<AssetServer>,
     o_marker : Option<Res<MarkAfterFetchAssets>>,
 )

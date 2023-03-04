@@ -4,27 +4,27 @@ use super::*;
 pub struct DemoPlay;
 impl Plugin for DemoPlay
 {   fn build( &self, app: &mut App )
-    {   //GameState::TitleDemo
+    {   //MyState::TitleDemo
         //------------------------------------------------------------------------------------------
         app
         .add_systems
         (   (   init_demoplay_record, //demoでのrecordの初期化
-                map::make_new_data.in_set( Mark::MakeMapNewData ), //新マップのデータ作成
+                map::make_new_data.in_set( MyLabel::MakeMapNewData ), //新マップのデータ作成
                 map::spawn_sprite,     //スプライトをspawnする
                 player::spawn_sprite,  //スプライトをspawnする
                 chasers::spawn_sprite, //スプライトをspawnする
             )
             .chain()
-            .in_schedule( OnEnter( GameState::TitleDemo ) )
+            .in_schedule( OnEnter( MyState::TitleDemo ) )
         )
         .add_systems
         (   (   player::scoring_and_clear_stage, //スコアリング＆クリア判定⇒DemoLoop
-                chasers::detect_collisions.in_set( Mark::DetectCollisions ), //衝突判定⇒DemoLoop
+                chasers::detect_collisions.in_set( MyLabel::DetectCollisions ), //衝突判定⇒DemoLoop
                 player::move_sprite,  //スプライト移動
                 chasers::move_sprite, //スプライト移動
             )
             .chain()
-            .in_set( OnUpdate( GameState::TitleDemo ) )
+            .in_set( OnUpdate( MyState::TitleDemo ) )
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -34,26 +34,26 @@ impl Plugin for DemoPlay
         app
         .add_system
         (   spawn_debug_sprite //スプライトをspawnする
-            .after( Mark::MakeMapNewData )
-            .in_schedule( OnEnter( GameState::TitleDemo ) )
+            .after( MyLabel::MakeMapNewData )
+            .in_schedule( OnEnter( MyState::TitleDemo ) )
         )
         .add_system
         (   update_debug_sprite //スプライト移動
-            .after( Mark::DetectCollisions )
-            .in_set( OnUpdate( GameState::TitleDemo ) )
+            .after( MyLabel::DetectCollisions )
+            .in_set( OnUpdate( MyState::TitleDemo ) )
         )
         .add_system
         (   despawn_entity::<DotsRect> //スプライト削除
-            .in_schedule( OnExit( GameState::TitleDemo ) )
+            .in_schedule( OnExit( MyState::TitleDemo ) )
         )
         ;
 
-        //GameState::DemoNext
+        //MyState::DemoNext
         //------------------------------------------------------------------------------------------
         app
         .add_system
         (   goto_title //無条件⇒TitleDemo
-            .in_set( OnUpdate( GameState::DemoLoop ) )
+            .in_set( OnUpdate( MyState::DemoLoop ) )
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -79,9 +79,9 @@ fn init_demoplay_record
 
 //無条件でStateを更新⇒TitleDemo
 fn goto_title
-(   mut state: ResMut<NextState<GameState>>,
+(   mut state: ResMut<NextState<MyState>>,
 )
-{   state.set( GameState::TitleDemo );
+{   state.set( MyState::TitleDemo );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

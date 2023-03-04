@@ -4,10 +4,10 @@ use super::*;
 pub struct SpawnTextUi;
 impl Plugin for SpawnTextUi
 {   fn build( &self, app: &mut App )
-    {   //GameState::InitApp
+    {   //MyState::InitApp
         //------------------------------------------------------------------------------------------
         app
-        .add_system( spawn_text_ui.in_schedule( OnExit( GameState::InitApp ) ) ) //text UIのspawn
+        .add_system( spawn_text_ui.in_schedule( OnExit( MyState::InitApp ) ) ) //text UIのspawn
         ;
         //------------------------------------------------------------------------------------------
     }
