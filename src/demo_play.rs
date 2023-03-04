@@ -7,39 +7,23 @@ impl Plugin for DemoPlay
     {   //GameState::TitleDemo
         //------------------------------------------------------------------------------------------
         app
-        .add_system
-        (   init_demoplay_record //demoでのrecordの初期化
-            .before( Mark::MakeMapNewData )
-            .in_schedule( OnEnter( GameState::TitleDemo ) )
-        )
-        .add_system
-        (   map::make_new_data //新マップのデータ作成
-            .in_set( Mark::MakeMapNewData )
-            .in_schedule( OnEnter( GameState::TitleDemo ) )
-        )
         .add_systems
-        (   (   map::spawn_sprite,     //スプライトをspawnする
+        (   (   init_demoplay_record, //demoでのrecordの初期化
+                map::make_new_data.in_set( Mark::MakeMapNewData ), //新マップのデータ作成
+                map::spawn_sprite,     //スプライトをspawnする
                 player::spawn_sprite,  //スプライトをspawnする
                 chasers::spawn_sprite, //スプライトをspawnする
             )
-            .after( Mark::MakeMapNewData )
+            .chain()
             .in_schedule( OnEnter( GameState::TitleDemo ) )
         )
-        .add_system
-        (   player::scoring_and_clear_stage //スコアリング＆クリア判定⇒DemoLoop
-            .before( Mark::DetectCollisions )
-            .in_set( OnUpdate( GameState::TitleDemo ) )
-        )
-        .add_system
-        (   chasers::detect_collisions //衝突判定⇒DemoLoop
-            .in_set( Mark::DetectCollisions )
-            .in_set( OnUpdate( GameState::TitleDemo ) )
-        )
         .add_systems
-        (   (   player::move_sprite,  //スプライト移動
+        (   (   player::scoring_and_clear_stage, //スコアリング＆クリア判定⇒DemoLoop
+                chasers::detect_collisions.in_set( Mark::DetectCollisions ), //衝突判定⇒DemoLoop
+                player::move_sprite,  //スプライト移動
                 chasers::move_sprite, //スプライト移動
             )
-            .after( Mark::DetectCollisions )
+            .chain()
             .in_set( OnUpdate( GameState::TitleDemo ) )
         )
         ;

@@ -61,18 +61,12 @@ impl Plugin for GamePlay
         .add_systems
         (   (   show_component::<TextUiStart>,       //text UI（Start）表示
                 set_countdown_params::<TextUiStart>, //カウントダウンタイマー初期化
-                map::make_new_data,                  //新マップのデータ作成
-            )
-            .in_set( Mark::MakeMapNewData )
-            .in_schedule( OnEnter( GameState::StageStart ) )
-        )
-
-        .add_systems
-        (   (   map::spawn_sprite,     //スプライトをspawnする
+                map::make_new_data.in_set( Mark::MakeMapNewData ), //新マップのデータ作成
+                map::spawn_sprite,     //スプライトをspawnする
                 player::spawn_sprite,  //スプライトをspawnする
                 chasers::spawn_sprite, //スプライトをspawnする
             )
-            .after( Mark::MakeMapNewData )
+            .chain()
             .in_schedule( OnEnter( GameState::StageStart ) )
         )
         .add_system
@@ -89,21 +83,13 @@ impl Plugin for GamePlay
         //GameState::MainLoop
         //------------------------------------------------------------------------------------------
         app
-        .add_system
-        (   player::scoring_and_clear_stage //スコアリング＆クリア判定⇒StageClear
-            .before( Mark::DetectCollisions )
-            .in_set( OnUpdate( GameState::MainLoop ) )
-        )
-        .add_system
-        (   chasers::detect_collisions //衝突判定⇒GameOver
-            .in_set( Mark::DetectCollisions )
-            .in_set( OnUpdate( GameState::MainLoop ) )
-        )
         .add_systems
-        (   (   player::move_sprite,  //スプライト移動
+        (   (   player::scoring_and_clear_stage, //スコアリング＆クリア判定⇒StageClear
+                chasers::detect_collisions.in_set( Mark::DetectCollisions ), //衝突判定⇒GameOver
+                player::move_sprite,  //スプライト移動
                 chasers::move_sprite, //スプライト移動
             )
-            .after( Mark::DetectCollisions )      
+            .chain()
             .in_set( OnUpdate( GameState::MainLoop ) )
         )
         ;
