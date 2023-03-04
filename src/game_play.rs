@@ -85,9 +85,9 @@ impl Plugin for GamePlay
         app
         .add_systems
         (   (   player::scoring_and_clear_stage, //スコアリング＆クリア判定⇒StageClear
-                chasers::detect_collisions.in_set( MyLabel::DetectCollisions ), //衝突判定⇒GameOver
-                player::move_sprite,  //スプライト移動
-                chasers::move_sprite, //スプライト移動
+                chasers::detect_collisions,      //衝突判定⇒GameOver
+                player::move_sprite,             //スプライト移動
+                chasers::move_sprite,            //スプライト移動
             )
             .chain()
             .in_set( OnUpdate( MyState::MainLoop ) )
