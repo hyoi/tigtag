@@ -208,8 +208,7 @@ pub fn scoring_and_clear_stage
     mut map: ResMut<Map>,
     ( state, mut next_state ): ( Res<State<MyState>>, ResMut<NextState<MyState>> ),
     mut ev_clear: EventWriter<EventClear>,
-//# ( mut cmds, asset_svr, audio ): ( Commands, Res<AssetServer>, Res<Audio> ),
-    ( mut cmds,                  ): ( Commands,                              ),
+    ( mut cmds, asset_svr, audio ): ( Commands, Res<AssetServer>, Res<Audio> ),
 )
 {   if let Ok ( player ) = q1.get_single()
     {   //自機の位置にドットがあるなら
@@ -224,8 +223,10 @@ pub fn scoring_and_clear_stage
             //スコア更新
             record.score += 1;
             map.remaining_dots -= 1;
-//#         audio.set_volume( VOLUME_SOUND_BEEP );
-//#         audio.play( asset_svr.load( ASSETS_SOUND_BEEP ) );
+            audio.play_with_settings
+            (   asset_svr.load( ASSETS_SOUND_BEEP ),
+                PlaybackSettings::ONCE.with_volume( VOLUME_SOUND_BEEP ),
+            );
 
             //ハイスコアの更新
             if ! state.0.is_demoplay() && record.score > record.hi_score
