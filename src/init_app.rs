@@ -16,7 +16,7 @@ impl Plugin for InitApp
         {   title     : APP_TITLE.to_string(),
             resolution: ( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT ).into(),
             resizable : false,
-            // fit_canvas_to_parent: true, //FIX v0.6.1: Android Chromeで発生する不具合を回避
+            fit_canvas_to_parent: true, //Android Chromeで不具合が発生する場合コメントアウトする
             ..default()
         };
         let primary_window = Some( window );
