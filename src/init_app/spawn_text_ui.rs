@@ -4,13 +4,10 @@ use super::*;
 pub struct SpawnTextUi;
 impl Plugin for SpawnTextUi
 {   fn build( &self, app: &mut App )
-    {   //GameState::Init
+    {   //MyState::InitApp
         //------------------------------------------------------------------------------------------
         app
-        .add_system_set
-        (   SystemSet::on_exit( GameState::InitApp )        //<EXIT>
-            .with_system( spawn_text_ui )                   //text UIのspawn
-        )
+        .add_system( spawn_text_ui.in_schedule( OnExit( MyState::InitApp ) ) ) //text UIのspawn
         ;
         //------------------------------------------------------------------------------------------
     }
@@ -64,50 +61,50 @@ fn spawn_text_ui
     );
 
     //中央
-    let mut ui_title = text_ui( &CENTER_TITLE_TEXT, HorizontalAlign::Right , &asset_svr );
-    let mut ui_demo  = text_ui( &CENTER_DEMO_TEXT , HorizontalAlign::Center, &asset_svr );
-    let mut ui_start = text_ui( &CENTER_START_TEXT, HorizontalAlign::Center, &asset_svr );
-    let mut ui_over  = text_ui( &CENTER_OVER_TEXT , HorizontalAlign::Center, &asset_svr );
-    let mut ui_clear = text_ui( &CENTER_CLEAR_TEXT, HorizontalAlign::Center, &asset_svr );
-    let mut ui_pause = text_ui( &CENTER_PAUSE_TEXT, HorizontalAlign::Center, &asset_svr );
+    let mut ui_title = text_ui( &CENTER_TITLE_TEXT, TextAlignment::Right , &asset_svr );
+    let mut ui_demo  = text_ui( &CENTER_DEMO_TEXT , TextAlignment::Center, &asset_svr );
+    let mut ui_start = text_ui( &CENTER_START_TEXT, TextAlignment::Center, &asset_svr );
+    let mut ui_over  = text_ui( &CENTER_OVER_TEXT , TextAlignment::Center, &asset_svr );
+    let mut ui_clear = text_ui( &CENTER_CLEAR_TEXT, TextAlignment::Center, &asset_svr );
+    let mut ui_pause = text_ui( &CENTER_PAUSE_TEXT, TextAlignment::Center, &asset_svr );
 
     ui_title.style.position_type = PositionType::Relative;
     ui_demo.style.position_type  = PositionType::Relative;
 
-    ui_title.visibility.is_visible = true; //親のvisibility.is_visibleで表示を制御する
-    ui_demo.visibility.is_visible  = true; //親のvisibility.is_visibleで表示を制御する
-    ui_start.visibility.is_visible = false;
-    ui_over.visibility.is_visible  = false;
-    ui_clear.visibility.is_visible = false;
-    ui_pause.visibility.is_visible = false;
+    ui_title.visibility = Visibility::Inherited; //親のvisibility.is_visibleで表示を制御する
+    ui_demo.visibility  = Visibility::Inherited; //親のvisibility.is_visibleで表示を制御する
+    ui_start.visibility = Visibility::Hidden;
+    ui_over.visibility  = Visibility::Hidden;
+    ui_clear.visibility = Visibility::Hidden;
+    ui_pause.visibility = Visibility::Hidden;
 
     //ヘッダー
-    let mut ui_header_left   = text_ui( &HEADER_LEFT_TEXT  , HorizontalAlign::Center, &asset_svr );
-    let mut ui_header_center = text_ui( &HEADER_CENTER_TEXT, HorizontalAlign::Center, &asset_svr );
-    let mut ui_header_right  = text_ui( &HEADER_RIGHT_TEXT , HorizontalAlign::Center, &asset_svr );
+    let mut ui_header_left   = text_ui( &HEADER_LEFT_TEXT  , TextAlignment::Center, &asset_svr );
+    let mut ui_header_center = text_ui( &HEADER_CENTER_TEXT, TextAlignment::Center, &asset_svr );
+    let mut ui_header_right  = text_ui( &HEADER_RIGHT_TEXT , TextAlignment::Center, &asset_svr );
 
     ui_header_left.style.align_self = AlignSelf::FlexStart;
-    ui_header_left.text.alignment.horizontal = HorizontalAlign::Left;
+    ui_header_left.text.alignment = TextAlignment::Left;
 
     ui_header_center.style.align_self = AlignSelf::Center;
-    ui_header_center.text.alignment.horizontal = HorizontalAlign::Center;
+    ui_header_center.text.alignment = TextAlignment::Center;
 
     ui_header_right.style.align_self = AlignSelf::FlexEnd;
-    ui_header_right.text.alignment.horizontal = HorizontalAlign::Right;
+    ui_header_right.text.alignment = TextAlignment::Right;
 
     //フッター
-    let mut ui_footer_left   = text_ui( &FOOTER_LEFT_TEXT  , HorizontalAlign::Center, &asset_svr );
-    let mut ui_footer_center = text_ui( &FOOTER_CENTER_TEXT, HorizontalAlign::Center, &asset_svr );
-    let mut ui_footer_right  = text_ui( &FOOTER_RIGHT_TEXT , HorizontalAlign::Center, &asset_svr );
+    let mut ui_footer_left   = text_ui( &FOOTER_LEFT_TEXT  , TextAlignment::Center, &asset_svr );
+    let mut ui_footer_center = text_ui( &FOOTER_CENTER_TEXT, TextAlignment::Center, &asset_svr );
+    let mut ui_footer_right  = text_ui( &FOOTER_RIGHT_TEXT , TextAlignment::Center, &asset_svr );
 
     ui_footer_left.style.align_self = AlignSelf::FlexStart;
-    ui_footer_left.text.alignment.horizontal = HorizontalAlign::Left;
+    ui_footer_left.text.alignment = TextAlignment::Left;
 
     ui_footer_center.style.align_self = AlignSelf::Center;
-    ui_footer_center.text.alignment.horizontal = HorizontalAlign::Center;
+    ui_footer_center.text.alignment = TextAlignment::Center;
 
     ui_footer_right.style.align_self = AlignSelf::FlexEnd;
-    ui_footer_right.text.alignment.horizontal = HorizontalAlign::Right;
+    ui_footer_right.text.alignment = TextAlignment::Right;
 
     //隠しフレームの上に子要素を作成する
     cmds.spawn( center_frame ).with_children
@@ -166,7 +163,7 @@ fn hidden_frame
 //text UI用にTextBundleを作る
 fn text_ui
 (   message: &[ MessageSect ],
-    horizontal: HorizontalAlign,
+    alignment: TextAlignment,
     asset_svr: &Res<AssetServer>,
 ) -> TextBundle
 {   let mut sections = Vec::new();
@@ -179,13 +176,9 @@ fn text_ui
         };
         sections.push( TextSection { value, style } );
     }
-    let alignment = TextAlignment
-    {   vertical  : VerticalAlign::Center,
-        horizontal,
-    };
     let position_type = PositionType::Absolute;
 
-    let text  = Text { sections, alignment };
+    let text  = Text { sections, alignment, ..default() };
     let style = Style { position_type, ..default() };
     TextBundle { text, style, ..default() }
 }

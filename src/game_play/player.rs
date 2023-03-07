@@ -58,7 +58,7 @@ pub fn spawn_sprite
 pub fn move_sprite
 (   ( mut q_player, q_chasers ): ( Query<(&mut Player, &mut Transform)>, Query<&Chaser> ),
     map: Res<Map>,
-    state: ResMut<State<GameState>>,
+    state: ResMut<State<MyState>>,
     ( mut ev_clear, mut ev_over ): ( EventReader<EventClear>, EventReader<EventOver> ),
     ( inkey, time ): ( Res<Input<KeyCode>>, Res<Time> ),
     cross_button: Res<GamepadCrossButton>,
@@ -83,7 +83,7 @@ pub fn move_sprite
         let mut new_side = player.side;
         player.stop = true; //停止フラグを立てる
 
-        if ! state.current().is_demoplay() //demoでないなら
+        if ! state.0.is_demoplay() //demoでないなら
         {   if ! cross_button.is_empty() //パッド十字キー入力があるなら
             {   let cross_button = cross_button.sides_list();
                 for &side in cross_button
@@ -206,7 +206,7 @@ pub fn scoring_and_clear_stage
     mut _q2: Query<( &mut Text, &TextUiNumTile )>,
     mut record: ResMut<Record>,
     mut map: ResMut<Map>,
-    mut state: ResMut<State<GameState>>,
+    ( state, mut next_state ): ( Res<State<MyState>>, ResMut<NextState<MyState>> ),
     mut ev_clear: EventWriter<EventClear>,
     ( mut cmds, asset_svr, audio ): ( Commands, Res<AssetServer>, Res<Audio> ),
 )
@@ -223,26 +223,28 @@ pub fn scoring_and_clear_stage
             //スコア更新
             record.score += 1;
             map.remaining_dots -= 1;
-            audio.set_volume( VOLUME_SOUND_BEEP );
-            audio.play( asset_svr.load( ASSETS_SOUND_BEEP ) );
+            audio.play_with_settings
+            (   asset_svr.load( ASSETS_SOUND_BEEP ),
+                PlaybackSettings::ONCE.with_volume( VOLUME_SOUND_BEEP ),
+            );
 
             //ハイスコアの更新
-            if ! state.current().is_demoplay() && record.score > record.hi_score
+            if ! state.0.is_demoplay() && record.score > record.hi_score
             {   record.hi_score = record.score;
             }
 
             //全ドットを拾ったら、Clearへ遷移する
             if map.remaining_dots <= 0
             {   let next =
-                {   if state.current().is_demoplay()
+                {   if state.0.is_demoplay()
                     {   record.demo.clear_flag = true;
-                        GameState::DemoLoop
+                        MyState::DemoLoop
                     }
                     else
-                    {   GameState::StageClear
+                    {   MyState::StageClear
                     }
                 };
-                let _ = state.overwrite_set( next );
+                next_state.set( next );
                 ev_clear.send( EventClear );    //後続の処理にクリアを伝える
             }
         }

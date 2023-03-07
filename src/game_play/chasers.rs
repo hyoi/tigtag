@@ -208,27 +208,28 @@ pub fn move_sprite
 pub fn detect_collisions
 (   q_player: Query<&Player>,
     q_chaser: Query<&Chaser>,
-    mut state: ResMut<State<GameState>>,
+    state: Res<State<MyState>>,
+    mut next_state: ResMut<NextState<MyState>>,
     mut ev_over: EventWriter<EventOver>,
     mut record: ResMut<Record>,
 )
 {   //クリアしておらず、且つ衝突判定が真なら、衝突処理する
-    if ! state.current().is_stageclear() && is_collision( q_player, q_chaser )
+    if ! state.0.is_stageclear() && is_collision( q_player, q_chaser )
     {   let next =
-        {   if state.current().is_demoplay()
+        {   if state.0.is_demoplay()
             {   //Demoの場合、記録を残す
                 if record.score > record.demo.hi_score
                 {   record.demo.hi_score = record.score;
                     record.demo.stage    = record.stage;
                 }
 
-                GameState::DemoLoop
+                MyState::DemoLoop
             }
             else
-            {   GameState::GameOver
+            {   MyState::GameOver
             }
         };
-        let _ = state.overwrite_set( next );
+        next_state.set( next );
         ev_over.send( EventOver );    //後続の処理にゲームオーバーを伝える
     }
 }

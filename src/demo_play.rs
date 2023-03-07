@@ -4,41 +4,27 @@ use super::*;
 pub struct DemoPlay;
 impl Plugin for DemoPlay
 {   fn build( &self, app: &mut App )
-    {   //GameState::TitleDemo
+    {   //MyState::TitleDemo
         //------------------------------------------------------------------------------------------
         app
-        .add_system_set
-        (   SystemSet::on_enter( GameState::TitleDemo )         //<ENTER>
-            .before( Mark::MakeMapNewData )                     //<label>
-            .with_system( init_demoplay_record )                //demoでのrecordの初期化
+        .add_systems
+        (   (   init_demoplay_record, //demoでのrecordの初期化
+                map::make_new_data.in_set( MyLabel::MakeMapNewData ), //新マップのデータ作成
+                map::spawn_sprite,     //スプライトをspawnする
+                player::spawn_sprite,  //スプライトをspawnする
+                chasers::spawn_sprite, //スプライトをspawnする
+            )
+            .chain()
+            .in_schedule( OnEnter( MyState::TitleDemo ) )
         )
-        .add_system_set
-        (   SystemSet::on_enter( GameState::TitleDemo )         //<ENTER>
-            .label( Mark::MakeMapNewData )                      //<label>
-            .with_system( map::make_new_data )                  //新マップのデータ作成
-        )
-        .add_system_set
-        (   SystemSet::on_enter( GameState::TitleDemo )         //<ENTER>
-            .after( Mark::MakeMapNewData )                      //<after>
-            .with_system( map::spawn_sprite )                   //スプライトをspawnする
-            .with_system( player::spawn_sprite )                //スプライトをspawnする
-            .with_system( chasers::spawn_sprite )               //スプライトをspawnする
-        )
-        .add_system_set
-        (   SystemSet::on_update( GameState::TitleDemo )        //<UPDATE>
-            .before( Mark::DetectCollisions )                   //<before>
-            .with_system( player::scoring_and_clear_stage )     //スコアリング＆クリア判定⇒DemoLoop
-        )
-        .add_system_set
-        (   SystemSet::on_update( GameState::TitleDemo )        //<UPDATE>
-            .label( Mark::DetectCollisions )                    //<label>
-            .with_system( chasers::detect_collisions )          //衝突判定⇒DemoLoop
-        )
-        .add_system_set
-        (   SystemSet::on_update( GameState::TitleDemo )        //<UPDATE>
-            .after( Mark::DetectCollisions )                    //<after>
-            .with_system( player::move_sprite )                 //スプライト移動
-            .with_system( chasers::move_sprite )                //スプライト移動
+        .add_systems
+        (   (   player::scoring_and_clear_stage, //スコアリング＆クリア判定⇒DemoLoop
+                chasers::detect_collisions.in_set( MyLabel::DetectCollisions ), //衝突判定⇒DemoLoop
+                player::move_sprite,  //スプライト移動
+                chasers::move_sprite, //スプライト移動
+            )
+            .chain()
+            .in_set( OnUpdate( MyState::TitleDemo ) )
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -46,28 +32,28 @@ impl Plugin for DemoPlay
         //debugy用スプライトの制御
         #[cfg( debug_assertions )]
         app
-        .add_system_set
-        (   SystemSet::on_enter( GameState::TitleDemo )         //<ENTER>
-            .after( Mark::MakeMapNewData )                      //<after>
-            .with_system( spawn_debug_sprite )                  //スプライトをspawnする
+        .add_system
+        (   spawn_debug_sprite //スプライトをspawnする
+            .after( MyLabel::MakeMapNewData )
+            .in_schedule( OnEnter( MyState::TitleDemo ) )
         )
-        .add_system_set
-        (   SystemSet::on_update( GameState::TitleDemo )        //<UPDATE>
-            .after( Mark::DetectCollisions )                    //<after>
-            .with_system( update_debug_sprite )                 //スプライト移動
+        .add_system
+        (   update_debug_sprite //スプライト移動
+            .after( MyLabel::DetectCollisions )
+            .in_set( OnUpdate( MyState::TitleDemo ) )
         )
-        .add_system_set
-        (   SystemSet::on_exit( GameState::TitleDemo )          //<EXIT>
-            .with_system( despawn_entity::<DotsRect> )          //スプライト削除
+        .add_system
+        (   despawn_entity::<DotsRect> //スプライト削除
+            .in_schedule( OnExit( MyState::TitleDemo ) )
         )
         ;
 
-        //GameState::DemoNext
+        //MyState::DemoNext
         //------------------------------------------------------------------------------------------
         app
-        .add_system_set
-        (   SystemSet::on_update( GameState::DemoLoop )         //<UPDATE>
-            .with_system( goto_title )                          //無条件⇒TitleDemo
+        .add_system
+        (   goto_title //無条件⇒TitleDemo
+            .in_set( OnUpdate( MyState::DemoLoop ) )
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -93,9 +79,9 @@ fn init_demoplay_record
 
 //無条件でStateを更新⇒TitleDemo
 fn goto_title
-(   mut state: ResMut<State<GameState>>,
+(   mut state: ResMut<NextState<MyState>>,
 )
-{   let _ = state.overwrite_set( GameState::TitleDemo );
+{   state.set( MyState::TitleDemo );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

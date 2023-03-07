@@ -10,11 +10,14 @@ pub fn spawn_camera( mut cmds: Commands )
 //ウィンドウとフルスクリーンを切り替える
 #[cfg( not( target_arch = "wasm32" ) )]
 pub fn toggle_window_mode
-(   inkey: Res<Input<KeyCode>>,
+(   mut windows: Query<&mut Window>,
+    inkey: Res<Input<KeyCode>>,
     inbtn: Res<Input<GamepadButton>>,
-    mut window: ResMut<Windows>,
 )
-{   //パッドのボタンの状態
+{   //ウィンドウが見つからなければ関数脱出
+    let Ok( mut window ) = windows.get_single_mut() else { return };
+
+   //パッドのボタンの状態
     let btn_fullscreen = GamepadButton::new( GAMEPAD, _BUTTON_FULLSCREEN );
     let is_btn_fullscreen = inbtn.just_pressed( btn_fullscreen );
 
@@ -26,11 +29,10 @@ pub fn toggle_window_mode
     //入力がないなら関数脱出
     if ! is_key_fullscreen && ! is_btn_fullscreen { return }
 
+    //ウィンドウとフルスクリーンを切り替える
     use bevy::window::WindowMode::*;
-    if let Some( window ) = window.get_primary_mut()
-    {   let mode = if window.mode() == Windowed { SizedFullscreen } else { Windowed };
-        window.set_mode( mode );
-    }
+    let mode = if window.mode == Windowed { SizedFullscreen } else { Windowed };
+    window.mode = mode;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,9 +40,10 @@ pub fn toggle_window_mode
 //一時停止する
 pub fn pause_with_esc_key
 (   q: Query<&mut Visibility, With<TextUiPause>>,
-    mut state: ResMut<State<GameState>>,
+    mut state: ResMut<State<MyState>>,
     mut inkey: ResMut<Input<KeyCode>>,
     inbtn: Res<Input<GamepadButton>>,
+    mut old_state: Local<MyState>,
 )
 {   //パッドのボタン
     let btn_pause = GamepadButton::new( GAMEPAD, BUTTON_PAUSE );
@@ -49,13 +52,14 @@ pub fn pause_with_esc_key
     if ! inkey.just_pressed( KEY_PAUSE ) && ! inbtn.just_pressed( btn_pause ) { return }
 
     //PAUSEのトグル処理
-    if state.current().is_pause()
+    if state.0.is_pause()
     {   hide_component( q );
-        let _ = state.pop();
+        state.0 = *old_state;
     }
     else
     {   show_component( q );
-        let _ = state.push( GameState::Pause );
+        *old_state = state.0;
+        state.0 = MyState::Pause;
     }
 
     //NOTE: https://bevy-cheatbook.github.io/programming/states.html#with-input
@@ -68,14 +72,14 @@ pub fn pause_with_esc_key
 pub fn show_component<T: Component>
 (   mut q: Query<&mut Visibility, With<T>>,
 )
-{   let _ = q.get_single_mut().map( | mut ui | ui.is_visible = true );
+{   let _ = q.get_single_mut().map( | mut ui | *ui = Visibility::Inherited );
 }
 
 //Componentを隠す
 pub fn hide_component<T: Component>
 (   mut q: Query<&mut Visibility, With<T>>,
 )
-{   let _ = q.get_single_mut().map( | mut ui | ui.is_visible = false );
+{   let _ = q.get_single_mut().map( | mut ui | *ui = Visibility::Hidden );
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

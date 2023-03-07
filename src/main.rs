@@ -1,8 +1,8 @@
 //import external modules
 use bevy::{ prelude::*, sprite::* };
-use bevy_kira_audio::{ Audio, AudioPlugin, AudioControl };
 use once_cell::sync::*;
 use rand::prelude::*;
+use counted_array::*;
 
 //internal submodules
 mod public;
@@ -16,7 +16,7 @@ use game_play::*;
 use demo_play::*;
 
 fn main()
-{   //bevy_kira_audioが標準出力へInfoを出力するのを抑止
+{   //コンソールへログを出力するのを抑止
     #[cfg( not( target_arch = "wasm32" ) )]
     std::env::set_var( "RUST_LOG", "OFF" );
 

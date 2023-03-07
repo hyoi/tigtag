@@ -1,30 +1,11 @@
 [package]
 name = "tigtag"
-version = "0.6.3"
+version = "0.7.0"
 edition = "2021"
 
-[dependencies.bevy]
-version = "0.9"
-default-features = false
-# These are the remaining default features other than `bevy_audio` and `vorbis`
-# https://github.com/bevyengine/bevy/blob/v0.8.0/Cargo.toml#L28-L39
-features = [
-  "animation",
-  "bevy_asset",
-# "bevy_audio",
-  "bevy_gilrs",
-  "bevy_scene",
-  "bevy_winit",
-  "render",
-  "png",
-  "hdr",
-# "vorbis",
-  "x11",
-  "filesystem_watcher",
-]
-
 [dependencies]
-#bevy = "0.9"
-bevy_kira_audio = "0.13"
+#bevy = { git = "https://github.com/bevyengine/bevy" } #Master branch
+bevy = "0.10"
+counted-array = "0.1"
 once_cell = "1"
 rand = "0.8"
