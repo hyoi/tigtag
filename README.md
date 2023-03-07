@@ -40,7 +40,6 @@ cargo install -f wasm-bindgen-cli
 　[Unofficial Bevy Cheat Book - 13.5. Browser (WebAssembly)](https://bevy-cheatbook.github.io/platforms/wasm.html)をご参考に。   
 ## お世話になりました
 - [bevy](https://bevyengine.org/)と[その仲間たち](https://crates.io/search?q=bevy)
-  - [bevy_kira_audio](https://github.com/NiklasEi/bevy_kira_audio)
   - [Unofficial Bevy Cheat Book](https://bevy-cheatbook.github.io/)
 - [Google Fonts](https://fonts.google.com/)
   - [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P)
@@ -50,10 +49,7 @@ cargo install -f wasm-bindgen-cli
 - [ドット絵ダウンロードサイト DOTOWN](https://dotown.maeda-design-room.net/)
   - Rustだから蟹 <img src="./assets/sprites/kani_DOTOWN.png" width="22" height="16" style="vertical-align: bottom;">
 ## 宿題
-- [x] (v0.2.2)音を鳴らしたい。beep音でいいから
-- [x] (v0.5.0)全部 なおしたい なおしたい 病（リファクタリングにいたる病）
-- [x] (v0.5.1)demoで稀に面クリするくらいに自機の逃走アルゴリズムを鍛えたい
-  - [X] (v0.6.3)もちょっと鍛える余地がありそう。アイディアはあるんだが～
-- [x] (v0.5.3)自機がドットのある道を通る時、WASMだとFPSが駄々下がるのをナントカしないと‥‥
-- [x] (v0.6.2)パッドで操作できるようにしたい
-- [ ] タッチ操作できたら、ブラウザ＆WASMでスマホ上で遊べる‥‥？
+- [x] bevyの最新リリースに対応させる。v0.10 対応完了。
+- [ ] Schedule v3へ最適化したい。
+- [ ] スマホでプレーできるようにしたい。
+  - [ ] タッチ操作できたらブラウザ＆WASMでスマホ上で遊べるかも？
