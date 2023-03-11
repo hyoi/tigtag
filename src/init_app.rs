@@ -41,8 +41,8 @@ impl Plugin for InitApp
 
         //共通のSystem
         app
-        .add_startup_system( spawn_camera )     //bevyのカメラ
-        .add_system( pause_with_esc_key )       //[Esc]でPause
+        .add_system( spawn_camera.on_startup() ) //bevyのカメラ
+        .add_system( pause_with_esc_key )        //[Esc]でPause
         ;
 
         //Not WASM用System
