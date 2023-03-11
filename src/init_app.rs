@@ -23,8 +23,11 @@ impl Plugin for InitApp
         app
         .insert_resource( ClearColor( SCREEN_BACKGROUND_COLOR ) )
         .insert_resource( Msaa::Sample4 )
-        .add_plugins( DefaultPlugins.set( WindowPlugin { primary_window, ..default() } ) )
-        ;
+        .add_plugins
+        (   DefaultPlugins
+            .set( WindowPlugin { primary_window, ..default() } )
+            .set( ImagePlugin::default_nearest() ) //pixel perfect style
+        );
 
         //ResourceとEvent
         app
