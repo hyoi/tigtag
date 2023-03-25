@@ -15,6 +15,7 @@ pub use player_chaser::*;
 //ゲームの状態
 #[allow( dead_code )]
 #[derive( Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States )]
+#[derive( MyConstState )]
 pub enum MyState
 {   #[default] InitApp,
     TitleDemo, DemoLoop,

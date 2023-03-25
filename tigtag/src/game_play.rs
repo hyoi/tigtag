@@ -32,15 +32,15 @@ impl Plugin for GamePlay
         app
         .add_system
         (   show_component::<TextUiTitle> //text UI（Title）表示
-            .in_schedule( OnEnter( MyState::TitleDemo ) )
+            .in_schedule( ENTER_TITLEDEMO )
         )
         .add_system
         (   into_next_state_with_key::<TextUiTitle> //SPACEキー入力⇒GameStart
-            .in_set( OnUpdate( MyState::TitleDemo ) )
+            .in_set( UPDATE_TITLEDEMO )
         )
         .add_system
         (   hide_component::<TextUiTitle> //text UI（Title）消去
-            .in_schedule( OnExit( MyState::TitleDemo ) )
+            .in_schedule( EXIT_TITLEDEMO )
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ impl Plugin for GamePlay
         app
         .add_system
         (   init_gameplay_record //初期化後 無条件⇒StageStart
-            .in_set( OnUpdate( MyState::GameStart ) )
+            .in_set( UPDATE_GAMESTART )
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -66,16 +66,15 @@ impl Plugin for GamePlay
                 player::spawn_sprite,  //スプライトをspawnする
                 chasers::spawn_sprite, //スプライトをspawnする
             )
-            .chain()
-            .in_schedule( OnEnter( MyState::StageStart ) )
+            .chain().in_schedule( ENTER_STAGESTART )
         )
         .add_system
         (   countdown_message::<TextUiStart> //カウントダウン後⇒MainLoop
-            .in_set( OnUpdate( MyState::StageStart ) )
+            .in_set( UPDATE_STAGESTART )
         )
         .add_system
         (   hide_component::<TextUiStart> //text UI（Start）消去
-            .in_schedule( OnExit( MyState::StageStart ) )
+            .in_schedule( EXIT_STAGESTART )
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -89,8 +88,7 @@ impl Plugin for GamePlay
                 player::move_sprite,             //スプライト移動
                 chasers::move_sprite,            //スプライト移動
             )
-            .chain()
-            .in_set( OnUpdate( MyState::MainLoop ) )
+            .chain().in_set( UPDATE_MAINLOOP )
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -102,15 +100,15 @@ impl Plugin for GamePlay
         (   (   show_component::<TextUiClear>,       //text UI（StageClear）表示
                 set_countdown_params::<TextUiClear>, //カウントダウンタイマー初期化
             )
-            .in_schedule( OnEnter( MyState::StageClear ) )
+            .in_schedule( ENTER_STAGECLEAR )
         )
         .add_system
         (   countdown_message::<TextUiClear> //カウントダウン後⇒StageStart
-            .in_set( OnUpdate( MyState::StageClear ) )
+            .in_set( UPDATE_STAGECLEAR )
         )
         .add_system
         (   hide_component::<TextUiClear> //text UI（StageClear）消去
-            .in_schedule( OnExit( MyState::StageClear ) )
+            .in_schedule( EXIT_STAGECLEAR )
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -122,17 +120,17 @@ impl Plugin for GamePlay
         (   (   show_component::<TextUiOver>,       //text UI（GameOver）表示
                 set_countdown_params::<TextUiOver>, //カウントダウンタイマー初期化
             )
-            .in_schedule( OnEnter( MyState::GameOver ) )
+            .in_schedule( ENTER_GAMEOVER )
         )
         .add_systems
         (   (   countdown_message::<TextUiOver>,        //カウントダウン後⇒TitleDemo
                 into_next_state_with_key::<TextUiOver>, //SPACEキー入力⇒GameStart
             )
-            .in_set( OnUpdate ( MyState::GameOver ) )
+            .in_set( UPDATE_GAMEOVER )
         )
         .add_system
         (   hide_component::<TextUiOver> //text UI（GameOver）消去
-            .in_schedule( OnExit( MyState::GameOver ) )
+            .in_schedule( EXIT_GAMEOVER )
         )
         ;
         //------------------------------------------------------------------------------------------

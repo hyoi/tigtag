@@ -62,7 +62,7 @@ impl Plugin for InitApp
         app
         .add_system
         (   spawn_debug_info                    //debug用の情報を表示
-            .in_schedule( OnExit( MyState::InitApp ) )
+            .in_schedule( EXIT_INITAPP )
         )
         ;
         // //------------------------------------------------------------------------------------------

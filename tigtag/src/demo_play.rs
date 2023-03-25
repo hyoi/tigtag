@@ -14,8 +14,7 @@ impl Plugin for DemoPlay
                 player::spawn_sprite,  //スプライトをspawnする
                 chasers::spawn_sprite, //スプライトをspawnする
             )
-            .chain()
-            .in_schedule( OnEnter( MyState::TitleDemo ) )
+            .chain().in_schedule( ENTER_TITLEDEMO )
         )
         .add_systems
         (   (   player::scoring_and_clear_stage, //スコアリング＆クリア判定⇒DemoLoop
@@ -23,8 +22,7 @@ impl Plugin for DemoPlay
                 player::move_sprite,  //スプライト移動
                 chasers::move_sprite, //スプライト移動
             )
-            .chain()
-            .in_set( OnUpdate( MyState::TitleDemo ) )
+            .chain().in_set( UPDATE_TITLEDEMO )
         )
         ;
         //------------------------------------------------------------------------------------------
@@ -35,16 +33,16 @@ impl Plugin for DemoPlay
         .add_system
         (   spawn_debug_sprite //スプライトをspawnする
             .after( MyLabel::MakeMapNewData )
-            .in_schedule( OnEnter( MyState::TitleDemo ) )
+            .in_schedule( ENTER_TITLEDEMO )
         )
         .add_system
         (   update_debug_sprite //スプライト移動
             .after( MyLabel::DetectCollisions )
-            .in_set( OnUpdate( MyState::TitleDemo ) )
+            .in_set( UPDATE_TITLEDEMO )
         )
         .add_system
         (   despawn_entity::<DotsRect> //スプライト削除
-            .in_schedule( OnExit( MyState::TitleDemo ) )
+            .in_schedule( EXIT_TITLEDEMO )
         )
         ;
 
@@ -53,7 +51,7 @@ impl Plugin for DemoPlay
         app
         .add_system
         (   goto_title //無条件⇒TitleDemo
-            .in_set( OnUpdate( MyState::DemoLoop ) )
+            .in_set( UPDATE_DEMOLOOP )
         )
         ;
         //------------------------------------------------------------------------------------------

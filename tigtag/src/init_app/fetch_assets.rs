@@ -8,12 +8,24 @@ impl Plugin for FetchAssets
         //------------------------------------------------------------------------------------------
         app
 //      .insert_resource( MarkAfterFetchAssets ( MyState::Debug ) ) //for debug(text UI)
-        .add_system( start_fetching_assets        .in_schedule( OnEnter( MyState::InitApp ) ) ) //Assetのロード開始
-        .add_system( spawn_sprite_now_loading     .in_schedule( OnEnter( MyState::InitApp ) ) ) //アニメ用スプライトの生成
-        .add_system( change_state_after_loading   .in_set( OnUpdate( MyState::InitApp ) ) )     //ロード完了か判定しState変更
-        .add_system( move_sprite_now_loading      .in_set( OnUpdate( MyState::InitApp ) ) )     //ローディングアニメ
-        .add_system( despawn_entity::<SpriteTile> .in_schedule( OnExit( MyState::InitApp ) ) )  //アニメ用スプライトの削除
-        .add_system( spawn_game_frame             .in_schedule( OnExit( MyState::InitApp ) ) )  //ゲームの枠の表示
+        .add_systems
+        (   (   start_fetching_assets,    //Assetのロード開始
+                spawn_sprite_now_loading, //アニメ用スプライトの生成
+            )
+            .in_schedule( ENTER_INITAPP )
+        )
+        .add_systems
+        (   (   change_state_after_loading, //ロード完了か判定しState変更
+                move_sprite_now_loading,    //ローディングアニメ
+            )
+            .in_set( UPDATE_INITAPP )
+        )
+        .add_systems
+        (   (   despawn_entity::<SpriteTile>, //アニメ用スプライトの削除
+                spawn_game_frame,             //ゲームの枠の表示
+            )
+            .in_schedule( EXIT_INITAPP )
+        )
         ;
         //------------------------------------------------------------------------------------------
     }

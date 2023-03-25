@@ -7,7 +7,7 @@ impl Plugin for SpawnTextUi
     {   //MyState::InitApp
         //------------------------------------------------------------------------------------------
         app
-        .add_system( spawn_text_ui.in_schedule( OnExit( MyState::InitApp ) ) ) //text UIのspawn
+        .add_system( spawn_text_ui.in_schedule( EXIT_INITAPP ) ) //text UIのspawn
         ;
         //------------------------------------------------------------------------------------------
     }
