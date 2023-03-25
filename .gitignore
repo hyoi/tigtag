@@ -1,7 +1,4 @@
 /.cargo/*
-/target/*
+/target
 /backup
 /Cargo.lock
-
-!/target/*_bg.wasm
-!/target/*.js
