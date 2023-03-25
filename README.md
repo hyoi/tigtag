@@ -7,7 +7,7 @@ Note: Japanese text only.
 逆襲なし、追手は重なるとスピードアップするマゾ仕様。  
 たいへん耳障りなSEが実装されています。ボリューム上げるな要注意っ (≧ω≦;)
 ## WASM版
-https://hyoi.github.io/tigtag/
+https://hyoi.github.io/tigtag/tigtag/ (workspaceを使用したらディレクトリが一段下がった‥‥)
 ## 操作方法
 ### キーボード
 - `⇧` `⇩` `⇦` `⇨` キーで上下左右に移動。
