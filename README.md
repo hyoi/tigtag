@@ -7,7 +7,7 @@ Note: Japanese text only.
 逆襲なし、追手は重なるとスピードアップするマゾ仕様。  
 たいへん耳障りなSEが実装されています。ボリューム上げるな要注意っ (≧ω≦;)
 ## WASM版
-https://hyoi.github.io/tigtag/tigtag/ (workspaceを使用したらディレクトリが一段下がった‥‥)
+[https://hyoi.github.io/tigtag/tigtag/](https://hyoi.github.io/tigtag/tigtag/) (workspaceを使用したらディレクトリが一段下がった‥‥)
 ## 操作方法
 ### キーボード
 - `⇧` `⇩` `⇦` `⇨` キーで上下左右に移動。
@@ -47,7 +47,7 @@ cargo install -f wasm-bindgen-cli
   - [Reggae One](https://fonts.google.com/specimen/Reggae+One)
   - [BIZ UDPGothic](https://fonts.google.com/specimen/BIZ+UDPGothic)
 - [ドット絵ダウンロードサイト DOTOWN](https://dotown.maeda-design-room.net/)
-  - Rustだから蟹 <img src="./assets/sprites/kani_DOTOWN.png" width="22" height="16" style="vertical-align: bottom;">
+  - Rustだから蟹 <img src="./assets/sprites/kani_DOTOWN.png" width="22" height="16" style="vertical-align: bottom;">  
 ## 宿題
 - [x] bevyの最新リリースに対応させる。v0.10 対応完了。
 - [ ] Schedule v3へ最適化したい。
