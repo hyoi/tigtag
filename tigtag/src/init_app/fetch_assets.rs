@@ -4,9 +4,7 @@ use super::*;
 pub struct FetchAssets;
 impl Plugin for FetchAssets
 {   fn build( &self, app: &mut App )
-    {   //MyState::InitApp
-        //------------------------------------------------------------------------------------------
-        app
+    {   app
 //      .insert_resource( MarkAfterFetchAssets ( MyState::Debug ) ) //for debug(text UI)
         .add_systems
         (   (   start_fetching_assets,    //Assetのロード開始
@@ -22,12 +20,10 @@ impl Plugin for FetchAssets
         )
         .add_systems
         (   (   despawn_entity::<SpriteTile>, //アニメ用スプライトの削除
-                spawn_game_frame,             //ゲームの枠の表示
             )
             .in_schedule( EXIT_INITAPP )
         )
         ;
-        //------------------------------------------------------------------------------------------
     }
 }
 

@@ -2,10 +2,9 @@ use super::*;
 
 //submodules
 mod fetch_assets;
-mod spawn_text_ui;
+mod text_ui;
 
 use fetch_assets::*;
-use spawn_text_ui::*;
 
 //プラグインの設定
 pub struct InitApp;
@@ -20,6 +19,7 @@ impl Plugin for InitApp
             ..default()
         };
         let primary_window = Some( window );
+
         app
         .insert_resource( ClearColor( SCREEN_BACKGROUND_COLOR ) )
         .insert_resource( Msaa::Sample4 )
@@ -31,18 +31,29 @@ impl Plugin for InitApp
 
         //ResourceとEvent
         app
-        .add_state::<MyState>()                 //Stateの初期化
-        .init_resource::<Record>()              //スコア等の初期化
-        .init_resource::<CountDown>()           //カウントダウンタイマーの初期化
-        .init_resource::<Map>()                 //迷路情報の初期化
-        .add_event::<EventClear>()              //ステージクリアイベント
-        .add_event::<EventOver>()               //ゲームオーバーイベント
+        .add_state::<MyState>()       //Stateの初期化
+        .init_resource::<Record>()    //スコア等の初期化
+        .init_resource::<CountDown>() //カウントダウンタイマーの初期化
+        .init_resource::<Map>()       //迷路情報の初期化
+        .add_event::<EventClear>()    //ステージクリアイベント
+        .add_event::<EventOver>()     //ゲームオーバーイベント
         ;
 
-        //共通のSystem
+        //Systemの登録
         app
-        .add_system( spawn_camera.on_startup() ) //bevyのカメラ
-        .add_system( pause_with_esc_key )        //[Esc]でPause
+        .add_systems
+        (   (   spawn_camera.on_startup(), //bevyのカメラ
+                pause_with_esc_key,        //[Esc]でPause
+            )
+        )
+        .add_plugin( FetchAssets ) //Assets(Fonts、Sprites等)のロード
+        .add_systems
+        (   (   spawn_game_frame,                  //ゲームの枠の表示
+                text_ui::spawn,                    //text UIを配置する
+                debug::spawn_info.run_if( DEBUG ), //debug用の情報
+            )
+            .in_schedule( EXIT_INITAPP )
+        )
         ;
 
         //Not WASM用System
@@ -50,22 +61,6 @@ impl Plugin for InitApp
         app
         .add_system( toggle_window_mode )       //[Alt]+[Enter]でフルスクリーン
         ;
-
-        //MyState::Init
-        //------------------------------------------------------------------------------------------
-        app
-        .add_plugin( FetchAssets )              //Fonts、Sprites等のプリロード
-        .add_plugin( SpawnTextUi )              //Text UIのspawn
-        ;
-        //デバッグ用System
-        #[cfg( debug_assertions )]
-        app
-        .add_system
-        (   spawn_debug_info                    //debug用の情報を表示
-            .in_schedule( EXIT_INITAPP )
-        )
-        ;
-        // //------------------------------------------------------------------------------------------
     }
 }
 
@@ -77,12 +72,7 @@ fn spawn_game_frame
     asset_svr: Res<AssetServer>,
 )
 {   let custom_size = Some ( Pixel::new( PIXELS_PER_GRID, PIXELS_PER_GRID ) );
-    let sprite_file = if cfg!( debug_assertions )
-    {   ASSETS_SPRITE_DEBUG_GRID
-    }
-    else
-    {   ASSETS_SPRITE_BRICK_WALL
-    };
+    let sprite_file = if DEBUG() { ASSETS_SPRITE_DEBUG_GRID } else { ASSETS_SPRITE_BRICK_WALL };
 
     for ( y, line ) in DESIGN_GAME_FRAME.iter().enumerate()
     {   for ( x, char ) in line.chars().enumerate()
@@ -97,85 +87,6 @@ fn spawn_game_frame
             }
         }
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//デバッグ用の情報を表示
-#[cfg( debug_assertions )]
-pub fn spawn_debug_info
-(   mut cmds: Commands,
-    asset_svr: Res<AssetServer>,
-)
-{   let custom_size = Some ( Pixel::new( PIXELS_PER_GRID, PIXELS_PER_GRID ) );
-    let color = _COLOR_SPRITE_DEBUG_GRID;
-
-    //方眼を表示する
-    for x in SCREEN_GRIDS_RANGE_X
-    {   for y in SCREEN_GRIDS_RANGE_Y
-        {   let pixel_xy = Grid::new( x, y ).into_pixel_screen();
-            cmds
-            .spawn( SpriteBundle::default() )
-            .insert( Sprite { custom_size, color, ..default() } )
-            .insert( Transform::from_translation( pixel_xy.extend( _DEPTH_SPRITE_DEBUG_GRID ) ) )
-            .insert( asset_svr.load( ASSETS_SPRITE_DEBUG_GRID ) as Handle<Image> )
-            ;
-        }
-    }
-
-    //Map内に数値用のText UIを表示する
-    for x in SCREEN_GRIDS_RANGE_X
-    {   for y in SCREEN_GRIDS_RANGE_Y
-        {   let grid = Grid::new( x, y );
-            let pixel = grid.into_pixel_map();
-
-            //UIのFLEX座標系に合せる
-            let mut text_ui = Pixel::new( pixel.x, - pixel.y );
-            text_ui.x += SCREEN_PIXELS_WIDTH  / 2.0 - PIXELS_PER_GRID / 2.0;
-            text_ui.y += SCREEN_PIXELS_HEIGHT / 2.0 - PIXELS_PER_GRID;
-
-            let mut txt = NUM_TILE_TEXT;
-            let val = format!( "{x},{y}" );
-            txt[ 0 ].0 = &val;
-
-            cmds
-            .spawn( ( text_ui_num_tile( text_ui, &txt, &asset_svr ), TextUiNumTile ( grid ) ) )
-            ;
-        }
-    }
-}
-
-//デバッグ用のText UI
-#[cfg( debug_assertions )]
-fn text_ui_num_tile
-(   pixel: Pixel,
-    message: &[ MessageSect ],
-    asset_svr: &Res<AssetServer>,
-) -> TextBundle
-{   let mut sections = Vec::new();
-    for ( line, file, size, color ) in message.iter()
-    {   let value = line.to_string();
-        let style = TextStyle
-        {   font     : asset_svr.load( *file ),
-            font_size: *size,
-            color    : *color
-        };
-        sections.push( TextSection { value, style } );
-    }
-    let text = Text { sections, ..default() };
-    let ( left, top, width, height ) =
-    (   Val::Px( pixel.x ),
-        Val::Px( pixel.y ),
-        Val::Px( PIXELS_PER_GRID ),
-        Val::Px( PIXELS_PER_GRID ),
-    );
-    let style = Style
-    {   position_type: PositionType::Absolute,
-        position: UiRect { left, top, ..default() },
-        size: Size { width, height },
-        ..default()
-    };
-    TextBundle { text, style, ..default() }
 }
 
 //End of code.

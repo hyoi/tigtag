@@ -2,6 +2,7 @@ use super::*;
 
 pub const APP_TITLE: &str = "TigTag";                           //アプリタイトル
 pub const CARGO_VER: &str = env!( "CARGO_PKG_VERSION" );        //cargo.ttomlの[package]version
+pub const DEBUG: fn() -> bool = || cfg!( debug_assertions );    //.run_if( DEBUG )用クロージャ
 
 pub const SCREEN_GRIDS_WIDTH : i32 = 25; //21,27,33,43          //ウィンドウ横幅(Grid)
 pub const SCREEN_GRIDS_HEIGHT: i32 = 19; //16,20,25,32          //ウインドウ縦幅(Grid)
@@ -276,7 +277,6 @@ counted_array!
 );
 
 //debug用数字タイル
-#[cfg( debug_assertions )]
 counted_array!
 (   pub const NUM_TILE_TEXT: [ MessageSect; _ ] =
     [   ( "", ASSETS_FONT_BIZUDPGOTHIC_REGULAR, PIXELS_PER_GRID * 0.3, Color::rgba( 1.0, 1.0, 1.0, 0.3 ) ),

@@ -64,7 +64,7 @@ fn header_center
         ui.sections[ 1 ].value = x;
 
         //デバッグ時、残ドット数を表示する
-        #[cfg( debug_assertions )]
+        if DEBUG()
         {   let x = o_map.map_or( NA3.to_string(), | map | format!( "/{:03}", map.remaining_dots ) );
             ui.sections[ 2 ].value = x;
         }

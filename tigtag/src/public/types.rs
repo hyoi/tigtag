@@ -29,13 +29,6 @@ impl MyState
     pub fn is_demoplay  ( &self ) -> bool { *self == MyState::TitleDemo || *self == MyState::DemoLoop }
 }
 
-//実行順を制御するためのLabel
-#[derive( SystemSet, Clone, Debug, PartialEq, Eq, Hash )]
-pub enum MyLabel
-{   MakeMapNewData,   //マップデータ作成処理の目印
-    DetectCollisions, //衝突判定処理の目印
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //System間の通知用イベント

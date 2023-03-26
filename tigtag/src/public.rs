@@ -4,6 +4,7 @@ use super::*;
 mod types;
 mod constants;
 mod misc;
+pub mod debug; //re-export
 
 //re-export
 pub use types::*;

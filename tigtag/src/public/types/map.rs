@@ -42,12 +42,7 @@ struct GridRect
 impl Default for Map
 {   fn default() -> Self
     {   //develpでは定数を乱数シードにする。releaseではランダムにする。
-        let seed = if cfg!( debug_assertions )
-        {   1234567890
-        }
-        else
-        {   rand::thread_rng().gen::<u64>()
-        };
+        let seed = if DEBUG() { 1234567890 } else { rand::thread_rng().gen::<u64>() };
 
         Self
         {   rng                : StdRng::seed_from_u64( seed ),
