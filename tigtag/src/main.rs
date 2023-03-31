@@ -6,15 +6,15 @@ use rand::prelude::*;
 use counted_array::*;
 
 //internal submodules
-mod public;
-mod init_app;
-mod game_play;
-mod demo_play;
+mod a_public;
+mod b_init_app;
+mod c_game_play;
+mod d_demo_play;
 
-use public::*;
-use init_app::*;
-use game_play::*;
-use demo_play::*;
+use a_public::*;
+use b_init_app::*;
+use c_game_play::*;
+use d_demo_play::*;
 
 fn main()
 {   //コンソールへログを出力するのを抑止
