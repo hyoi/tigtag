@@ -121,8 +121,10 @@ fn text_ui_num_tile
     );
     let style = Style
     {   position_type: PositionType::Absolute,
-        position: UiRect { left, top, ..default() },
-        size: Size { width, height },
+        left,
+        top,
+        width,
+        height,
         ..default()
     };
     TextBundle { text, style, ..default() }

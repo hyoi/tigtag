@@ -40,7 +40,8 @@ pub fn toggle_window_mode
 //一時停止する
 pub fn pause_with_esc_key
 (   q: Query<&mut Visibility, With<TextUiPause>>,
-    mut state: ResMut<State<MyState>>,
+    state: Res<State<MyState>>,
+    mut next_state: ResMut<NextState<MyState>>,
     mut inkey: ResMut<Input<KeyCode>>,
     inbtn: Res<Input<GamepadButton>>,
     mut old_state: Local<MyState>,
@@ -52,14 +53,14 @@ pub fn pause_with_esc_key
     if ! inkey.just_pressed( KEY_PAUSE ) && ! inbtn.just_pressed( btn_pause ) { return }
 
     //PAUSEのトグル処理
-    if state.0.is_pause()
+    if state.get().is_pause()
     {   hide_component( q );
-        state.0 = *old_state;
+        next_state.set( *old_state );
     }
     else
     {   show_component( q );
-        *old_state = state.0;
-        state.0 = MyState::Pause;
+        *old_state = *state.get();
+        next_state.set( MyState::Pause );
     }
 
     //NOTE: https://bevy-cheatbook.github.io/programming/states.html#with-input

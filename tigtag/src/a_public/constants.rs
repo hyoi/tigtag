@@ -103,8 +103,8 @@ pub const KEY_PAUSE: KeyCode = KeyCode::Escape;
 pub const BUTTON_PAUSE: GamepadButtonType = GamepadButtonType::North; //PS4の△ボタン
 
 //FULLSCREENのキーとパッドボタン
-pub const _KEY_ALT_RIGHT: KeyCode = KeyCode::RAlt;
-pub const _KEY_ALT_LEFT : KeyCode = KeyCode::LAlt;
+pub const _KEY_ALT_RIGHT: KeyCode = KeyCode::AltRight;
+pub const _KEY_ALT_LEFT : KeyCode = KeyCode::AltLeft;
 pub const _KEY_FULLSCREEN: KeyCode = KeyCode::Return;
 pub const _BUTTON_FULLSCREEN: GamepadButtonType = GamepadButtonType::West; //PS4の□ボタン
 

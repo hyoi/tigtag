@@ -7,14 +7,14 @@ use counted_array::*;
 
 //internal submodules
 mod a_public;
-mod b_init_app;
-mod c_game_play;
-mod d_demo_play;
+// mod b_init_app;
+// mod c_game_play;
+// mod d_demo_play;
 
 use a_public::*;
-use b_init_app::*;
-use c_game_play::*;
-use d_demo_play::*;
+// use b_init_app::*;
+// use c_game_play::*;
+// use d_demo_play::*;
 
 fn main()
 {   //コンソールへログを出力するのを抑止
@@ -23,9 +23,9 @@ fn main()
 
     //アプリの実行
     App::new()
-    .add_plugin( InitApp  )
-    .add_plugin( GamePlay )
-    .add_plugin( DemoPlay )
+    // .add_plugin( InitApp  )
+    // .add_plugin( GamePlay )
+    // .add_plugin( DemoPlay )
     .run()
     ;
 }
