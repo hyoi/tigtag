@@ -7,8 +7,8 @@ pub struct CrossButton;
 impl Plugin for CrossButton
 {   fn build( &self, app: &mut App )
     {   app
-        .init_resource::<GamepadCrossButton>()  //十字キーの入力状態を保存するResource
-        .add_system( read_cross_button )        //十字キーの入力読み取り
+        .init_resource::<GamepadCrossButton>()    //十字キーの入力状態を保存するResource
+        .add_systems( Update, read_cross_button ) //十字キーの入力読み取り
         ;
     }
 }
