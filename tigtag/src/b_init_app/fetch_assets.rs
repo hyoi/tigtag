@@ -7,21 +7,21 @@ impl Plugin for FetchAssets
     {   app
 //      .insert_resource( MarkAfterFetchAssets ( MyState::Debug ) ) //for debug(text UI)
         .add_systems
-        (   (   start_fetching_assets,    //Assetのロード開始
+        (   OnEnter ( MyState::InitApp ),
+            (   start_fetching_assets,    //Assetのロード開始
                 spawn_sprite_now_loading, //アニメ用スプライトの生成
             )
-            .in_schedule( ENTER_INITAPP )
         )
         .add_systems
-        (   (   change_state_after_loading, //ロード完了か判定しState変更
+        (   Update,
+            (   change_state_after_loading, //ロード完了か判定しState変更
                 move_sprite_now_loading,    //ローディングアニメ
             )
-            .in_set( UPDATE_INITAPP )
+            .run_if( in_state( MyState::InitApp ) )
         )
         .add_systems
-        (   (   despawn_entity::<SpriteTile>, //アニメ用スプライトの削除
-            )
-            .in_schedule( EXIT_INITAPP )
+        (   OnExit ( MyState::InitApp ),
+                despawn_entity::<SpriteTile>, //アニメ用スプライトの削除
         )
         ;
     }

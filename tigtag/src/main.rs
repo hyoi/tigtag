@@ -7,12 +7,12 @@ use counted_array::*;
 
 //internal submodules
 mod a_public;
-// mod b_init_app;
+mod b_init_app;
 // mod c_game_play;
 // mod d_demo_play;
 
 use a_public::*;
-// use b_init_app::*;
+use b_init_app::*;
 // use c_game_play::*;
 // use d_demo_play::*;
 
@@ -23,7 +23,7 @@ fn main()
 
     //アプリの実行
     App::new()
-    // .add_plugin( InitApp  )
+    .add_plugins( InitApp  )
     // .add_plugin( GamePlay )
     // .add_plugin( DemoPlay )
     .run()

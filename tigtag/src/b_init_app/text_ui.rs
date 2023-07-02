@@ -11,7 +11,8 @@ pub fn spawn
     let height = Val::Px( SCREEN_PIXELS_HEIGHT );
     let center_frame = hidden_frame
     (   Style
-        {   size           : Size::new( per100, per100 ),
+        {   width          : per100,
+            height         : per100,
             position_type  : PositionType::Absolute,
             justify_content: JustifyContent::Center,
             align_items    : AlignItems::Center,
@@ -28,7 +29,8 @@ pub fn spawn
 
     let header_frame = hidden_frame
     (   Style
-        {   size           : Size::new( width, height ),
+        {   width,
+            height,
             position_type  : PositionType::Absolute,
             flex_direction : FlexDirection::Column,
             justify_content: JustifyContent::FlexStart, //画面の上端
@@ -37,7 +39,8 @@ pub fn spawn
     );
     let footer_frame = hidden_frame
     (   Style
-        {   size           : Size::new( width, height ),
+        {   width,
+            height,
             position_type  : PositionType::Absolute,
             flex_direction : FlexDirection::Column,
             justify_content: JustifyContent::FlexEnd, //画面の下端

@@ -41,25 +41,22 @@ impl Plugin for InitApp
 
         //Systemの登録
         app
+        .add_systems( Startup, spawn_camera       ) //bevyのカメラ
+        .add_systems( Update , pause_with_esc_key ) //[Esc]でPause
+        .add_plugins( FetchAssets ) //Assets(Fonts、Sprites等)のロード
         .add_systems
-        (   (   spawn_camera.on_startup(), //bevyのカメラ
-                pause_with_esc_key,        //[Esc]でPause
+        (   OnExit( MyState::InitApp ),
+            (   spawn_game_frame,
+                text_ui::spawn,
+                debug::spawn_info.run_if( DEBUG ),
             )
-        )
-        .add_plugin( FetchAssets ) //Assets(Fonts、Sprites等)のロード
-        .add_systems
-        (   (   spawn_game_frame,                  //ゲームの枠の表示
-                text_ui::spawn,                    //text UIを配置する
-                debug::spawn_info.run_if( DEBUG ), //debug用の情報
-            )
-            .in_schedule( EXIT_INITAPP )
         )
         ;
 
         //Not WASM用System
         #[cfg( not( target_arch = "wasm32" ) )]
         app
-        .add_system( toggle_window_mode )       //[Alt]+[Enter]でフルスクリーン
+        .add_systems( Update, toggle_window_mode ) //[Alt]+[Enter]でフルスクリーン
         ;
     }
 }
