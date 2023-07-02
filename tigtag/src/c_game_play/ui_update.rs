@@ -9,11 +9,15 @@ impl Plugin for UiUpdate
 {   fn build( &self, app: &mut App )
     {   //常時表示を更新するSystem
         app
-        .add_plugin( FrameTimeDiagnosticsPlugin )   //FPSプラグイン
-        .add_system( ui_update::header_left   )     //UI表示更新(STAGE)
-        .add_system( ui_update::header_center )     //UI表示更新(SCORE)
-        .add_system( ui_update::header_right  )     //UI表示更新(Hi-SCORE)
-        .add_system( ui_update::footer_left   )     //UI表示更新(FPS)
+        .add_plugins( FrameTimeDiagnosticsPlugin )   //FPSプラグイン
+        .add_systems
+        (   Update,
+            (   ui_update::header_left,   //UI表示更新(STAGE)
+                ui_update::header_center, //UI表示更新(SCORE)
+                ui_update::header_right,  //UI表示更新(Hi-SCORE)
+                ui_update::footer_left,   //UI表示更新(FPS)
+            )
+        )
         ;
     }
 }
@@ -23,7 +27,7 @@ impl Plugin for UiUpdate
 //UIの表示を更新する(FPS)
 fn footer_left
 (   mut q: Query<&mut Text, With<FooterLeft>>,
-    diag: Res<Diagnostics>,
+    diag: Res<DiagnosticsStore>,
     o_record: Option<Res<Record>>,
 )
 {   if let Ok( mut ui ) = q.get_single_mut()

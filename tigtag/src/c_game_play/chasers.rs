@@ -214,9 +214,9 @@ pub fn detect_collisions
     mut record: ResMut<Record>,
 )
 {   //クリアしておらず、且つ衝突判定が真なら、衝突処理する
-    if ! state.0.is_stageclear() && is_collision( q_player, q_chaser )
+    if ! state.get().is_stageclear() && is_collision( q_player, q_chaser )
     {   let next =
-        {   if state.0.is_demoplay()
+        {   if state.get().is_demoplay()
             {   //Demoの場合、記録を残す
                 if record.score > record.demo.hi_score
                 {   record.demo.hi_score = record.score;

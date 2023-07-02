@@ -83,7 +83,7 @@ pub fn move_sprite
         let mut new_side = player.side;
         player.stop = true; //停止フラグを立てる
 
-        if ! state.0.is_demoplay() //demoでないなら
+        if ! state.get().is_demoplay() //demoでないなら
         {   if ! cross_button.is_empty() //パッド十字キー入力があるなら
             {   let cross_button = cross_button.sides_list();
                 for &side in cross_button
@@ -225,18 +225,20 @@ pub fn scoring_and_clear_stage
             map.remaining_dots -= 1;
             audio.play_with_settings
             (   asset_svr.load( ASSETS_SOUND_BEEP ),
-                PlaybackSettings::ONCE.with_volume( VOLUME_SOUND_BEEP ),
+                PlaybackSettings::ONCE.with_volume
+                (   Volume::Relative( VolumeLevel::new( VOLUME_SOUND_BEEP ) )
+                ),
             );
 
             //ハイスコアの更新
-            if ! state.0.is_demoplay() && record.score > record.hi_score
+            if ! state.get().is_demoplay() && record.score > record.hi_score
             {   record.hi_score = record.score;
             }
 
             //全ドットを拾ったら、Clearへ遷移する
             if map.remaining_dots <= 0
             {   let next =
-                {   if state.0.is_demoplay()
+                {   if state.get().is_demoplay()
                     {   record.demo.clear_flag = true;
                         MyState::DemoLoop
                     }

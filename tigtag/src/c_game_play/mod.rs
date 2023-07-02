@@ -20,31 +20,38 @@ pub struct GamePlay;
 impl Plugin for GamePlay
 {   fn build( &self, app: &mut App )
     {   app
-        .add_plugin( UiUpdate )                                         //header & footer UIの表示更新
-        .add_system( chasers::rotate_sprite )                           //追手スプライトがあれば回転させる
+        .add_plugins( UiUpdate )                                        //header & footer UIの表示更新
+        .add_systems( Update, chasers::rotate_sprite )                  //追手スプライトがあれば回転させる
         .insert_resource( MarkAfterFetchAssets ( MyState::TitleDemo ) ) //Assetsロード後のState変更先
-        .add_plugin( CrossButton )                                      //ゲームパッドの十字キー入力
+        .add_plugins( CrossButton )                                     //ゲームパッドの十字キー入力
         //------------------------------------------------------------------------------------------
-        .add_system
-        (   show_component::<TextUiTitle> //text UI（Title）表示
-            .in_schedule( ENTER_TITLEDEMO )
+        .add_systems
+        (   OnEnter ( MyState::TitleDemo ),
+            show_component::<TextUiTitle> //text UI（Title）表示
+            // .in_schedule( ENTER_TITLEDEMO )
         )
-        .add_system
-        (   into_next_state_with_key::<TextUiTitle> //SPACEキー入力⇒GameStart
-            .in_set( UPDATE_TITLEDEMO )
+        .add_systems
+        (   Update,
+            into_next_state_with_key::<TextUiTitle> //SPACEキー入力⇒GameStart
+            .run_if( in_state( MyState::TitleDemo ) )
+            // .in_set( UPDATE_TITLEDEMO )
         )
-        .add_system
-        (   hide_component::<TextUiTitle> //text UI（Title）消去
-            .in_schedule( EXIT_TITLEDEMO )
-        )
-        //------------------------------------------------------------------------------------------
-        .add_system
-        (   init_gameplay_record //初期化後 無条件⇒StageStart
-            .in_set( UPDATE_GAMESTART )
+        .add_systems
+        (   OnExit ( MyState::TitleDemo ),
+            hide_component::<TextUiTitle> //text UI（Title）消去
+            // .in_schedule( EXIT_TITLEDEMO )
         )
         //------------------------------------------------------------------------------------------
         .add_systems
-        (   (   show_component::<TextUiStart>,       //text UI（Start）表示
+        (   Update,
+            init_gameplay_record //初期化後 無条件⇒StageStart
+            .run_if( in_state( MyState::GameStart ) )
+            // .in_set( UPDATE_GAMESTART )
+        )
+        //------------------------------------------------------------------------------------------
+        .add_systems
+        (   OnEnter ( MyState::StageStart ),
+            (   show_component::<TextUiStart>,       //text UI（Start）表示
                 set_countdown_params::<TextUiStart>, //カウントダウンタイマー初期化
                 map::make_new_data,                  //新マップのデータ作成
                 map::spawn_sprite,                   //スプライトをspawnする
@@ -52,57 +59,72 @@ impl Plugin for GamePlay
                 chasers::spawn_sprite,               //スプライトをspawnする
                 debug::spawn_sprite.run_if( DEBUG ), //スプライトをspawnする
             )
-            .chain().in_schedule( ENTER_STAGESTART )
+            .chain() //実行順を固定
+            // .chain().in_schedule( ENTER_STAGESTART )
         )
-        .add_system
-        (   countdown_message::<TextUiStart> //カウントダウン後⇒MainLoop
-            .in_set( UPDATE_STAGESTART )
+        .add_systems
+        (   Update,
+            countdown_message::<TextUiStart> //カウントダウン後⇒MainLoop
+            .run_if( in_state( MyState::StageStart ) )
+            // .in_set( UPDATE_STAGESTART )
         )
-        .add_system
-        (   hide_component::<TextUiStart> //text UI（Start）消去
-            .in_schedule( EXIT_STAGESTART )
+        .add_systems
+        (   OnExit ( MyState::StageStart ),
+            hide_component::<TextUiStart> //text UI（Start）消去
+            // .in_schedule( EXIT_STAGESTART )
         )
         //------------------------------------------------------------------------------------------
         .add_systems
-        (   (   player::scoring_and_clear_stage,      //スコアリング＆クリア判定⇒StageClear
+        (   Update,
+            (   player::scoring_and_clear_stage,      //スコアリング＆クリア判定⇒StageClear
                 chasers::detect_collisions,           //衝突判定⇒GameOver
                 player::move_sprite,                  //スプライト移動
                 chasers::move_sprite,                 //スプライト移動
                 debug::update_sprite.run_if( DEBUG ), //スプライト移動
             )
-            .chain().in_set( UPDATE_MAINLOOP )
+            .chain() //実行順を固定
+            .run_if( in_state( MyState::MainLoop ) )
+            // .chain().in_set( UPDATE_MAINLOOP )
         )
         //------------------------------------------------------------------------------------------
         .add_systems
-        (   (   show_component::<TextUiClear>,       //text UI（StageClear）表示
+        (   OnEnter ( MyState::StageClear ),
+            (   show_component::<TextUiClear>,       //text UI（StageClear）表示
                 set_countdown_params::<TextUiClear>, //カウントダウンタイマー初期化
             )
-            .in_schedule( ENTER_STAGECLEAR )
+            // .in_schedule( ENTER_STAGECLEAR )
         )
-        .add_system
-        (   countdown_message::<TextUiClear> //カウントダウン後⇒StageStart
-            .in_set( UPDATE_STAGECLEAR )
+        .add_systems
+        (   Update,
+            countdown_message::<TextUiClear> //カウントダウン後⇒StageStart
+            .run_if( in_state( MyState::StageClear ) )
+            // .in_set( UPDATE_STAGECLEAR )
         )
-        .add_system
-        (   hide_component::<TextUiClear> //text UI（StageClear）消去
-            .in_schedule( EXIT_STAGECLEAR )
+        .add_systems
+        (   OnExit ( MyState::StageClear ),
+            hide_component::<TextUiClear> //text UI（StageClear）消去
+            // .in_schedule( EXIT_STAGECLEAR )
         )
         //------------------------------------------------------------------------------------------
         .add_systems
-        (   (   show_component::<TextUiOver>,       //text UI（GameOver）表示
+        (   OnEnter ( MyState::GameOver ),
+            (   show_component::<TextUiOver>,       //text UI（GameOver）表示
                 set_countdown_params::<TextUiOver>, //カウントダウンタイマー初期化
             )
-            .in_schedule( ENTER_GAMEOVER )
+            // .in_schedule( ENTER_GAMEOVER )
         )
         .add_systems
-        (   (   countdown_message::<TextUiOver>,        //カウントダウン後⇒TitleDemo
+        (   Update,
+            (   countdown_message::<TextUiOver>,        //カウントダウン後⇒TitleDemo
                 into_next_state_with_key::<TextUiOver>, //SPACEキー入力⇒GameStart
             )
-            .in_set( UPDATE_GAMEOVER )
+            .run_if( in_state( MyState::GameOver ) )
+            // .in_set( UPDATE_GAMEOVER )
         )
-        .add_system
-        (   hide_component::<TextUiOver> //text UI（GameOver）消去
-            .in_schedule( EXIT_GAMEOVER )
+        .add_systems
+        (   OnExit ( MyState::GameOver ),
+            hide_component::<TextUiOver> //text UI（GameOver）消去
+            // .in_schedule( EXIT_GAMEOVER )
         )
         ;
     }
@@ -139,7 +161,7 @@ fn into_next_state_with_key<T: Component + TextUiWithHitKey>
         { return }
 
         //MyState::GameStartへ遷移する前にゼロクリアする
-        let current = state.0;
+        let current = *state.get();
         if current == MyState::TitleDemo || current == MyState::GameOver
         {   record.score = 0;
             record.stage = 0;
