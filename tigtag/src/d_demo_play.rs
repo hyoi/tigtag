@@ -6,26 +6,36 @@ impl Plugin for DemoPlay
 {   fn build( &self, app: &mut App )
     {   app
         .add_systems
-        (   (   init_demoplay_record,                //demoでのrecordの初期化
+        (   OnEnter ( MyState::TitleDemo ),
+            (   init_demoplay_record,                //demoでのrecordの初期化
                 map::make_new_data,                  //新マップのデータ作成
                 map::spawn_sprite,                   //スプライトをspawnする
                 player::spawn_sprite,                //スプライトをspawnする
                 chasers::spawn_sprite,               //スプライトをspawnする
                 debug::spawn_sprite.run_if( DEBUG ), //スプライトをspawnする
             )
-            .chain().in_schedule( ENTER_TITLEDEMO )
+            .chain() //実行順を固定
+            // .in_schedule( ENTER_TITLEDEMO )
         )
         .add_systems
-        (   (   player::scoring_and_clear_stage,      //スコアリング＆クリア判定⇒DemoLoop
+        (   Update,
+            (   player::scoring_and_clear_stage,      //スコアリング＆クリア判定⇒DemoLoop
                 chasers::detect_collisions,           //衝突判定⇒DemoLoop
                 player::move_sprite,                  //スプライト移動
                 chasers::move_sprite,                 //スプライト移動
                 debug::update_sprite.run_if( DEBUG ), //スプライト更新
             )
-            .chain().in_set( UPDATE_TITLEDEMO )
+            .chain() //実行順を固定
+            .run_if( in_state( MyState::TitleDemo ) )
+            // .in_set( UPDATE_TITLEDEMO )
         )
         //------------------------------------------------------------------------------------------
-        .add_system( goto_title.in_set( UPDATE_DEMOLOOP ) ); //無条件⇒TitleDemo
+        .add_systems
+        (   Update,
+            goto_title //無条件⇒TitleDemo
+            .run_if( in_state( MyState::DemoLoop ) )
+            // .in_set( UPDATE_DEMOLOOP )
+        );
     }
 }
 

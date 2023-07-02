@@ -1,5 +1,5 @@
 //import external modules
-use macros::*;
+// use macros::*;
 use bevy::{ prelude::*, sprite::*,  audio::* };
 use once_cell::sync::*;
 use rand::prelude::*;
@@ -9,12 +9,12 @@ use counted_array::*;
 mod a_public;
 mod b_init_app;
 mod c_game_play;
-// mod d_demo_play;
+mod d_demo_play;
 
 use a_public::*;
 use b_init_app::*;
 use c_game_play::*;
-// use d_demo_play::*;
+use d_demo_play::*;
 
 fn main()
 {   //コンソールへログを出力するのを抑止
@@ -25,7 +25,7 @@ fn main()
     App::new()
     .add_plugins( InitApp  )
     .add_plugins( GamePlay )
-    // .add_plugin( DemoPlay )
+    .add_plugins( DemoPlay )
     .run()
     ;
 }
