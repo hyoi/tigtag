@@ -15,6 +15,7 @@ impl Plugin for InitApp
         {   title     : APP_TITLE.to_string(),
             resolution: ( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT ).into(),
             resizable : false,
+            cursor    : bevy::window::Cursor { visible: false, ..default() },
             fit_canvas_to_parent: true, //Android Chromeで不具合が発生する場合コメントアウトする
             ..default()
         };
