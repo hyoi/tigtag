@@ -140,7 +140,6 @@ pub fn move_sprite
             sides.retain( | side | chaser.next + side != chaser.grid ); //戻り路を排除
 
             //追手の向きを決める（自機のプレーヤーのキー入力に相当）
-            use std::cmp::Ordering;
             chaser.stop = false;
             chaser.side
                 = match sides.len().cmp( &1 ) //sides要素数は1以上(このゲームのマップに行き止まりが無いので)

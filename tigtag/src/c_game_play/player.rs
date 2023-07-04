@@ -120,7 +120,6 @@ pub fn move_sprite
 
             //demoなのでプレイヤーのキー入力を詐称する
             player.stop = false;
-            use std::cmp::Ordering;
             new_side = match sides.len().cmp( &1 )
             {   Ordering::Equal => //一本道 ⇒ 道なりに進む
                     sides[ 0 ],

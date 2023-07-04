@@ -1,7 +1,5 @@
 use super::*;
 
-use std::collections::HashSet;
-
 //プラグインの設定
 pub struct CrossButton;
 impl Plugin for CrossButton

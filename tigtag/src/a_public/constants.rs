@@ -50,7 +50,6 @@ pub const SCREEN_BACKGROUND_COLOR: Color = Color::rgb( 0.13, 0.13, 0.18 );      
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-use std::ops::Range;
 pub const SCREEN_GRIDS_RANGE_X: Range<i32> = 0..SCREEN_GRIDS_WIDTH;     //ウィンドウ横幅(Grid)
 pub const SCREEN_GRIDS_RANGE_Y: Range<i32> = 0..SCREEN_GRIDS_HEIGHT;    //ウィンドウ縦幅(Grid)
 
@@ -88,7 +87,6 @@ counted_array!
 pub const GAMEPAD: Gamepad = Gamepad { id: 0 }; //Todo: pad 0番決め打ちでいいいのか？
 
 //パッドの十字ボタンチェック用
-use std::collections::HashSet;
 pub static CROSS_BUTTON_SET: Lazy<HashSet<GamepadButtonType>> = Lazy::new
 (   ||
     HashSet::from

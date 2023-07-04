@@ -30,7 +30,6 @@ pub fn toggle_window_mode
     if ! is_key_fullscreen && ! is_btn_fullscreen { return }
 
     //ウィンドウとフルスクリーンを切り替える
-    use bevy::window::WindowMode::*;
     let mode = if window.mode == Windowed { SizedFullscreen } else { Windowed };
     window.mode = mode;
 }

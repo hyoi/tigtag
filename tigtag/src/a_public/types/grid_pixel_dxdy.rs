@@ -34,7 +34,6 @@ pub enum DxDy { Up, Down, Right, Left }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //GridとDxDyを加算できるよう演算子をオーバーロードする
-use std::ops::*;
 
 //Grid = Grid + DxDy
 impl Add<DxDy> for Grid

@@ -1,7 +1,5 @@
 use super::*;
 
-use std::collections::VecDeque;
-
 //demoplay用の自機の移動方向を決める関数
 pub fn which_way_player_goes
 (   player: &Player,

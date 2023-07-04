@@ -1,9 +1,13 @@
-//import external modules
-// use macros::*;
-use bevy::{ prelude::*, sprite::*,  audio::* };
+//external crates
+use bevy::{ prelude::*, sprite::*,  audio::*, diagnostic::*, window::WindowMode::* };
 use once_cell::sync::*;
 use rand::prelude::*;
 use counted_array::*;
+
+//standard library
+use std::ops::*;
+use std::cmp::*;
+use std::collections::*;
 
 //internal submodules
 mod a_public;
@@ -16,8 +20,9 @@ use b_init_app::*;
 use c_game_play::*;
 use d_demo_play::*;
 
+//メイン関数
 fn main()
-{   //コンソールへログを出力するのを抑止
+{   //ログのコンソールへの出力を抑止
     #[cfg( not( target_arch = "wasm32" ) )]
     std::env::set_var( "RUST_LOG", "OFF" );
 

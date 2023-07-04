@@ -1,8 +1,5 @@
 use super::*;
 
-//import external modules
-use bevy::diagnostic::*;
-
 //プラグインの設定
 pub struct UiUpdate;
 impl Plugin for UiUpdate
