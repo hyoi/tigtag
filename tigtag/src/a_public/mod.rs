@@ -2,13 +2,13 @@ use super::*;
 
 //submodules
 mod types;
-mod constants;
+mod config;
 mod misc;
 pub mod debug; //re-export
 
 //re-export
 pub use types::*;
-pub use constants::*;
+pub use config::*;
 pub use misc::*;
 
 //End of code.
