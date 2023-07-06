@@ -12,7 +12,7 @@ impl Plugin for DemoPlay
                 map::spawn_sprite,                   //スプライトをspawnする
                 player::spawn_sprite,                //スプライトをspawnする
                 chasers::spawn_sprite,               //スプライトをspawnする
-                debug::spawn_sprite.run_if( DEBUG ), //スプライトをspawnする
+                debug::spawn_sprite.run_if( misc::DEBUG ), //スプライトをspawnする
             )
             .chain() //実行順を固定
             // .in_schedule( ENTER_TITLEDEMO )
@@ -23,7 +23,7 @@ impl Plugin for DemoPlay
                 chasers::detect_collisions,           //衝突判定⇒DemoLoop
                 player::move_sprite,                  //スプライト移動
                 chasers::move_sprite,                 //スプライト移動
-                debug::update_sprite.run_if( DEBUG ), //スプライト更新
+                debug::update_sprite.run_if( misc::DEBUG ), //スプライト更新
             )
             .chain() //実行順を固定
             .run_if( in_state( MyState::TitleDemo ) )

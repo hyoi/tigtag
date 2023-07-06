@@ -1,11 +1,48 @@
 use super::*;
 
-pub const APP_TITLE: &str = "TigTag";                           //アプリタイトル
-pub const CARGO_VER: &str = env!( "CARGO_PKG_VERSION" );        //cargo.ttomlの[package]version
-pub const DEBUG: fn() -> bool = || cfg!( debug_assertions );    //.run_if( DEBUG )用クロージャ
+//アプリの情報
+pub const _CARGO_TOML_NAME: &str = env!( "CARGO_PKG_NAME"    );
+pub const _CARGO_TOML_VER : &str = env!( "CARGO_PKG_VERSION" );
 
-pub const SCREEN_GRIDS_WIDTH : i32 = 25; //21,27,33,43          //ウィンドウ横幅(Grid)
-pub const SCREEN_GRIDS_HEIGHT: i32 = 19; //16,20,25,32          //ウインドウ縦幅(Grid)
+pub const APP_TITLE: &str = _CARGO_TOML_NAME; //アプリタイトル
+pub const CARGO_VER: &str = _CARGO_TOML_VER;  //アプリのバージョン
+
+//単位Gridの縦横幅(Pixel)
+const BASE_PIXELS: i32 = 8;
+const SCALING: f32 = 4.0;
+pub const PIXELS_PER_GRID: f32 = BASE_PIXELS as f32 * SCALING;
+
+//ウィンドウ縦横幅(Grid)
+pub const SCREEN_GRIDS_WIDTH  : i32 = 25; //best 43
+pub const SCREEN_GRIDS_HEIGHT : i32 = 19; //best 24
+// pub const SCREEN_GRIDS_X_RANGE: Range<i32> = 0..SCREEN_GRIDS_WIDTH;
+// pub const SCREEN_GRIDS_Y_RANGE: Range<i32> = 0..SCREEN_GRIDS_HEIGHT;
+
+//ウィンドウ縦横幅(Pixel)
+pub const SCREEN_PIXELS_WIDTH : f32 = PIXELS_PER_GRID * SCREEN_GRIDS_WIDTH  as f32;
+pub const SCREEN_PIXELS_HEIGHT: f32 = PIXELS_PER_GRID * SCREEN_GRIDS_HEIGHT as f32;
+
+//ウィンドウ背景色
+pub const SCREEN_BACKGROUND_COLOR: Color = Color::rgb( 0.13, 0.13, 0.18 );
+
+//ウィンドウの定義
+pub static MAIN_WINDOW: Lazy<Option<Window>> = Lazy::new
+(   ||
+    {   let title = format!( "{APP_TITLE} v{CARGO_VER}" );
+        let window = Window
+        {   title,
+            resolution: ( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT ).into(),
+            resizable: false,
+            cursor: bevy::window::Cursor { visible: false, ..default() },
+            fit_canvas_to_parent: true,
+            ..default()
+        };
+
+        Some ( window )
+    }
+);
+
+////////////////////////////////////////////////////////////////////////////////
 
 pub const MAP_GRIDS_WIDTH : i32 = SCREEN_GRIDS_WIDTH;           //マップ横幅(Grid)
 pub const MAP_GRIDS_HEIGHT: i32 = SCREEN_GRIDS_HEIGHT - 2;      //マップ縦幅(Grid)
@@ -38,15 +75,6 @@ counted_array!
         "                         ", //18
     ]  //0123456789 123456789 123456789
 );
-
-const SCREEN_SCALING      : f32 = 4.0;
-const BASE_PIXELS_PER_GRID: i32 = 8;
-pub const PIXELS_PER_GRID : f32 = BASE_PIXELS_PER_GRID as f32 * SCREEN_SCALING;     //1GridあたりのPixel数
-
-pub const SCREEN_PIXELS_WIDTH : f32 = SCREEN_GRIDS_WIDTH  as f32 * PIXELS_PER_GRID; //ウィンドウ横幅(Pixel)
-pub const SCREEN_PIXELS_HEIGHT: f32 = SCREEN_GRIDS_HEIGHT as f32 * PIXELS_PER_GRID; //ウィンドウ縦幅(Pixel)
-
-pub const SCREEN_BACKGROUND_COLOR: Color = Color::rgb( 0.13, 0.13, 0.18 );          //ウィンドウ背景色
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

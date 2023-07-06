@@ -21,7 +21,7 @@ impl Plugin for FetchAssets
         )
         .add_systems
         (   OnExit ( MyState::InitApp ),
-                despawn_entity::<SpriteTile>, //アニメ用スプライトの削除
+                misc::despawn_entity::<SpriteTile>, //アニメ用スプライトの削除
         )
         ;
     }

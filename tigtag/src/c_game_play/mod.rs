@@ -27,7 +27,7 @@ impl Plugin for GamePlay
         //------------------------------------------------------------------------------------------
         .add_systems
         (   OnEnter ( MyState::TitleDemo ),
-            show_component::<TextUiTitle> //text UI（Title）表示
+            misc::show_component::<TextUiTitle> //text UI（Title）表示
             // .in_schedule( ENTER_TITLEDEMO )
         )
         .add_systems
@@ -38,7 +38,7 @@ impl Plugin for GamePlay
         )
         .add_systems
         (   OnExit ( MyState::TitleDemo ),
-            hide_component::<TextUiTitle> //text UI（Title）消去
+            misc::hide_component::<TextUiTitle> //text UI（Title）消去
             // .in_schedule( EXIT_TITLEDEMO )
         )
         //------------------------------------------------------------------------------------------
@@ -51,13 +51,13 @@ impl Plugin for GamePlay
         //------------------------------------------------------------------------------------------
         .add_systems
         (   OnEnter ( MyState::StageStart ),
-            (   show_component::<TextUiStart>,       //text UI（Start）表示
+            (   misc::show_component::<TextUiStart>,       //text UI（Start）表示
                 set_countdown_params::<TextUiStart>, //カウントダウンタイマー初期化
                 map::make_new_data,                  //新マップのデータ作成
                 map::spawn_sprite,                   //スプライトをspawnする
                 player::spawn_sprite,                //スプライトをspawnする
                 chasers::spawn_sprite,               //スプライトをspawnする
-                debug::spawn_sprite.run_if( DEBUG ), //スプライトをspawnする
+                debug::spawn_sprite.run_if( misc::DEBUG ), //スプライトをspawnする
             )
             .chain() //実行順を固定
             // .chain().in_schedule( ENTER_STAGESTART )
@@ -70,7 +70,7 @@ impl Plugin for GamePlay
         )
         .add_systems
         (   OnExit ( MyState::StageStart ),
-            hide_component::<TextUiStart> //text UI（Start）消去
+            misc::hide_component::<TextUiStart> //text UI（Start）消去
             // .in_schedule( EXIT_STAGESTART )
         )
         //------------------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ impl Plugin for GamePlay
                 chasers::detect_collisions,           //衝突判定⇒GameOver
                 player::move_sprite,                  //スプライト移動
                 chasers::move_sprite,                 //スプライト移動
-                debug::update_sprite.run_if( DEBUG ), //スプライト移動
+                debug::update_sprite.run_if( misc::DEBUG ), //スプライト移動
             )
             .chain() //実行順を固定
             .run_if( in_state( MyState::MainLoop ) )
@@ -89,7 +89,7 @@ impl Plugin for GamePlay
         //------------------------------------------------------------------------------------------
         .add_systems
         (   OnEnter ( MyState::StageClear ),
-            (   show_component::<TextUiClear>,       //text UI（StageClear）表示
+            (   misc::show_component::<TextUiClear>,       //text UI（StageClear）表示
                 set_countdown_params::<TextUiClear>, //カウントダウンタイマー初期化
             )
             // .in_schedule( ENTER_STAGECLEAR )
@@ -102,13 +102,13 @@ impl Plugin for GamePlay
         )
         .add_systems
         (   OnExit ( MyState::StageClear ),
-            hide_component::<TextUiClear> //text UI（StageClear）消去
+            misc::hide_component::<TextUiClear> //text UI（StageClear）消去
             // .in_schedule( EXIT_STAGECLEAR )
         )
         //------------------------------------------------------------------------------------------
         .add_systems
         (   OnEnter ( MyState::GameOver ),
-            (   show_component::<TextUiOver>,       //text UI（GameOver）表示
+            (   misc::show_component::<TextUiOver>,       //text UI（GameOver）表示
                 set_countdown_params::<TextUiOver>, //カウントダウンタイマー初期化
             )
             // .in_schedule( ENTER_GAMEOVER )
@@ -123,7 +123,7 @@ impl Plugin for GamePlay
         )
         .add_systems
         (   OnExit ( MyState::GameOver ),
-            hide_component::<TextUiOver> //text UI（GameOver）消去
+            misc::hide_component::<TextUiOver> //text UI（GameOver）消去
             // .in_schedule( EXIT_GAMEOVER )
         )
         ;

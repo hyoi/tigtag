@@ -1,46 +1,65 @@
 use super::*;
 
-//bevyのカメラを設置する
-pub fn spawn_camera( mut cmds: Commands )
-{   cmds.spawn( Camera2dBundle::default() );
+////////////////////////////////////////////////////////////////////////////////
+
+//.run_if( condition )用
+pub const DEBUG: fn() -> bool = || cfg!( debug_assertions );
+pub const WASM : fn() -> bool = || cfg!( target_arch = "wasm32" );
+
+////////////////////////////////////////////////////////////////////////////////
+
+//2D cameraをspawnする
+pub fn spawn_2d_camera( mut cmds: Commands )
+{   cmds.spawn( Camera2dBundle::default() )
+    // .insert( Camera { order: CAMERA2D_ORDER, ..default() } )
+    // .insert( Camera2d { clear_color: CAMERA2D_BGCOLOR } )
+    ;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-//ウィンドウとフルスクリーンを切り替える
-#[cfg( not( target_arch = "wasm32" ) )]
+//ウィンドウとフルスクリーンの切換(トグル動作)
 pub fn toggle_window_mode
-(   mut windows: Query<&mut Window>,
+(   mut q_window: Query<&mut Window>,
     inkey: Res<Input<KeyCode>>,
     inbtn: Res<Input<GamepadButton>>,
+    mut button_events: EventReader<GamepadButtonChangedEvent>,
 )
-{   //ウィンドウが見つからなければ関数脱出
-    let Ok( mut window ) = windows.get_single_mut() else { return };
+{   //ウィンドウが見つからないなら
+    let Ok( mut window ) = q_window.get_single_mut() else { return };
 
-   //パッドのボタンの状態
-    let btn_fullscreen = GamepadButton::new( GAMEPAD, _BUTTON_FULLSCREEN );
-    let is_btn_fullscreen = inbtn.just_pressed( btn_fullscreen );
+    //[Alt]＋[Enter]の状態
+    let is_key_pressed =
+        ( inkey.pressed( KeyCode::AltRight ) || inkey.pressed( KeyCode::AltLeft ) )
+            && inkey.just_pressed( KeyCode::Return );
 
-    //Alt＋Enterキーの状態
-    let is_key_fullscreen =
-    ( inkey.pressed( _KEY_ALT_RIGHT ) || inkey.pressed( _KEY_ALT_LEFT ) )
-    && inkey.just_pressed( _KEY_FULLSCREEN );
+    //パッドのボタンの状態
+    let mut is_btn_pressed = false;
+    let btn = GamepadButtonType::Select; //ps4[SHARE]
+    for button_event in button_events.iter()
+    {   if button_event.button_type == btn
+        {   let btn = GamepadButton::new( button_event.gamepad, btn );
+            is_btn_pressed = inbtn.just_pressed( btn );
+            if is_btn_pressed { break }
+        }
+    }
 
-    //入力がないなら関数脱出
-    if ! is_key_fullscreen && ! is_btn_fullscreen { return }
+    //入力がないなら
+    if ! is_key_pressed && ! is_btn_pressed { return }
 
     //ウィンドウとフルスクリーンを切り替える
-    let mode = if window.mode == Windowed { SizedFullscreen } else { Windowed };
-    window.mode = mode;
+    window.mode = match window.mode
+    {   Windowed => SizedFullscreen,
+        _        => Windowed,
+    };
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 //一時停止する
 pub fn pause_with_esc_key
 (   q: Query<&mut Visibility, With<TextUiPause>>,
     mut state: ResMut<State<MyState>>,
-    // mut next_state: ResMut<NextState<MyState>>,
     mut inkey: ResMut<Input<KeyCode>>,
     inbtn: Res<Input<GamepadButton>>,
     mut old_state: Local<MyState>,
@@ -54,15 +73,11 @@ pub fn pause_with_esc_key
     //PAUSEのトグル処理
     if state.get().is_pause()
     {   hide_component( q );
-        // next_state.set( *old_state );
-        // next_state.0 = Some( *old_state );
         *state = State::new( *old_state ); //遷移先のOnEnterを実行しない
     }
     else
     {   show_component( q );
         *old_state = *state.get();
-        // next_state.set( MyState::Pause );
-        // next_state.0 = Some( MyState::Pause );
         *state = State::new( MyState::Pause ); //遷移元のOnExitを実行しない
     }
 
@@ -70,30 +85,33 @@ pub fn pause_with_esc_key
     inkey.reset( KeyCode::Escape );
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-//Componentを見せる
-pub fn show_component<T: Component>
-(   mut q: Query<&mut Visibility, With<T>>,
-)
-{   let _ = q.get_single_mut().map( | mut ui | *ui = Visibility::Inherited );
-}
-
-//Componentを隠す
-pub fn hide_component<T: Component>
-(   mut q: Query<&mut Visibility, With<T>>,
-)
-{   let _ = q.get_single_mut().map( | mut ui | *ui = Visibility::Hidden );
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//ComponentでQueryしたEnityを再帰的に削除する
+//QueryしたEnityを再帰的に削除する
 pub fn despawn_entity<T: Component>
 (   q: Query<Entity, With<T>>,
     mut cmds: Commands,
 )
-{   q.for_each( | id | cmds.entity( id ).despawn_recursive() );
+{   q.for_each( | ent | cmds.entity( ent ).despawn_recursive() );
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+//QueryしたComponentを見せる
+pub fn show_component<T: Component>
+(   mut q: Query<&mut Visibility, With<T>>,
+)
+{// q.for_each_mut( | mut vis | *vis = Visibility::Inherited );
+    q.for_each_mut( | mut vis | *vis = Visibility::Visible );
+}
+
+//QueryしたComponentを隠す
+pub fn hide_component<T: Component>
+(   mut q: Query<&mut Visibility, With<T>>,
+)
+{   q.for_each_mut( | mut vis | *vis = Visibility::Hidden );
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 //End of cooe.
