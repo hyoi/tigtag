@@ -1,6 +1,7 @@
 //external crates
 use bevy::{ prelude::*, sprite::*, audio::*,
-            input::gamepad::*, diagnostic::*, window::WindowMode::* };
+            input::gamepad::*, window::WindowMode::*,
+            diagnostic::* };
 use once_cell::sync::*;
 use rand::prelude::*;
 use counted_array::*;
@@ -11,15 +12,16 @@ use std::cmp::*;
 use std::collections::*;
 
 //internal submodules
-mod a_public;
-mod b_init_app;
-mod c_game_play;
-mod d_demo_play;
+mod public;
+use public::*;
 
-use a_public::*;
-use b_init_app::*;
-use c_game_play::*;
-use d_demo_play::*;
+mod a_init_app;
+mod b_game_play;
+mod c_demo_play;
+
+use a_init_app::*;
+use b_game_play::*;
+use c_demo_play::*;
 
 //メイン関数
 fn main()
@@ -27,9 +29,11 @@ fn main()
     #[cfg( not( target_arch = "wasm32" ) )]
     std::env::set_var( "RUST_LOG", "OFF" );
 
+    //アプリの生成
+    let mut app = App::new();
+
     //メインウィンドウの設定
     let primary_window = MAIN_WINDOW.clone();
-    let mut app = App::new();
     app
     .insert_resource( ClearColor( SCREEN_BACKGROUND_COLOR ) )
     .insert_resource( Msaa::Sample4 ) //アンチエイリアス
