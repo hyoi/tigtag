@@ -4,8 +4,8 @@ version = "0.7.1"
 edition = "2021"
 
 [dependencies]
-bevy = { git = "https://github.com/bevyengine/bevy" } #Master branch
-#bevy = "0.10"
+#bevy = { git = "https://github.com/bevyengine/bevy" } #Master branch
+bevy = "0.11"
 counted-array = "0.1"
 once_cell = "1"
 rand = "0.8"
