@@ -3,8 +3,8 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////
 
 //アプリの情報
-pub const _CARGO_TOML_NAME: &str = env!( "CARGO_PKG_NAME"    );
-pub const _CARGO_TOML_VER : &str = env!( "CARGO_PKG_VERSION" );
+const _CARGO_TOML_NAME: &str = env!( "CARGO_PKG_NAME"    );
+const _CARGO_TOML_VER : &str = env!( "CARGO_PKG_VERSION" );
 
 pub const APP_TITLE: &str = _CARGO_TOML_NAME; //アプリタイトル
 pub const APP_VER  : &str = _CARGO_TOML_VER;  //アプリのバージョン

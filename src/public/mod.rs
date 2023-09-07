@@ -1,6 +1,6 @@
 use super::*;
 
-//submodules
+//internal submodules
 mod types;
 mod config;
 pub mod misc;
