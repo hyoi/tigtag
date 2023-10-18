@@ -17,7 +17,7 @@ pub fn spawn_2d_sprites
 
     for x in SCREEN_GRIDS_X_RANGE
     {   for y in SCREEN_GRIDS_Y_RANGE
-        {   let vec2 = IVec2::new( x, y ).to_screen_pixel();
+        {   let vec2 = IVec2::new( x, y ).to_sprite_pixels();
             let vec3 = vec2.extend( DEPTH_SPRITE_DEBUG_GRID );
 
             cmds.spawn( SpriteBundle::default() )

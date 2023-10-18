@@ -48,11 +48,11 @@ pub fn spawn_2d_camera( mut cmds: Commands )
     //タイトルバーのWクリックや最大化ボタンによるウィンドウ最大化時に
     //表示が著しく崩れることを緩和するためviewportを設定しておく
     let zero = UVec2::new( 0, 0 );
-    let size = Vec2::new( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT );
+    let size = Vec2::new( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT ).as_uvec2();
     let viewport = Some
     (   camera::Viewport
         {   physical_position: zero,
-            physical_size    : size.as_uvec2(),
+            physical_size    : size,
             ..default()
         }
     );

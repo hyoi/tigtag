@@ -97,14 +97,22 @@ pub enum News { #[default] North, East, West, South }
 
 //glamの型にメソッドを追加する準備
 pub trait GridToPixel
-{   fn to_screen_pixel( &self ) -> Vec2;
+{   fn to_sprite_pixels( &self ) -> Vec2;
+    fn to_screen_pixels( &self ) -> Vec2;
 }
 
 //glamの型にメソッドを追加する
 impl GridToPixel for IVec2
-{   //平面座標(IVec2)からスクリーン第一象限の座標(Vec2)を算出する
-    fn to_screen_pixel( &self ) -> Vec2
+{   //平面座標(IVec2)から画面第一象限の座標(Vec2)を算出する
+    //アンカーはグリッドの中央
+    fn to_sprite_pixels( &self ) -> Vec2
     {   ( self.as_vec2() + 0.5 ) * PIXELS_PER_GRID
+    }
+
+    //平面座標(IVec2)から画面第一象限の座標(Vec2)を算出する
+    //アンカーはグリッドの左下
+    fn to_screen_pixels( &self ) -> Vec2
+    {   self.as_vec2() * PIXELS_PER_GRID
     }
 }
 
@@ -118,6 +126,12 @@ pub enum MyState
     GameStart, StageStart, MainLoop, StageClear, GameOver,
     Pause, Debug,
 }
+
+// impl MyState
+// {   pub fn is_stageclear( &self ) -> bool { *self == MyState::StageClear }
+//     pub fn is_pause     ( &self ) -> bool { *self == MyState::Pause      }
+//     pub fn is_demoplay  ( &self ) -> bool { *self == MyState::Title || *self == MyState::DemoLoop }
+// }
 
 // //Stateの遷移に使うマーカー(not Resource)
 // #[derive( Default )] pub struct MainLoop;
@@ -140,39 +154,6 @@ impl GotoState for AfterInitAppTo<MyState>    { fn next( &self ) -> MyState { se
 
 
 
-// use super::*;
-
-// //internal submodules
-// mod dxdy;
-// mod map;
-// mod player_chaser;
-
-// //re-export
-// pub use dxdy::*;
-// pub use map::*;
-// pub use player_chaser::*;
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //ゲームの状態
-// #[derive( Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States )]
-// pub enum MyState
-// {   #[default] InitApp,
-//     Title, DemoLoop,
-//     StageStart, MainLoop, StageClear, GameOver,
-//     Pause, Debug,
-// }
-// impl MyState
-// {   pub fn is_stageclear( &self ) -> bool { *self == MyState::StageClear }
-//     pub fn is_pause     ( &self ) -> bool { *self == MyState::Pause      }
-//     pub fn is_demoplay  ( &self ) -> bool { *self == MyState::Title || *self == MyState::DemoLoop }
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //InitAppから遷移する先のState
-// #[derive( Resource )]
-// pub struct AfterInitApp<T: States> ( pub T );
 
 // ////////////////////////////////////////////////////////////////////////////////
 
