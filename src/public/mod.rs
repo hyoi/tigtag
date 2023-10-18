@@ -1,13 +1,17 @@
 use super::*;
 
-//internal submodules
-mod types;
+//アプリの設定
 mod config;
-pub mod misc;
-// pub mod debug;
-
-//re-export
-pub use types::*;
 pub use config::*;
+
+//型定義
+mod types;
+pub use types::*;
+
+//ユーティリティ
+pub mod misc;
+
+//debug用
+pub mod debug;
 
 //End of code.
