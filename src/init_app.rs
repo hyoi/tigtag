@@ -14,7 +14,7 @@ impl Plugin for Schedule
         .add_systems
         (   OnEnter ( MyState::InitApp ),
             (   spawn_screen_frame, //ゲーム枠を表示
-                spawn_footer,       //フッターを表示
+                spawn_text_ui,      //TEXT UIを表示
                 misc::change_state_with_res::<AfterInitAppTo<MyState>>, //無条件遷移
             )
         )
@@ -36,26 +36,57 @@ type MessageSect<'a> =
     Color,   //フォントの色
 );
 
+//ヘッダーのComponent
+#[derive( Component )] struct HeaderUiStages;
+#[derive( Component )] struct HeaderUiScore;
+#[derive( Component )] struct HeaderUiHiScore;
+
 //フッター(FPS表示)のComponent
-#[derive( Component )]
-struct FooterUiFps;
+#[derive( Component )] struct FooterUiFps;
+
+//text UIの初期値
+// #[allow( dead_code )]
+pub const NA2  : &str = "##";
+pub const NA3  : &str = "###";
+pub const NA5  : &str = "#####";
+pub const NA2_5: &str = "##-#####";
+pub const NA3_2: &str = "###.##";
+
+//ヘッダーの設定
+counted_array!
+(   pub const TEXT_HEADER_LEFT: [ MessageSect; _ ] =
+    [   ( " STAGE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
+        ( NA2      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
+    ]
+);
+counted_array!
+(   pub const TEXT_HEADER_CENTER: [ MessageSect; _ ] =
+    [   ( " SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD   ),
+        ( NA5      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE  ),
+        ( NA3      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.5, Color::SILVER ),  //placeholder for debug
+    ]
+);
+counted_array!
+(   pub const TEXT_HEADER_RIGHT: [ MessageSect; _ ] =
+    [   ( " Hi-SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
+        ( NA5         , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
+    ]
+);
 
 //フッターの設定
-const NA3_2: &str = "###.##";
-
 counted_array!
 (   const TEXT_FOOTER_LEFT: [ MessageSect; _ ] =
-    [   ( " FPS ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, Color::TEAL   ),
-        ( NA3_2  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4, Color::SILVER ),
-    ]
+    [   ( " FPS " , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.60, Color::TEAL   ),
+        ( NA3_2   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.40, Color::SILVER ),
+        ( " demo ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID       * 0.45, Color::TEAL   ),
+        ( NA2_5   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.25, Color::SILVER ),
+]
 );
-
 counted_array!
 (   const TEXT_FOOTER_CENTER: [ MessageSect; _ ] =
-    [   ( "hyoi 2023 - xxxx", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
+    [   ( "hyoi 2021 - 2023", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
     ]
 );
-
 counted_array!
 (   const TEXT_FOOTER_RIGHT: [ MessageSect; _ ] =
     [   ( "Powered by ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL   ),
@@ -122,23 +153,66 @@ fn spawn_screen_frame
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//フッターを配置する
-fn spawn_footer
+//TEXT UIを配置する
+fn spawn_text_ui
 (   mut cmds: Commands,
     asset_svr: Res<AssetServer>,
 )
 {   //レイアウト用の隠しフレームの準備
     let per100 = Val::Percent( 100.0 );
+    let width  = Val::Px( SCREEN_PIXELS_WIDTH  );
+    let height = Val::Px( SCREEN_PIXELS_HEIGHT );
+    let background_color = BackgroundColor ( Color::NONE );
+
     let style = Style
     {   width          : per100,
         height         : per100,
         position_type  : PositionType::Absolute,
         flex_direction : FlexDirection::Column,
+//      justify_content: JustifyContent::Center,
+//      align_items    : AlignItems::Center,
+        ..default()
+    };
+    let hidden_frame_base = NodeBundle { style, background_color, ..default() };
+
+    let style = Style
+    {   width,
+        height,
+        position_type  : PositionType::Absolute,
+        flex_direction : FlexDirection::Column,
+        justify_content: JustifyContent::FlexStart, //画面の上端
+        ..default()
+    };
+    let hidden_frame_header = NodeBundle { style, background_color, ..default() };
+
+//     let hidden_frame_middle = NodeBundle
+//     {   style: Style
+//         {   flex_direction: FlexDirection::Column,
+//             align_items   : AlignItems::Center,
+//             ..default()
+//         },
+//         background_color,
+//         ..default()
+//     };
+
+    let style = Style
+    {   width,
+        height,
+        position_type  : PositionType::Absolute,
+        flex_direction : FlexDirection::Column,
         justify_content: JustifyContent::FlexEnd, //画面の下端
         ..default()
     };
-    let background_color = BackgroundColor ( Color::NONE );
-    let hidden_frame = NodeBundle { style, background_color, ..default() };
+    let hidden_frame_footer = NodeBundle { style, background_color, ..default() };
+
+    //ヘッダーの準備
+    let mut header_left   = text_ui( &TEXT_HEADER_LEFT  , &asset_svr );
+    let mut header_center = text_ui( &TEXT_HEADER_CENTER, &asset_svr );
+    let mut header_right  = text_ui( &TEXT_HEADER_RIGHT , &asset_svr );
+    header_left.style.align_self   = AlignSelf::FlexStart;
+    header_center.style.align_self = AlignSelf::Center;
+    header_right.style.align_self  = AlignSelf::FlexEnd;
+
 
     //フッターの準備
     let mut footer_left   = text_ui( &TEXT_FOOTER_LEFT  , &asset_svr );
@@ -149,11 +223,24 @@ fn spawn_footer
     footer_right.style.align_self  = AlignSelf::FlexEnd;
 
     //隠しフレームの中に子要素を作成する
-    cmds.spawn( hidden_frame ).with_children
+    cmds.spawn( hidden_frame_base ).with_children
     (   | cmds |
-        {   cmds.spawn( ( footer_left, FooterUiFps ) );
-            cmds.spawn(   footer_center              );
-            cmds.spawn(   footer_right               );
+        {   cmds.spawn( hidden_frame_header ).with_children
+            (   | cmds |
+                {   //ヘッダー
+                    cmds.spawn( ( header_left  , HeaderUiStages  ) );
+                    cmds.spawn( ( header_center, HeaderUiScore   ) );
+                    cmds.spawn( ( header_right , HeaderUiHiScore ) );
+                }
+            );
+            cmds.spawn( hidden_frame_footer ).with_children
+            (   | cmds |
+                {   //フッター
+                    cmds.spawn( ( footer_left, FooterUiFps ) );
+                    cmds.spawn(   footer_center              );
+                    cmds.spawn(   footer_right               );
+                }
+            );
         }
     );
 
@@ -163,8 +250,7 @@ fn spawn_footer
     let vec2 = IVec2::new( GRID_X_KANI, GRID_Y_KANI ).to_sprite_pixels();
     let vec3 = vec2.extend( DEPTH_SPRITE_KANI_DOTOWN );
 
-    cmds
-    .spawn( SpriteBundle::default() )
+    cmds.spawn( SpriteBundle::default() )
     .insert( Sprite { custom_size, color, ..default() } )
     .insert( Transform::from_translation( vec3 ) )
     .insert( asset_svr.load( ASSETS_SPRITE_KANI_DOTOWN ) as Handle<Image> )
@@ -198,19 +284,17 @@ fn text_ui
 
 //フッターを更新する(FPS)
 fn update_fps
-(   mut q_text: Query<&mut Text, With<FooterUiFps>>,
+(   mut qry_text: Query<&mut Text, With<FooterUiFps>>,
     diag_store: Res<DiagnosticsStore>,
 )
-{   let Ok( mut text ) = q_text.get_single_mut() else { return };
+{   let Ok( mut text ) = qry_text.get_single_mut() else { return };
 
-    let fps_avr =
-    diag_store
+    let fps_avr = diag_store
     .get( FrameTimeDiagnosticsPlugin::FPS )
     .map_or
     (   NA3_2.to_string(),
         | fps |
-        fps
-        .average()
+        fps.average()
         .map_or
         (   NA3_2.to_string(),
             | avg |
@@ -225,10 +309,9 @@ fn update_fps
 
 //End of code.
 
-// use super::*;
 
-// //internal submodules
-// mod load_assets;
+
+
 
 // ////////////////////////////////////////////////////////////////////////////////
 
@@ -265,28 +348,6 @@ fn update_fps
 //     }
 // }
 
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //ゲームの枠を表示する
-// fn spawn_screen_frame
-// (   mut cmds : Commands,
-//     asset_svr: Res<AssetServer>,
-// )
-// {   for ( y, line ) in DESIGN_GAME_FRAME.iter().enumerate()
-//     {   for ( x, char ) in line.chars().enumerate()
-//         {   if char != ' '
-//             {   let px2d = Grid::new( x as i32, y as i32 ).px2d_map();
-//                 let px3d = px2d.extend( DEPTH_SPRITE_GAME_FRAME );
-    
-//                 cmds.spawn( SpriteBundle::default() )
-//                 .insert( asset_svr.load( ASSETS_SPRITE_BRICK_WALL ) as Handle<Image> )
-//                 .insert( Sprite { custom_size: Some ( SIZE_GRID ), ..default() } )
-//                 .insert( Transform::from_translation( px3d ) )
-//                 ;
-//             }
-//         }
-//     }
-// }
 
 // ////////////////////////////////////////////////////////////////////////////////
 
@@ -433,24 +494,3 @@ fn update_fps
 // }
 
 // ////////////////////////////////////////////////////////////////////////////////
-
-// //UIの表示を更新する(FPS)
-// fn update_footer_fps
-// (   mut q_ui: Query<&mut Text, With<FooterLeft>>,
-//     diag: Res<DiagnosticsStore>,
-// )
-// {   let Ok( mut ui ) = q_ui.get_single_mut() else { return };
-
-//     let fps_avr = diag
-//     .get( FrameTimeDiagnosticsPlugin::FPS )
-//     .map_or
-//     (   NA3_2.to_string(),
-//         | fps |
-//         fps.average().map_or( NA3_2.to_string(), | avg | format!( "{avg:06.2}" ) )
-//     );
-//     ui.sections[ 1 ].value = fps_avr;
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //End of code.
