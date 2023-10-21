@@ -26,6 +26,9 @@ impl Plugin for Schedule
         //接続されているgamepadの特定
         .add_systems( Update, misc::catch_gamepad_connection )
 
+        //チェイサーの回転アニメーション
+        .add_systems( Update, chasers::rotate )
+
         //GameStart＜仮＞
         .add_systems
         (   OnEnter ( MyState::GameStart ),
@@ -38,8 +41,8 @@ impl Plugin for Schedule
             (   // zero_clear_score_and_stage, //ゲーム開始時(非クリア時)の初期化
                 map::make_new_data,         //新マップのデータ作成
                 (   map::spawn_sprite,      //スプライトをspawnする
-                    // player::spawn_sprite,   //スプライトをspawnする
-                    // chasers::spawn_sprite,  //スプライトをspawnする
+                    player::spawn_sprite,   //スプライトをspawnする
+                    chasers::spawn_sprite,  //スプライトをspawnする
                 ),
                 // set_countdown_params::<TextUiStart>, //カウントダウン初期化
                 // misc::show_component::<TextUiStart>, //カウントダウン表示
@@ -56,13 +59,6 @@ impl Plugin for Schedule
 
 
 
-// //internal submodules
-
-// pub mod player;  //pub必須(demoplayモジュールから呼び出すため)
-// pub mod chasers; //pub必須(demoplayモジュールから呼び出すため)
-
-// ////////////////////////////////////////////////////////////////////////////////
-
 // //プラグインの設定
 // pub struct Schedule;
 // impl Plugin for Schedule
@@ -75,7 +71,6 @@ impl Plugin for Schedule
         // .add_event::<EventOver>()       //ゲームオーバーイベントの登録
         // .init_resource::<CrossButton>() //十字ボタンの入力状態保存用
 
-//         .add_systems( Update, chasers::rotate_sprite ) //追手スプライトがあれば回転させる
 //         .add_systems( Update, player::catch_cross_button_pressed ) //十字ボタンの入力読み取り
 
 //         //----------------------------------------------------------------------

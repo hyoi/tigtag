@@ -13,6 +13,12 @@ mod pause;
 //マップの処理
 pub mod map; //title_demoから呼び出すためpub付
 
+//プレイヤーの処理
+pub mod player; //title_demoから呼び出すためpub付
+
+//チェイサーの処理
+pub mod chasers; //title_demoから呼び出すためpub付
+
 // //アプリの設定
 // mod config;
 // pub use config::*;

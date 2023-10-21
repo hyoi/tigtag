@@ -101,8 +101,8 @@ counted_array!
 pub const DEPTH_SPRITE_DEBUG_GRID : f32 = 999.0; //重なりの最大値
 pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0;
 pub const DEPTH_SPRITE_GAME_FRAME : f32 = 800.0;
-// pub const DEPTH_SPRITE_CHASER     : f32 = 700.0;
-// pub const DEPTH_SPRITE_PLAYER     : f32 = 600.0;
+pub const DEPTH_SPRITE_CHASER     : f32 = 700.0;
+pub const DEPTH_SPRITE_PLAYER     : f32 = 600.0;
 pub const DEPTH_SPRITE_DOT        : f32 = 500.0;
 pub const DEPTH_SPRITE_BRICK_WALL : f32 = 400.0;
 
@@ -111,13 +111,12 @@ pub const DEPTH_SPRITE_BRICK_WALL : f32 = 400.0;
 
 //スプライト色
 pub const COLOR_SPRITE_DOT   : Color = Color::rgb( 1.0, 1.0, 0.7 );
-// pub const COLOR_SPRITE_PLAYER: Color = Color::YELLOW;
+pub const COLOR_SPRITE_PLAYER: Color = Color::YELLOW;
 
 //スプライト拡縮
 pub const MAGNIFY_SPRITE_DOT   : f32 = 0.08;
-// pub const MAGNIFY_SPRITE_PLAYER: f32 = 0.4;
-// pub const MAGNIFY_SPRITE_CHASER: f32 = 0.5;
-// pub const MAGNIFY_SPRITE_KANI  : f32 = 0.9;
+pub const MAGNIFY_SPRITE_PLAYER: f32 = 0.4;
+pub const MAGNIFY_SPRITE_CHASER: f32 = 0.5;
 
 //調整値
 pub const ADJUSTER_MAP_SPRITES: Vec2 = Vec2::new( 0.0, 1.0 * PIXELS_PER_GRID );
@@ -207,6 +206,33 @@ pub const MAP_GRIDS_Y_RANGE: Range<i32> = 0..MAP_GRIDS_HEIGHT;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//Playerの設定値
+// pub const PLAYER_TURN_COEF: f32 = 3.5;
+// pub const PLAYER_MOVE_COEF: f32 = 3.5;
+
+// pub const UNIT_TURN: f32 = FRAC_PI_2;
+// pub const UNIT_MOVE: f32 = 1.0;
+
+pub const PLAYER_WAIT: f32 = 0.09;                               //移動のウェイト
+// pub const PLAYER_MOVE_COEF: f32 = PIXELS_PER_GRID / PLAYER_WAIT; //移動の中割係数
+
+////////////////////////////////////////////////////////////////////////////////
+
+//Chaserの設定値
+pub const CHASER_WAIT: f32 = 0.13;                               //移動のウェイト
+// pub const CHASER_MOVE_COEF: f32 = PIXELS_PER_GRID / CHASER_WAIT; //移動の中割係数
+// pub const CHASER_ACCEL: f32 = 0.4;                               //スピードアップの割増
+pub const CHASER_INIT_POSITION: [ ( i32, i32 ); 4 ] =            //スタート座標(Grid)
+[   ( 1    , 1     ),
+    ( 1    , MAX_Y ),
+    ( MAX_X, 1     ),
+    ( MAX_X, MAX_Y ),
+];
+const MAX_X: i32 = MAP_GRIDS_WIDTH  - 2;
+const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.
 
 
@@ -217,32 +243,6 @@ pub const MAP_GRIDS_Y_RANGE: Range<i32> = 0..MAP_GRIDS_HEIGHT;
 //四方の配列
 // pub const NEWS: [ News; 4 ] = [ News::South, News::East, News::West, News::North ];
 
-////////////////////////////////////////////////////////////////////////////////
-
-//Playerの設定値
-// pub const PLAYER_TURN_COEF: f32 = 3.5;
-// pub const PLAYER_MOVE_COEF: f32 = 3.5;
-
-// pub const UNIT_TURN: f32 = FRAC_PI_2;
-// pub const UNIT_MOVE: f32 = 1.0;
-
-// pub const PLAYER_WAIT: f32 = 0.09;                               //移動のウェイト
-// pub const PLAYER_MOVE_COEF: f32 = PIXELS_PER_GRID / PLAYER_WAIT; //移動の中割係数
-
-//Chaserの設定値
-// pub const CHASER_WAIT: f32 = 0.13;                               //移動のウェイト
-// pub const CHASER_MOVE_COEF: f32 = PIXELS_PER_GRID / CHASER_WAIT; //移動の中割係数
-// pub const CHASER_ACCEL: f32 = 0.4;                               //スピードアップの割増
-// pub const CHASER_INIT_POSITION: [ ( i32, i32 ); 4 ] =            //スタート座標(Grid)
-// [   ( 1    , 1     ),
-//     ( 1    , MAX_Y ),
-//     ( MAX_X, 1     ),
-//     ( MAX_X, MAX_Y ),
-// ];
-// const MAX_X: i32 = MAP_GRIDS_WIDTH  - 2;
-// const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
-
-////////////////////////////////////////////////////////////////////////////////
 
 
 // ////////////////////////////////////////////////////////////////////////////////
