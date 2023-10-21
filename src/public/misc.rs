@@ -12,12 +12,18 @@ pub fn toggle_window_mode
 {   let Ok( mut window ) = qry_window.get_single_mut() else { return };
 
     //[Alt]＋[Enter]の状態
-    let is_key_pressed =
-        ( keys.pressed( KeyCode::AltRight ) || keys.pressed( KeyCode::AltLeft ) )
-            && keys.just_pressed( KeyCode::Return );
+    let mut is_key_pressed = false;
+    if keys.just_pressed( FULL_SCREEN_KEY )
+    {   for key in FULL_SCREEN_KEY_MODIFIER
+        {   if keys.pressed( key )
+            {   is_key_pressed = true;
+                break;
+            }
+        }
+    }
 
     //ゲームパッドは抜き挿しでIDが変わるので.iter()で回す
-    let button_type = GamepadButtonType::Select; //ps4[SHARE]
+    let button_type = FULL_SCREEN_BUTTON;
     let mut is_gpdbtn_pressed = false;
     for gamepad in gamepads.iter()
     {   if gpdbtn.just_pressed( GamepadButton { gamepad, button_type } )
@@ -93,94 +99,69 @@ pub fn despawn<T: Component>
 {   qry_entity.for_each( | id | cmds.entity( id ).despawn_recursive() );
 }
 
+//QueryしたComponentを見せる
+pub fn show<T: Component>
+(   mut qry: Query<&mut Visibility, With<T>>,
+)
+{   qry.for_each_mut( | mut vis | *vis = Visibility::Visible );
+}
+
+//QueryしたComponentを隠す
+pub fn hide<T: Component>
+(   mut qry: Query<&mut Visibility, With<T>>,
+)
+{   qry.for_each_mut( | mut vis | *vis = Visibility::Hidden );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//TextBundleを作る
+pub fn text_ui
+(   message: &[ MessageSect ],
+    asset_svr: &Res<AssetServer>,
+) -> TextBundle
+{   let mut sections = Vec::new();
+    for ( line, file, size, color ) in message.iter()
+    {   let value = line.to_string();
+        let style = TextStyle
+        {   font     : asset_svr.load( *file ),
+            font_size: *size,
+            color    : *color
+        };
+        sections.push( TextSection { value, style } );
+    }
+    let alignment = TextAlignment::Center;
+    let position_type = PositionType::Absolute;
+
+    let text  = Text { sections, alignment, ..default() };
+    let style = Style { position_type, ..default() };
+    TextBundle { text, style, ..default() }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//操作を受け付けるgamepadを切り替える
+pub fn catch_gamepad_connection
+(   opt_gamepad_id: Option<ResMut<EnabledGamepadId>>,
+    gamepads: Res<Gamepads>,
+)
+{   let Some ( mut gamepad_id ) = opt_gamepad_id else { return };
+    
+    //記録済のgamepadがまだ接続中なら
+    if gamepad_id.0.is_some_and( | id | gamepads.contains( id ) ) { return }
+
+    //一つも接続されていないなら
+    if gamepads.iter().count() == 0
+    {   if gamepad_id.0.is_some() { gamepad_id.0 = None }
+        return;
+    }
+
+    //gamepadsの中から1つ取り出して記録する
+    if let Some ( id ) = gamepads.iter().next()
+    {   gamepad_id.0 = Some ( id );
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //End of code.
-
-
-
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //QueryしたEnityを再帰的に削除する
-// pub fn despawn_entity<T: Component>
-// (   q: Query<Entity, With<T>>,
-//     mut cmds: Commands,
-// )
-// {   q.for_each( | ent | cmds.entity( ent ).despawn_recursive() );
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //QueryしたComponentを見せる
-// pub fn show_component<T: Component>
-// (   mut q: Query<&mut Visibility, With<T>>,
-// )
-// {// q.for_each_mut( | mut vis | *vis = Visibility::Inherited );
-//     q.for_each_mut( | mut vis | *vis = Visibility::Visible );
-// }
-
-// //QueryしたComponentを隠す
-// pub fn hide_component<T: Component>
-// (   mut q: Query<&mut Visibility, With<T>>,
-// )
-// {   q.for_each_mut( | mut vis | *vis = Visibility::Hidden );
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //指定の情報からTextBundleを作る
-// pub fn text_ui
-// (   message: &[ MessageSect ],
-//     alignment: TextAlignment,
-//     asset_svr: &Res<AssetServer>,
-// ) -> TextBundle
-// {   let mut sections = Vec::new();
-//     for ( line, file, size, color ) in message.iter()
-//     {   let value = line.to_string();
-//         let style = TextStyle
-//         {   font     : asset_svr.load( *file ),
-//             font_size: *size,
-//             color    : *color
-//         };
-//         sections.push( TextSection { value, style } );
-//     }
-//     let position_type = PositionType::Absolute;
-
-//     let text  = Text { sections, alignment, ..default() };
-//     let style = Style { position_type, ..default() };
-//     TextBundle { text, style, ..default() }
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //操作を受け付けるgamepadを切り替える
-// pub fn catch_gamepad_connection_changes
-// (   o_now_gamepad: Option<ResMut<NowGamepad>>,
-//     gamepads: Res<Gamepads>,
-// )
-// {   //トラブル除け
-//     let Some ( mut now_gamepad ) = o_now_gamepad else { return };
-    
-//     //記録済のgamepadがまだ接続中なら
-//     if now_gamepad.0
-//         .is_some_and( | gamepad | gamepads.contains( gamepad ) ) { return }
-
-//     //gamepadが一つも接続されていないなら
-//     if gamepads.iter().count() == 0
-//     {   if now_gamepad.0.is_some()
-//         {   //gamepadが取り外された場合
-//             now_gamepad.0 = None;
-//         }
-//         return;
-//     }
-
-//     //gamepadsの中から1つ取り出して記録する
-//     if let Some ( gamepad ) = gamepads.iter().next()
-//     {   now_gamepad.0 = Some ( gamepad );
-//     }
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //End of cooe.

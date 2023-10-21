@@ -1,5 +1,9 @@
 use super::*;
 
+//internal submodules
+mod map;
+pub use map::*;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //画面デザイン(枠)
@@ -9,23 +13,170 @@ pub struct ScreenFrame<'a>
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//glamの型にメソッドを追加する準備
+pub trait GridToPixel
+{   fn to_sprite_pixels( &self ) -> Vec2;
+    fn to_screen_pixels( &self ) -> Vec2;
+}
+
+//glamの型にメソッドを追加する
+impl GridToPixel for IVec2
+{   //平面座標(IVec2)から画面第一象限の座標(Vec2)を算出する
+    //アンカーはグリッドの中央
+    fn to_sprite_pixels( &self ) -> Vec2
+    {   ( self.as_vec2() + 0.5 ) * PIXELS_PER_GRID
+    }
+
+    //平面座標(IVec2)から画面第一象限の座標(Vec2)を算出する
+    //アンカーはグリッドの左下
+    fn to_screen_pixels( &self ) -> Vec2
+    {   self.as_vec2() * PIXELS_PER_GRID
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//ゲームの状態
+#[derive( Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States )]
+pub enum MyState
+{   #[default] LoadAssets, InitApp,
+    GameStart, StageStart, MainLoop, StageClear, GameOver,
+    TitleDemo, DemoLoop,
+    Pause, Debug,
+}
+
+impl MyState
+{   pub fn is_pause     ( &self ) -> bool { *self == MyState::Pause      }
+    // pub fn is_stageclear( &self ) -> bool { *self == MyState::StageClear }
+    // pub fn is_demoplay  ( &self ) -> bool { *self == MyState::TitleDemo || *self == MyState::DemoLoop }
+}
+
+//Stateの遷移に使うマーカー(not Resource)
+#[derive( Default )] pub struct StageStart;
+// #[derive( Default )] pub struct TitleDemo;
+// #[derive( Default )] pub struct MainLoop;
+
+//Stateの遷移に使うResouce
+#[derive( Resource )] pub struct AfterLoadAssetsTo<T: States> ( pub T );
+#[derive( Resource )] pub struct AfterInitAppTo   <T: States> ( pub T );
+#[derive( Resource )] pub struct TitleDemoExist   <T: States> ( pub T );
+
+//Stateの遷移に使うTrait
+pub trait GotoState { fn next( &self ) -> MyState; }
+
+//Traitの実装
+impl GotoState for StageStart                  { fn next( &self ) -> MyState { MyState::StageStart } }
+// impl GotoState for TitleDemo                  { fn next( &self ) -> MyState { MyState::TitleDemo } }
+// impl GotoState for MainLoop                   { fn next( &self ) -> MyState { MyState::MainLoop } }
+impl GotoState for AfterLoadAssetsTo<MyState> { fn next( &self ) -> MyState { self.0 } }
+impl GotoState for AfterInitAppTo   <MyState> { fn next( &self ) -> MyState { self.0 } }
+impl GotoState for TitleDemoExist   <MyState> { fn next( &self ) -> MyState { self.0 } }
+
+////////////////////////////////////////////////////////////////////////////////
+
+//ゲームの記録用Resource
+
+#[derive( Resource, Default )] pub struct Stage ( i32 );
+impl Stage
+{   pub fn get( &self ) -> i32 { self.0 }
+    pub fn get_mut( &mut self ) -> &mut i32 { &mut self.0 }
+}
+
+#[derive( Resource, Default )] pub struct Score ( i32 );
+impl Score
+{   pub fn get( &self ) -> i32 { self.0 }
+    // pub fn get_mut( &mut self ) -> &mut i32 { &mut self.0 }
+}
+
+#[derive( Resource, Default )] pub struct HiScore ( i32 );
+impl HiScore
+{   pub fn get( &self ) -> i32 { self.0 }
+    // pub fn get_mut( &mut self ) -> &mut i32 { &mut self.0 }
+}
+
+// #[derive( Resource )]
+// pub struct Record
+// {   pub score         : i32,        //スコア
+//     pub hi_score      : i32,        //ハイスコア
+//     pub stage         : i32,        //ステージ数
+//     pub count_down    : i32,        //カウントダウンタイマーの初期値
+//     pub cd_timer      : Timer,      //カウントダウンタイマー用タイマー
+//     pub is_stage_clear: bool,       //ステージクリアすると真、それ以外は偽
+//     pub demo          : DemoRecord, //demo用の記録
+// }
+
+// //demo用
+// #[derive( Default )]
+// pub struct DemoRecord
+// {   pub stage   : i32,  //ステージ数
+//     pub hi_score: i32,  //ハイスコア
+// }
+
+// impl Default for Record
+// {   fn default() -> Self
+//     {   Self
+//         {   score         : 0,
+//             hi_score      : 0,
+//             stage         : 0,
+//             count_down    : 0,
+//             cd_timer      : Timer::from_seconds( 1.0, TimerMode::Once ),
+//             is_stage_clear: false,
+//             demo          : DemoRecord::default(),
+//         }
+//     }
+// }
+
+////////////////////////////////////////////////////////////////////////////////
+
+//中央の隠しフレームのComponent
+#[derive( Component )] pub struct HiddenFrameMiddle;
+
+//ヘッダーのComponent
+#[derive( Component )] pub struct UiStage;
+#[derive( Component )] pub struct UiScore;
+#[derive( Component )] pub struct UiHiScore;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//text UIのメッセージセクションの型
+pub type MessageSect<'a> =
+(   &'a str, //表示文字列
+    &'a str, //フォントのAssets
+    f32,     //フォントのサイズ
+    Color,   //フォントの色
+);
+
+////////////////////////////////////////////////////////////////////////////////
+
+//操作を受け付けるgamepadを保存するResource
+#[derive( Resource, Default )]
+pub struct EnabledGamepadId ( pub Option<Gamepad> );
+
+////////////////////////////////////////////////////////////////////////////////
+
 //四方を表す列挙型
 #[derive( Default, Clone, Copy, PartialEq, Eq, Hash, Debug )]
 pub enum News { #[default] North, East, West, South }
 
-// //IVec2 = IVec2 + News
-// impl Add<News> for IVec2
-// {   type Output = IVec2;
-//     fn add( mut self, news: News ) -> IVec2
-//     {   match news
-//         {   News::North => { self.y -= 1; }
-//             News::East  => { self.x += 1; }
-//             News::West  => { self.x -= 1; }
-//             News::South => { self.y += 1; }
-//         }
-//         self
-//     }
-// }
+//IVec2 = IVec2 + News
+impl Add<News> for IVec2
+{   type Output = IVec2;
+    fn add( mut self, news: News ) -> IVec2
+    {   match news
+        {   News::North => { self.y -= 1; }
+            News::East  => { self.x += 1; }
+            News::West  => { self.x -= 1; }
+            News::South => { self.y += 1; }
+        }
+        self
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//End of code.
+
+
 
 // //IVec2 += News
 // impl AddAssign<News> for IVec2
@@ -95,62 +246,6 @@ pub enum News { #[default] North, East, West, South }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//glamの型にメソッドを追加する準備
-pub trait GridToPixel
-{   fn to_sprite_pixels( &self ) -> Vec2;
-    fn to_screen_pixels( &self ) -> Vec2;
-}
-
-//glamの型にメソッドを追加する
-impl GridToPixel for IVec2
-{   //平面座標(IVec2)から画面第一象限の座標(Vec2)を算出する
-    //アンカーはグリッドの中央
-    fn to_sprite_pixels( &self ) -> Vec2
-    {   ( self.as_vec2() + 0.5 ) * PIXELS_PER_GRID
-    }
-
-    //平面座標(IVec2)から画面第一象限の座標(Vec2)を算出する
-    //アンカーはグリッドの左下
-    fn to_screen_pixels( &self ) -> Vec2
-    {   self.as_vec2() * PIXELS_PER_GRID
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//ゲームの状態
-#[derive( Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States )]
-pub enum MyState
-{   #[default] LoadAssets, InitApp,
-    Title, DemoLoop,
-    GameStart, StageStart, MainLoop, StageClear, GameOver,
-    Pause, Debug,
-}
-
-// impl MyState
-// {   pub fn is_stageclear( &self ) -> bool { *self == MyState::StageClear }
-//     pub fn is_pause     ( &self ) -> bool { *self == MyState::Pause      }
-//     pub fn is_demoplay  ( &self ) -> bool { *self == MyState::Title || *self == MyState::DemoLoop }
-// }
-
-// //Stateの遷移に使うマーカー(not Resource)
-// #[derive( Default )] pub struct MainLoop;
-
-//Stateの遷移に使うResouce
-#[derive( Resource )] pub struct AfterLoadAssetsTo <T: States> ( pub T );
-#[derive( Resource )] pub struct AfterInitAppTo    <T: States> ( pub T );
-
-//Stateの遷移に使うTrait
-pub trait GotoState { fn next( &self ) -> MyState; }
-
-//Traitの実装
-// impl GotoState for MainLoop                   { fn next( &self ) -> MyState { MyState::MainLoop } }
-impl GotoState for AfterLoadAssetsTo<MyState> { fn next( &self ) -> MyState { self.0 } }
-impl GotoState for AfterInitAppTo<MyState>    { fn next( &self ) -> MyState { self.0 } }
-
-////////////////////////////////////////////////////////////////////////////////
-
-//End of code.
 
 
 
@@ -195,39 +290,6 @@ impl GotoState for AfterInitAppTo<MyState>    { fn next( &self ) -> MyState { se
 
 // ////////////////////////////////////////////////////////////////////////////////
 
-// //ゲームの記録用Resource
-// #[derive( Resource )]
-// pub struct Record
-// {   pub stage   : i32,        //ステージ数
-//     pub score   : i32,        //スコア
-//     pub hi_score: i32,        //ハイスコア
-//     pub count   : i32,        //カウントダウンタイマーの初期値
-//     pub timer   : Timer,      //カウントダウンタイマー用タイマー
-//     pub is_clear: bool,       //ステージクリアすると真、それ以外は偽
-//     pub demo    : DemoRecord, //demo用の記録
-// }
-// impl Default for Record
-// {   fn default() -> Self
-//     {   Self
-//         {   stage   : 0,
-//             score   : 0,
-//             hi_score: 0,
-//             count   : 0,
-//             timer   : Timer::from_seconds( 1.0, TimerMode::Once ),
-//             is_clear: false,
-//             demo    : DemoRecord::default(),
-//         }
-//     }
-// }
-
-// //demo用の記録
-// #[derive( Default )]
-// pub struct DemoRecord
-// {   pub stage     : i32,  //ステージ数
-//     pub hi_score  : i32,  //ハイスコア
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
 
 // //text UIのメッセージセクションの型
 // pub type MessageSect<'a> =
@@ -250,23 +312,6 @@ impl GotoState for AfterInitAppTo<MyState>    { fn next( &self ) -> MyState { se
 // #[derive( Component )]
 // pub struct TextUiClear ( pub i32, pub MyState, pub usize, pub fn ( i32 ) -> String );
 
-// #[derive( Component )]
-// pub struct HeaderLeft;
-
-// #[derive( Component )]
-// pub struct HeaderCenter;
-
-// #[derive( Component )]
-// pub struct HeaderRight;
-
-// #[derive( Component )]
-// pub struct FooterLeft;
-
-// #[derive( Component )]
-// pub struct FooterCenter;
-
-// #[derive( Component )]
-// pub struct FooterRight;
 
 // //カウントダウン付きtext UIでトレイト境界を使う準備
 // pub trait WithCountDown
@@ -321,10 +366,6 @@ impl GotoState for AfterInitAppTo<MyState>    { fn next( &self ) -> MyState { se
 // }
 
 // ////////////////////////////////////////////////////////////////////////////////
-
-// //操作を受け付けるgamepadを保存するResource
-// #[derive( Resource, Default )]
-// pub struct NowGamepad ( pub Option<Gamepad> );
 
 // //十字ボタンの入力状態を保存するResource
 // #[derive( Resource )]

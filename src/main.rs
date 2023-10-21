@@ -14,8 +14,8 @@ use rand::prelude::*;
 use regex::Regex;
 
 //standard library
-use std::ops::{ Range, Add, AddAssign };
-use std::f32::consts::{ PI, TAU, FRAC_PI_2 };
+use std::ops::{ Range, Add, /*AddAssign*/ };
+// use std::f32::consts::{ PI, TAU, FRAC_PI_2 };
 
 //internal submodules
 mod public;
@@ -23,7 +23,7 @@ use public::*;
 
 mod load_assets;
 mod init_app;
-// mod play_game;
+mod play_game;
 // mod title_demo;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ fn main()
     )
     .add_systems
     (   Update,
-        (   (   bevy::window::close_on_esc, //[ESC]で終了
+        (   (   // bevy::window::close_on_esc, //[ESC]で終了
                 misc::toggle_window_mode,   //フルスクリーン切換
             )
             .run_if( not( WASM ) ),
@@ -71,7 +71,7 @@ fn main()
     .add_state::<MyState>() //Stateを初期化する。enumの#[default]で初期値指定
     .add_plugins( load_assets::Schedule ) //assetsの事前ロード
     .add_plugins( init_app::Schedule )    //ゲーム枠・FPSの表示等、事前処理
-    // .add_plugins( play_game::Schedule )   //ゲームロジック
+    .add_plugins( play_game::Schedule )   //ゲームロジック
     // .add_plugins( title_demo::Schedule ) //タイトルデモ
     ;
 
@@ -82,43 +82,3 @@ fn main()
 ////////////////////////////////////////////////////////////////////////////////
 
 //End of code.
-
-// //external crates
-// use bevy::
-// {   prelude::*, sprite::*, audio::*,
-//     window::WindowMode::*, diagnostic::*
-// };
-
-// //standard library
-// use std::{ ops::*, cmp::*, collections::* };
-
-// //internal submodules
-// mod public;
-// use public::*;
-
-// mod init_game;
-// mod game_play;
-// mod title_demo;
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //メイン関数
-// fn main()
-// {   //ログのコンソールへの出力を抑制
-//     #[cfg( not( target_arch = "wasm32" ) )]
-//     std::env::set_var( "RUST_LOG", "OFF" );
-
-//     //アプリの生成
-//     let mut app = App::new();
-
-//     //メインウィンドウの設定等
-//     let primary_window = MAIN_WINDOW.clone();
-//     app
-//     .add_systems( Update, misc::catch_gamepad_connection_changes ) //gamepadの特定
-//     ;
-
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //End of code.
