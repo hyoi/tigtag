@@ -5,41 +5,40 @@ use super::*;
 //ウィンドウとフルスクリーンの切換(トグル動作)
 pub fn toggle_window_mode
 (   mut qry_window: Query<&mut Window>,
-    keys: Res<Input<KeyCode>>,
-    gpdbtn: Res<Input<GamepadButton>>,
+    inkey: Res<Input<KeyCode>>,
+    inbtn: Res<Input<GamepadButton>>,
     gamepads: Res<Gamepads>,
 )
 {   let Ok( mut window ) = qry_window.get_single_mut() else { return };
+    let mut is_pressed = false;
 
-    //[Alt]＋[Enter]の状態
-    let mut is_key_pressed = false;
-    if keys.just_pressed( FULL_SCREEN_KEY )
+    //キーの状態
+    if inkey.just_pressed( FULL_SCREEN_KEY )
     {   for key in FULL_SCREEN_KEY_MODIFIER
-        {   if keys.pressed( key )
-            {   is_key_pressed = true;
+        {   if inkey.pressed( key )
+            {   is_pressed = true;
                 break;
             }
         }
     }
 
-    //ゲームパッドは抜き挿しでIDが変わるので.iter()で回す
-    let button_type = FULL_SCREEN_BUTTON;
-    let mut is_gpdbtn_pressed = false;
-    for gamepad in gamepads.iter()
-    {   if gpdbtn.just_pressed( GamepadButton { gamepad, button_type } )
-        {   is_gpdbtn_pressed = true;
-            break;
+    //ゲームパッドのボタンの状態
+    if ! is_pressed
+    {   for id in gamepads.iter()
+        {   if inbtn.just_pressed( GamepadButton::new( id, FULL_SCREEN_BUTTON ) )
+            {   is_pressed = true;
+                break;
+            }
         }
     }
 
-    //入力がないなら
-    if ! is_key_pressed && ! is_gpdbtn_pressed { return }
-
     //ウィンドウとフルスクリーンを切り替える
-    window.mode = match window.mode
-    {   WindowMode::Windowed => WindowMode::SizedFullscreen,
-        _                    => WindowMode::Windowed,
-    };
+    if is_pressed
+    {   window.mode = match window.mode
+        {   WindowMode::Windowed => WindowMode::SizedFullscreen,
+            _                    => WindowMode::Windowed,
+        };
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

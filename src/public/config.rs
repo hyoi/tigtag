@@ -189,9 +189,10 @@ counted_array!
         KeyCode::AltLeft,
     ]
 );
-pub const FULL_SCREEN_BUTTON: GamepadButtonType = GamepadButtonType::Start; //ps4[OPTION]
+pub const FULL_SCREEN_BUTTON: GamepadButtonType = GamepadButtonType::Start; //ps4[OPTIONS]
 
 ////////////////////////////////////////////////////////////////////////////////
+
 //マップ縦横幅(Grid)
 pub const MAP_GRIDS_WIDTH : i32 = SCREEN_GRIDS_WIDTH;
 pub const MAP_GRIDS_HEIGHT: i32 = SCREEN_GRIDS_HEIGHT - 2;

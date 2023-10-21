@@ -91,10 +91,10 @@ impl Map
         self.bits( grid ) & BIT_WALL == 0
     }
 
-    pub fn o_entity( &self, grid: IVec2 ) -> Option<Entity>
-    {   if ! self.is_inside( grid ) { return None } //範囲外はOption::Noneを返す
-        self.dot_entities[ grid.x as usize ][ grid.y as usize ]
-    }
+    // pub fn o_entity( &self, grid: IVec2 ) -> Option<Entity>
+    // {   if ! self.is_inside( grid ) { return None } //範囲外はOption::Noneを返す
+    //     self.dot_entities[ grid.x as usize ][ grid.y as usize ]
+    // }
     pub fn o_entity_mut( &mut self, grid: IVec2 ) -> &mut Option<Entity>
     {   if ! self.is_inside( grid ) { return &mut self.dummy_o_entity_none } //範囲外は&mut Option::Noneを返す
         &mut self.dot_entities[ grid.x as usize ][ grid.y as usize ]
@@ -112,17 +112,17 @@ impl Map
         }
     }
 
-    pub fn get_byways_list( &self, grid: IVec2 ) -> Vec<News>
-    {   let mut vec = Vec::<News>::with_capacity( 4 );
-        if self.is_inside( grid )
-        {   let bits = self.bits( grid );
-            if bits & BIT_WAY_RIGHT != 0 { vec.push( News::East  ) }
-            if bits & BIT_WAY_LEFT  != 0 { vec.push( News::West  ) }
-            if bits & BIT_WAY_DOWN  != 0 { vec.push( News::South ) }
-            if bits & BIT_WAY_UP    != 0 { vec.push( News::North ) }
-        }
-        vec //範囲外は空になる（最外壁の外の座標だから上下左右に道はない）
-    }
+    // pub fn get_byways_list( &self, grid: IVec2 ) -> Vec<News>
+    // {   let mut vec = Vec::<News>::with_capacity( 4 );
+    //     if self.is_inside( grid )
+    //     {   let bits = self.bits( grid );
+    //         if bits & BIT_WAY_RIGHT != 0 { vec.push( News::East  ) }
+    //         if bits & BIT_WAY_LEFT  != 0 { vec.push( News::West  ) }
+    //         if bits & BIT_WAY_DOWN  != 0 { vec.push( News::South ) }
+    //         if bits & BIT_WAY_UP    != 0 { vec.push( News::North ) }
+    //     }
+    //     vec //範囲外は空になる（最外壁の外の座標だから上下左右に道はない）
+    // }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
