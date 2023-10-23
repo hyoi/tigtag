@@ -45,10 +45,10 @@ pub fn toggle_window_mode
 
 //2D cameraをspawnする
 pub fn spawn_2d_camera( mut cmds: Commands )
-{   //2Dカメラを第一象限に移動する
-    //左下隅が(0,0)、X軸はプラス方向へ伸び、Y軸はプラス方向へ上がる
+{   //2Dカメラを第四象限に移動する
+    //左↑隅が(0,0)、X軸はプラス方向へ伸び、Y軸はマイナス方向へ上がる
     let translation = Vec3::X * SCREEN_PIXELS_WIDTH  * 0.5
-                    + Vec3::Y * SCREEN_PIXELS_HEIGHT * 0.5;
+                    - Vec3::Y * SCREEN_PIXELS_HEIGHT * 0.5;
 
     //タイトルバーのWクリックや最大化ボタンによるウィンドウ最大化時に
     //表示が著しく崩れることを緩和するためviewportを設定しておく

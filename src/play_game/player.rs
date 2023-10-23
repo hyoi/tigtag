@@ -54,6 +54,161 @@ pub fn spawn_sprite
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//プレイヤーを移動させる
+#[allow(clippy::too_many_arguments)]
+pub fn move_sprite
+(   mut qry_player: Query<( &mut Player, &mut Transform )>,
+    qry_chasers: Query<&Chaser>,
+    opt_map: Option<Res<Map>>,
+
+    state: ResMut<State<MyState>>,
+
+    mut ev_clear: EventReader<EventClear>,
+    mut ev_over: EventReader<EventOver>,
+
+    inkey: Res<Input<KeyCode>>,
+    time: Res<Time>,
+    cross_button: Res<CrossButton>,
+)
+{   let Ok ( ( mut player, mut transform ) ) = qry_player.get_single_mut() else { return };
+    let Some ( map ) = opt_map else { return };
+    
+    //直前の判定でクリア／オーバーしていたらスプライトを移動させない
+    if ev_clear.iter().next().is_some() { return }
+    if ev_over .iter().next().is_some() { return }
+
+    //前回からの経過時間✕スピードアップ係数
+    let time_delta = time.delta().mul_f32( player.speedup );
+
+    //待ち時間が完了したら
+    if player.wait.tick( time_delta ).finished()
+    {   //スプライトの表示位置をグリッドにそろえる
+        if player.px_start != player.px_end
+        {   player.px_start = player.px_end;
+            player.px_end   = player.next.to_sprite_pixels() + ADJUSTER_MAP_SPRITES;
+            transform.translation = player.px_end.extend( DEPTH_SPRITE_PLAYER );
+        }
+
+        //自機の進行方向を決める
+        let mut new_side = player.side;
+        player.stop = true; //停止フラグを立てる
+
+        if ! state.get().is_demoplay() //demoでないなら
+        {   if ! cross_button.is_empty() //パッド十字キー入力があるなら
+            {   let sides = cross_button.sides();
+                for &side in sides
+                {   //道なら
+                    if map.is_passage( player.next + side )
+                    {   new_side = side;
+                        player.stop = false;
+                        break;
+                    }
+
+                    //道ではない場合でも向きは変える
+                    if side == sides[ 0 ]
+                    {   new_side = side;
+                    }
+                }
+            }
+            else
+            {   //キー入力を確認(入力がなければ停止)
+                     if inkey.pressed( KeyCode::Up    ) { new_side = News::North; player.stop = false; }
+                else if inkey.pressed( KeyCode::Down  ) { new_side = News::South; player.stop = false; }
+                else if inkey.pressed( KeyCode::Right ) { new_side = News::East;  player.stop = false; }
+                else if inkey.pressed( KeyCode::Left  ) { new_side = News::West;  player.stop = false; }
+
+                //キー入力があっても壁があれば停止
+                if ! player.stop
+                {   player.stop = map.is_wall( player.next + new_side )
+                }
+            }
+        }
+        else
+        {   //demoの場合
+            let mut sides = map.get_byways_list( player.next );         //脇道のリスト
+            sides.retain( | side | player.next + side != player.grid ); //戻り路を排除
+
+            //demoなのでプレイヤーのキー入力を詐称する
+            player.stop = false;
+            new_side = match sides.len().cmp( &1 )
+            {   Ordering::Equal => //一本道 ⇒ 道なりに進む
+                    sides[ 0 ],
+                Ordering::Greater => //三叉路または十字路
+                    if let Some ( fnx ) = player.o_fn_runaway
+                    {   fnx( &player, qry_chasers, map, &sides ) //外部関数で進行方向を決める
+                    }
+                    else
+                    {   let mut rng = rand::thread_rng();
+                        sides[ rng.gen_range( 0..sides.len() ) ] //外部関数がない(None)なら乱数で決める
+                    },
+                Ordering::Less => //行き止まり ⇒ 逆走 (このゲームに行き止まりはないけど)
+                    match player.side
+                    {   News::North    => News::South ,
+                        News::South  => News::North   ,
+                        News::East => News::West ,
+                        News::West  => News::East,
+                    },
+            };
+        }
+
+        //自機の向きが変化したらスプライトを回転させる
+        if player.side != new_side
+        {   rotate_player_sprite( &player, &mut transform, new_side );
+            player.side = new_side;
+        }
+
+        //現在の位置と次の位置を更新する
+        player.grid = player.next;
+        if ! player.stop { player.next += new_side; }
+
+        //waitをリセットする
+        player.wait.reset();
+    }
+    else if ! player.stop
+    {   //移動中ならスプライトを中割の位置に移動する
+        let delta = PLAYER_MOVE_COEF * time_delta.as_secs_f32();
+        match player.side
+        {   News::North => transform.translation.y += delta,
+            News::South => transform.translation.y -= delta,
+            News::East  => transform.translation.x += delta,
+            News::West  => transform.translation.x -= delta,
+        }
+        player.px_start = player.px_end;
+        player.px_end   = transform.translation.truncate();
+    }
+}
+
+//自機の向きとキー入力から角度の差分を求めてスプライトを回転させる
+fn rotate_player_sprite
+(   player: &Player,
+    transform: &mut Mut<Transform>,
+    input: News
+)
+{   let angle: f32 = match player.side
+    {   News::North =>
+                 if input == News::West {  90.0 }
+            else if input == News::East { -90.0 }
+            else                        { 180.0 },
+        News::South =>
+                 if input == News::East {  90.0 }
+            else if input == News::West { -90.0 }
+            else                        { 180.0 },
+        News::East =>
+                 if input == News::North {  90.0 }
+            else if input == News::South { -90.0 }
+            else                         { 180.0 },
+        News::West =>
+                 if input == News::South {  90.0 }
+            else if input == News::North { -90.0 }
+            else                         { 180.0 },
+    };
+
+    let quat = Quat::from_rotation_z( angle.to_radians() );
+    transform.rotate( quat );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.
 
 
@@ -65,154 +220,6 @@ pub fn spawn_sprite
 
 // mod cross_button; //ゲームパッドの十字ボタン入力
 // pub use cross_button::*;
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //自機の移動
-// pub fn move_sprite
-// (   ( mut q_player, q_chasers ): ( Query<(&mut Player, &mut Transform)>, Query<&Chaser> ),
-//     map: Res<Map>,
-//     state: ResMut<State<MyState>>,
-//     ( mut ev_clear, mut ev_over ): ( EventReader<EventClear>, EventReader<EventOver> ),
-//     ( inkey, time ): ( Res<Input<KeyCode>>, Res<Time> ),
-//     cross_button: Res<CrossButton>,
-// )
-// {   //直前の判定でクリア／オーバーしていたらスプライトの表示を変更しない
-//     if ev_clear.iter().next().is_some() { return }
-//     if ev_over .iter().next().is_some() { return }
-
-//     let ( mut player, mut transform ) = q_player.get_single_mut().unwrap(); //プレイヤーの情報
-//     let time_delta = time.delta().mul_f32( player.speedup ); //前回からの経過時間×スピードアップ係数
-
-//     //待ち時間が完了したら
-//     if player.wait.tick( time_delta ).finished()
-//     {   //スプライトの表示位置をグリッドにそろえる
-//         if player.px_start != player.px_end
-//         {   player.px_start = player.px_end;
-//             player.px_end   = player.next.px2d_map();
-//             transform.translation = player.px_end.extend( DEPTH_SPRITE_PLAYER );
-//         }
-
-//         //自機の進行方向を決める
-//         let mut new_side = player.side;
-//         player.stop = true; //停止フラグを立てる
-
-//         if ! state.get().is_demoplay() //demoでないなら
-//         {   if ! cross_button.is_empty() //パッド十字キー入力があるなら
-//             {   let sides = cross_button.sides();
-//                 for &side in sides
-//                 {   //道なら
-//                     if map.is_passage( player.next + side )
-//                     {   new_side = side;
-//                         player.stop = false;
-//                         break;
-//                     }
-
-//                     //道ではない場合でも向きは変える
-//                     if side == sides[ 0 ]
-//                     {   new_side = side;
-//                     }
-//                 }
-//             }
-//             else
-//             {   //キー入力を確認(入力がなければ停止)
-//                      if inkey.pressed( KeyCode::Up    ) { new_side = DxDy::Up;    player.stop = false; }
-//                 else if inkey.pressed( KeyCode::Down  ) { new_side = DxDy::Down;  player.stop = false; }
-//                 else if inkey.pressed( KeyCode::Right ) { new_side = DxDy::Right; player.stop = false; }
-//                 else if inkey.pressed( KeyCode::Left  ) { new_side = DxDy::Left;  player.stop = false; }
-
-//                 //キー入力があっても壁があれば停止
-//                 if ! player.stop
-//                 {   player.stop = map.is_wall( player.next + new_side )
-//                 }
-//             }
-//         }
-//         else
-//         {   //demoの場合
-//             let mut sides = map.get_byways_list( player.next );         //脇道のリスト
-//             sides.retain( | side | player.next + side != player.grid ); //戻り路を排除
-
-//             //demoなのでプレイヤーのキー入力を詐称する
-//             player.stop = false;
-//             new_side = match sides.len().cmp( &1 )
-//             {   Ordering::Equal => //一本道 ⇒ 道なりに進む
-//                     sides[ 0 ],
-//                 Ordering::Greater => //三叉路または十字路
-//                     if let Some ( fnx ) = player.o_fn_runaway
-//                     {   fnx( &player, q_chasers, map, &sides ) //外部関数で進行方向を決める
-//                     }
-//                     else
-//                     {   let mut rng = rand::thread_rng();
-//                         sides[ rng.gen_range( 0..sides.len() ) ] //外部関数がない(None)なら乱数で決める
-//                     },
-//                 Ordering::Less => //行き止まり ⇒ 逆走 (このゲームに行き止まりはないけど)
-//                     match player.side
-//                     {   DxDy::Up    => DxDy::Down ,
-//                         DxDy::Down  => DxDy::Up   ,
-//                         DxDy::Right => DxDy::Left ,
-//                         DxDy::Left  => DxDy::Right,
-//                     },
-//             };
-//         }
-
-//         //自機の向きが変化したらスプライトを回転させる
-//         if player.side != new_side
-//         {   rotate_player_sprite( &player, &mut transform, new_side );
-//             player.side = new_side;
-//         }
-
-//         //現在の位置と次の位置を更新する
-//         player.grid = player.next;
-//         if ! player.stop { player.next += new_side; }
-
-//         //waitをリセットする
-//         player.wait.reset();
-//     }
-//     else if ! player.stop
-//     {   //移動中ならスプライトを中割の位置に移動する
-//         let delta = PLAYER_MOVE_COEF * time_delta.as_secs_f32();
-//         match player.side
-//         {   DxDy::Up    => transform.translation.y += delta,
-//             DxDy::Down  => transform.translation.y -= delta,
-//             DxDy::Right => transform.translation.x += delta,
-//             DxDy::Left  => transform.translation.x -= delta,
-//         }
-//         player.px_start = player.px_end;
-//         player.px_end   = transform.translation.truncate();
-//     }
-// }
-
-// //自機の向きとキー入力から角度の差分を求めてスプライトを回転させる
-// fn rotate_player_sprite
-// (   player: &Player,
-//     transform: &mut Mut<Transform>,
-//     input: DxDy
-// )
-// {   let angle: f32 = match player.side
-//     {   DxDy::Up =>
-//                  if input == DxDy::Left  {  90.0 }
-//             else if input == DxDy::Right { -90.0 }
-//             else                         { 180.0 },
-//         DxDy::Down =>
-//                  if input == DxDy::Right {  90.0 }
-//             else if input == DxDy::Left  { -90.0 }
-//             else                         { 180.0 },
-//         DxDy::Right =>
-//                  if input == DxDy::Up    {  90.0 }
-//             else if input == DxDy::Down  { -90.0 }
-//             else                         { 180.0 },
-//         DxDy::Left =>
-//                  if input == DxDy::Down  {  90.0 }
-//             else if input == DxDy::Up    { -90.0 }
-//             else                         { 180.0 },
-//     };
-
-//     let quat = Quat::from_rotation_z( angle.to_radians() );
-//     transform.rotate( quat );
-// }
 
 // ////////////////////////////////////////////////////////////////////////////////
 

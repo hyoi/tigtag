@@ -7,6 +7,7 @@ use bevy::
     asset::LoadState,
     diagnostic::{ DiagnosticsStore, FrameTimeDiagnosticsPlugin },
     sprite::{ Anchor, MaterialMesh2dBundle },
+    utils::HashSet,
 };
 use once_cell::sync::Lazy;
 use counted_array::counted_array;
@@ -14,7 +15,8 @@ use rand::prelude::*;
 use regex::Regex;
 
 //standard library
-use std::ops::{ Range, Add, /*AddAssign*/ };
+use std::ops::{ Range, Add, AddAssign };
+use std::cmp::Ordering;
 // use std::f32::consts::{ PI, TAU, FRAC_PI_2 };
 
 //internal submodules

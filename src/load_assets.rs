@@ -63,7 +63,7 @@ struct LoadingMessage<'a>
 }
 static NOWLOADING: Lazy<LoadingMessage> = Lazy::new
 (   ||
-    {   let mut message = vec!
+    {   let message = vec!
         [//  0123456789_123456789_123456789_123456789_12345
             " ##  #           #                            ", //0
             " ##  # ### #   # #    ###  #  ##  # #  #  ##  ", //1
@@ -80,7 +80,6 @@ static NOWLOADING: Lazy<LoadingMessage> = Lazy::new
             " #    #   #   ###   # #    # #  ### #  #      ", //12
             " #    ### ### # # ### ###  # #  # # #  #  # # ", //13
         ];// 0123456789_123456789_123456789_123456789_12345
-        message.reverse(); //データをY軸で逆順にする
 
         let width  = message[ 0 ].len() as f32 * PIXELS_PER_GRID;
         let height = message.len()      as f32 * PIXELS_PER_GRID;
@@ -160,7 +159,7 @@ fn spawn_sprite( mut cmds: Commands )
             .insert( Sprite { color, custom_size, ..default() } )
             .insert( Transform::from_translation( px3d ) )
             ;
-        } 
+        }
     }
 }
 
@@ -172,7 +171,7 @@ fn move_sprite
 {   let time_delta = time.delta().as_secs_f32() * 5.0;
 
     let scaling = SCREEN_PIXELS_WIDTH / NOWLOADING.width; //横方向に長いので
-    let adjuster_y = ( SCREEN_PIXELS_HEIGHT - NOWLOADING.height * scaling ) * 0.5;
+    let adjuster_y = ( SCREEN_PIXELS_HEIGHT - NOWLOADING.height * scaling ) * -0.5;
 
     qry_transform.for_each_mut
     (   | ( mut transform, goal ) |

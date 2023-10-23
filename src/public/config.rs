@@ -119,7 +119,7 @@ pub const MAGNIFY_SPRITE_PLAYER: f32 = 0.4;
 pub const MAGNIFY_SPRITE_CHASER: f32 = 0.5;
 
 //調整値
-pub const ADJUSTER_MAP_SPRITES: Vec2 = Vec2::new( 0.0, 1.0 * PIXELS_PER_GRID );
+pub const ADJUSTER_MAP_SPRITES: Vec2 = Vec2::new( 0.0, -1.0 * PIXELS_PER_GRID );
 
 // //SEボリューム
 // pub const VOLUME_SOUND_BEEP: f32 = 0.1;
@@ -136,7 +136,7 @@ pub const SCREEN_FRAME_SPACE_CHAR : char = ' ';
 pub const SCREEN_FRAME_LABEL_REGEX: &str = r"[a-zA-Z0-9\.]+";
 pub static SCREEN_FRAME: Lazy<ScreenFrame> = Lazy::new
 (   ||
-    {   let mut design = vec!
+    {   let design = vec!
         [  //0123456789_123456789_1234
             "                         ", //0
             "#########################", //1
@@ -158,7 +158,6 @@ pub static SCREEN_FRAME: Lazy<ScreenFrame> = Lazy::new
             "#########################", //17
             "                         ", //18
         ]; //0123456789_123456789_1234
-        design.reverse(); //データをY軸で逆順にする
 
         if design[ 0 ].len() != SCREEN_GRIDS_WIDTH  as usize
         || design.len()      != SCREEN_GRIDS_HEIGHT as usize
@@ -214,7 +213,7 @@ pub const MAP_GRIDS_Y_RANGE: Range<i32> = 0..MAP_GRIDS_HEIGHT;
 // pub const UNIT_MOVE: f32 = 1.0;
 
 pub const PLAYER_WAIT: f32 = 0.09;                               //移動のウェイト
-// pub const PLAYER_MOVE_COEF: f32 = PIXELS_PER_GRID / PLAYER_WAIT; //移動の中割係数
+pub const PLAYER_MOVE_COEF: f32 = PIXELS_PER_GRID / PLAYER_WAIT; //移動の中割係数
 
 ////////////////////////////////////////////////////////////////////////////////
 

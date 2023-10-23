@@ -24,13 +24,13 @@ impl GridToPixel for IVec2
 {   //平面座標(IVec2)から画面第一象限の座標(Vec2)を算出する
     //アンカーはグリッドの中央
     fn to_sprite_pixels( &self ) -> Vec2
-    {   ( self.as_vec2() + 0.5 ) * PIXELS_PER_GRID
+    {   ( self.as_vec2() + 0.5 ) * PIXELS_PER_GRID * Vec2::new( 1.0, -1.0 )
     }
 
     //平面座標(IVec2)から画面第一象限の座標(Vec2)を算出する
     //アンカーはグリッドの左下
     fn to_screen_pixels( &self ) -> Vec2
-    {   self.as_vec2() * PIXELS_PER_GRID
+    {   self.as_vec2() * PIXELS_PER_GRID * Vec2::new( 1.0, -1.0 )
     }
 }
 
@@ -47,30 +47,34 @@ pub enum MyState
 
 impl MyState
 {   pub fn is_pause     ( &self ) -> bool { *self == MyState::Pause      }
+    pub fn is_demoplay  ( &self ) -> bool { *self == MyState::TitleDemo || *self == MyState::DemoLoop }
     // pub fn is_stageclear( &self ) -> bool { *self == MyState::StageClear }
-    // pub fn is_demoplay  ( &self ) -> bool { *self == MyState::TitleDemo || *self == MyState::DemoLoop }
 }
-
-//Stateの遷移に使うマーカー(not Resource)
-#[derive( Default )] pub struct StageStart;
-// #[derive( Default )] pub struct TitleDemo;
-// #[derive( Default )] pub struct MainLoop;
-
-//Stateの遷移に使うResouce
-#[derive( Resource )] pub struct AfterLoadAssetsTo<T: States> ( pub T );
-#[derive( Resource )] pub struct AfterInitAppTo   <T: States> ( pub T );
-#[derive( Resource )] pub struct TitleDemoExist   <T: States> ( pub T );
 
 //Stateの遷移に使うTrait
 pub trait GotoState { fn next( &self ) -> MyState; }
 
-//Traitの実装
-impl GotoState for StageStart                  { fn next( &self ) -> MyState { MyState::StageStart } }
-// impl GotoState for TitleDemo                  { fn next( &self ) -> MyState { MyState::TitleDemo } }
-// impl GotoState for MainLoop                   { fn next( &self ) -> MyState { MyState::MainLoop } }
+//Stateの遷移に使うマーカー(not Resource)
+#[derive( Default )] pub struct StageStart;
+#[derive( Default )] pub struct MainLoop;
+
+impl GotoState for StageStart { fn next( &self ) -> MyState { MyState::StageStart } }
+impl GotoState for MainLoop   { fn next( &self ) -> MyState { MyState::MainLoop   } }
+
+//Stateの遷移に使うマーカー(Resouce)
+#[derive( Resource )] pub struct AfterLoadAssetsTo<T: States> ( pub T );
+#[derive( Resource )] pub struct AfterInitAppTo   <T: States> ( pub T );
+#[derive( Resource )] pub struct TitleDemoExist   <T: States> ( pub T );
+
 impl GotoState for AfterLoadAssetsTo<MyState> { fn next( &self ) -> MyState { self.0 } }
 impl GotoState for AfterInitAppTo   <MyState> { fn next( &self ) -> MyState { self.0 } }
 impl GotoState for TitleDemoExist   <MyState> { fn next( &self ) -> MyState { self.0 } }
+
+////////////////////////////////////////////////////////////////////////////////
+
+//System間の通知用イベント
+#[derive( Event )] pub struct EventClear;
+#[derive( Event )] pub struct EventOver;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -172,6 +176,32 @@ impl Add<News> for IVec2
     }
 }
 
+//IVec2 = IVec2 + &News
+impl Add<&News> for IVec2
+{   type Output = IVec2;
+    fn add( mut self, news: &News ) -> IVec2
+    {   match news
+        {   News::North => { self.y -= 1; }
+            News::South => { self.y += 1; }
+            News::East  => { self.x += 1; }
+            News::West  => { self.x -= 1; }
+        }
+        self
+    }
+}
+
+//IVec2 += News
+impl AddAssign<News> for IVec2
+{   fn add_assign( &mut self, news: News )
+    {   match news
+        {   News::North => { self.y -= 1; }
+            News::East  => { self.x += 1; }
+            News::West  => { self.x -= 1; }
+            News::South => { self.y += 1; }
+        }
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //プレイヤーのComponent
@@ -185,7 +215,7 @@ pub struct Player
     pub speedup     : f32,               //スピードアップ係数
     pub px_start    : Vec2,              //移動した微小区間の始点
     pub px_end      : Vec2,              //移動した微小区間の終点
-    // pub o_fn_runaway: Option<FnRunAway>, //(demoplay)自機の移動方向を決める関数のポインタ
+    pub o_fn_runaway: Option<FnRunAway>, //(demoplay)自機の移動方向を決める関数のポインタ
 }
 
 impl Default for Player
@@ -199,13 +229,13 @@ impl Default for Player
             speedup     : 1.0,
             px_start    : Vec2::default(),
             px_end      : Vec2::default(),
-            // o_fn_runaway: None,
+            o_fn_runaway: None,
         }
     }
 }
 
 //関数ポインタ型((demoplay)自機の移動方向を決める関数)
-// type FnRunAway = fn( &Player, Query<&Chaser>, Res<Map>, &[ News ] ) -> News;
+type FnRunAway = fn( &Player, Query<&Chaser>, Res<Map>, &[ News ] ) -> News;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -247,21 +277,41 @@ pub type FnChasing = fn( &mut Chaser, &Player, &[ News ] ) -> News;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//十字ボタンの入力状態を保存するResource
+#[derive( Resource )]
+pub struct CrossButton ( pub Vec::<News> );
+impl Default for CrossButton
+{   fn default() -> Self
+    {   Self ( Vec::with_capacity( 2 ) ) //十字ボタンは最大2要素
+    }
+}
+impl CrossButton
+{   pub fn sides( &self ) -> &[ News ] { &self.0 }
+    pub fn is_empty( &self ) -> bool { self.0.is_empty() }
+    // pub fn push( &mut self, dxdy: News ) { self.0.push( dxdy ) }
+    // pub fn clear( &mut self ) { self.0.clear() }
+}
+
+//判定用メソッド（traitはオーファンルール対策）
+pub trait Cotains
+{   fn contains_right( &self ) -> bool;
+    fn contains_left ( &self ) -> bool;
+    fn contains_down ( &self ) -> bool;
+    fn contains_up   ( &self ) -> bool;
+}
+impl Cotains for HashSet<GamepadButtonType>
+{   fn contains_right( &self ) -> bool { self.contains( &GamepadButtonType::DPadRight ) }
+    fn contains_left ( &self ) -> bool { self.contains( &GamepadButtonType::DPadLeft  ) }
+    fn contains_down ( &self ) -> bool { self.contains( &GamepadButtonType::DPadDown  ) }
+    fn contains_up   ( &self ) -> bool { self.contains( &GamepadButtonType::DPadUp    ) }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.
 
 
 
-// //IVec2 += News
-// impl AddAssign<News> for IVec2
-// {   fn add_assign( &mut self, news: News )
-//     {   match news
-//         {   News::North => { self.y -= 1; }
-//             News::East  => { self.x += 1; }
-//             News::West  => { self.x -= 1; }
-//             News::South => { self.y += 1; }
-//         }
-//     }
-// }
 
 // impl News
 // {   //四方に対応するXZ平面上の角度（四元数）を返す（Y軸回転）
@@ -354,13 +404,6 @@ pub type FnChasing = fn( &mut Chaser, &Player, &[ News ] ) -> News;
 
 // ////////////////////////////////////////////////////////////////////////////////
 
-// //System間の通知用イベント
-// #[derive( Event )]
-// pub struct EventClear;
-
-// #[derive( Event )]
-// pub struct EventOver;
-
 // ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -440,35 +483,5 @@ pub type FnChasing = fn( &mut Chaser, &Player, &[ News ] ) -> News;
 
 // ////////////////////////////////////////////////////////////////////////////////
 
-// //十字ボタンの入力状態を保存するResource
-// #[derive( Resource )]
-// pub struct CrossButton ( pub Vec::<DxDy> );
-// impl Default for CrossButton
-// {   fn default() -> Self
-//     {   Self ( Vec::with_capacity( 2 ) ) //十字ボタンは最大2要素
-//     }
-// }
-// impl CrossButton
-// {   pub fn sides( &self ) -> &[ DxDy ] { &self.0 }
-//     pub fn is_empty( &self ) -> bool { self.0.is_empty() }
-//     pub fn push( &mut self, dxdy: DxDy ) { self.0.push( dxdy ) }
-//     pub fn clear( &mut self ) { self.0.clear() }
-// }
-
-// //判定用メソッド（traitはオーファンルール対策）
-// pub trait Cotains
-// {   fn contains_right( &self ) -> bool;
-//     fn contains_left ( &self ) -> bool;
-//     fn contains_down ( &self ) -> bool;
-//     fn contains_up   ( &self ) -> bool;
-// }
-// impl Cotains for HashSet<GamepadButtonType>
-// {   fn contains_right( &self ) -> bool { self.contains( &GamepadButtonType::DPadRight ) }
-//     fn contains_left ( &self ) -> bool { self.contains( &GamepadButtonType::DPadLeft  ) }
-//     fn contains_down ( &self ) -> bool { self.contains( &GamepadButtonType::DPadDown  ) }
-//     fn contains_up   ( &self ) -> bool { self.contains( &GamepadButtonType::DPadUp    ) }
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
 
 // //End of code.

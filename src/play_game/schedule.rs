@@ -16,6 +16,10 @@ impl Plugin for Schedule
         .init_resource::<HiScore>() //ハイスコアの初期化
         .init_resource::<EnabledGamepadId>() //操作を受け付けるgamepadのID
         .init_resource::<Map>()     //迷路の初期化
+        .add_event::<EventClear>()  //ステージクリアイベントの登録
+        .add_event::<EventOver>()   //ゲームオーバーイベントの登録
+
+        .init_resource::<CrossButton>() //十字ボタンの入力状態保存用
 
         //ヘッダーの表示(Stage、Score、HiScore)
         .add_plugins( header::Schedule )
@@ -46,8 +50,23 @@ impl Plugin for Schedule
                 ),
                 // set_countdown_params::<TextUiStart>, //カウントダウン初期化
                 // misc::show_component::<TextUiStart>, //カウントダウン表示
+
+                misc::change_state::<MainLoop> //＜仮＞無条件遷移
             )
             .chain() //実行順を固定
+        )
+
+        //MainLoop
+        .add_systems
+        (   Update,
+            (   // player::scoring_and_clear_stage, //スコアリング＆クリア判定⇒StageClear
+                // chasers::detect_collisions,      //衝突判定⇒GameOver
+                (   player::move_sprite,         //スプライト移動
+                    // chasers::move_sprite,        //スプライト移動
+                )
+            )
+            .chain() //実行順を固定
+            .run_if( in_state( MyState::MainLoop ) )
         )
         ;
     }
@@ -67,9 +86,6 @@ impl Plugin for Schedule
 
         // //ResourceとEvent
         // .init_resource::<CountDown>()   //カウントダウンタイマーの初期化
-        // .add_event::<EventClear>()      //ステージクリアイベントの登録
-        // .add_event::<EventOver>()       //ゲームオーバーイベントの登録
-        // .init_resource::<CrossButton>() //十字ボタンの入力状態保存用
 
 //         .add_systems( Update, player::catch_cross_button_pressed ) //十字ボタンの入力読み取り
 

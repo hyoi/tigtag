@@ -137,7 +137,25 @@ pub fn spawn_sprite
                 .insert( Sprite { custom_size, ..default() } )
                 .insert( asset_svr.load( ASSETS_SPRITE_BRICK_WALL ) as Handle<Image> )
                 .insert( Transform::from_translation( pixel.extend( DEPTH_SPRITE_BRICK_WALL ) ) )
-                ;
+                .with_children
+                (   | _cmds |
+                    {   #[cfg( debug_assertions )]
+                        {   let value = format!( "{:02}\n{:02}", x, y ).to_string();
+                            let style = TextStyle
+                            {   font     : asset_svr.load( ASSETS_FONT_PRESSSTART2P_REGULAR ),
+                                font_size: PIXELS_PER_GRID * 0.3,
+                                color    : Color::YELLOW,
+                            };
+                            let sections  = vec![ TextSection { value, style } ];
+                            let alignment = TextAlignment::Center;
+        
+                            _cmds.spawn( Text2dBundle::default() )
+                            .insert( Text { sections, alignment, ..default() } )
+                            .insert( Transform::from_translation( Vec3::Z ) )
+                            ;
+                        }
+                    }
+                );
             }
 
             if map.is_passage( grid )
