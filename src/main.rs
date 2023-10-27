@@ -59,9 +59,10 @@ fn main()
             .run_if( not( resource_exists::<AfterInitAppTo<MyState>>() ) )
         )
     )
+    .init_resource::<ConnectedGamepad>() //操作を受け付けるgamepadのID
     .add_systems
     (   Update,
-        (   (   misc::choose_gamepad_connection, //接続されたgamepadの特定
+        (   (   misc::choose_gamepad_connection, //<ConnectedGamepad>を設定
                 misc::toggle_window_mode,        //フルスクリーン切換
                 // bevy::window::close_on_esc,   //[ESC]で終了
             )
