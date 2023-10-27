@@ -2,47 +2,6 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//ウィンドウとフルスクリーンの切換(トグル動作)
-pub fn toggle_window_mode
-(   mut qry_window: Query<&mut Window>,
-    inkey: Res<Input<KeyCode>>,
-    inbtn: Res<Input<GamepadButton>>,
-    gamepads: Res<Gamepads>,
-)
-{   let Ok( mut window ) = qry_window.get_single_mut() else { return };
-    let mut is_pressed = false;
-
-    //キーの状態
-    if inkey.just_pressed( FULL_SCREEN_KEY )
-    {   for key in FULL_SCREEN_KEY_MODIFIER
-        {   if inkey.pressed( key )
-            {   is_pressed = true;
-                break;
-            }
-        }
-    }
-
-    //ゲームパッドのボタンの状態
-    if ! is_pressed
-    {   for id in gamepads.iter()
-        {   if inbtn.just_pressed( GamepadButton::new( id, FULL_SCREEN_BUTTON ) )
-            {   is_pressed = true;
-                break;
-            }
-        }
-    }
-
-    //ウィンドウとフルスクリーンを切り替える
-    if is_pressed
-    {   window.mode = match window.mode
-        {   WindowMode::Windowed => WindowMode::SizedFullscreen,
-            _                    => WindowMode::Windowed,
-        };
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 //2D cameraをspawnする
 pub fn spawn_2d_camera( mut cmds: Commands )
 {   //2Dカメラを第四象限に移動する
@@ -66,6 +25,73 @@ pub fn spawn_2d_camera( mut cmds: Commands )
     .insert( Camera { viewport, ..default() } )
     .insert( Transform::from_translation( translation) )
     ;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//操作を受け付けるgamepadを切り替える
+pub fn choose_gamepad_connection
+(   opt_gamepad: Option<ResMut<ConnectedGamepad>>,
+    gamepads: Res<Gamepads>,
+)
+{   let Some ( mut gamepad ) = opt_gamepad else { return };
+
+    //IDが保存されている場合
+    if let Some ( id ) = gamepad.id()
+    {   //IDのgamepadがまだ接続されている
+        if gamepads.contains( id ) { return }
+
+        //gamepadが１つも接続されていない
+        if gamepads.iter().count() == 0
+        {   *gamepad.id_mut() = None; //IDが無効
+            return;
+        }
+    }
+
+    //gamepadsから１つ取り出してIDを保存する
+    *gamepad.id_mut() = gamepads.iter().next();
+
+    #[cfg( debug_assertions )]
+    if gamepad.id().is_some() { dbg!( gamepad.id() ); }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//ウィンドウとフルスクリーンの切換(トグル動作)
+pub fn toggle_window_mode
+(   mut qry_window: Query<&mut Window>,
+    opt_gamepad: Option<Res<ConnectedGamepad>>,
+    inkey: Res<Input<KeyCode>>,
+    inbtn: Res<Input<GamepadButton>>,
+)
+{   let Ok( mut window ) = qry_window.get_single_mut() else { return };
+    let mut is_pressed = false;
+
+    //キーの状態
+    if inkey.just_pressed( FULL_SCREEN_KEY )
+    {   //装飾キー
+        for key in FULL_SCREEN_KEY_MODIFIER
+        {   if inkey.pressed( key )
+            {   is_pressed = true;
+                break;
+            }
+        }
+    }
+
+    //ゲームパッドのボタンの状態
+    if ! is_pressed
+    {   let Some ( gamepad ) = opt_gamepad else { return }; //Resource未登録
+        let Some ( id ) = gamepad.id() else { return };     //gamepad未接続
+        is_pressed = inbtn.just_pressed( GamepadButton::new( id, FULL_SCREEN_BUTTON ) )
+    }
+
+    //ウィンドウとフルスクリーンを切り替える
+    if is_pressed
+    {   window.mode = match window.mode
+        {   WindowMode::Windowed => WindowMode::SizedFullscreen,
+            _                    => WindowMode::Windowed,
+        };
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -135,30 +161,6 @@ pub fn text_ui
     let text  = Text { sections, alignment, ..default() };
     let style = Style { position_type, ..default() };
     TextBundle { text, style, ..default() }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//操作を受け付けるgamepadを切り替える
-pub fn catch_gamepad_connection
-(   opt_gamepad_id: Option<ResMut<EnabledGamepadId>>,
-    gamepads: Res<Gamepads>,
-)
-{   let Some ( mut gamepad_id ) = opt_gamepad_id else { return };
-    
-    //記録済のgamepadがまだ接続中なら
-    if gamepad_id.0.is_some_and( | id | gamepads.contains( id ) ) { return }
-
-    //一つも接続されていないなら
-    if gamepads.iter().count() == 0
-    {   if gamepad_id.0.is_some() { gamepad_id.0 = None }
-        return;
-    }
-
-    //gamepadsの中から1つ取り出して記録する
-    if let Some ( id ) = gamepads.iter().next()
-    {   gamepad_id.0 = Some ( id );
-    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

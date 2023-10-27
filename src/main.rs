@@ -61,8 +61,9 @@ fn main()
     )
     .add_systems
     (   Update,
-        (   (   // bevy::window::close_on_esc, //[ESC]で終了
-                misc::toggle_window_mode,   //フルスクリーン切換
+        (   (   misc::choose_gamepad_connection, //接続されたgamepadの特定
+                misc::toggle_window_mode,        //フルスクリーン切換
+                // bevy::window::close_on_esc,   //[ESC]で終了
             )
             .run_if( not( WASM ) ),
         )

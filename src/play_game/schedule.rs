@@ -14,7 +14,7 @@ impl Plugin for Schedule
         .init_resource::<Stage>()   //ステージの初期化
         .init_resource::<Score>()   //スコアの初期化
         .init_resource::<HiScore>() //ハイスコアの初期化
-        .init_resource::<EnabledGamepadId>() //操作を受け付けるgamepadのID
+        .init_resource::<ConnectedGamepad>() //操作を受け付けるgamepadのID
         .init_resource::<Map>()     //迷路の初期化
         .add_event::<EventClear>()  //ステージクリアイベントの登録
         .add_event::<EventOver>()   //ゲームオーバーイベントの登録
@@ -26,9 +26,6 @@ impl Plugin for Schedule
 
         //Pause処理
         .add_plugins( pause::Schedule )
-
-        //接続されているgamepadの特定
-        .add_systems( Update, misc::catch_gamepad_connection )
 
         //チェイサーの回転アニメーション
         .add_systems( Update, chasers::rotate )

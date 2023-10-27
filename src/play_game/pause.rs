@@ -56,37 +56,33 @@ fn spawn_ui_pause
 //PAUSE処理
 fn pause
 (   qry_text: Query<&mut Visibility, With<UiPause>>,
+    opt_gamepad: Option<Res<ConnectedGamepad>>,
     mut state: ResMut<State<MyState>>,
-    mut old_state: Local<MyState>,
+    mut saved_in: Local<MyState>,
     inkey: Res<Input<KeyCode>>,
     inbtn: Res<Input<GamepadButton>>,
-    opt_connected_gamepad: Option<Res<EnabledGamepadId>>,
 )
 {   //キーの状態
     let mut is_pressed = inkey.just_pressed( PAUSE_KEY );
 
     //ゲームパッドのボタンの状態
     if ! is_pressed
-    {   if let Some ( connected_gamepad ) = opt_connected_gamepad
-        {   if let Some ( id ) = connected_gamepad.0
-            {   let pause_button = GamepadButton::new( id, PAUSE_BUTTON );
-                is_pressed = inbtn.just_pressed( pause_button );
-            }
-        }
+    {   let Some ( gamepad ) = opt_gamepad else { return }; //Resource未登録
+        let Some ( id ) = gamepad.id() else { return };     //gamepad未接続
+        is_pressed = inbtn.just_pressed( GamepadButton::new( id, PAUSE_BUTTON ) );
     }
-
-    //入力がないなら
-    if ! is_pressed { return }
 
     //PAUSEのトグル処理
-    if state.get().is_pause()
-    {   misc::hide( qry_text );            //PAUSEメッセージを非表示
-        *state = State::new( *old_state ); //OnEnter／OnExitを実行せす遷移する
-    }
-    else
-    {   misc::show( qry_text );                //PAUSEメッセージを表示
-        *old_state = *state.get();             //遷移元のStateをローカルに保存する
-        *state = State::new( MyState::Pause ); //OnEnter／OnExitを実行せす遷移する
+    if is_pressed
+    {   if state.get().is_pause()
+        {   misc::hide( qry_text );           //PAUSEメッセージを非表示
+            *state = State::new( *saved_in ); //OnEnter／OnExitを実行せす遷移する
+        }
+        else
+        {   misc::show( qry_text );                //PAUSEメッセージを表示
+            *saved_in = *state.get();              //遷移元のStateをローカルに保存する
+            *state = State::new( MyState::Pause ); //OnEnter／OnExitを実行せす遷移する
+        }
     }
 }
 
