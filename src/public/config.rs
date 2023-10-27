@@ -263,16 +263,6 @@ const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
 //     ]
 // );
 
-// //パッド十字ボタンチェック用
-// pub static CROSS_BUTTONS: Lazy<HashSet<GamepadButtonType>> = Lazy::new
-// (   ||
-//     HashSet::from
-//     (   [   GamepadButtonType::DPadRight, GamepadButtonType::DPadLeft,
-//             GamepadButtonType::DPadDown,  GamepadButtonType::DPadUp,
-//         ]
-//     )
-// );
-
 // ////////////////////////////////////////////////////////////////////////////////
 
 // //中央に表示するtext UI
