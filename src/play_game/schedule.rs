@@ -18,13 +18,9 @@ impl Plugin for Schedule
         .add_event::<EventClear>()  //ステージクリアイベントの登録
         .add_event::<EventOver>()   //ゲームオーバーイベントの登録
 
-        .init_resource::<CrossButton>() //十字ボタンの入力状態保存用
-
-        //ヘッダーの表示(Stage、Score、HiScore)
-        .add_plugins( header::Schedule )
-
-        //Pause処理
-        .add_plugins( pause::Schedule )
+        //submoduleのplugin
+        .add_plugins( header::Schedule ) //ヘッダーの表示(Stage、Score、HiScore)
+        .add_plugins( pause::Schedule )  //Pause処理
 
         //チェイサーの回転アニメーション
         .add_systems( Update, chasers::rotate )
@@ -53,12 +49,17 @@ impl Plugin for Schedule
         )
 
         //MainLoop
+        .init_resource::<input::CrossDirection>() //十字方向の入力状態
         .add_systems
         (   Update,
-            (   // player::scoring_and_clear_stage, //スコアリング＆クリア判定⇒StageClear
-                // chasers::detect_collisions,      //衝突判定⇒GameOver
-                (   player::move_sprite,         //スプライト移動
-                    // chasers::move_sprite,        //スプライト移動
+            (   // judge::player::scoring_and_clear_stage, //スコアリング＆クリア判定⇒StageClear
+                // judge::chasers::detect_collisions,      //衝突判定⇒GameOver
+                (   (   input::catch_player_operation, //十字方向の入力状態取得
+                        player::move_sprite, //スプライト移動
+                    )
+                    .chain(), //実行順を固定
+
+                    // chasers::move_sprite, //スプライト移動
                 )
             )
             .chain() //実行順を固定

@@ -10,14 +10,14 @@ mod header;
 //pause処理
 mod pause;
 
-//マップの処理
-pub mod map; //title_demoから呼び出すためpub付
+//マップ、自機、追手の処理
+pub mod map;
+pub mod player;
+pub mod chasers;
 
-//プレイヤーの処理
-pub mod player; //title_demoから呼び出すためpub付
-
-//チェイサーの処理
-pub mod chasers; //title_demoから呼び出すためpub付
+//入力と判定の処理
+mod input;
+// mod judge;
 
 // //アプリの設定
 // mod config;

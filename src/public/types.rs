@@ -172,6 +172,38 @@ impl TraitGamepad for ConnectedGamepad
 #[derive( Default, Clone, Copy, PartialEq, Eq, Hash, Debug )]
 pub enum News { #[default] North, East, West, South }
 
+impl News
+{   //時計回りで方角を得る
+    pub fn turn_right( &self ) -> Self
+    {   match self
+        {   News::North => News::East,
+            News::East  => News::South,
+            News::West  => News::North,
+            News::South => News::West,
+        }
+    }
+
+    //反時計回りで方角を得る
+    pub fn turn_left( &self ) -> Self
+    {   match self
+        {   News::North => News::West,
+            News::East  => News::North,
+            News::West  => News::South,
+            News::South => News::East,
+        }
+    }
+
+    //背面の方角を得る
+    pub fn back_side( &self ) -> Self
+    {   match self
+        {   News::North => News::South,
+            News::East  => News::West,
+            News::West  => News::East,
+            News::South => News::North,
+        }
+    }
+}
+
 //IVec2 = IVec2 + News
 impl Add<News> for IVec2
 {   type Output = IVec2;
@@ -287,37 +319,6 @@ pub type FnChasing = fn( &mut Chaser, &Player, &[ News ] ) -> News;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//十字ボタンの入力状態を保存するResource
-#[derive( Resource )]
-pub struct CrossButton ( pub Vec::<News> );
-impl Default for CrossButton
-{   fn default() -> Self
-    {   Self ( Vec::with_capacity( 2 ) ) //十字ボタンは最大2要素
-    }
-}
-impl CrossButton
-{   pub fn sides( &self ) -> &[ News ] { &self.0 }
-    pub fn is_empty( &self ) -> bool { self.0.is_empty() }
-    // pub fn push( &mut self, dxdy: News ) { self.0.push( dxdy ) }
-    // pub fn clear( &mut self ) { self.0.clear() }
-}
-
-//判定用メソッド（traitはオーファンルール対策）
-pub trait Cotains
-{   fn contains_right( &self ) -> bool;
-    fn contains_left ( &self ) -> bool;
-    fn contains_down ( &self ) -> bool;
-    fn contains_up   ( &self ) -> bool;
-}
-impl Cotains for HashSet<GamepadButtonType>
-{   fn contains_right( &self ) -> bool { self.contains( &GamepadButtonType::DPadRight ) }
-    fn contains_left ( &self ) -> bool { self.contains( &GamepadButtonType::DPadLeft  ) }
-    fn contains_down ( &self ) -> bool { self.contains( &GamepadButtonType::DPadDown  ) }
-    fn contains_up   ( &self ) -> bool { self.contains( &GamepadButtonType::DPadUp    ) }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 //End of code.
 
 
@@ -345,37 +346,6 @@ impl Cotains for HashSet<GamepadButtonType>
 //             News::South => Quat::from_rotation_z( PI * 1.0 ),
 //         }
 //     }
-
-//     //時計回りで方角を得る
-//     pub fn turn_right( &self ) -> Self
-//     {   match self
-//         {   News::North => News::East,
-//             News::East  => News::South,
-//             News::West  => News::North,
-//             News::South => News::West,
-//         }
-//     }
-
-//     //反時計回りで方角を得る
-//     pub fn turn_left( &self ) -> Self
-//     {   match self
-//         {   News::North => News::West,
-//             News::East  => News::North,
-//             News::West  => News::South,
-//             News::South => News::East,
-//         }
-//     }
-
-//     //背面の方角を得る
-//     pub fn back( &self ) -> Self
-//     {   match self
-//         {   News::North => News::South,
-//             News::East  => News::West,
-//             News::West  => News::East,
-//             News::South => News::North,
-//         }
-//     }
-// }
 
 ////////////////////////////////////////////////////////////////////////////////
 

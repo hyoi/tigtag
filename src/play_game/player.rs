@@ -60,15 +60,11 @@ pub fn move_sprite
 (   mut qry_player: Query<( &mut Player, &mut Transform )>,
     qry_chasers: Query<&Chaser>,
     opt_map: Option<Res<Map>>,
-
     state: ResMut<State<MyState>>,
-
     mut ev_clear: EventReader<EventClear>,
     mut ev_over: EventReader<EventOver>,
-
-    inkey: Res<Input<KeyCode>>,
     time: Res<Time>,
-    cross_button: Res<CrossButton>,
+    cross: Res<input::CrossDirection>,
 )
 {   let Ok ( ( mut player, mut transform ) ) = qry_player.get_single_mut() else { return };
     let Some ( map ) = opt_map else { return };
@@ -94,32 +90,18 @@ pub fn move_sprite
         player.stop = true; //停止フラグを立てる
 
         if ! state.get().is_demoplay() //demoでないなら
-        {   if ! cross_button.is_empty() //パッド十字キー入力があるなら
-            {   let sides = cross_button.sides();
-                for &side in sides
-                {   //道なら
-                    if map.is_passage( player.next + side )
-                    {   new_side = side;
-                        player.stop = false;
-                        break;
-                    }
-
-                    //道ではない場合でも向きは変える
-                    if side == sides[ 0 ]
-                    {   new_side = side;
-                    }
+        {   let sides = cross.sides();
+            for &side in sides
+            {   //道なら
+                if map.is_passage( player.next + side )
+                {   new_side = side;
+                    player.stop = false;
+                    break;
                 }
-            }
-            else
-            {   //キー入力を確認(入力がなければ停止)
-                     if inkey.pressed( KeyCode::Up    ) { new_side = News::North; player.stop = false; }
-                else if inkey.pressed( KeyCode::Down  ) { new_side = News::South; player.stop = false; }
-                else if inkey.pressed( KeyCode::Right ) { new_side = News::East;  player.stop = false; }
-                else if inkey.pressed( KeyCode::Left  ) { new_side = News::West;  player.stop = false; }
 
-                //キー入力があっても壁があれば停止
-                if ! player.stop
-                {   player.stop = map.is_wall( player.next + new_side )
+                //道ではない場合でも向きは変える
+                if side == sides[ 0 ]
+                {   new_side = side;
                 }
             }
         }
@@ -212,14 +194,8 @@ fn rotate_player_sprite
 //End of code.
 
 
-// use super::*;
-
-// //internal submodules
 // mod demo_algorithm;
 // use demo_algorithm::*;
-
-// mod cross_button; //ゲームパッドの十字ボタン入力
-// pub use cross_button::*;
 
 // ////////////////////////////////////////////////////////////////////////////////
 
