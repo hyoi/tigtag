@@ -89,13 +89,13 @@ impl Stage
 #[derive( Resource, Default )] pub struct Score ( i32 );
 impl Score
 {   pub fn get( &self ) -> i32 { self.0 }
-    // pub fn get_mut( &mut self ) -> &mut i32 { &mut self.0 }
+    pub fn get_mut( &mut self ) -> &mut i32 { &mut self.0 }
 }
 
 #[derive( Resource, Default )] pub struct HiScore ( i32 );
 impl HiScore
 {   pub fn get( &self ) -> i32 { self.0 }
-    // pub fn get_mut( &mut self ) -> &mut i32 { &mut self.0 }
+    pub fn get_mut( &mut self ) -> &mut i32 { &mut self.0 }
 }
 
 // #[derive( Resource )]
@@ -296,7 +296,6 @@ pub struct Chaser
     pub fn_chasing: Option<FnChasing>,  //追手の移動方向を決める関数のポインタ
 }
 
-//追手の構造体の初期化
 impl Default for Chaser
 {   fn default() -> Self
     {   Self

@@ -169,7 +169,7 @@ pub fn spawn_sprite
                 .insert( Transform::from_translation( pixel.extend( DEPTH_SPRITE_DOT ) ) )
                 .id()
                 ;
-                *map.o_entity_mut( grid ) = Some ( id ); //idを保存(プレー中にdespawnするため)
+                *map.opt_entity_mut( grid ) = Some ( id ); //idを保存(プレー中にdespawnするため)
                 map.remaining_dots += 1; //ドットを数える
             }
         }

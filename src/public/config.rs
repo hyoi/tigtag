@@ -121,10 +121,10 @@ pub const MAGNIFY_SPRITE_CHASER: f32 = 0.5;
 //調整値
 pub const ADJUSTER_MAP_SPRITES: Vec2 = Vec2::new( 0.0, -1.0 * PIXELS_PER_GRID );
 
-// //SEボリューム
-// pub const VOLUME_SOUND_BEEP: f32 = 0.1;
-// // pub const VOLUME_SOUND_BEEP: Volume = Volume::Relative ( VolumeLevel::new( 0.1 ) );
-// //と書きたいがVolumeLevel::new()がnon-const fnなので書けない。
+//SEボリューム
+pub const VOLUME_SOUND_BEEP: f32 = 0.1;
+// pub const VOLUME_SOUND_BEEP: Volume = Volume::Relative ( VolumeLevel::new( 0.1 ) );
+//と書きたいがVolumeLevel::new()がnon-const fnなので書けない。
 
 ////////////////////////////////////////////////////////////////////////////////
 

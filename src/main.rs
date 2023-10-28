@@ -8,6 +8,7 @@ use bevy::
     diagnostic::{ DiagnosticsStore, FrameTimeDiagnosticsPlugin },
     sprite::{ Anchor, MaterialMesh2dBundle },
     utils::HashSet,
+    audio::{ Volume, VolumeLevel },
 };
 use once_cell::sync::Lazy;
 use counted_array::counted_array;

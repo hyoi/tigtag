@@ -17,7 +17,7 @@ pub mod chasers;
 
 //入力と判定の処理
 mod input;
-// mod judge;
+mod judge;
 
 // //アプリの設定
 // mod config;
