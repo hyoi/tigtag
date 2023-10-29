@@ -11,7 +11,7 @@ pub fn scoring_and_stageclear
     opt_hi_score: Option<ResMut<HiScore>>,
     state: Res<State<MyState>>,
     mut next_state: ResMut<NextState<MyState>>,
-    mut ev_clear: EventWriter<EventClear>,
+    mut evt_clear: EventWriter<EventClear>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
 )
@@ -56,7 +56,7 @@ pub fn scoring_and_stageclear
                 _ => unreachable!( "Bad state: {:?}", state.get() ),
             }
         );
-        ev_clear.send( EventClear ); //後続の処理にクリアを伝える
+        evt_clear.send( EventClear ); //後続の処理にクリアを伝える
     }
 }
 

@@ -61,8 +61,8 @@ pub fn move_sprite
     qry_chasers: Query<&Chaser>,
     opt_map: Option<Res<Map>>,
     state: ResMut<State<MyState>>,
-    mut ev_clear: EventReader<EventClear>,
-    mut ev_over: EventReader<EventOver>,
+    mut evt_clear: EventReader<EventClear>,
+    mut evt_over: EventReader<EventOver>,
     time: Res<Time>,
     cross: Res<input::CrossDirection>,
 )
@@ -70,8 +70,8 @@ pub fn move_sprite
     let Some ( map ) = opt_map else { return };
     
     //直前の判定でクリア／オーバーしていたらスプライトを移動させない
-    if ev_clear.iter().next().is_some() { return }
-    if ev_over .iter().next().is_some() { return }
+    if evt_clear.iter().next().is_some() { return }
+    if evt_over .iter().next().is_some() { return }
 
     //前回からの経過時間✕スピードアップ係数
     let time_delta = time.delta().mul_f32( player.speedup );
