@@ -38,47 +38,36 @@ const NA2_5: &str = "##-#####";
 const NA3_2: &str = "###.##";
 
 //ヘッダーの設定
-counted_array!
-(   const TEXT_HEADER_LEFT: [ MessageSect; _ ] =
-    [   ( " STAGE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
-        ( NA2      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
-    ]
-);
-counted_array!
-(   const TEXT_HEADER_CENTER: [ MessageSect; _ ] =
-    [   ( " SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD   ),
-        ( NA5      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE  ),
-    ]
-);
-counted_array!
-(   const TEXT_HEADER_RIGHT: [ MessageSect; _ ] =
-    [   ( " Hi-SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
-        ( NA5         , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
-    ]
-);
+const TEXT_HEADER_LEFT: &[ MessageSect ] =
+&[  ( " STAGE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
+    ( NA2      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
+];
+const TEXT_HEADER_CENTER: &[ MessageSect ] =
+&[  ( " SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
+    ( NA5      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
+];
+
+const TEXT_HEADER_RIGHT: &[ MessageSect ] =
+&[  ( " Hi-SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
+    ( NA5         , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
+];
 
 //フッターの設定
-counted_array!
-(   const TEXT_FOOTER_LEFT: [ MessageSect; _ ] =
-    [   ( "  FPS ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.60, Color::TEAL   ),
-        ( NA3_2   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.40, Color::SILVER ),
-        ( " demo ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID       * 0.45, Color::TEAL   ),
-        ( NA2_5   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.25, Color::SILVER ),
-]
-);
-counted_array!
-(   const TEXT_FOOTER_CENTER: [ MessageSect; _ ] =
-    [   ( "hyoi 2021 - 2023", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
-    ]
-);
-counted_array!
-(   const TEXT_FOOTER_RIGHT: [ MessageSect; _ ] =
-    [   ( "Powered by ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL   ),
-        ( "RUST"       , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::SILVER ),
-        ( " & "        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL   ),
-        ( "BEVY  "     , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::SILVER ),
-    ]
-);
+const TEXT_FOOTER_LEFT: &[ MessageSect ] =
+&[  ( "  FPS ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.60, Color::TEAL   ),
+    ( NA3_2   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.40, Color::SILVER ),
+    ( " demo ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.45, Color::TEAL   ),
+    ( NA2_5   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.25, Color::SILVER ),
+];
+const TEXT_FOOTER_CENTER: &[ MessageSect ] =
+&[  ( "hyoi 2021 - 2023", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
+];
+const TEXT_FOOTER_RIGHT: &[ MessageSect ] =
+&[  ( "Powered by ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL   ),
+    ( "RUST"       , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::SILVER ),
+    ( " & "        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL   ),
+    ( "BEVY  "     , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::SILVER ),
+];
 
 //おまけ(蟹)
 const GRID_X_KANI: i32 = SCREEN_GRIDS_WIDTH  - 4;
@@ -188,17 +177,17 @@ fn spawn_text_ui
     };
 
     //ヘッダーの準備
-    let mut header_left   = misc::text_ui( &TEXT_HEADER_LEFT  , &asset_svr );
-    let mut header_center = misc::text_ui( &TEXT_HEADER_CENTER, &asset_svr );
-    let mut header_right  = misc::text_ui( &TEXT_HEADER_RIGHT , &asset_svr );
+    let mut header_left   = misc::text_ui( TEXT_HEADER_LEFT  , &asset_svr );
+    let mut header_center = misc::text_ui( TEXT_HEADER_CENTER, &asset_svr );
+    let mut header_right  = misc::text_ui( TEXT_HEADER_RIGHT , &asset_svr );
     header_left.style.align_self   = AlignSelf::FlexStart;
     header_center.style.align_self = AlignSelf::Center;
     header_right.style.align_self  = AlignSelf::FlexEnd;
 
     //フッターの準備
-    let mut footer_left   = misc::text_ui( &TEXT_FOOTER_LEFT  , &asset_svr );
-    let mut footer_center = misc::text_ui( &TEXT_FOOTER_CENTER, &asset_svr );
-    let mut footer_right  = misc::text_ui( &TEXT_FOOTER_RIGHT , &asset_svr );
+    let mut footer_left   = misc::text_ui( TEXT_FOOTER_LEFT  , &asset_svr );
+    let mut footer_center = misc::text_ui( TEXT_FOOTER_CENTER, &asset_svr );
+    let mut footer_right  = misc::text_ui( TEXT_FOOTER_RIGHT , &asset_svr );
     footer_left.style.align_self   = AlignSelf::FlexStart;
     footer_center.style.align_self = AlignSelf::Center;
     footer_right.style.align_self  = AlignSelf::FlexEnd;

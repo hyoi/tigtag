@@ -232,6 +232,17 @@ const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//UIのメッセージ
+pub const UI_START: &[ MessageSect ] =
+&[  ( "Start\n"   , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN ),
+    ( "\n"        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
+    ( "Ready...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.0, Color::GOLD ),
+    ( "\n"        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
+    ( ""          , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::GOLD ),
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.
 
 

@@ -25,17 +25,16 @@ impl Plugin for Schedule
 #[derive( Component, Clone, Copy )]
 pub struct UiPause<'a> ( &'a [ MessageSect<'a> ] );
 
-impl<'a> TextUI for UiPause<'a>
-{   fn message( &self ) -> & [ MessageSect ] { self.0 }
-}
+const UI_PAUSE: &[ MessageSect ] =
+&[  ( "P A U S E", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::SILVER ),
+];
 
 impl<'a> Default for UiPause<'a>
-{   fn default() -> Self
-    {   Self
-        (   &[  ( "P A U S E", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::SILVER ),
-            ],
-        )
-    }
+{   fn default() -> Self { Self ( UI_PAUSE ) }
+}
+
+impl<'a> TextUI for UiPause<'a>
+{   fn message( &self ) -> & [ MessageSect ] { self.0 }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

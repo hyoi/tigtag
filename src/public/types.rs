@@ -183,13 +183,7 @@ impl<'a> Default for UiStart<'a>
             next_state : MyState::MainLoop,
             placeholder: 4,
             string     : |n| { if n == 0 { "Go!!".to_string() } else { n.to_string() } },
-            message    :
-            &[  ( "Start\n"   , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN ),
-                ( "\n"        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
-                ( "Ready...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.0, Color::GOLD ),
-                ( "\n"        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
-                ( ""          , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::GOLD ),
-            ],
+            message    : UI_START,
         }
     }
 }
