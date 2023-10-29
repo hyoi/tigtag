@@ -17,6 +17,8 @@ impl Plugin for Schedule
         .init_resource::<Map>()     //迷路の初期化
         .add_event::<EventClear>()  //ステージクリアイベントの登録
         .add_event::<EventOver>()   //ゲームオーバーイベントの登録
+        .init_resource::<CountDownTimer>() //カウントダウンタイマーの初期化
+        .init_resource::<input::CrossDirection>() //十字方向の入力状態
 
         //submoduleのplugin
         .add_plugins( header::Schedule ) //ヘッダーの表示(Stage、Score、HiScore)
@@ -25,31 +27,49 @@ impl Plugin for Schedule
         //チェイサーの回転アニメーション
         .add_systems( Update, chasers::rotate )
 
-        //GameStart＜仮＞
+        //GameStart-------------------------------------------------------------
         .add_systems
         (   OnEnter ( MyState::GameStart ),
-            misc::change_state::<StageStart> //＜仮＞無条件遷移
-        )
+            (   ui::spawn_in_middle_frame::<UiStart>, //UIをspawn
 
-        //StageStart
+                misc::change_state::<StageStart>, //無条件遷移
+            )
+        )
+        //GameStart-------------------------------------------------------------
+
+        //StageStart------------------------------------------------------------
         .add_systems
         (   OnEnter ( MyState::StageStart ),
             (   // zero_clear_score_and_stage, //ゲーム開始時(非クリア時)の初期化
-                map::make_new_data,         //新マップのデータ作成
-                (   map::spawn_sprite,      //スプライトをspawnする
-                    player::spawn_sprite,   //スプライトをspawnする
-                    chasers::spawn_sprite,  //スプライトをspawnする
-                ),
-                // set_countdown_params::<TextUiStart>, //カウントダウン初期化
-                // misc::show_component::<TextUiStart>, //カウントダウン表示
 
-                misc::change_state::<MainLoop> //＜仮＞無条件遷移
+                //マップ作成とスプライト初期表示
+                (   map::make_new_data,         //新マップのデータ作成
+                    (   map::spawn_sprite,      //スプライトをspawnする
+                        player::spawn_sprite,   //スプライトをspawnする
+                        chasers::spawn_sprite,  //スプライトをspawnする
+                    ),
+                ).chain(), //実行順を固定
+
+                //Startメッセージの表示
+                (   ui::init_countdown::<UiStart>, //カウントダウン初期化
+                    misc::show::<UiStart>,         //メッセージ表示
+                ).chain(), //実行順を固定
             )
-            .chain() //実行順を固定
         )
+        .add_systems
+        (   Update,
+            (   ui::show_countdown::<UiStart>, //カウントダウン
+            )
+            .run_if( in_state( MyState::StageStart ) )
+        )
+        .add_systems
+        (   OnExit ( MyState::StageStart ),
+            (   misc::hide::<UiStart>, //メッセージ非表示
+            )
+        )
+        //StageStart------------------------------------------------------------
 
-        //MainLoop
-        .init_resource::<input::CrossDirection>() //十字方向の入力状態
+        //MainLoop--------------------------------------------------------------
         .add_systems
         (   Update,
             (   judge::scoring_and_stageclear, //スコアリング＆クリア判定
@@ -67,6 +87,7 @@ impl Plugin for Schedule
             .chain() //実行順を固定
             .run_if( in_state( MyState::MainLoop ) )
         )
+        //MainLoop--------------------------------------------------------------
         ;
     }
 }
@@ -74,19 +95,6 @@ impl Plugin for Schedule
 ////////////////////////////////////////////////////////////////////////////////
 
 //End of code.
-
-
-
-// //プラグインの設定
-// pub struct Schedule;
-// impl Plugin for Schedule
-// {   fn build( &self, app: &mut App )
-//     {   app
-
-        // //ResourceとEvent
-        // .init_resource::<CountDown>()   //カウントダウンタイマーの初期化
-
-//         .add_systems( Update, player::catch_cross_button_pressed ) //十字ボタンの入力読み取り
 
 //         //----------------------------------------------------------------------
 //         //タイトルを表示する
@@ -261,48 +269,5 @@ impl Plugin for Schedule
 //     record.score = 0;
 //     record.stage = 0;
 // }
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //カウントダウンを初期化する
-// fn set_countdown_params<T: Component + WithCountDown>
-// (   mut q_text_ui: Query<&T>,
-//     mut countdown: ResMut<CountDown>,
-// )
-// {   if let Ok ( text_ui ) = q_text_ui.get_single_mut()
-//     {   countdown.count = text_ui.initial_value() + 1;
-//         countdown.timer.reset();
-//     }
-// }
-
-// //カウントダウンを表示しゼロになったらStateを変更する
-// fn countdown_message<T: Component + WithCountDown>
-// (   mut q_text_ui: Query<(&mut Text, &T)>,
-//     mut countdown: ResMut<CountDown>,
-//     mut state: ResMut<NextState<MyState>>,
-//     time: Res<Time>,
-// )
-// {   if let Ok ( ( mut text, text_ui ) ) = q_text_ui.get_single_mut()
-//     {   let finished = countdown.timer.tick( time.delta() ).finished();
-        
-//         //1秒経過したら
-//         if finished
-//         {   countdown.count -= 1;    //カウントダウン
-//             countdown.timer.reset(); //1秒タイマーリセット
-//         }
-
-//         //カウントダウンが終わったら、次のStateへ遷移する
-//         if countdown.count <= 0
-//         {   state.set( text_ui.next_state() );
-//             return;
-//         }
-
-//         //カウントダウンの表示を更新
-//         let message = text_ui.cd_string( countdown.count - 1 );
-//         text.sections[ text_ui.placeholder() ].value = message;
-//     }
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
 
 // //End of code.

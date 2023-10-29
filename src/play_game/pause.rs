@@ -8,7 +8,10 @@ impl Plugin for Schedule
 {   fn build( &self, app: &mut App )
     {   app
         //PAUSE用UIをspawnする
-        .add_systems( OnExit ( MyState::InitApp ), spawn_ui_pause )
+        .add_systems
+        (   OnExit ( MyState::GameStart ),
+            ui::spawn_in_middle_frame::<UiPause>
+        )
 
         //PAUSE処理
         .add_systems( Update, pause )
@@ -18,44 +21,28 @@ impl Plugin for Schedule
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//PauseのText
-counted_array!
-(   const PAUSE_TEXT: [ MessageSect; _ ] =
-    [   (   "P A U S E",
-            ASSETS_FONT_ORBITRON_BLACK,
-            PIXELS_PER_GRID * 4.0,
-            Color::SILVER,
-        ),
-    ]
-);
+//TextUIのComponent
+#[derive( Component, Clone, Copy )]
+pub struct UiPause<'a> ( &'a [ MessageSect<'a> ] );
 
-//UIのComponent
-#[derive( Component )] struct UiPause;
+impl<'a> TextUI for UiPause<'a>
+{   fn message( &self ) -> & [ MessageSect ] { self.0 }
+}
 
-////////////////////////////////////////////////////////////////////////////////
-
-//PAUSE用UIをspawnする
-fn spawn_ui_pause
-(   qry_hidden_frame: Query<Entity, With<HiddenFrameMiddle>>,
-    mut cmds: Commands,
-    asset_svr: Res<AssetServer>,
-)
-{   let Ok ( hidden_frame ) = qry_hidden_frame.get_single() else { return };
-
-    //PAUSEのメッセージの準備
-    let mut ui = misc::text_ui( &PAUSE_TEXT, &asset_svr );
-    ui.visibility = Visibility::Hidden; //初期状態
-
-    //レイアウト用の隠しフレームの中に子要素を作成する
-    let child_id = cmds.spawn( ( ui, UiPause ) ).id();
-    cmds.entity( hidden_frame ).add_child( child_id );
+impl<'a> Default for UiPause<'a>
+{   fn default() -> Self
+    {   Self
+        (   &[  ( "P A U S E", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::SILVER ),
+            ],
+        )
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //PAUSE処理
 fn pause
-(   qry_text: Query<&mut Visibility, With<UiPause>>,
+(   qry_text: Query<&mut Visibility, With<UiPause<'static>>>,
     opt_gamepad: Option<Res<ConnectedGamepad>>,
     mut state: ResMut<State<MyState>>,
     mut saved_in: Local<MyState>,

@@ -9,7 +9,7 @@ impl Plugin for Schedule
     {   app
         .add_systems
         (   //初期表示
-            OnExit ( MyState::InitApp ),
+            OnExit ( MyState::GameStart ),
             (   header_stage,    //ステージ
                 header_score,    //スコア
                 header_hi_score, //ハイスコア

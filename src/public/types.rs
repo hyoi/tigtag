@@ -140,15 +140,74 @@ impl HiScore
 #[derive( Component )] pub struct UiScore;
 #[derive( Component )] pub struct UiHiScore;
 
-////////////////////////////////////////////////////////////////////////////////
-
-//text UIのメッセージセクションの型
+//TextUIのメッセージセクションの型
 pub type MessageSect<'a> =
 (   &'a str, //表示文字列
     &'a str, //フォントのAssets
     f32,     //フォントのサイズ
     Color,   //フォントの色
 );
+
+//マーカーtrait
+pub trait TextUI
+{   fn message( &self ) -> & [ MessageSect ];
+}
+pub trait CountDown
+{   fn initial_count( &self ) -> i32;
+    fn next_state( &self ) -> MyState;
+    fn placeholder( &self ) -> usize;
+    fn to_string( &self, n: i32 ) -> String;
+}
+
+//TextUIのComponent
+#[derive( Component, Clone, Copy )] pub struct UiStart<'a>
+{   count      : i32,
+    next_state : MyState,
+    placeholder: usize,
+    string     : fn ( i32 ) -> String,
+    message    : &'a [ MessageSect<'a> ],
+}
+impl<'a> TextUI for UiStart<'a>
+{   fn message( &self ) -> & [ MessageSect ] { self.message }
+}
+impl<'a> CountDown for UiStart<'a>
+{   fn initial_count( &self ) -> i32 { self.count + 1 }
+    fn next_state( &self ) -> MyState { self.next_state }
+    fn placeholder( &self ) -> usize { self.placeholder }
+    fn to_string( &self, n: i32 ) -> String { ( self.string )( n ) }
+}
+impl<'a> Default for UiStart<'a>
+{   fn default() -> Self
+    {   Self
+        {   count      : 3,
+            next_state : MyState::MainLoop,
+            placeholder: 4,
+            string     : |n| { if n == 0 { "Go!!".to_string() } else { n.to_string() } },
+            message    :
+            &[  ( "Start\n"   , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN ),
+                ( "\n"        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
+                ( "Ready...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.0, Color::GOLD ),
+                ( "\n"        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
+                ( ""          , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::GOLD ),
+            ],
+        }
+    }
+}
+
+//カウントダウン用のResource
+#[derive( Resource )]
+pub struct CountDownTimer
+{   pub counter: i32,   //カウンター
+    pub timer  : Timer, //１秒タイマー
+}
+impl Default for CountDownTimer
+{   fn default() -> Self
+    {   Self
+        {   counter: 0,
+            timer  : Timer::from_seconds( 1.0, TimerMode::Once ),
+        }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -320,86 +379,11 @@ pub type FnChasing = fn( &mut Chaser, &Player, &[ News ] ) -> News;
 
 //End of code.
 
-
-
-
-// impl News
-// {   //四方に対応するXZ平面上の角度（四元数）を返す（Y軸回転）
-//     #[allow(clippy::wrong_self_convention)]
-//     pub fn to_quat_y( &self ) -> Quat
-//     {   match self
-//         {   News::North => Quat::from_rotation_y( PI * 0.0 ),
-//             News::East  => Quat::from_rotation_y( PI * 1.5 ),
-//             News::West  => Quat::from_rotation_y( PI * 0.5 ),
-//             News::South => Quat::from_rotation_y( PI * 1.0 ),
-//         }
-//     }
-
-//     //四方に対応するXY平面上の角度（四元数）を返す（Z軸回転）
-//     #[allow(clippy::wrong_self_convention)]
-//     pub fn to_quat_z( &self ) -> Quat
-//     {   match self
-//         {   News::North => Quat::from_rotation_z( PI * 0.0 ),
-//             News::East  => Quat::from_rotation_z( PI * 1.5 ),
-//             News::West  => Quat::from_rotation_z( PI * 0.5 ),
-//             News::South => Quat::from_rotation_z( PI * 1.0 ),
-//         }
-//     }
-
-////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
 // ////////////////////////////////////////////////////////////////////////////////
-
-// //glamの型に別名を付ける
-// pub type Grid = IVec2;
-// pub type Px2d =  Vec2;
-
-// pub trait GridTrait
-// {   fn px2d_screen( &self ) -> Px2d;
-//     fn px2d_map   ( &self ) -> Px2d;
-// }
-// impl GridTrait for Grid
-// {   //Gridからスクリーン座標(Px2d)を算出する
-//     fn px2d_screen( &self ) -> Px2d
-//     {   let neg_half_w = SCREEN_PIXELS_WIDTH  / -2.0;
-//         let half_h     = SCREEN_PIXELS_HEIGHT /  2.0;
-//         let half_grid  = PIXELS_PER_GRID      /  2.0;
-
-//         let x = neg_half_w + PIXELS_PER_GRID * self.x as f32 + half_grid;
-//         let y = half_h     - PIXELS_PER_GRID * self.y as f32 - half_grid;
-
-//         Px2d::new( x, y )
-//     }
-
-//     //Gridからマップの原点座標を加味したスクリーン座標(Px2d)を算出する
-//     fn px2d_map( &self ) -> Px2d
-//     {   ( *self + MAP_ORIGIN_GRID ).px2d_screen()
-//     }
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-
-// //text UIのメッセージセクションの型
-// pub type MessageSect<'a> =
-// (   &'a str, //表示文字列
-//     &'a str, //フォントのファイル名
-//     f32,     //フォンtのピクセル数（PIXELS_PER_GRIDＸ0.7 等）
-//     Color,   //文字の色（Bevy::Color）
-// );
 
 // //text UIのComponent
 // #[derive( Component )]
 // pub struct TextUiTitle ( pub MyState );
-
-// #[derive( Component )]
-// pub struct TextUiStart ( pub i32, pub MyState, pub usize, pub fn ( i32 ) -> String );
 
 // #[derive( Component )]
 // pub struct TextUiOver  ( pub i32, pub MyState, pub usize, pub fn ( i32 ) -> String, pub MyState );
@@ -407,19 +391,12 @@ pub type FnChasing = fn( &mut Chaser, &Player, &[ News ] ) -> News;
 // #[derive( Component )]
 // pub struct TextUiClear ( pub i32, pub MyState, pub usize, pub fn ( i32 ) -> String );
 
-
 // //カウントダウン付きtext UIでトレイト境界を使う準備
 // pub trait WithCountDown
 // {   fn initial_value( &self ) -> i32;
 //     fn next_state   ( &self ) -> MyState;
 //     fn placeholder  ( &self ) -> usize;
 //     fn cd_string    ( &self, n: i32 ) -> String;
-// }
-// impl WithCountDown for TextUiStart
-// {   fn initial_value( &self ) -> i32     { self.0 }
-//     fn next_state   ( &self ) -> MyState { self.1 }
-//     fn placeholder  ( &self ) -> usize   { self.2 }
-//     fn cd_string    ( &self, n: i32 ) -> String { self.3( n ) }
 // }
 // impl WithCountDown for TextUiClear
 // {   fn initial_value( &self ) -> i32     { self.0 }
@@ -445,22 +422,6 @@ pub type FnChasing = fn( &mut Chaser, &Player, &[ News ] ) -> News;
 // {   fn next_state( &self ) -> MyState { self.4 }
 // }
 
-// //カウントダウンタイマー用のResource
-// #[derive( Resource )]
-// pub struct CountDown
-// {   pub count: i32,   //カウントダウンの初期値
-//     pub timer: Timer, //カウントダウン用タイマー
-// }
-// impl Default for CountDown
-// {   fn default() -> Self
-//     {   Self
-//         {   count: 0,
-//             timer: Timer::from_seconds( 1.0, TimerMode::Once ),
-//         }
-//     }
-// }
-
 // ////////////////////////////////////////////////////////////////////////////////
-
 
 // //End of code.
