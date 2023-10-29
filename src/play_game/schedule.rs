@@ -55,11 +55,11 @@ impl Plugin for Schedule
             (   judge::scoring_and_stageclear, //スコアリング＆クリア判定⇒StageClear
                 // judge::chasers::detect_collisions,      //衝突判定⇒GameOver
                 (   (   input::catch_player_operation, //十字方向の入力状態取得
-                        player::move_sprite, //スプライト移動
+                        player::move_sprite, //プレイヤー移動
                     )
                     .chain(), //実行順を固定
 
-                    // chasers::move_sprite, //スプライト移動
+                    chasers::move_sprite, //チェイサー移動
                 )
             )
             .chain() //実行順を固定

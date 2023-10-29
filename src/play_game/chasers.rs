@@ -107,107 +107,110 @@ pub fn rotate
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//チェイサーを移動させる
+pub fn move_sprite
+(   qry_player: Query<&Player>,
+    mut qry_chaser: Query<(&mut Chaser, &mut Transform)>,
+    opt_map: Option<Res<Map>>,
+    mut evt_clear : EventReader<EventClear>,
+    mut evt_over  : EventReader<EventOver>,
+    time: Res<Time>,
+)
+{   let Ok ( player ) = qry_player.get_single() else { return };
+    let Some ( map ) = opt_map else { return };
+    
+    //直前の判定でクリア／オーバーしていたらスプライトを移動させない
+    if evt_clear.iter().next().is_some() { return }
+    if evt_over .iter().next().is_some() { return }
+
+    //前回からの経過時間
+    let time_delta = time.delta();
+
+    //チェイサーは複数なのでループ処理する
+    for ( mut chaser, mut transform ) in qry_chaser.iter_mut()
+    {   //スピードアップを反映する
+        let time_delta = time_delta.mul_f32( chaser.speedup );
+
+        //待ち時間が完了したら or ストップ状態だったら ⇒ 移動方向を決めて移動開始
+        if chaser.wait.tick( time_delta ).finished() || chaser.stop
+        {   //スプライトの表示位置をグリッドにそろえる
+            if chaser.px_start != chaser.px_end
+            {   chaser.px_start = chaser.px_end;
+                chaser.px_end   = chaser.next.to_sprite_pixels() + ADJUSTER_MAP_SPRITES;
+                transform.translation = chaser.px_end.extend( DEPTH_SPRITE_CHASER );
+            }
+    
+            //四方の脇道を取得する
+            let mut sides = map.get_byways_list( chaser.next );         //脇道のリスト
+            sides.retain( | side | chaser.next + side != chaser.grid ); //戻り路を排除
+
+            //チェイサーの向きを決める（プレーヤーのキー入力に相当）
+            chaser.stop = false;
+            chaser.side =
+                match sides.len().cmp( &1 ) //sides要素数は１以上(このゲームのマップに行き止まりが無いので)
+                {   Ordering::Equal =>
+                        sides[ 0 ], //一本道なら道なりに進む
+                    Ordering::Greater =>
+                        if let Some ( fnx ) = chaser.fn_chasing
+                        {   fnx( &mut chaser, player, &sides ) //分かれ道なら外部関数で進行方向を決める
+                        }
+                        else
+                        {   chaser.stop = true; //外部関数がない(None)なら停止フラグを立てる
+                            chaser.side
+                        },
+                    Ordering::Less =>
+                        match chaser.side //行き止まりなら逆走する(このゲームに行き止まりはないけど)
+                        {   News::North => News::South,
+                            News::South => News::North,
+                            News::East  => News::West ,
+                            News::West  => News::East ,
+                        },
+                };
+
+            //現在の位置と次の位置を更新する
+            chaser.grid = chaser.next;
+            if ! chaser.stop
+            {   let side = chaser.side; //chaser.side += chaser.next すると、
+                chaser.next += side;    //error[E0502]: cannot borrow `chaser` as 
+            }                           //immutable because it is also borrowed as mutable
+
+            //waitをリセットする
+            chaser.wait.reset();
+        }
+        else if ! chaser.stop
+        {   //移動中ならスプライトを中割の位置に移動する
+            let delta = CHASER_MOVE_COEF * time_delta.as_secs_f32();
+            match chaser.side
+            {   News::North => transform.translation.y += delta,
+                News::South => transform.translation.y -= delta,
+                News::East  => transform.translation.x += delta,
+                News::West  => transform.translation.x -= delta,
+            }
+            chaser.px_start = chaser.px_end;
+            chaser.px_end   = transform.translation.truncate();
+        }
+    }
+
+    //チェイサーは重なるとスピードアップする
+    let mut color_grid = Vec::with_capacity( qry_chaser.iter().len() );
+    for ( mut chaser, _ ) in qry_chaser.iter_mut()
+    {   color_grid.push( ( chaser.color, chaser.next ) );
+        chaser.speedup = 1.0;
+    }
+    for ( color, grid ) in color_grid
+    {   for ( mut chaser, _ ) in qry_chaser.iter_mut()
+        {   if grid != chaser.next || color == chaser.color { continue }
+            chaser.speedup += CHASER_ACCEL;
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.
 
 
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //追手の移動
-// pub fn move_sprite
-// (   q_player: Query<&Player>,
-//     mut q_chaser: Query<(&mut Chaser, &mut Transform)>,
-//     map: Res<Map>,
-//     mut ev_clear : EventReader<EventClear>,
-//     mut ev_over  : EventReader<EventOver>,
-//     time: Res<Time>,
-// )
-// {   //直前の判定でクリア／オーバーしていたらスプライトの表示を変更しない
-//     if ev_clear.iter().next().is_some() { return }
-//     if ev_over .iter().next().is_some() { return }
-
-//     let player = q_player.get_single().unwrap(); //プレイヤーの情報
-//     let time_delta = time.delta();               //前回からの経過時間
-
-//     //追手は複数なのでループ処理する
-//     for ( mut chaser, mut transform ) in q_chaser.iter_mut()
-//     {   //スピードアップを反映する
-//         let time_delta = time_delta.mul_f32( chaser.speedup );
-
-//         //待ち時間が完了したら or ストップ状態だったら ⇒ 移動方向を決めて移動開始
-//         if chaser.wait.tick( time_delta ).finished() || chaser.stop
-//         {   //スプライトの表示位置をグリッドにそろえる
-//             if chaser.px_start != chaser.px_end
-//             {   chaser.px_start = chaser.px_end;
-//                 chaser.px_end   = chaser.next.px2d_map();
-//                 transform.translation = chaser.px_end.extend( DEPTH_SPRITE_CHASER );
-//             }
-    
-//             //四方の脇道を取得する
-//             let mut sides = map.get_byways_list( chaser.next );         //脇道のリスト
-//             sides.retain( | side | chaser.next + side != chaser.grid ); //戻り路を排除
-
-//             //追手の向きを決める（自機のプレーヤーのキー入力に相当）
-//             chaser.stop = false;
-//             chaser.side
-//                 = match sides.len().cmp( &1 ) //sides要素数は1以上(このゲームのマップに行き止まりが無いので)
-//                 {   Ordering::Equal =>
-//                         sides[ 0 ], //一本道なら道なりに進む
-//                     Ordering::Greater =>
-//                         if let Some ( fnx ) = chaser.fn_chasing
-//                         {   fnx( &mut chaser, player, &sides ) //分かれ道なら外部関数で進行方向を決める
-//                         }
-//                         else
-//                         {   chaser.stop = true; //外部関数がない(None)なら停止フラグを立てる
-//                             chaser.side
-//                         },
-//                     Ordering::Less =>
-//                         match chaser.side //行き止まりなら逆走する(このゲームに行き止まりはないけど)
-//                         {   News::North    => News::South ,
-//                             News::South  => News::North   ,
-//                             News::East => News::West ,
-//                             News::West  => News::East,
-//                         },
-//                 };
-
-//             //現在の位置と次の位置を更新する
-//             chaser.grid = chaser.next;
-//             if ! chaser.stop
-//             {   let side = chaser.side; //chaser.side += chaser.next すると、
-//                 chaser.next += side;    //error[E0502]: cannot borrow `chaser` as 
-//             }                           //immutable because it is also borrowed as mutable
-
-//             //waitをリセットする
-//             chaser.wait.reset();
-//         }
-//         else if ! chaser.stop
-//         {   //移動中ならスプライトを中割の位置に移動する
-//             let delta = CHASER_MOVE_COEF * time_delta.as_secs_f32();
-//             match chaser.side
-//             {   News::North    => transform.translation.y += delta,
-//                 News::South  => transform.translation.y -= delta,
-//                 News::East => transform.translation.x += delta,
-//                 News::West  => transform.translation.x -= delta,
-//             }
-//             chaser.px_start = chaser.px_end;
-//             chaser.px_end   = transform.translation.truncate();
-//         }
-//     }
-
-//     //追手は重なるとスピードアップする
-//     let mut color_grid = Vec::with_capacity( q_chaser.iter().len() );
-//     for ( mut chaser, _ ) in q_chaser.iter_mut()
-//     {   color_grid.push( ( chaser.color, chaser.next ) );
-//         chaser.speedup = 1.0;
-//     }
-//     for ( color, grid ) in color_grid
-//     {   for ( mut chaser, _ ) in q_chaser.iter_mut()
-//         {   if grid != chaser.next || color == chaser.color { continue }
-//             chaser.speedup += CHASER_ACCEL;
-//         }
-//     }
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 // //衝突を判定する。条件を満たしたら、
 // //デモならTitleへ、衝突ならOverへ遷移する

@@ -219,8 +219,8 @@ pub const PLAYER_MOVE_COEF: f32 = PIXELS_PER_GRID / PLAYER_WAIT; //移動の中�
 
 //Chaserの設定値
 pub const CHASER_WAIT: f32 = 0.13;                               //移動のウェイト
-// pub const CHASER_MOVE_COEF: f32 = PIXELS_PER_GRID / CHASER_WAIT; //移動の中割係数
-// pub const CHASER_ACCEL: f32 = 0.4;                               //スピードアップの割増
+pub const CHASER_MOVE_COEF: f32 = PIXELS_PER_GRID / CHASER_WAIT; //移動の中割係数
+pub const CHASER_ACCEL: f32 = 0.4;                               //スピードアップの割増
 pub const CHASER_INIT_POSITION: [ ( i32, i32 ); 4 ] =            //スタート座標(Grid)
 [   ( 1    , 1     ),
     ( 1    , MAX_Y ),
