@@ -52,14 +52,16 @@ impl Plugin for Schedule
         .init_resource::<input::CrossDirection>() //十字方向の入力状態
         .add_systems
         (   Update,
-            (   judge::scoring_and_stageclear, //スコアリング＆クリア判定⇒StageClear
-                // judge::chasers::detect_collisions,      //衝突判定⇒GameOver
-                (   (   input::catch_player_operation, //十字方向の入力状態取得
-                        player::move_sprite, //プレイヤー移動
+            (   judge::scoring_and_stageclear, //スコアリング＆クリア判定
+                judge::detect_collisions,      //衝突判定
+                (   //プレイヤーの移動
+                    (   input::catch_player_operation,
+                        player::move_sprite,
                     )
                     .chain(), //実行順を固定
 
-                    chasers::move_sprite, //チェイサー移動
+                    //チェイサー移動
+                    chasers::move_sprite,
                 )
             )
             .chain() //実行順を固定

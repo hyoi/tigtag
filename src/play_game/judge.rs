@@ -2,7 +2,7 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//スコアの処理とクリア判定
+//スコア処理とステージクリア判定
 #[allow(clippy::too_many_arguments)]
 pub fn scoring_and_stageclear
 (   qry_player: Query<&Player>,
@@ -46,7 +46,7 @@ pub fn scoring_and_stageclear
     {   *hi_score.get_mut() = score.get();
     }
 
-    //全ドットを拾ったら、Clearへ遷移する
+    //全ドットを拾ったらステージクリア
     if map.remaining_dots <= 0
     {   // record.is_clear = true;
         next_state.set
@@ -56,8 +56,109 @@ pub fn scoring_and_stageclear
                 _ => unreachable!( "Bad state: {:?}", state.get() ),
             }
         );
-        evt_clear.send( EventClear ); //後続の処理にクリアを伝える
+        evt_clear.send( EventClear ); //後続の処理にステージクリアを伝える
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//衝突判定
+#[allow(clippy::too_many_arguments)]
+pub fn detect_collisions
+(   qry_player: Query<&Player>,
+    qry_chaser: Query<&Chaser>,
+    opt_stage: Option<Res<Stage>>,
+    opt_score: Option<Res<Score>>,
+    state: Res<State<MyState>>,
+    mut next_state: ResMut<NextState<MyState>>,
+    mut evt_clear: EventReader<EventClear>,
+    mut evt_over: EventWriter<EventOver>,
+)
+{   let Some ( _stage ) = opt_stage else { return };
+    let Some ( _score ) = opt_score else { return };
+
+    //直前の判定でクリアしていたら衝突判定しない
+    if evt_clear.iter().next().is_some() { return }
+    
+    //クリアしておらず、且つ衝突判定が真なら
+    if /* ! state.get().is_stageclear() && */ is_collision( qry_player, qry_chaser )
+    {   //衝突処理
+        next_state.set
+        (   match state.get()
+            {   MyState::MainLoop  => MyState::GameOver,
+                MyState::TitleDemo =>
+                {   //Demoの場合、記録を残す
+                    // if score.get() > record.demo.hi_score
+                    // {   record.demo.hi_score = score.get();
+                    //     record.demo.stage    = stage.get();
+                    // }
+                    MyState::DemoLoop
+                },
+                _ => unreachable!( "Bad state: {:?}", state.get() ),
+            }
+        );
+        evt_over.send( EventOver ); //後続の処理にゲームオーバーを伝える
+    }
+}
+
+//衝突判定関数
+fn is_collision
+(   qry_player: Query<&Player>,
+    qry_chaser: Query<&Chaser>
+) -> bool
+{   let mut is_collision = false;
+    let Ok ( player ) = qry_player.get_single() else { return is_collision };
+
+    //自機の移動区間を a1➜a2 とする
+    let mut a1 = player.px_start;
+    let mut a2 = player.px_end;
+    if a1.x > a2.x { std::mem::swap( &mut a1.x, &mut a2.x ) } //a1.x < a2.xにする
+    if a1.y > a2.y { std::mem::swap( &mut a1.y, &mut a2.y ) } //a1.y < a2.yにする
+
+    //各追手ごとの処理
+    for chaser in qry_chaser.iter()
+    {   //同じグリッドにいる場合
+        if player.px_end == chaser.px_end
+        {   is_collision = true;
+            break;
+        }
+
+        //追手の移動区間を b1➜b2 とする
+        let mut b1 = chaser.px_start;
+        let mut b2 = chaser.px_end;
+        if b1.x > b2.x { std::mem::swap( &mut b1.x, &mut b2.x ) } //b1.x < b2.xにする
+        if b1.y > b2.y { std::mem::swap( &mut b1.y, &mut b2.y ) } //b1.y < b2.yにする
+
+        //移動した微小区間の重なりを判定する
+        if player.px_end.y == chaser.px_end.y
+        {   //Y軸が一致する場合
+            is_collision = is_overlap( a1.x, a2.x, b1.x, b2.x, player.side, chaser.side );
+        }
+        else if player.px_end.x == chaser.px_end.x
+        {   //X軸が一致する場合
+            is_collision = is_overlap( a1.y, a2.y, b1.y, b2.y, player.side, chaser.side );
+        }
+        if is_collision { break }
+    }
+
+    //衝突判定の結果を返す
+    is_collision
+}
+
+//線分の重なりで衝突を判定
+fn is_overlap
+(   a1: f32, a2: f32,
+    b1: f32, b2: f32,
+    a_side: News, b_side: News,
+) -> bool
+{   //a1➜a2 と b1➜b2 が重ならないなら衝突しない(この条件が一番多いので先にはじく)
+    if a2 < b1 || b2 < a1 { return false }
+
+    //1つ目、2つ目の条件: a1➜a2 と b1➜b2 が包含関係なら衝突する
+    //3つ目の条件: 部分的に重なる場合 移動が対向なら衝突する(同一方向なら衝突しない)
+    if a1 < b1 && b2 < a2 || b1 < a1 && a2 < b2 || a_side != b_side { return true }
+
+    false
 }
 
 ////////////////////////////////////////////////////////////////////////////////
