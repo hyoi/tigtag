@@ -3,6 +3,7 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////
 
 //スコアの処理とクリア判定
+#[allow(clippy::too_many_arguments)]
 pub fn scoring_and_stageclear
 (   qry_player: Query<&Player>,
     opt_map: Option<ResMut<Map>>,
@@ -48,9 +49,13 @@ pub fn scoring_and_stageclear
     //全ドットを拾ったら、Clearへ遷移する
     if map.remaining_dots <= 0
     {   // record.is_clear = true;
-        // let next = if is_demo { MyState::DemoLoop } else { MyState::StageClear };
-        let next = MyState::StageClear; //＜仮＞
-        next_state.set( next );
+        next_state.set
+        (   match state.get()
+            {   MyState::MainLoop  => MyState::StageClear,
+                MyState::TitleDemo => MyState::DemoLoop,
+                _ => unreachable!( "Bad state: {:?}", state.get() ),
+            }
+        );
         ev_clear.send( EventClear ); //後続の処理にクリアを伝える
     }
 }
