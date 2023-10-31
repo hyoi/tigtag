@@ -31,12 +31,15 @@ impl Plugin for Schedule
         .add_systems
         (   OnEnter ( MyState::GameStart ),
             (   ui::spawn_in_middle_frame::<UiStart>, //UIをspawn
+                ui::spawn_in_middle_frame::<UiClear>, //UIをspawn
+                ui::spawn_in_middle_frame::<UiOver>,  //UIをspawn
 
                 misc::change_state::<StageStart>, //無条件遷移
             )
         )
         //GameStart-------------------------------------------------------------
 
+        //ステージ初期化
         //StageStart------------------------------------------------------------
         .add_systems
         (   OnEnter ( MyState::StageStart ),
@@ -48,12 +51,12 @@ impl Plugin for Schedule
                         player::spawn_sprite,   //スプライトをspawnする
                         chasers::spawn_sprite,  //スプライトをspawnする
                     ),
-                ).chain(), //実行順を固定
+                ).chain(),
 
                 //Startメッセージの表示
                 (   ui::init_countdown::<UiStart>, //カウントダウン初期化
                     misc::show::<UiStart>,         //メッセージ表示
-                ).chain(), //実行順を固定
+                ).chain(),
             )
         )
         .add_systems
@@ -69,6 +72,7 @@ impl Plugin for Schedule
         )
         //StageStart------------------------------------------------------------
 
+        //メインループ
         //MainLoop--------------------------------------------------------------
         .add_systems
         (   Update,
@@ -78,16 +82,61 @@ impl Plugin for Schedule
                     (   input::catch_player_operation,
                         player::move_sprite,
                     )
-                    .chain(), //実行順を固定
+                    .chain(),
 
                     //チェイサー移動
                     chasers::move_sprite,
                 )
             )
-            .chain() //実行順を固定
+            .chain()
             .run_if( in_state( MyState::MainLoop ) )
         )
         //MainLoop--------------------------------------------------------------
+
+        //ステージクリアの処理
+        //StageClear------------------------------------------------------------
+        .add_systems
+        (   OnEnter ( MyState::StageClear ),
+            (   ui::init_countdown::<UiClear>, //カウントダウン初期化
+                misc::show::<UiClear>,         //メッセージ表示
+            )
+            .chain()
+        )
+        .add_systems
+        (   Update,
+            (   ui::show_countdown::<UiClear>, //カウントダウン
+            )
+            .run_if( in_state( MyState::StageClear ) )
+        )
+        .add_systems
+        (   OnExit ( MyState::StageClear ),
+            (   misc::hide::<UiClear>, //メッセージ非表示
+            )
+        )
+        //StageClear------------------------------------------------------------
+
+        //ゲームオーバーの処理
+        //GameOver--------------------------------------------------------------
+        .add_systems
+        (   OnEnter ( MyState::GameOver ),
+            (   ui::init_countdown::<UiOver>, //カウントダウン初期化
+                misc::show::<UiOver>,         //メッセージ表示
+            )
+            .chain()
+        )
+        .add_systems
+        (   Update,
+            (   ui::show_countdown::<UiOver>, //カウントダウン後Titleへ
+                ui::hit_any_key::<UiOver>,    //Hit ANY keyでReplay
+            )
+            .run_if( in_state( MyState::GameOver ) )
+        )
+        .add_systems
+        (   OnExit ( MyState::GameOver ),
+            (   misc::hide::<UiOver>, //メッセージ非表示
+            )
+        )
+        //GameOver--------------------------------------------------------------
         ;
     }
 }
@@ -143,112 +192,6 @@ impl Plugin for Schedule
 //             (   misc::hide_component::<TextUiStart>, //カウントダウン非表示
 //             )
 //         )
-
-//         //----------------------------------------------------------------------
-//         //メインループ
-//         .add_systems
-//         (   Update,
-//             (   player::scoring_and_clear_stage, //スコアリング＆クリア判定⇒StageClear
-//                 chasers::detect_collisions,      //衝突判定⇒GameOver
-//                 (   player::move_sprite,         //スプライト移動
-//                     chasers::move_sprite,        //スプライト移動
-//                 )
-//             )
-//             .chain() //実行順を固定
-//             .run_if( in_state( MyState::MainLoop ) )
-//         )
-
-//         //----------------------------------------------------------------------
-//         //ステージクリアの処理
-//         .add_systems
-//         (   OnEnter ( MyState::StageClear ),
-//             (   set_countdown_params::<TextUiClear>, //カウントダウン初期化
-//                 misc::show_component::<TextUiClear>, //カウントダウン表示
-//             )
-//             .chain() //実行順を固定
-//         )
-//         .add_systems
-//         (   Update,
-//             (   countdown_message::<TextUiClear>, //カウントダウン後StageStartへ
-//             )
-//             .run_if( in_state( MyState::StageClear ) )
-//         )
-//         .add_systems
-//         (   OnExit ( MyState::StageClear ),
-//             (   misc::hide_component::<TextUiClear>, //カウントダウン非表示
-//             )
-//         )
-
-//         //----------------------------------------------------------------------
-//         //ゲームオーバーの処理
-//         .add_systems
-//         (   OnEnter ( MyState::GameOver ),
-//             (   set_countdown_params::<TextUiOver>, //カウントダウン初期化
-//                 misc::show_component::<TextUiOver>, //カウントダウン表示
-//             )
-//             .chain() //実行順を固定
-//         )
-//         .add_systems
-//         (   Update,
-//             (   countdown_message::<TextUiOver>,             //カウントダウン後Titleへ
-//                 goto_nextstate_with_hitanykey::<TextUiOver>, //Hit ANY keyでReplay
-//             )
-//             .run_if( in_state( MyState::GameOver ) )
-//         )
-//         .add_systems
-//         (   OnExit ( MyState::GameOver ),
-//             (   misc::hide_component::<TextUiOver>, //カウントダウン非表示
-//             )
-//         )
-//         ;
-//     }
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //キー入力さたらStateを遷移させる
-// fn goto_nextstate_with_hitanykey<T: Component + WithHitAnyKey>
-// (   q_text_ui: Query<&T>,
-//     mut next_state: ResMut<NextState<MyState>>,
-//     inkey: Res<Input<KeyCode>>,
-//     inbtn: Res<Input<GamepadButton>>,
-//     o_now_gamepad: Option<Res<NowGamepad>>,
-// )
-// {   //トラブル除け
-//     let Ok ( text_ui ) = q_text_ui.get_single() else { return };
-//     let Some ( now_gamepad ) = o_now_gamepad else { return };
-
-//     //HIT ANY KEY処理の例外になる入力があるなら
-//     for key in HAK_IGNORE_KEYS
-//     {   if inkey.pressed( key ) { return }
-//     }
-//     if let Some ( gamepad ) = now_gamepad.0
-//     {   for button in HAK_IGNORE_BUTTONS
-//         {   if inbtn.pressed( GamepadButton::new( gamepad, button ) )
-//             {   return;
-//             }
-//         }
-//     }
-
-//     //ゲームパッドの接続があるか、入力があるか
-//     let gamepad = now_gamepad.0.map
-//     (   |gamepad|
-//         {   //接続がある(入力は0個以上)
-//             inbtn.get_just_pressed()
-//             .filter( |button| button.gamepad == gamepad )
-//             .count()
-//         }
-//     );
-
-//     //入力がないなら
-//     if inkey.get_just_pressed().len() == 0
-//     {   if gamepad.is_none() { return } //ゲームパッドの接続がない
-//         if gamepad.is_some_and( |x| x == 0 ) { return } //ゲームパッドの入力がない
-//     }
-
-//     //Stateを遷移させる
-//     next_state.set( text_ui.next_state() );
-// }
 
 // ////////////////////////////////////////////////////////////////////////////////
 

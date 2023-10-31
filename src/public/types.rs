@@ -150,13 +150,16 @@ pub type MessageSect<'a> =
 
 //マーカーtrait
 pub trait TextUI
-{   fn message( &self ) -> & [ MessageSect ];
+{   fn message( &self ) -> &[ MessageSect ];
 }
 pub trait CountDown
 {   fn initial_count( &self ) -> i32;
     fn next_state( &self ) -> MyState;
     fn placeholder( &self ) -> usize;
     fn to_string( &self, n: i32 ) -> String;
+}
+pub trait HitAnyKey
+{   fn shortcut( &self ) -> MyState;
 }
 
 //TextUIのComponent
@@ -168,7 +171,7 @@ pub trait CountDown
     message    : &'a [ MessageSect<'a> ],
 }
 impl<'a> TextUI for UiStart<'a>
-{   fn message( &self ) -> & [ MessageSect ] { self.message }
+{   fn message( &self ) -> &[ MessageSect ] { self.message }
 }
 impl<'a> CountDown for UiStart<'a>
 {   fn initial_count( &self ) -> i32 { self.count + 1 }
@@ -179,11 +182,72 @@ impl<'a> CountDown for UiStart<'a>
 impl<'a> Default for UiStart<'a>
 {   fn default() -> Self
     {   Self
-        {   count      : 3,
+        {   count      : 5,
             next_state : MyState::MainLoop,
             placeholder: 4,
             string     : |n| { if n == 0 { "Go!!".to_string() } else { n.to_string() } },
             message    : UI_START,
+        }
+    }
+}
+
+#[derive( Component, Clone, Copy )] pub struct UiClear<'a>
+{   count      : i32,
+    next_state : MyState,
+    placeholder: usize,
+    string     : fn ( i32 ) -> String,
+    message    : &'a [ MessageSect<'a> ],
+}
+impl<'a> TextUI for UiClear<'a>
+{   fn message( &self ) -> &[ MessageSect ] { self.message }
+}
+impl<'a> CountDown for UiClear<'a>
+{   fn initial_count( &self ) -> i32 { self.count + 1 }
+    fn next_state( &self ) -> MyState { self.next_state }
+    fn placeholder( &self ) -> usize { self.placeholder }
+    fn to_string( &self, n: i32 ) -> String { ( self.string )( n ) }
+}
+impl<'a> Default for UiClear<'a>
+{   fn default() -> Self
+    {   Self
+        {   count      : 4,
+            next_state : MyState::StageStart,
+            placeholder: 4,
+            string     : |n| { ( n + 6 ).to_string() },
+            message    : UI_CLEAR,
+        }
+    }
+}
+
+#[derive( Component, Clone, Copy )] pub struct UiOver<'a>
+{   count      : i32,
+    next_state : MyState,
+    placeholder: usize,
+    string     : fn ( i32 ) -> String,
+    message    : &'a [ MessageSect<'a> ],
+    shortcut   : MyState,
+}
+impl<'a> TextUI for UiOver<'a>
+{   fn message( &self ) -> &[ MessageSect ] { self.message }
+}
+impl<'a> CountDown for UiOver<'a>
+{   fn initial_count( &self ) -> i32 { self.count + 1 }
+    fn next_state( &self ) -> MyState { self.next_state }
+    fn placeholder( &self ) -> usize { self.placeholder }
+    fn to_string( &self, n: i32 ) -> String { ( self.string )( n ) }
+}
+impl<'a> HitAnyKey for UiOver<'a>
+{   fn shortcut( &self ) -> MyState { self.shortcut }
+}
+impl<'a> Default for UiOver<'a>
+{   fn default() -> Self
+    {   Self
+        {   count      : 10,
+            next_state : MyState::StageStart, //MyState::Title
+            placeholder: 6,
+            string     : |n| { n.to_string() },
+            message    : UI_OVER,
+            shortcut   : MyState::StageStart,
         }
     }
 }

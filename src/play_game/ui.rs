@@ -67,4 +67,36 @@ pub fn show_countdown<T: Component + CountDown>
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//キー入力さたらStateを変更する
+pub fn hit_any_key<T: Component + HitAnyKey>
+(   qry_ui: Query<&T>,
+    opt_gamepad: Option<Res<ConnectedGamepad>>,
+    mut next_state: ResMut<NextState<MyState>>,
+    inkey: Res<Input<KeyCode>>,
+    inbtn: Res<Input<GamepadButton>>,
+)
+{   let Ok ( ui ) = qry_ui.get_single() else { return };
+
+    //無視キー以外のキー入力はあるか
+    for key in HAK_IGNORE_KEYS { if inkey.pressed( *key ) { return } }
+    let mut is_pressed = inkey.get_just_pressed().len();
+
+    //無視ボタン以外のボタン入力はあるか
+    if is_pressed == 0
+    {   let Some ( gamepad ) = opt_gamepad else { return };
+        let Some ( id ) = gamepad.id() else { return };
+        for buton in HAK_IGNORE_BUTTONS
+        {   if inbtn.pressed( GamepadButton::new( id, *buton ) ) { return }
+        }
+    is_pressed = inbtn.get_just_pressed().filter( |x| x.gamepad == id ).count();
+    }
+
+    //Stateを遷移させる
+    if is_pressed > 0
+    {   next_state.set( ui.shortcut() );
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.

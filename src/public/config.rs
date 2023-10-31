@@ -241,6 +241,37 @@ pub const UI_START: &[ MessageSect ] =
     ( ""          , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::GOLD ),
 ];
 
+pub const UI_CLEAR: &[ MessageSect ] =
+&[  ( "C L E A R !!\n" , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN ),
+    ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
+    ( "Next stage...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.0, Color::GOLD ),
+    ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
+    ( ""               , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::GOLD ),
+];
+
+pub const UI_OVER: &[ MessageSect ] =
+&[  ( "Game Over\n"  , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 6.0, Color::RED  ),
+    ( "\n"           , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.5, Color::NONE ),
+    ( "REPLAY?\n\n"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, Color::GOLD ),
+    ( "Hit ANY key!" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, Color::CYAN ),
+    ( "\nor\n"       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, Color::CYAN ),
+    ( "ANY button!\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, Color::CYAN ),
+    ( ""             , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::GOLD ),
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//Hit ANY Keyの処理で無視するキーとボタン
+pub const HAK_IGNORE_KEYS: &[ KeyCode ] =
+&[  KeyCode::AltLeft    , KeyCode::AltRight,
+    KeyCode::ControlLeft, KeyCode::ControlRight,
+    KeyCode::ShiftLeft  , KeyCode::ShiftRight,
+    PAUSE_KEY,
+];
+pub const HAK_IGNORE_BUTTONS: &[ GamepadButtonType ] =
+&[  PAUSE_BUTTON, FULL_SCREEN_BUTTON,
+];
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //End of code.
@@ -252,27 +283,6 @@ pub const UI_START: &[ MessageSect ] =
 
 //四方の配列
 // pub const NEWS: [ News; 4 ] = [ News::South, News::East, News::West, News::North ];
-
-
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-
-// //Hit ANY Keyの処理で押されても無視するキーとボタン
-// counted_array!
-// (   pub const HAK_IGNORE_KEYS: [ KeyCode; _ ] =
-//     [   KeyCode::AltLeft    , KeyCode::AltRight,
-//         KeyCode::ControlLeft, KeyCode::ControlRight,
-//         KeyCode::ShiftLeft  , KeyCode::ShiftRight,
-//         PAUSE_KEY,
-//     ]
-// );
-// counted_array!
-// (   pub const HAK_IGNORE_BUTTONS: [ GamepadButtonType; _ ] =
-//     [   PAUSE_BUTTON, FULL_SCREEN_BUTTON,
-//         GamepadButtonType::Mode,
-//     ]
-// );
 
 // ////////////////////////////////////////////////////////////////////////////////
 
@@ -299,44 +309,6 @@ pub const UI_START: &[ MessageSect ] =
 //     ]
 // );
 // pub const TEXT_UI_TITLE: TextUiTitle = TextUiTitle( MyState::StageStart );
-
-// counted_array!
-// (   pub const CENTER_START_TEXT: [ MessageSect; _ ] =
-//     [   ( "Game Start\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN ),
-//         ( "\n"          , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
-//         ( "Ready...\n"  , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.0, Color::GOLD ),
-//         ( "\n"          , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
-//         ( ""            , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::GOLD ),
-//     ]
-// );
-// pub const TEXT_UI_START: TextUiStart = TextUiStart ( 3, MyState::MainLoop, 4, cd_string_start );
-// fn cd_string_start( n: i32 ) -> String { if n == 0 { "Go!!".to_string() } else { n.to_string() } }
-
-// counted_array!
-// (   pub const CENTER_CLEAR_TEXT: [ MessageSect; _ ] =
-//     [   ( "C L E A R !!\n" , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN ),
-//         ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
-//         ( "Next stage...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.0, Color::GOLD ),
-//         ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
-//         ( ""               , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::GOLD ),
-//     ]
-// );
-// pub const TEXT_UI_CLEAR: TextUiClear = TextUiClear ( 1, MyState::StageStart, 4, cd_string_clear );
-// fn cd_string_clear( n: i32 ) -> String { ( n + 4 ).to_string() }
-
-// counted_array!
-// (   pub const CENTER_OVER_TEXT: [ MessageSect; _ ] =
-//     [   ( "Game Over\n"  , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 6.0, Color::RED  ),
-//         ( "\n"           , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.5, Color::NONE ),
-//         ( "REPLAY?\n\n"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, Color::GOLD ),
-//         ( "Hit ANY key!" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, Color::CYAN ),
-//         ( "\nor\n"       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, Color::CYAN ),
-//         ( "ANY button!\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, Color::CYAN ),
-//         ( ""             , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::GOLD ),
-//     ]
-// );
-// pub const TEXT_UI_OVER: TextUiOver = TextUiOver( 10, MyState::Title, 6, cd_string_over, MyState::StageStart );
-// fn cd_string_over( n: i32 ) -> String { n.to_string() }
 
 // ////////////////////////////////////////////////////////////////////////////////
 
