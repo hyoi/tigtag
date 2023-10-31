@@ -30,14 +30,35 @@ impl Plugin for Schedule
         //GameStart-------------------------------------------------------------
         .add_systems
         (   OnEnter ( MyState::GameStart ),
-            (   ui::spawn_in_middle_frame::<UiStart>, //UIをspawn
+            (   ui::spawn_in_middle_frame::<UiTitle>, //UIをspawn
+                ui::spawn_in_middle_frame::<UiStart>, //UIをspawn
                 ui::spawn_in_middle_frame::<UiClear>, //UIをspawn
                 ui::spawn_in_middle_frame::<UiOver>,  //UIをspawn
 
-                misc::change_state::<StageStart>, //無条件遷移
+                misc::change_state::<TitleDemo>, //無条件遷移
             )
         )
         //GameStart-------------------------------------------------------------
+
+        //タイトルを表示する
+        //TitleDemo-------------------------------------------------------------
+        .add_systems
+        (   OnEnter ( MyState::TitleDemo ),
+            (   misc::show::<UiTitle>, //タイトル表示
+            )
+        )
+        .add_systems
+        (   Update,
+            (   ui::hit_any_key::<UiTitle>, //Hit ANY Key
+            )
+            .run_if( in_state( MyState::TitleDemo ) )
+        )
+        .add_systems
+        (   OnExit ( MyState::TitleDemo ),
+            (   misc::hide::<UiTitle>, //タイトル非表示
+            )
+        )
+        //TitleDemo-------------------------------------------------------------
 
         //ステージ初期化
         //StageStart------------------------------------------------------------
@@ -146,25 +167,6 @@ impl Plugin for Schedule
 //End of code.
 
 //         //----------------------------------------------------------------------
-//         //タイトルを表示する
-//         //(assetsロード後に[AfterInitApp]の値を参照して遷移する)
-//         .insert_resource( AfterInitApp ( MyState::Title ) )
-//         .add_systems
-//         (   OnEnter ( MyState::Title ),
-//             (   misc::show_component::<TextUiTitle>, //タイトル表示
-//             )
-//         )
-//         .add_systems
-//         (   Update,
-//             (   goto_nextstate_with_hitanykey::<TextUiTitle>, //Hit ANY Key
-//             )
-//             .run_if( in_state( MyState::Title ) )
-//         )
-//         .add_systems
-//         (   OnExit ( MyState::Title ),
-//             (   misc::hide_component::<TextUiTitle>, //タイトル非表示
-//             )
-//         )
 
 //         //----------------------------------------------------------------------
 //         //ステージ初期化＆ゲーム開始のカウントダウン

@@ -40,8 +40,7 @@ impl GridToPixel for IVec2
 #[derive( Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States )]
 pub enum MyState
 {   #[default] LoadAssets, InitApp,
-    GameStart, StageStart, MainLoop, StageClear, GameOver,
-    TitleDemo, DemoLoop,
+    GameStart, TitleDemo, DemoLoop, StageStart, MainLoop, StageClear, GameOver,
     Pause, Debug,
 }
 
@@ -55,9 +54,11 @@ impl MyState
 pub trait GotoState { fn next( &self ) -> MyState; }
 
 //Stateの遷移に使うマーカー(not Resource)
+#[derive( Default )] pub struct TitleDemo;
 #[derive( Default )] pub struct StageStart;
 #[derive( Default )] pub struct MainLoop;
 
+impl GotoState for TitleDemo  { fn next( &self ) -> MyState { MyState::TitleDemo  } }
 impl GotoState for StageStart { fn next( &self ) -> MyState { MyState::StageStart } }
 impl GotoState for MainLoop   { fn next( &self ) -> MyState { MyState::MainLoop   } }
 
@@ -166,9 +167,9 @@ pub trait HitAnyKey
 #[derive( Component, Clone, Copy )] pub struct UiStart<'a>
 {   count      : i32,
     next_state : MyState,
+    message    : &'a [ MessageSect<'a> ],
     placeholder: usize,
     string     : fn ( i32 ) -> String,
-    message    : &'a [ MessageSect<'a> ],
 }
 impl<'a> TextUI for UiStart<'a>
 {   fn message( &self ) -> &[ MessageSect ] { self.message }
@@ -184,9 +185,9 @@ impl<'a> Default for UiStart<'a>
     {   Self
         {   count      : 5,
             next_state : MyState::MainLoop,
+            message    : UI_START,
             placeholder: 4,
             string     : |n| { if n == 0 { "Go!!".to_string() } else { n.to_string() } },
-            message    : UI_START,
         }
     }
 }
@@ -194,9 +195,9 @@ impl<'a> Default for UiStart<'a>
 #[derive( Component, Clone, Copy )] pub struct UiClear<'a>
 {   count      : i32,
     next_state : MyState,
+    message    : &'a [ MessageSect<'a> ],
     placeholder: usize,
     string     : fn ( i32 ) -> String,
-    message    : &'a [ MessageSect<'a> ],
 }
 impl<'a> TextUI for UiClear<'a>
 {   fn message( &self ) -> &[ MessageSect ] { self.message }
@@ -212,9 +213,9 @@ impl<'a> Default for UiClear<'a>
     {   Self
         {   count      : 4,
             next_state : MyState::StageStart,
+            message    : UI_CLEAR,
             placeholder: 4,
             string     : |n| { ( n + 6 ).to_string() },
-            message    : UI_CLEAR,
         }
     }
 }
@@ -222,9 +223,9 @@ impl<'a> Default for UiClear<'a>
 #[derive( Component, Clone, Copy )] pub struct UiOver<'a>
 {   count      : i32,
     next_state : MyState,
+    message    : &'a [ MessageSect<'a> ],
     placeholder: usize,
     string     : fn ( i32 ) -> String,
-    message    : &'a [ MessageSect<'a> ],
     shortcut   : MyState,
 }
 impl<'a> TextUI for UiOver<'a>
@@ -243,10 +244,29 @@ impl<'a> Default for UiOver<'a>
 {   fn default() -> Self
     {   Self
         {   count      : 10,
-            next_state : MyState::StageStart, //MyState::Title
+            next_state : MyState::TitleDemo,
+            message    : UI_OVER,
             placeholder: 6,
             string     : |n| { n.to_string() },
-            message    : UI_OVER,
+            shortcut   : MyState::StageStart,
+        }
+    }
+}
+
+#[derive( Component, Clone, Copy )] pub struct UiTitle<'a>
+{   message    : &'a [ MessageSect<'a> ],
+    shortcut   : MyState,
+}
+impl<'a> TextUI for UiTitle<'a>
+{   fn message( &self ) -> &[ MessageSect ] { self.message }
+}
+impl<'a> HitAnyKey for UiTitle<'a>
+{   fn shortcut( &self ) -> MyState { self.shortcut }
+}
+impl<'a> Default for UiTitle<'a>
+{   fn default() -> Self
+    {   Self
+        {   message    : UI_TITLE,
             shortcut   : MyState::StageStart,
         }
     }
@@ -436,50 +456,3 @@ pub type FnChasing = fn( &mut Chaser, &Player, &[ News ] ) -> News;
 ////////////////////////////////////////////////////////////////////////////////
 
 //End of code.
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //text UIのComponent
-// #[derive( Component )]
-// pub struct TextUiTitle ( pub MyState );
-
-// #[derive( Component )]
-// pub struct TextUiOver  ( pub i32, pub MyState, pub usize, pub fn ( i32 ) -> String, pub MyState );
-
-// #[derive( Component )]
-// pub struct TextUiClear ( pub i32, pub MyState, pub usize, pub fn ( i32 ) -> String );
-
-// //カウントダウン付きtext UIでトレイト境界を使う準備
-// pub trait WithCountDown
-// {   fn initial_value( &self ) -> i32;
-//     fn next_state   ( &self ) -> MyState;
-//     fn placeholder  ( &self ) -> usize;
-//     fn cd_string    ( &self, n: i32 ) -> String;
-// }
-// impl WithCountDown for TextUiClear
-// {   fn initial_value( &self ) -> i32     { self.0 }
-//     fn next_state   ( &self ) -> MyState { self.1 }
-//     fn placeholder  ( &self ) -> usize   { self.2 }
-//     fn cd_string    ( &self, n: i32 ) -> String { self.3( n ) }
-// }
-// impl WithCountDown for TextUiOver
-// {   fn initial_value( &self ) -> i32     { self.0 }
-//     fn next_state   ( &self ) -> MyState { self.1 }
-//     fn placeholder  ( &self ) -> usize   { self.2 }
-//     fn cd_string    ( &self, n: i32 ) -> String { self.3( n ) }
-// }
-
-// //キー入力でstateを変更するtext UIでトレイト境界を使う準備
-// pub trait WithHitAnyKey
-// {   fn next_state( &self ) -> MyState;
-// }
-// impl WithHitAnyKey for TextUiTitle
-// {   fn next_state( &self ) -> MyState { self.0 }
-// }
-// impl WithHitAnyKey for TextUiOver
-// {   fn next_state( &self ) -> MyState { self.4 }
-// }
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //End of code.

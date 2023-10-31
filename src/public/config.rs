@@ -259,6 +259,22 @@ pub const UI_OVER: &[ MessageSect ] =
     ( ""             , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::GOLD ),
 ];
 
+const TITLE_COLOR1: Color = Color::rgba( 0.6, 1.0, 0.4, 0.75 );
+const TITLE_COLOR2: Color = Color::rgba( 0.0, 0.7, 0.5, 0.75 );
+pub const UI_TITLE: &[ MessageSect ] =
+&[  ( APP_TITLE, ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, TITLE_COLOR1 ),
+    // ( "\n"     , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, TITLE_COLOR1 ),
+    ( "\nv"    , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, TITLE_COLOR2 ),
+    ( APP_VER  , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, TITLE_COLOR2 ),
+    ( "\n"     , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, TITLE_COLOR2 ),
+    // ( "    "   , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, TITLE_COLOR2 ),
+    // ( " "            , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, Color::NONE ),
+    ( "\nD E M O\n\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, Color::GOLD ),
+    ( "Hit ANY key!" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, Color::CYAN ),
+    ( "\nor\n"       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, Color::CYAN ),
+    ( "ANY button!"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, Color::CYAN ),
+];
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //Hit ANY Keyの処理で無視するキーとボタン
@@ -275,41 +291,3 @@ pub const HAK_IGNORE_BUTTONS: &[ GamepadButtonType ] =
 ////////////////////////////////////////////////////////////////////////////////
 
 //End of code.
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-
-//四方の配列
-// pub const NEWS: [ News; 4 ] = [ News::South, News::East, News::West, News::North ];
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //中央に表示するtext UI
-// const TITLE_COLOR1: Color = Color::rgba( 0.6, 1.0, 0.4, 0.75 );
-// const TITLE_COLOR2: Color = Color::rgba( 0.0, 0.7, 0.5, 0.75 );
-// counted_array!
-// (   pub const CENTER_TITLE_TEXT: [ MessageSect; _ ] =
-//     [   ( APP_TITLE, ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, TITLE_COLOR1 ),
-//         ( "\n"     , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, TITLE_COLOR1 ),
-//         ( "v"      , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, TITLE_COLOR2 ),
-//         ( APP_VER  , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, TITLE_COLOR2 ),
-//         ( "    "   , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, TITLE_COLOR2 ),
-//     ]
-// );
-
-// counted_array!
-// (   pub const CENTER_DEMO_TEXT: [ MessageSect; _ ] =
-//     [   ( " "            , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, Color::NONE ),
-//         ( "\nD E M O\n\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, Color::GOLD ),
-//         ( "Hit ANY key!" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, Color::CYAN ),
-//         ( "\nor\n"       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, Color::CYAN ),
-//         ( "ANY button!"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, Color::CYAN ),
-//     ]
-// );
-// pub const TEXT_UI_TITLE: TextUiTitle = TextUiTitle( MyState::StageStart );
-
-// ////////////////////////////////////////////////////////////////////////////////
-
-// //End of code.
