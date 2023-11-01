@@ -10,7 +10,7 @@ impl Plugin for Schedule
         //PAUSE用UIをspawnする
         .add_systems
         (   OnExit ( MyState::GameStart ),
-            center_ui::spawn_in_hidden_frame::<Pause>
+            ui_center::spawn_in_hidden_frame::<Pause>
         )
 
         //PAUSE処理
@@ -33,7 +33,7 @@ impl<'a> Default for Pause<'a>
 {   fn default() -> Self { Self ( UI_PAUSE ) }
 }
 
-impl<'a> center_ui::TextUI for Pause<'a>
+impl<'a> ui_center::TextUI for Pause<'a>
 {   fn message( &self ) -> & [ MessageSect ] { self.0 }
 }
 
