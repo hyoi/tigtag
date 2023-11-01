@@ -4,10 +4,10 @@ use super::*;
 mod schedule;
 pub use schedule::Schedule;
 
-//ヘッダー情報、pause処理、UI
-mod header;
+//UI、pause処理
+mod header_ui;
+mod center_ui;
 mod pause;
-mod ui;
 
 //マップ、自機、追手の処理
 pub mod map;

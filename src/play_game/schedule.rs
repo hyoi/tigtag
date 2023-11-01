@@ -17,12 +17,13 @@ impl Plugin for Schedule
         .init_resource::<Map>()     //迷路の初期化
         .add_event::<EventClear>()  //ステージクリアイベントの登録
         .add_event::<EventOver>()   //ゲームオーバーイベントの登録
-        .init_resource::<CountDownTimer>() //カウントダウンタイマーの初期化
+
         .init_resource::<input::CrossDirection>() //十字方向の入力状態
+        .init_resource::<center_ui::CountDownTimer>() //カウントダウンタイマーの初期化
 
         //submoduleのplugin
-        .add_plugins( header::Schedule ) //ヘッダーの表示(Stage、Score、HiScore)
-        .add_plugins( pause::Schedule )  //Pause処理
+        .add_plugins( header_ui::Schedule ) //ヘッダー(Stage、Score、HiScore)
+        .add_plugins( pause::Schedule )     //Pause処理
 
         //チェイサーの回転アニメーション
         .add_systems( Update, chasers::rotate )
@@ -30,10 +31,10 @@ impl Plugin for Schedule
         //GameStart-------------------------------------------------------------
         .add_systems
         (   OnEnter ( MyState::GameStart ),
-            (   ui::spawn_in_middle_frame::<UiTitle>, //UIをspawn
-                ui::spawn_in_middle_frame::<UiStart>, //UIをspawn
-                ui::spawn_in_middle_frame::<UiClear>, //UIをspawn
-                ui::spawn_in_middle_frame::<UiOver>,  //UIをspawn
+            (   center_ui::spawn_in_hidden_frame::<center_ui::Title>,
+                center_ui::spawn_in_hidden_frame::<center_ui::Start>,
+                center_ui::spawn_in_hidden_frame::<center_ui::Clear>,
+                center_ui::spawn_in_hidden_frame::<center_ui::Over>,
 
                 misc::change_state::<TitleDemo>, //無条件遷移
             )
@@ -44,18 +45,18 @@ impl Plugin for Schedule
         //TitleDemo-------------------------------------------------------------
         .add_systems
         (   OnEnter ( MyState::TitleDemo ),
-            (   misc::show::<UiTitle>, //タイトル表示
+            (   misc::show::<center_ui::Title>, //タイトル表示
             )
         )
         .add_systems
         (   Update,
-            (   ui::hit_any_key::<UiTitle>, //Hit ANY Key
+            (   center_ui::hit_any_key::<center_ui::Title>, //Hit ANY Key
             )
             .run_if( in_state( MyState::TitleDemo ) )
         )
         .add_systems
         (   OnExit ( MyState::TitleDemo ),
-            (   misc::hide::<UiTitle>, //タイトル非表示
+            (   misc::hide::<center_ui::Title>, //タイトル非表示
             )
         )
         //TitleDemo-------------------------------------------------------------
@@ -75,20 +76,20 @@ impl Plugin for Schedule
                 ).chain(),
 
                 //Startメッセージの表示
-                (   ui::init_countdown::<UiStart>, //カウントダウン初期化
-                    misc::show::<UiStart>,         //メッセージ表示
+                (   center_ui::init_countdown::<center_ui::Start>, //カウントダウン初期化
+                    misc::show::<center_ui::Start>, //メッセージ表示
                 ).chain(),
             )
         )
         .add_systems
         (   Update,
-            (   ui::show_countdown::<UiStart>, //カウントダウン
+            (   center_ui::counting_down::<center_ui::Start>, //カウントダウン
             )
             .run_if( in_state( MyState::StageStart ) )
         )
         .add_systems
         (   OnExit ( MyState::StageStart ),
-            (   misc::hide::<UiStart>, //メッセージ非表示
+            (   misc::hide::<center_ui::Start>, //メッセージ非表示
             )
         )
         //StageStart------------------------------------------------------------
@@ -118,20 +119,20 @@ impl Plugin for Schedule
         //StageClear------------------------------------------------------------
         .add_systems
         (   OnEnter ( MyState::StageClear ),
-            (   ui::init_countdown::<UiClear>, //カウントダウン初期化
-                misc::show::<UiClear>,         //メッセージ表示
+            (   center_ui::init_countdown::<center_ui::Clear>, //カウントダウン初期化
+                misc::show::<center_ui::Clear>, //メッセージ表示
             )
             .chain()
         )
         .add_systems
         (   Update,
-            (   ui::show_countdown::<UiClear>, //カウントダウン
+            (   center_ui::counting_down::<center_ui::Clear>, //カウントダウン
             )
             .run_if( in_state( MyState::StageClear ) )
         )
         .add_systems
         (   OnExit ( MyState::StageClear ),
-            (   misc::hide::<UiClear>, //メッセージ非表示
+            (   misc::hide::<center_ui::Clear>, //メッセージ非表示
             )
         )
         //StageClear------------------------------------------------------------
@@ -140,21 +141,21 @@ impl Plugin for Schedule
         //GameOver--------------------------------------------------------------
         .add_systems
         (   OnEnter ( MyState::GameOver ),
-            (   ui::init_countdown::<UiOver>, //カウントダウン初期化
-                misc::show::<UiOver>,         //メッセージ表示
+            (   center_ui::init_countdown::<center_ui::Over>, //カウントダウン初期化
+                misc::show::<center_ui::Over>, //メッセージ表示
             )
             .chain()
         )
         .add_systems
         (   Update,
-            (   ui::show_countdown::<UiOver>, //カウントダウン後Titleへ
-                ui::hit_any_key::<UiOver>,    //Hit ANY keyでReplay
+            (   center_ui::counting_down::<center_ui::Over>, //カウントダウン後Titleへ
+                center_ui::hit_any_key::<center_ui::Over>,   //Hit ANY keyでReplay
             )
             .run_if( in_state( MyState::GameOver ) )
         )
         .add_systems
         (   OnExit ( MyState::GameOver ),
-            (   misc::hide::<UiOver>, //メッセージ非表示
+            (   misc::hide::<center_ui::Over>, //メッセージ非表示
             )
         )
         //GameOver--------------------------------------------------------------
@@ -167,8 +168,6 @@ impl Plugin for Schedule
 //End of code.
 
 //         //----------------------------------------------------------------------
-
-//         //----------------------------------------------------------------------
 //         //ステージ初期化＆ゲーム開始のカウントダウン
 //         .add_systems
 //         (   OnEnter ( MyState::StageStart ),
@@ -178,20 +177,20 @@ impl Plugin for Schedule
 //                     player::spawn_sprite,   //スプライトをspawnする
 //                     chasers::spawn_sprite,  //スプライトをspawnする
 //                 ),
-//                 set_countdown_params::<TextUiStart>, //カウントダウン初期化
-//                 misc::show_component::<TextUiStart>, //カウントダウン表示
+//                 set_countdown_params::<Textui::Start>, //カウントダウン初期化
+//                 misc::show_component::<Textui::Start>, //カウントダウン表示
 //             )
 //             .chain() //実行順を固定
 //         )
 //         .add_systems
 //         (   Update,
-//             (   countdown_message::<TextUiStart>, //カウントダウン後MainLoopへ
+//             (   countdown_message::<Textui::Start>, //カウントダウン後MainLoopへ
 //             )
 //             .run_if( in_state( MyState::StageStart ) )
 //         )
 //         .add_systems
 //         (   OnExit ( MyState::StageStart ),
-//             (   misc::hide_component::<TextUiStart>, //カウントダウン非表示
+//             (   misc::hide_component::<Textui::Start>, //カウントダウン非表示
 //             )
 //         )
 
