@@ -232,13 +232,16 @@ const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//カウントダウンのプレイスホルダー目印用の文字列
+pub const CDPH: &str = "__Placeholder_for_countdown__";
+
 //UIのメッセージ
 pub const UI_START: &[ MessageSect ] =
 &[  ( "Start\n"   , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN ),
     ( "\n"        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
     ( "Ready...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.0, Color::GOLD ),
     ( "\n"        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
-    ( ""          , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::GOLD ),
+    ( CDPH        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::GOLD ),
 ];
 
 pub const UI_CLEAR: &[ MessageSect ] =
@@ -246,7 +249,7 @@ pub const UI_CLEAR: &[ MessageSect ] =
     ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
     ( "Next stage...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.0, Color::GOLD ),
     ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
-    ( ""               , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::GOLD ),
+    ( CDPH             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 5.0, Color::GOLD ),
 ];
 
 pub const UI_OVER: &[ MessageSect ] =
@@ -256,7 +259,7 @@ pub const UI_OVER: &[ MessageSect ] =
     ( "Hit ANY key!" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, Color::CYAN ),
     ( "\nor\n"       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, Color::CYAN ),
     ( "ANY button!\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, Color::CYAN ),
-    ( ""             , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::GOLD ),
+    ( CDPH           , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::GOLD ),
 ];
 
 const TITLE_COLOR1: Color = Color::rgba( 0.6, 1.0, 0.4, 0.75 );

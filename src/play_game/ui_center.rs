@@ -2,129 +2,6 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//マーカーtrait
-pub trait TextUI
-{   fn message( &self ) -> &[ MessageSect ];
-}
-pub trait CountDown
-{   fn initial_count( &self ) -> i32;
-    fn next_state( &self ) -> MyState;
-    fn placeholder( &self ) -> usize;
-    fn to_string( &self, n: i32 ) -> String;
-}
-pub trait HitAnyKey
-{   fn shortcut( &self ) -> MyState;
-}
-
-//TextUIのComponent
-#[derive( Component, Clone, Copy )] pub struct Start<'a>
-{   count      : i32,
-    next_state : MyState,
-    message    : &'a [ MessageSect<'a> ],
-    placeholder: usize,
-    string     : fn ( i32 ) -> String,
-}
-impl<'a> TextUI for Start<'a>
-{   fn message( &self ) -> &[ MessageSect ] { self.message }
-}
-impl<'a> CountDown for Start<'a>
-{   fn initial_count( &self ) -> i32 { self.count + 1 }
-    fn next_state( &self ) -> MyState { self.next_state }
-    fn placeholder( &self ) -> usize { self.placeholder }
-    fn to_string( &self, n: i32 ) -> String { ( self.string )( n ) }
-}
-impl<'a> Default for Start<'a>
-{   fn default() -> Self
-    {   Self
-        {   count      : 5,
-            next_state : MyState::MainLoop,
-            message    : UI_START,
-            placeholder: 4,
-            string     : |n| { if n == 0 { "Go!!".to_string() } else { n.to_string() } },
-        }
-    }
-}
-
-#[derive( Component, Clone, Copy )] pub struct Clear<'a>
-{   count      : i32,
-    next_state : MyState,
-    message    : &'a [ MessageSect<'a> ],
-    placeholder: usize,
-    string     : fn ( i32 ) -> String,
-}
-impl<'a> TextUI for Clear<'a>
-{   fn message( &self ) -> &[ MessageSect ] { self.message }
-}
-impl<'a> CountDown for Clear<'a>
-{   fn initial_count( &self ) -> i32 { self.count + 1 }
-    fn next_state( &self ) -> MyState { self.next_state }
-    fn placeholder( &self ) -> usize { self.placeholder }
-    fn to_string( &self, n: i32 ) -> String { ( self.string )( n ) }
-}
-impl<'a> Default for Clear<'a>
-{   fn default() -> Self
-    {   Self
-        {   count      : 4,
-            next_state : MyState::StageStart,
-            message    : UI_CLEAR,
-            placeholder: 4,
-            string     : |n| { ( n + 6 ).to_string() },
-        }
-    }
-}
-
-#[derive( Component, Clone, Copy )] pub struct Over<'a>
-{   count      : i32,
-    next_state : MyState,
-    message    : &'a [ MessageSect<'a> ],
-    placeholder: usize,
-    string     : fn ( i32 ) -> String,
-    shortcut   : MyState,
-}
-impl<'a> TextUI for Over<'a>
-{   fn message( &self ) -> &[ MessageSect ] { self.message }
-}
-impl<'a> CountDown for Over<'a>
-{   fn initial_count( &self ) -> i32 { self.count + 1 }
-    fn next_state( &self ) -> MyState { self.next_state }
-    fn placeholder( &self ) -> usize { self.placeholder }
-    fn to_string( &self, n: i32 ) -> String { ( self.string )( n ) }
-}
-impl<'a> HitAnyKey for Over<'a>
-{   fn shortcut( &self ) -> MyState { self.shortcut }
-}
-impl<'a> Default for Over<'a>
-{   fn default() -> Self
-    {   Self
-        {   count      : 10,
-            next_state : MyState::TitleDemo,
-            message    : UI_OVER,
-            placeholder: 6,
-            string     : |n| { n.to_string() },
-            shortcut   : MyState::StageStart,
-        }
-    }
-}
-
-#[derive( Component, Clone, Copy )] pub struct Title<'a>
-{   message    : &'a [ MessageSect<'a> ],
-    shortcut   : MyState,
-}
-impl<'a> TextUI for Title<'a>
-{   fn message( &self ) -> &[ MessageSect ] { self.message }
-}
-impl<'a> HitAnyKey for Title<'a>
-{   fn shortcut( &self ) -> MyState { self.shortcut }
-}
-impl<'a> Default for Title<'a>
-{   fn default() -> Self
-    {   Self
-        {   message    : UI_TITLE,
-            shortcut   : MyState::StageStart,
-        }
-    }
-}
-
 //カウントダウン用のResource
 #[derive( Resource )]
 pub struct CountDownTimer
@@ -136,6 +13,151 @@ impl Default for CountDownTimer
     {   Self
         {   counter: 0,
             timer  : Timer::from_seconds( 1.0, TimerMode::Once ),
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//Center UIの基本トレイト
+pub trait TextUI
+{   fn message( &self ) -> &[ MessageSect ];
+}
+
+//カウントダウンのトレイト
+pub trait CountDown
+{   fn initial_count( &self ) -> i32;
+    fn next_state( &self ) -> MyState;
+    fn to_string( &self, n: i32 ) -> String;
+    fn placeholder( &self ) -> Option<usize>;
+}
+
+//Hit ANY Key! のトレイト
+pub trait HitAnyKey
+{   fn shortcut( &self ) -> MyState;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//ゲームスタートメッセージのComponent
+#[derive( Component, Clone, Copy )]
+pub struct Start<'a>
+{   count     : i32,
+    next_state: MyState,
+    message   : &'a [ MessageSect<'a> ],
+    string    : fn ( i32 ) -> String,
+}
+
+impl<'a> TextUI for Start<'a>
+{   fn message( &self ) -> &[ MessageSect ] { self.message }
+}
+
+impl<'a> CountDown for Start<'a>
+{   fn initial_count( &self ) -> i32 { self.count + 1 }
+    fn next_state( &self ) -> MyState { self.next_state }
+    fn to_string( &self, n: i32 ) -> String { ( self.string )( n ) }
+    fn placeholder( &self ) -> Option<usize> { self.message.iter().position( |x| x.0 == CDPH ) }
+}
+
+impl<'a> Default for Start<'a>
+{   fn default() -> Self
+    {   Self
+        {   count     : 5,
+            next_state: MyState::MainLoop,
+            message   : UI_START,
+            string    : |n| if n == 0 { "Go!!".to_string() } else { n.to_string() },
+        }
+    }
+}
+
+//ステージクリアメッセージのComponent
+#[derive( Component, Clone, Copy )]
+pub struct Clear<'a>
+{   count     : i32,
+    next_state: MyState,
+    message   : &'a [ MessageSect<'a> ],
+    string    : fn ( i32 ) -> String,
+}
+
+impl<'a> TextUI for Clear<'a>
+{   fn message( &self ) -> &[ MessageSect ] { self.message }
+}
+
+impl<'a> CountDown for Clear<'a>
+{   fn initial_count( &self ) -> i32 { self.count + 1 }
+    fn next_state( &self ) -> MyState { self.next_state }
+    fn to_string( &self, n: i32 ) -> String { ( self.string )( n ) }
+    fn placeholder( &self ) -> Option<usize> { self.message.iter().position( |x| x.0 == CDPH ) }
+}
+
+impl<'a> Default for Clear<'a>
+{   fn default() -> Self
+    {   Self
+        {   count     : 4,
+            next_state: MyState::StageStart,
+            message   : UI_CLEAR,
+            string    : |n| ( n + 6 ).to_string(),
+        }
+    }
+}
+
+//ゲームオーバーメッセージのComponent
+#[derive( Component, Clone, Copy )]
+pub struct Over<'a>
+{   count     : i32,
+    next_state: MyState,
+    message   : &'a [ MessageSect<'a> ],
+    string    : fn ( i32 ) -> String,
+    shortcut  : MyState,
+}
+
+impl<'a> TextUI for Over<'a>
+{   fn message( &self ) -> &[ MessageSect ] { self.message }
+}
+
+impl<'a> CountDown for Over<'a>
+{   fn initial_count( &self ) -> i32 { self.count + 1 }
+    fn next_state( &self ) -> MyState { self.next_state }
+    fn to_string( &self, n: i32 ) -> String { ( self.string )( n ) }
+    fn placeholder( &self ) -> Option<usize> { self.message.iter().position( |x| x.0 == CDPH ) }
+}
+
+impl<'a> HitAnyKey for Over<'a>
+{   fn shortcut( &self ) -> MyState { self.shortcut }
+}
+
+impl<'a> Default for Over<'a>
+{   fn default() -> Self
+    {   Self
+        {   count     : 10,
+            next_state: MyState::TitleDemo,
+            message   : UI_OVER,
+            string    : |n| n.to_string(),
+            shortcut  : MyState::StageStart,
+        }
+    }
+}
+
+//タイトルのComponent
+#[derive( Component, Clone, Copy )]
+pub struct Title<'a>
+{   message    : &'a [ MessageSect<'a> ],
+    shortcut   : MyState,
+}
+
+impl<'a> TextUI for Title<'a>
+{   fn message( &self ) -> &[ MessageSect ] { self.message }
+}
+
+impl<'a> HitAnyKey for Title<'a>
+{   fn shortcut( &self ) -> MyState { self.shortcut }
+}
+
+impl<'a> Default for Title<'a>
+{   fn default() -> Self
+    {   Self
+        {   message : UI_TITLE,
+            shortcut: MyState::StageStart,
         }
     }
 }
@@ -184,25 +206,25 @@ pub fn counting_down<T: Component + CountDown>
     time: Res<Time>,
 )
 {   let Ok ( ( mut text, ui ) ) = qry_text_ui.get_single_mut() else { return };
+    let Some ( placeholder ) = ui.placeholder() else { return };
     let Some ( mut countdown ) = opt_countdown else { return };
 
-    let finished = countdown.timer.tick( time.delta() ).finished();
-    
     //1秒経過したら
-    if finished
+    if countdown.timer.tick( time.delta() ).finished()
     {   countdown.counter -= 1;  //カウントダウン
         countdown.timer.reset(); //1秒タイマーリセット
     }
 
-    //カウントダウンが終わったら、次のStateへ遷移する
-    if countdown.counter <= 0
-    {   next_state.set( ui.next_state() );
-        return;
+    //カウントダウンが続いているなら
+    if countdown.counter > 0
+    {   //カウントダウンの表示を更新する
+        let message = ui.to_string( countdown.counter - 1 );
+        text.sections[ placeholder ].value = message;
     }
-
-    //カウントダウンの表示を更新
-    let message = ui.to_string( countdown.counter - 1 );
-    text.sections[ ui.placeholder() ].value = message;
+    else
+    {   //そうでないならStateを変更する
+        next_state.set( ui.next_state() );
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,7 +250,7 @@ pub fn hit_any_key<T: Component + HitAnyKey>
         for buton in HAK_IGNORE_BUTTONS
         {   if inbtn.pressed( GamepadButton::new( id, *buton ) ) { return }
         }
-    is_pressed = inbtn.get_just_pressed().filter( |x| x.gamepad == id ).count();
+        is_pressed = inbtn.get_just_pressed().filter( |x| x.gamepad == id ).count();
     }
 
     //Stateを遷移させる
