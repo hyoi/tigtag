@@ -57,7 +57,7 @@ fn main()
             //テスト用：オブジェクト表示
             debug::spawn_2d_sprites //2D表示テスト
             .run_if( DEBUG )
-            .run_if( not( resource_exists::<AfterInitAppTo<MyState>>() ) )
+            .run_if( not( resource_exists::<Map>() ) ) //debug表示が被るので
         )
     )
     .init_resource::<ConnectedGamepad>() //操作を受け付けるgamepadのID
