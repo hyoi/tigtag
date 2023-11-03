@@ -13,19 +13,10 @@ impl Plugin for Schedule
             )
         )
         .add_systems
-        (   //初期表示
-            OnExit ( MyState::GameStart ),
-            (   update_stage,    //ステージ
-                update_score,    //スコア
-                update_hi_score, //ハイスコア
-            )
-        )
-        .add_systems
-        (   //表示更新
-            Update,
-            (   update_stage   .run_if( resource_changed::<Stage  >() ), //ステージ
-                update_score   .run_if( resource_changed::<Score  >() ), //スコア
-                update_hi_score.run_if( resource_changed::<HiScore>() ), //ハイスコア
+        (   Update,
+            (   update_stage,    //ステージ表示更新
+                update_score,    //スコア表示更新
+                update_hi_score, //ハイスコア表示更新
             )
         );
     }
@@ -70,37 +61,37 @@ fn spawn_ui_header
 //UIの表示を更新する(SCORE)
 fn update_score
 (   mut qry_text: Query<&mut Text, With<UiScore>>,
-    opt_score: Option<Res<Score>>,
+    opt_record: Option<Res<Record>>,
 )
 {   let Ok ( mut text ) = qry_text.get_single_mut() else { return };
-    let Some ( score ) = opt_score else { return };
+    let Some ( record ) = opt_record else { return };
 
     let Some ( index ) = *PLACE_HOLDER_HEADER_CENTER else { return };
-    text.sections[ index ].value = format!( "{:05}", score.get() );
+    text.sections[ index ].value = format!( "{:05}", record.score() );
 }
 
 //UIの表示を更新する(HI-SCORE)
 fn update_hi_score
 (   mut qry_text: Query<&mut Text, With<UiHiScore>>,
-    opt_hi_score: Option<Res<HiScore>>,
+    opt_record: Option<Res<Record>>,
 )
 {   let Ok ( mut text ) = qry_text.get_single_mut() else { return };
-    let Some ( hi_score ) = opt_hi_score else { return };
+    let Some ( record ) = opt_record else { return };
 
     let Some ( index ) = *PLACE_HOLDER_HEADER_RIGHT else { return };
-    text.sections[ index ].value = format!( "{:05}", hi_score.get() );
+    text.sections[ index ].value = format!( "{:05}", record.hi_score() );
 }
 
 //UIの表示を更新する(STAGE)
 fn update_stage
 (   mut qry_text: Query<&mut Text, With<UiStage>>,
-    opt_stage: Option<Res<Stage>>,
+    opt_record: Option<Res<Record>>,
 )
 {   let Ok ( mut text ) = qry_text.get_single_mut() else { return };
-    let Some ( stage ) = opt_stage else { return };
+    let Some ( record ) = opt_record else { return };
 
     let Some ( index ) = *PLACE_HOLDER_HEADER_LEFT else { return };
-    text.sections[ index ].value = format!( "{:02}", stage.get() );
+    text.sections[ index ].value = format!( "{:02}", record.stage() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

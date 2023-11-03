@@ -8,10 +8,8 @@ impl Plugin for Schedule
 {   fn build( &self, app: &mut App )
     {   app
         //ResourceとEvent
-        .init_resource::<Stage>()   //ステージの初期化
-        .init_resource::<Score>()   //スコアの初期化
-        .init_resource::<HiScore>() //ハイスコアの初期化
-        .init_resource::<Map>()     //迷路の初期化
+        .init_resource::<Record>()  //ゲームの成績
+        .init_resource::<Map>()     //マップ情報
         .add_event::<EventClear>()  //ステージクリアイベントの登録
         .add_event::<EventOver>()   //ゲームオーバーイベントの登録
 

@@ -81,24 +81,20 @@ impl GotoState for TitleDemoExist   <MyState> { fn next( &self ) -> MyState { se
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//ゲームの記録用Resource
-
-#[derive( Resource, Default )] pub struct Stage ( i32 );
-impl Stage
-{   pub fn get( &self ) -> i32 { self.0 }
-    pub fn get_mut( &mut self ) -> &mut i32 { &mut self.0 }
+//ゲームの成績記録用のResource
+#[derive( Resource, Default )]
+pub struct Record
+{   score   : i32, //スコア
+    hi_score: i32, //ハイスコア
+    stage   : i32, //ステージ数
 }
-
-#[derive( Resource, Default )] pub struct Score ( i32 );
-impl Score
-{   pub fn get( &self ) -> i32 { self.0 }
-    pub fn get_mut( &mut self ) -> &mut i32 { &mut self.0 }
-}
-
-#[derive( Resource, Default )] pub struct HiScore ( i32 );
-impl HiScore
-{   pub fn get( &self ) -> i32 { self.0 }
-    pub fn get_mut( &mut self ) -> &mut i32 { &mut self.0 }
+impl Record
+{   pub fn score       ( &    self ) ->      i32 {      self.score    }
+    pub fn score_mut   ( &mut self ) -> &mut i32 { &mut self.score    }
+    pub fn hi_score    ( &    self ) ->      i32 {      self.hi_score }
+    pub fn hi_score_mut( &mut self ) -> &mut i32 { &mut self.hi_score }
+    pub fn stage       ( &    self ) ->      i32 {      self.stage    }
+    pub fn stage_mut   ( &mut self ) -> &mut i32 { &mut self.stage    }
 }
 
 // #[derive( Resource )]

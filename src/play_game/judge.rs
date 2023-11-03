@@ -7,8 +7,7 @@ use super::*;
 pub fn scoring_and_stageclear
 (   qry_player: Query<&Player>,
     opt_map: Option<ResMut<Map>>,
-    opt_score: Option<ResMut<Score>>,
-    opt_hi_score: Option<ResMut<HiScore>>,
+    opt_record: Option<ResMut<Record>>,
     state: Res<State<MyState>>,
     mut next_state: ResMut<NextState<MyState>>,
     mut evt_clear: EventWriter<EventClear>,
@@ -18,8 +17,7 @@ pub fn scoring_and_stageclear
 {   let Ok ( player ) = qry_player.get_single() else { return };
     let Some ( mut map ) = opt_map else { return };
     let Some ( dot ) = map.opt_entity( player.grid ) else { return };
-    let Some ( mut score ) = opt_score else { return };
-    let Some ( mut hi_score ) = opt_hi_score else { return };
+    let Some ( mut record ) = opt_record else { return };
 
     //ドットの削除
     cmds.entity( dot ).despawn();
@@ -30,7 +28,7 @@ pub fn scoring_and_stageclear
     // if is_demo { map.demo.update_params( player.grid ); }
 
     //スコア更新
-    *score.get_mut() += 1;
+    *record.score_mut() += 1;
     map.remaining_dots -= 1;
 
     //1度beepを鳴らす(despawn処理付き)
@@ -42,8 +40,8 @@ pub fn scoring_and_stageclear
     cmds.spawn( sound_beep );
 
     //ハイスコアの更新
-    if ! is_demo && score.get() > hi_score.get()
-    {   *hi_score.get_mut() = score.get();
+    if ! is_demo && record.score() > record.hi_score()
+    {   *record.hi_score_mut() = record.score();
     }
 
     //全ドットを拾ったらステージクリア
@@ -67,15 +65,13 @@ pub fn scoring_and_stageclear
 pub fn detect_collisions
 (   qry_player: Query<&Player>,
     qry_chaser: Query<&Chaser>,
-    opt_stage: Option<Res<Stage>>,
-    opt_score: Option<Res<Score>>,
+    opt_record: Option<Res<Record>>,
     state: Res<State<MyState>>,
     mut next_state: ResMut<NextState<MyState>>,
     mut evt_clear: EventReader<EventClear>,
     mut evt_over: EventWriter<EventOver>,
 )
-{   let Some ( _stage ) = opt_stage else { return };
-    let Some ( _score ) = opt_score else { return };
+{   let Some ( _record ) = opt_record else { return };
 
     //直前の判定でクリアしていたら衝突判定しない
     if evt_clear.iter().next().is_some() { return }

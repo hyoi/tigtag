@@ -55,10 +55,10 @@ fn which_way_pink_goes( chaser: &mut Chaser, player: &Player, sides: &[ News ] )
 //チェイサーをspawnする
 pub fn spawn_sprite
 (   qry_player: Query<Entity, With<Chaser>>,
-    opt_stage: Option<Res<Stage>>,
+    opt_record: Option<Res<Record>>,
     mut cmds: Commands,
 )
-{   let Some ( stage ) = opt_stage else { return };
+{   let Some ( record ) = opt_record else { return };
 
     //スプライトがあれば削除する
     qry_player.for_each( | id | cmds.entity( id ).despawn_recursive() );
@@ -70,7 +70,8 @@ pub fn spawn_sprite
     (   | ( i, ( x, y ) ) |
         {   let grid  = IVec2::new( x, y );
             let pixel = grid.to_sprite_pixels() + ADJUSTER_MAP_SPRITES;
-            let ( color, fn_chasing ) = COLOR_SPRITE_CHASERS[ ( ( stage.get() - 1 + i ) % 4 ) as usize ];
+            let index = ( ( i + record.stage() - 1 ) % 4 ) as usize;
+            let ( color, fn_chasing ) = COLOR_SPRITE_CHASERS[ index ];
             let chaser = Chaser
             {   grid,
                 next    : grid,

@@ -5,10 +5,10 @@ use super::*;
 //マップのデータを作る
 pub fn make_new_data
 (   opt_map  : Option<ResMut<Map>>,
-    opt_stage: Option<ResMut<Stage>>,
+    opt_record: Option<ResMut<Record>>,
 )
 {   let Some ( mut map ) = opt_map else { return };
-    let Some ( mut stage ) = opt_stage else { return };
+    let Some ( mut record ) = opt_record else { return };
     
     let half_w = MAP_GRIDS_WIDTH  / 2;
     let half_h = MAP_GRIDS_HEIGHT / 2;
@@ -72,8 +72,8 @@ pub fn make_new_data
     }
 
     //付随する情報の初期化
-    *stage.get_mut() += 1;  //新マップを作ったらステージ数を＋１する
-    map.init_byways_bit();  //全グリッドに対し、四方の通路の状態をセットする
+    *record.stage_mut() += 1; //新マップを作ったらステージ数を＋１する
+    map.init_byways_bit();    //全グリッドに対し、四方の壁・通の状態をセットする
     // map.init_demo_params(); //demo用の情報を準備する
 }
 
