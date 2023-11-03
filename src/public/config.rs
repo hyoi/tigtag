@@ -232,10 +232,69 @@ const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//カウントダウンのプレイスホルダー目印用の文字列
+//ヘッダー＆フッターのプレイスホルダー
+pub const NA2  : &str = "##";
+pub const NA5  : &str = "#####";
+pub const NA2_5: &str = "##-#####";
+pub const NA3_2: &str = "###.##";
+const PLACE_HOLDERS_HEAD_FOOT: &[ &str ] = &[  NA2, NA5, NA2_5, NA3_2 ];
+
+//ヘッダーの設定
+pub const TEXT_HEADER_LEFT: &[ MessageSect ] =
+&[  ( " STAGE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
+    ( NA2      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
+];
+pub static PLACE_HOLDER_HEADER_LEFT: Lazy<Option<usize>> = Lazy::new
+(   || TEXT_HEADER_LEFT.iter().position( |x| PLACE_HOLDERS_HEAD_FOOT.contains( &x.0 ) )
+);
+
+pub const TEXT_HEADER_CENTER: &[ MessageSect ] =
+&[  ( " SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
+    ( NA5      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
+];
+pub static PLACE_HOLDER_HEADER_CENTER: Lazy<Option<usize>> = Lazy::new
+(   || TEXT_HEADER_CENTER.iter().position( |x| PLACE_HOLDERS_HEAD_FOOT.contains( &x.0 ) )
+);
+
+pub const TEXT_HEADER_RIGHT: &[ MessageSect ] =
+&[  ( " Hi-SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
+    ( NA5         , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
+];
+pub static PLACE_HOLDER_HEADER_RIGHT: Lazy<Option<usize>> = Lazy::new
+(   || TEXT_HEADER_RIGHT.iter().position( |x| PLACE_HOLDERS_HEAD_FOOT.contains( &x.0 ) )
+);
+
+//フッターの設定
+pub const TEXT_FOOTER_LEFT: &[ MessageSect ] =
+&[  ( "  FPS ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.60, Color::TEAL   ),
+    ( NA3_2   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.40, Color::SILVER ),
+    ( " demo ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.45, Color::TEAL   ),
+    ( NA2_5   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.25, Color::SILVER ),
+];
+
+pub const TEXT_FOOTER_CENTER: &[ MessageSect ] =
+&[  ( "hyoi 2021 - 2023", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
+];
+
+pub const TEXT_FOOTER_RIGHT: &[ MessageSect ] =
+&[  ( "Powered by ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL   ),
+    ( "RUST"       , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::SILVER ),
+    ( " & "        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL   ),
+    ( "BEVY  "     , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::SILVER ),
+];
+
+//おまけ(蟹)
+pub const GRID_X_KANI: i32 = SCREEN_GRIDS_WIDTH  - 4;
+pub const GRID_Y_KANI: i32 = SCREEN_GRIDS_HEIGHT - 1;
+pub const MAGNIFY_SPRITE_KANI: f32 = 0.9;
+pub const COLOR_SPRITE_KANI: Color = Color::rgba( 1.0, 1.0, 1.0, 0.6 );
+
+////////////////////////////////////////////////////////////////////////////////
+
+//カウントダウンのプレイスホルダー
 pub const CDPH: &str = "__Placeholder_for_countdown__";
 
-//UIのメッセージ
+//メッセージの設定
 pub const UI_START: &[ MessageSect ] =
 &[  ( "Start\n"   , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::CYAN ),
     ( "\n"        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, Color::NONE ),
@@ -262,6 +321,9 @@ pub const UI_OVER: &[ MessageSect ] =
     ( CDPH           , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, Color::GOLD ),
 ];
 
+////////////////////////////////////////////////////////////////////////////////
+
+//タイトルの設定
 const TITLE_COLOR1: Color = Color::rgba( 0.6, 1.0, 0.4, 0.75 );
 const TITLE_COLOR2: Color = Color::rgba( 0.0, 0.7, 0.5, 0.75 );
 pub const UI_TITLE: &[ MessageSect ] =
@@ -276,6 +338,11 @@ pub const UI_TITLE: &[ MessageSect ] =
     ( "Hit ANY key!" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, Color::CYAN ),
     ( "\nor\n"       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, Color::CYAN ),
     ( "ANY button!"  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, Color::CYAN ),
+];
+
+//PAUSEメッセージの設定
+pub const UI_PAUSE: &[ MessageSect ] =
+&[  ( "P A U S E", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, Color::SILVER ),
 ];
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -13,9 +13,16 @@ impl Plugin for Schedule
         //ゲーム枠とフッターを表示する
         .add_systems
         (   OnEnter ( MyState::InitApp ),
-            (   spawn_screen_frame, //ゲーム枠を表示
-                spawn_text_ui,      //TEXT UIを表示
-                misc::change_state_with_res::<AfterInitAppTo<MyState>>, //無条件遷移
+            (   spawn_screen_frame,    //ゲーム枠を表示
+                spawn_ui_hidden_frame, //UI用の隠しフレーム作成
+                misc::change_state::<GameStart>, //無条件遷移
+            )
+        )
+        .add_systems
+        (   OnExit ( MyState::InitApp ),
+            (   spawn_ui_footer, //フッターを表示
+                //OnEnter ( MyState::InitApp ) に書いてもフッターはspawnされない。
+                //原因は親である隠しフレームのspawnが遅延実行されるため。
             )
         )
 
@@ -30,50 +37,6 @@ impl Plugin for Schedule
 
 //FPS表示のComponent
 #[derive( Component )] struct UiFps;
-
-//text UIの初期値
-const NA2  : &str = "##";
-const NA5  : &str = "#####";
-const NA2_5: &str = "##-#####";
-const NA3_2: &str = "###.##";
-
-//ヘッダーの設定
-const TEXT_HEADER_LEFT: &[ MessageSect ] =
-&[  ( " STAGE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
-    ( NA2      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
-];
-const TEXT_HEADER_CENTER: &[ MessageSect ] =
-&[  ( " SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
-    ( NA5      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
-];
-
-const TEXT_HEADER_RIGHT: &[ MessageSect ] =
-&[  ( " Hi-SCORE ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.7, Color::GOLD  ),
-    ( NA5         , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.7, Color::WHITE ),
-];
-
-//フッターの設定
-const TEXT_FOOTER_LEFT: &[ MessageSect ] =
-&[  ( "  FPS ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.60, Color::TEAL   ),
-    ( NA3_2   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.40, Color::SILVER ),
-    ( " demo ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.45, Color::TEAL   ),
-    ( NA2_5   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.25, Color::SILVER ),
-];
-const TEXT_FOOTER_CENTER: &[ MessageSect ] =
-&[  ( "hyoi 2021 - 2023", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
-];
-const TEXT_FOOTER_RIGHT: &[ MessageSect ] =
-&[  ( "Powered by ", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL   ),
-    ( "RUST"       , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::SILVER ),
-    ( " & "        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL   ),
-    ( "BEVY  "     , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::SILVER ),
-];
-
-//おまけ(蟹)
-const GRID_X_KANI: i32 = SCREEN_GRIDS_WIDTH  - 4;
-const GRID_Y_KANI: i32 = SCREEN_GRIDS_HEIGHT - 1;
-const MAGNIFY_SPRITE_KANI: f32 = 0.9;
-const COLOR_SPRITE_KANI: Color = Color::rgba( 1.0, 1.0, 1.0, 0.6 );
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -126,16 +89,15 @@ fn spawn_screen_frame
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//TEXT UIを配置する
-fn spawn_text_ui
+//UI用の隠しフレームをspawnする
+fn spawn_ui_hidden_frame
 (   mut cmds: Commands,
-    asset_svr: Res<AssetServer>,
 )
-{   //レイアウト用の隠しフレームの準備
-    let width  = Val::Px( SCREEN_PIXELS_WIDTH  );
+{   let width  = Val::Px( SCREEN_PIXELS_WIDTH  );
     let height = Val::Px( SCREEN_PIXELS_HEIGHT );
     let background_color = BackgroundColor ( Color::NONE );
 
+    //ヘッダー
     let hidden_frame_header = NodeBundle
     {   style: Style
         {   width,
@@ -149,6 +111,7 @@ fn spawn_text_ui
         ..default()
     };
 
+    //センター
     let hidden_frame_middle = NodeBundle
     {   style: Style
         {   width,
@@ -163,6 +126,7 @@ fn spawn_text_ui
         ..default()
     };
 
+    //フッター
     let hidden_frame_footer = NodeBundle
     {   style: Style
         {   width,
@@ -176,13 +140,21 @@ fn spawn_text_ui
         ..default()
     };
 
-    //ヘッダーの準備
-    let mut header_left   = misc::text_ui( TEXT_HEADER_LEFT  , &asset_svr );
-    let mut header_center = misc::text_ui( TEXT_HEADER_CENTER, &asset_svr );
-    let mut header_right  = misc::text_ui( TEXT_HEADER_RIGHT , &asset_svr );
-    header_left.style.align_self   = AlignSelf::FlexStart;
-    header_center.style.align_self = AlignSelf::Center;
-    header_right.style.align_self  = AlignSelf::FlexEnd;
+    //隠しフレームを作成する
+    cmds.spawn( ( hidden_frame_header, HiddenFrameHeader ) );
+    cmds.spawn( ( hidden_frame_middle, HiddenFrameCenter ) );
+    cmds.spawn( ( hidden_frame_footer, HiddenFrameFooter ) );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//フッターをspawnする
+fn spawn_ui_footer
+(   qry_hidden_frame: Query<Entity, With<HiddenFrameFooter>>,
+    mut cmds: Commands,
+    asset_svr: Res<AssetServer>,
+)
+{   let Ok ( hidden_frame ) = qry_hidden_frame.get_single() else { return };
 
     //フッターの準備
     let mut footer_left   = misc::text_ui( TEXT_FOOTER_LEFT  , &asset_svr );
@@ -192,29 +164,19 @@ fn spawn_text_ui
     footer_center.style.align_self = AlignSelf::Center;
     footer_right.style.align_self  = AlignSelf::FlexEnd;
 
-    //隠しフレームと子要素を作成する
-    cmds.spawn( hidden_frame_header ).with_children
-    (   | cmds |
-        {   cmds.spawn( ( header_left  , UiStage   ) );
-            cmds.spawn( ( header_center, UiScore   ) );
-            cmds.spawn( ( header_right , UiHiScore ) );
-        }
-    );
-    cmds.spawn( ( hidden_frame_middle, HiddenFrameMiddle ) );
-    cmds.spawn( hidden_frame_footer ).with_children
-    (   | cmds |
-        {   cmds.spawn( ( footer_left, UiFps ) );
-            cmds.spawn(   footer_center        );
-            cmds.spawn(   footer_right         );
-        }
-    );
+    //レイアウト用の隠しフレームの中に子要素を作成する
+    let child_left   = cmds.spawn( ( footer_left, UiFps ) ).id();
+    let child_center = cmds.spawn(   footer_center        ).id();
+    let child_right  = cmds.spawn(   footer_right         ).id();
+    cmds.entity( hidden_frame ).add_child( child_left   );
+    cmds.entity( hidden_frame ).add_child( child_center );
+    cmds.entity( hidden_frame ).add_child( child_right  );
 
     //おまけ(蟹)
     let custom_size = Some ( SIZE_GRID * MAGNIFY_SPRITE_KANI );
     let color = COLOR_SPRITE_KANI;
     let vec2 = IVec2::new( GRID_X_KANI, GRID_Y_KANI ).to_sprite_pixels();
     let vec3 = vec2.extend( DEPTH_SPRITE_KANI_DOTOWN );
-
     cmds.spawn( SpriteBundle::default() )
     .insert( Sprite { custom_size, color, ..default() } )
     .insert( Transform::from_translation( vec3 ) )

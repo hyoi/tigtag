@@ -167,7 +167,7 @@ impl<'a> Default for Title<'a>
 //UIをspawnする
 pub fn spawn_in_hidden_frame<T: Component + Default + Copy + TextUI>
 (   component: Local<T>,
-    qry_hidden_frame: Query<Entity, With<HiddenFrameMiddle>>,
+    qry_hidden_frame: Query<Entity, With<HiddenFrameCenter>>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
 )

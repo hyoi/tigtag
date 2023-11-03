@@ -54,10 +54,12 @@ impl MyState
 pub trait GotoState { fn next( &self ) -> MyState; }
 
 //Stateの遷移に使うマーカー(not Resource)
+#[derive( Default )] pub struct GameStart;
 #[derive( Default )] pub struct TitleDemo;
 #[derive( Default )] pub struct StageStart;
 #[derive( Default )] pub struct MainLoop;
 
+impl GotoState for GameStart  { fn next( &self ) -> MyState { MyState::GameStart  } }
 impl GotoState for TitleDemo  { fn next( &self ) -> MyState { MyState::TitleDemo  } }
 impl GotoState for StageStart { fn next( &self ) -> MyState { MyState::StageStart } }
 impl GotoState for MainLoop   { fn next( &self ) -> MyState { MyState::MainLoop   } }
@@ -133,15 +135,12 @@ impl HiScore
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//中央の隠しフレームのComponent
-#[derive( Component )] pub struct HiddenFrameMiddle;
+//UI用の隠しフレームのComponent
+#[derive( Component )] pub struct HiddenFrameHeader;
+#[derive( Component )] pub struct HiddenFrameCenter;
+#[derive( Component )] pub struct HiddenFrameFooter;
 
-//ヘッダーのComponent
-#[derive( Component )] pub struct UiStage;
-#[derive( Component )] pub struct UiScore;
-#[derive( Component )] pub struct UiHiScore;
-
-//TextUIのメッセージセクションの型
+//UIのテキストメッセージセクションの型
 pub type MessageSect<'a> =
 (   &'a str, //表示文字列
     &'a str, //フォントのAssets
