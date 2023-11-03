@@ -2,16 +2,17 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//demoplay用の自機の移動方向を決める関数
+//デモ時の自走プレイヤーの移動方向を決める関数
 pub fn which_way_player_goes
 (   player: &Player,
-    q_chasers: Query<&Chaser>,
+    qry_chasers: Query<&Chaser>,
     map: Res<Map>,
-    org_sides: &[ DxDy ], //交差点が前提なので、要素数は2(三叉路)～3(十字路)
-) -> DxDy
+    demo: Res<DemoMapParams>,
+    org_sides: &[ News ], //交差点が前提なので、要素数は2(三叉路)～3(十字路)
+) -> News
 {   let mut sides = Vec::from( org_sides );
-    let mut goals = Vec::with_capacity( q_chasers.iter().len() );
-    q_chasers.for_each
+    let mut goals = Vec::with_capacity( qry_chasers.iter().len() );
+    qry_chasers.for_each
     (   | chaser |
         if chaser.next != player.next
         {   //追手が遠くにいる場合、終点(追手の座標)のリストを作る
@@ -27,10 +28,10 @@ pub fn which_way_player_goes
                 else
                 {   //追手に対し正面衝突する方向を避ける
                     match chaser.side
-                    {   DxDy::Right => DxDy::Left ,
-                        DxDy::Left  => DxDy::Right,
-                        DxDy::Down  => DxDy::Up   ,
-                        DxDy::Up    => DxDy::Down ,
+                    {   News::East  => News::West ,
+                        News::West  => News::East ,
+                        News::South => News::North,
+                        News::North => News::South,
                     }
                 }
             };
@@ -46,9 +47,7 @@ pub fn which_way_player_goes
     }
 
     //sidesの要素数が１なら
-    if sides.len() == 1
-    {   return sides[ 0 ]
-    }
+    if sides.len() == 1 { return sides[ 0 ] }
 
     //sidesの要素数が２以上なら、リスクを評価する
     let mut risk_rating = Vec::with_capacity( 3 ); //最大で十字路(3)
@@ -96,9 +95,9 @@ pub fn which_way_player_goes
         }
         else
         {   //道が複数ある場合
-            if ! map.demo.is_inside_rect( player.next )
+            if ! demo.is_inside_rect( player.next )
             {   //自機が残dotsを含む最小の矩形の外にいる場合
-                if let Some ( side ) = heuristic_dots_rect( player.next, ptr_sides, map )
+                if let Some ( side ) = heuristic_dots_rect( player.next, ptr_sides, demo )
                 {   return side
                 }
             }
@@ -112,15 +111,15 @@ pub fn which_way_player_goes
 
 //自機が残dotsを含む最小の矩形の外にいる場合のheuristic関数
 fn heuristic_dots_rect
-(   grid: Grid,
-    sides: &[ ( DxDy, i32 ) ],
-    map: Res<Map>,
-) -> Option<DxDy>
+(   grid: IVec2,
+    sides: &[ ( News, i32 ) ],
+    demo: Res<DemoMapParams>,
+) -> Option<News>
 {   //脇道ごとにdots_rectまでの単純距離(dx+dy)を求める
     let mut vec = Vec::with_capacity( 3 );
     for &( dxdy, _ ) in sides
     {   let side = grid + dxdy;
-        let count = map.demo.how_far_to_rect( side );
+        let count = demo.how_far_to_rect( side );
         vec.push( ( dxdy, count ) );
     }
 
@@ -135,14 +134,14 @@ fn heuristic_dots_rect
 
 impl Map
 {   //指定した座標とその四方のドットを数える(結果は0～4)
-    fn count_dots_4sides( &self, center: Grid ) -> i32
+    fn count_dots_4sides( &self, center: IVec2 ) -> i32
     {   //指定の座標にドットはあるか
-        let mut count = i32::from( self.o_entity( center ).is_some() ); //true:1,false:0
+        let mut count = i32::from( self.opt_entity( center ).is_some() ); //true:1,false:0
 
         //四方にドットはあるか
         self.get_byways_list( center ).iter().for_each
         (   | side |
-            count += i32::from( self.o_entity( center + side ).is_some() ) //true:1,false:0
+            count += i32::from( self.opt_entity( center + side ).is_some() ) //true:1,false:0
         );
 
         count
@@ -151,9 +150,9 @@ impl Map
 
 //リスクを評価する
 fn check_risk
-(   byway: Grid,
+(   byway: IVec2,
     player: &Player,
-    goals: &[ Grid ],
+    goals: &[ IVec2 ],
     map: &Res<Map>,
 ) -> Option<usize>
 {   //goalsが空の場合(全ての追手が目前にいる場合)、わき道はリスクがない
@@ -247,7 +246,7 @@ fn check_risk
 }
 
 //ざっくり追手との距離を測って最小値を返す
-fn heuristic( byway: Grid, goals: &[ Grid ] ) -> i32
+fn heuristic( byway: IVec2, goals: &[ IVec2 ] ) -> i32
 {   let mut shortest = MAP_GRIDS_WIDTH + MAP_GRIDS_HEIGHT;
     for goal in goals
     {   shortest = shortest.min( ( byway.x - goal.x ).abs() + ( byway.y - goal.y ).abs() );

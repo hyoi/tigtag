@@ -12,9 +12,7 @@ mod pause;
 pub mod map;
 pub mod player;
 pub mod chasers;
-
-//入力と判定の処理
+pub mod judge;
 mod input;
-mod judge;
 
 //End of code.

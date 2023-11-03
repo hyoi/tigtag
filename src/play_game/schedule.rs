@@ -8,10 +8,11 @@ impl Plugin for Schedule
 {   fn build( &self, app: &mut App )
     {   app
         //ResourceとEvent
-        .init_resource::<Record>() //ゲームの成績
-        .init_resource::<Map>()    //マップ情報
-        .add_event::<EventClear>() //ステージクリアイベントの伝達
-        .add_event::<EventOver>()  //ゲームオーバーイベントの伝達
+        .init_resource::<Record>()  //ゲームの成績
+        .init_resource::<Map>()     //マップ情報
+        .add_event::<EventClear>()  //ステージクリアイベントの伝達
+        .add_event::<EventOver>()   //ゲームオーバーイベントの伝達
+        .add_event::<EventEatDot>() //スコアリングイベントの伝達（demo用）
         .init_resource::<input::CrossDirection>()      //十字方向の入力状態
         .init_resource::<ui::center::CountDownTimer>() //カウントダウンタイマー
 
@@ -61,10 +62,10 @@ impl Plugin for Schedule
         .add_systems
         (   OnEnter ( MyState::StageStart ),
             (   //マップ作成とスプライト表示
-                (   map::make_new_data,         //マップデータの作成
-                    (   map::spawn_sprite,      //マップをspawnする
-                        player::spawn_sprite,   //プレイヤーをspawnする
-                        chasers::spawn_sprite,  //チェイサーをspawnする
+                (   map::make_new_data,        //マップデータの作成
+                    (   map::spawn_sprite,     //マップをspawnする
+                        player::spawn_sprite,  //プレイヤーをspawnする
+                        chasers::spawn_sprite, //チェイサーをspawnする
                     ),
                 ).chain(),
 

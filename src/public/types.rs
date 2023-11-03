@@ -47,7 +47,6 @@ pub enum MyState
 impl MyState
 {   pub fn is_pause     ( &self ) -> bool { *self == MyState::Pause      }
     pub fn is_demoplay  ( &self ) -> bool { *self == MyState::TitleDemo || *self == MyState::DemoLoop }
-    // pub fn is_stageclear( &self ) -> bool { *self == MyState::StageClear }
 }
 
 //Stateの遷移に使うTrait
@@ -78,6 +77,7 @@ impl GotoState for TitleDemoExist   <MyState> { fn next( &self ) -> MyState { se
 //System間の通知用イベント
 #[derive( Event )] pub struct EventClear;
 #[derive( Event )] pub struct EventOver;
+#[derive( Event )] pub struct EventEatDot;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -87,7 +87,18 @@ pub struct Record
 {   score   : i32, //スコア
     hi_score: i32, //ハイスコア
     stage   : i32, //ステージ数
+    demo    : DemoRecord, //demo用の記録
+    is_clear: bool, //ステージクリア時にtrue(※)
 }
+//※スコアとステージ数を誤って初期化しないよう制御用フラグを設けた
+
+//demo用
+#[derive( Default )]
+pub struct DemoRecord
+{   hi_score: i32, //ハイスコア
+    stage   : i32, //ステージ数
+}
+
 impl Record
 {   pub fn score       ( &    self ) ->      i32 {      self.score    }
     pub fn score_mut   ( &mut self ) -> &mut i32 { &mut self.score    }
@@ -95,39 +106,15 @@ impl Record
     pub fn hi_score_mut( &mut self ) -> &mut i32 { &mut self.hi_score }
     pub fn stage       ( &    self ) ->      i32 {      self.stage    }
     pub fn stage_mut   ( &mut self ) -> &mut i32 { &mut self.stage    }
+
+    pub fn demo_hi_score    ( &    self ) ->      i32 {      self.demo.hi_score }
+    pub fn demo_hi_score_mut( &mut self ) -> &mut i32 { &mut self.demo.hi_score }
+    pub fn demo_stage       ( &    self ) ->      i32 {      self.demo.stage    }
+    pub fn demo_stage_mut   ( &mut self ) -> &mut i32 { &mut self.demo.stage    }
+
+    pub fn is_clear    ( &    self ) ->      bool {      self.is_clear }
+    pub fn is_clear_mut( &mut self ) -> &mut bool { &mut self.is_clear }
 }
-
-// #[derive( Resource )]
-// pub struct Record
-// {   pub score         : i32,        //スコア
-//     pub hi_score      : i32,        //ハイスコア
-//     pub stage         : i32,        //ステージ数
-//     pub count_down    : i32,        //カウントダウンタイマーの初期値
-//     pub cd_timer      : Timer,      //カウントダウンタイマー用タイマー
-//     pub is_stage_clear: bool,       //ステージクリアすると真、それ以外は偽
-//     pub demo          : DemoRecord, //demo用の記録
-// }
-
-// //demo用
-// #[derive( Default )]
-// pub struct DemoRecord
-// {   pub stage   : i32,  //ステージ数
-//     pub hi_score: i32,  //ハイスコア
-// }
-
-// impl Default for Record
-// {   fn default() -> Self
-//     {   Self
-//         {   score         : 0,
-//             hi_score      : 0,
-//             stage         : 0,
-//             count_down    : 0,
-//             cd_timer      : Timer::from_seconds( 1.0, TimerMode::Once ),
-//             is_stage_clear: false,
-//             demo          : DemoRecord::default(),
-//         }
-//     }
-// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -243,51 +230,51 @@ impl AddAssign<News> for IVec2
 //プレイヤーのComponent
 #[derive( Component )]
 pub struct Player
-{   pub grid        : IVec2,             //移動中は移動元の座標、停止中はその場の座標
-    pub next        : IVec2,             //移動中は移動先の座標、停止中はその場の座標
-    pub side        : News,              //移動向き
-    pub wait        : Timer,             //移動ウエイト
-    pub stop        : bool,              //移動停止フラグ
-    pub speedup     : f32,               //スピードアップ係数
-    pub px_start    : Vec2,              //移動した微小区間の始点
-    pub px_end      : Vec2,              //移動した微小区間の終点
-    pub o_fn_runaway: Option<FnRunAway>, //(demoplay)自機の移動方向を決める関数のポインタ
+{   pub grid         : IVec2,               //移動中は移動元の座標、停止中はその場の座標
+    pub next         : IVec2,               //移動中は移動先の座標、停止中はその場の座標
+    pub side         : News,                //移動向き
+    pub wait         : Timer,               //移動ウエイト
+    pub stop         : bool,                //移動停止フラグ
+    pub speedup      : f32,                 //スピードアップ係数
+    pub px_start     : Vec2,                //移動した微小区間の始点
+    pub px_end       : Vec2,                //移動した微小区間の終点
+    pub opt_autodrive: Option<FnAutoDrive>, //デモ時の自走プレイヤーの移動方向を決める関数ポインタ
 }
 
 impl Default for Player
 {   fn default() -> Self
     {   Self
-        {   grid        : IVec2::default(),
-            next        : IVec2::default(),
-            side        : News::default(),
-            wait        : Timer::from_seconds( PLAYER_WAIT, TimerMode::Once ),
-            stop        : true,
-            speedup     : 1.0,
-            px_start    : Vec2::default(),
-            px_end      : Vec2::default(),
-            o_fn_runaway: None,
+        {   grid         : IVec2::default(),
+            next         : IVec2::default(),
+            side         : News::default(),
+            wait         : Timer::from_seconds( PLAYER_WAIT, TimerMode::Once ),
+            stop         : true,
+            speedup      : 1.0,
+            px_start     : Vec2::default(),
+            px_end       : Vec2::default(),
+            opt_autodrive: None,
         }
     }
 }
 
-//関数ポインタ型((demoplay)自機の移動方向を決める関数)
-type FnRunAway = fn( &Player, Query<&Chaser>, Res<Map>, &[ News ] ) -> News;
+//関数ポインタ型(デモ時の自走プレイヤーの移動方向を決める関数)
+type FnAutoDrive = fn( &Player, Query<&Chaser>, Res<Map>, Res<DemoMapParams>, &[News] ) -> News;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //チェイサーのComponent
 #[derive( Component )]
 pub struct Chaser
-{   pub grid      : IVec2,              //移動中は移動元の座標、停止中はその場の座標
-    pub next      : IVec2,              //移動中は移動先の座標、停止中はその場の座標
-    pub side      : News,               //移動向き
-    pub wait      : Timer,              //移動ウエイト
-    pub stop      : bool,               //移動停止フラグ
-    pub speedup   : f32,                //スピードアップ係数(1.0未満なら減速、1.0より大きいと増速)
-    pub px_start  : Vec2,               //移動した微小区間の始点
-    pub px_end    : Vec2,               //移動した微小区間の終点
-    pub color     : Color,              //表示色
-    pub fn_chasing: Option<FnChasing>,  //追手の移動方向を決める関数のポインタ
+{   pub grid      : IVec2,             //移動中は移動元の座標、停止中はその場の座標
+    pub next      : IVec2,             //移動中は移動先の座標、停止中はその場の座標
+    pub side      : News,              //移動向き
+    pub wait      : Timer,             //移動ウエイト
+    pub stop      : bool,              //移動停止フラグ
+    pub speedup   : f32,               //スピードアップ係数(1.0未満なら減速、1.0より大きいと増速)
+    pub px_start  : Vec2,              //移動した微小区間の始点
+    pub px_end    : Vec2,              //移動した微小区間の終点
+    pub color     : Color,             //表示色
+    pub fn_chasing: Option<FnChasing>, //チェイサーの移動方向を決める関数ポインタ
 }
 
 impl Default for Chaser
@@ -308,7 +295,7 @@ impl Default for Chaser
 }
 
 //関数ポインタ型(追手の移動方向を決める関数)
-pub type FnChasing = fn( &mut Chaser, &Player, &[ News ] ) -> News;
+pub type FnChasing = fn( &mut Chaser, &Player, &[News] ) -> News;
 
 ////////////////////////////////////////////////////////////////////////////////
 

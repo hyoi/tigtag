@@ -36,10 +36,10 @@ pub fn spawn_sprite
     //プレイヤーのスプライトを配置する
     let player = Player
     {   grid,
-        next    : grid,
-        px_start: vec2,
-        px_end  : vec2,
-        // o_fn_runaway: Some ( which_way_player_goes ), //default()に任せるとNone 
+        next         : grid,
+        px_start     : vec2,
+        px_end       : vec2,
+        opt_autodrive: Some ( title_demo::algorithm::which_way_player_goes ), //default()に任せるとNone
         ..default()
     };
     let triangle = MaterialMesh2dBundle
@@ -60,6 +60,7 @@ pub fn move_sprite
 (   mut qry_player: Query<( &mut Player, &mut Transform )>,
     qry_chasers: Query<&Chaser>,
     opt_map: Option<Res<Map>>,
+    opt_demo: Option<Res<DemoMapParams>>,
     state: ResMut<State<MyState>>,
     mut evt_clear: EventReader<EventClear>,
     mut evt_over: EventReader<EventOver>,
@@ -116,8 +117,8 @@ pub fn move_sprite
             {   Ordering::Equal => //一本道 ⇒ 道なりに進む
                     sides[ 0 ],
                 Ordering::Greater => //三叉路または十字路
-                    if let Some ( fnx ) = player.o_fn_runaway
-                    {   fnx( &player, qry_chasers, map, &sides ) //外部関数で進行方向を決める
+                    if let ( Some ( autodrive ), Some ( demo ) ) = ( player.opt_autodrive, opt_demo )
+                    {   autodrive( &player, qry_chasers, map, demo, &sides ) //外部関数で進行方向を決める
                     }
                     else
                     {   let mut rng = rand::thread_rng();

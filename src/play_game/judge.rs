@@ -8,6 +8,12 @@ pub fn init_record_except_hiscore
 )
 {   let Some ( mut record ) = opt_record else { return };
 
+    //クリアフラグが立っていた場合
+    if record.is_clear()
+    {   *record.is_clear_mut() = false;
+        return;
+    }
+
     //scoreとstageをゼロクリア
     *record.score_mut() = 0;
     *record.stage_mut() = 0;
@@ -24,21 +30,21 @@ pub fn scoring_and_stageclear
     state: Res<State<MyState>>,
     mut next_state: ResMut<NextState<MyState>>,
     mut evt_clear: EventWriter<EventClear>,
+    mut evt_eatdot: EventWriter<EventEatDot>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
 )
 {   let Ok ( player ) = qry_player.get_single() else { return };
     let Some ( mut map ) = opt_map else { return };
-    let Some ( dot ) = map.opt_entity( player.grid ) else { return };
     let Some ( mut record ) = opt_record else { return };
+
+    //プレイヤーの位置にドットがないなら
+    let Some ( dot ) = map.opt_entity( player.grid ) else { return };
 
     //ドットの削除
     cmds.entity( dot ).despawn();
     *map.opt_entity_mut( player.grid ) = None;
-
-    //demoの場合、スプライト削除後(EntityにNone代入後)に残dots情報を更新する
-    let is_demo = state.get().is_demoplay();
-    // if is_demo { map.demo.update_params( player.grid ); }
+    evt_eatdot.send( EventEatDot ); //後続の処理にドット削除を伝達する(demo用)
 
     //スコア更新
     *record.score_mut() += 1;
@@ -53,21 +59,21 @@ pub fn scoring_and_stageclear
     cmds.spawn( sound_beep );
 
     //ハイスコアの更新
-    if ! is_demo && record.score() > record.hi_score()
+    if ! state.get().is_demoplay() && record.score() > record.hi_score()
     {   *record.hi_score_mut() = record.score();
     }
 
     //全ドットを拾ったらステージクリア
     if map.remaining_dots <= 0
-    {   // record.is_clear = true;
-        next_state.set
+    {   next_state.set
         (   match state.get()
             {   MyState::MainLoop  => MyState::StageClear,
                 MyState::TitleDemo => MyState::DemoLoop,
                 _ => unreachable!( "Bad state: {:?}", state.get() ),
             }
         );
-        evt_clear.send( EventClear ); //後続の処理にステージクリアを伝える
+        *record.is_clear_mut() = true;
+        evt_clear.send( EventClear ); //後続の処理にステージクリアを伝達する
     }
 }
 
@@ -89,20 +95,13 @@ pub fn detect_collisions
     //直前の判定でクリアしていたら衝突判定しない
     if evt_clear.iter().next().is_some() { return }
     
-    //クリアしておらず、且つ衝突判定が真なら
-    if /* ! state.get().is_stageclear() && */ is_collision( qry_player, qry_chaser )
+    //衝突判定が真なら
+    if is_collision( qry_player, qry_chaser )
     {   //衝突処理
         next_state.set
         (   match state.get()
             {   MyState::MainLoop  => MyState::GameOver,
-                MyState::TitleDemo =>
-                {   //Demoの場合、記録を残す
-                    // if score.get() > record.demo.hi_score
-                    // {   record.demo.hi_score = score.get();
-                    //     record.demo.stage    = stage.get();
-                    // }
-                    MyState::DemoLoop
-                },
+                MyState::TitleDemo => MyState::DemoLoop,
                 _ => unreachable!( "Bad state: {:?}", state.get() ),
             }
         );

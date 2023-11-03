@@ -74,35 +74,7 @@ pub fn make_new_data
     //付随する情報の初期化
     *record.stage_mut() += 1; //新マップを作ったらステージ数を＋１する
     map.init_byways_bit();    //全グリッドに対し、四方の壁・通の状態をセットする
-    // map.init_demo_params(); //demo用の情報を準備する
 }
-
-// impl Map
-// {   //マップ作成時にdemo用パラメータを初期化する
-//     pub fn init_demo_params( &mut self )
-//     {   //dotではなく道を数える(初期状態では必ず道にdotがある)
-//         MAP_GRIDS_Y_RANGE.for_each
-//         (   | y |
-//             *self.demo.dots_sum_y_mut( y ) =
-//             {   MAP_GRIDS_X_RANGE
-//                 .filter( | &x | self.is_passage( IVec2::new( x, y ) ) )
-//                 .count() as i32
-//             }
-//         );
-//         MAP_GRIDS_X_RANGE.for_each
-//         (   | x |
-//             *self.demo.dots_sum_x_mut( x ) =
-//             {   MAP_GRIDS_Y_RANGE
-//                 .filter( | &y | self.is_passage( IVec2::new( x, y ) ) )
-//                 .count() as i32
-//             }
-//         );
-
-//         //dotsを内包する最小の矩形は決め打ちでいい(Mapをそう作っているから)
-//         *self.demo.dots_rect_min_mut() = IVec2::new( 1, 1 );
-//         *self.demo.dots_rect_max_mut() = IVec2::new( MAP_GRIDS_WIDTH - 2, MAP_GRIDS_HEIGHT - 2 );
-//     }
-// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
