@@ -2,6 +2,19 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//ScoreとStageの初期化
+pub fn init_record_except_hiscore
+(   opt_record: Option<ResMut<Record>>,
+)
+{   let Some ( mut record ) = opt_record else { return };
+
+    //scoreとstageをゼロクリア
+    *record.score_mut() = 0;
+    *record.stage_mut() = 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //スコア処理とステージクリア判定
 #[allow(clippy::too_many_arguments)]
 pub fn scoring_and_stageclear
