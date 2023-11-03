@@ -25,9 +25,9 @@ impl Plugin for Schedule
 ////////////////////////////////////////////////////////////////////////////////
 
 //ヘッダーのComponent
-#[derive( Component )] struct UiStage;
-#[derive( Component )] struct UiScore;
-#[derive( Component )] struct UiHiScore;
+#[derive( Component )] struct Stage;
+#[derive( Component )] struct Score;
+#[derive( Component )] struct HiScore;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -48,9 +48,9 @@ fn spawn_ui_header
     header_right.style.align_self  = AlignSelf::FlexEnd;
 
     //レイアウト用の隠しフレームの中に子要素を作成する
-    let child_left   = cmds.spawn( ( header_left  , UiStage   ) ).id();
-    let child_center = cmds.spawn( ( header_center, UiScore   ) ).id();
-    let child_right  = cmds.spawn( ( header_right , UiHiScore ) ).id();
+    let child_left   = cmds.spawn( ( header_left  , Stage   ) ).id();
+    let child_center = cmds.spawn( ( header_center, Score   ) ).id();
+    let child_right  = cmds.spawn( ( header_right , HiScore ) ).id();
     cmds.entity( hidden_frame ).add_child( child_left   );
     cmds.entity( hidden_frame ).add_child( child_center );
     cmds.entity( hidden_frame ).add_child( child_right  );
@@ -60,7 +60,7 @@ fn spawn_ui_header
 
 //UIの表示を更新する(SCORE)
 fn update_score
-(   mut qry_text: Query<&mut Text, With<UiScore>>,
+(   mut qry_text: Query<&mut Text, With<Score>>,
     opt_record: Option<Res<Record>>,
 )
 {   let Ok ( mut text ) = qry_text.get_single_mut() else { return };
@@ -72,7 +72,7 @@ fn update_score
 
 //UIの表示を更新する(HI-SCORE)
 fn update_hi_score
-(   mut qry_text: Query<&mut Text, With<UiHiScore>>,
+(   mut qry_text: Query<&mut Text, With<HiScore>>,
     opt_record: Option<Res<Record>>,
 )
 {   let Ok ( mut text ) = qry_text.get_single_mut() else { return };
@@ -84,7 +84,7 @@ fn update_hi_score
 
 //UIの表示を更新する(STAGE)
 fn update_stage
-(   mut qry_text: Query<&mut Text, With<UiStage>>,
+(   mut qry_text: Query<&mut Text, With<Stage>>,
     opt_record: Option<Res<Record>>,
 )
 {   let Ok ( mut text ) = qry_text.get_single_mut() else { return };
