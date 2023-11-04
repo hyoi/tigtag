@@ -17,17 +17,16 @@ const BIT_WAY_UP   : usize = 0b00010000; //下に道
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//マップの構造体
+//マップのResource
 #[derive( Resource )]
 pub struct Map
-{   pub rng            : rand::prelude::StdRng,     //マップ生成専用の乱数生成器(マップに再現性を持たせるため)
-    bit_flags          : Vec<Vec<usize>>,           //マップの各グリッドの状態をbitで保存
-    dot_entities       : Vec<Vec<Option<Entity>>>,  //ドットをdespawnする際に使うEntityIDを保存
-    pub remaining_dots : i32,                       //マップに残っているドットの数
-    dummy_o_entity_none: Option<Entity>,            //o_entity_mut()の範囲外アクセスで&mut Noneを返すために使用
+{   pub rng            : rand::prelude::StdRng,    //マップ生成専用の乱数生成器(マップに再現性を持たせるため)
+    bit_flags          : Vec<Vec<usize>>,          //マップの各グリッドの状態をbitで保存
+    dot_entities       : Vec<Vec<Option<Entity>>>, //ドットをdespawnする際に使うEntityIDを保存
+    pub remaining_dots : i32,                      //マップに残っているドットの数
+    dummy_o_entity_none: Option<Entity>,           //o_entity_mut()の範囲外アクセスで&mut Noneを返すために使用
 }
 
-//マップ構造体の初期化
 impl Default for Map
 {   fn default() -> Self
     {   //develpでは定数を、releaseではランダムを乱数シードにする
@@ -47,9 +46,9 @@ impl Default for Map
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//マップ構造体のメソッド
+//マップのメソッド
 //メソッド経由にすることで配列の範囲外アクセスもパニックさせず意図した値を返す。
-//構造体メンバーに直接アクセスさせない(構造体メンバーはNot pub)。
+//構造体メンバーに直接アクセスさせない(構造体メンバーは原則Not pub)。
 impl Map
 {   fn bits    ( &    self, grid: IVec2 ) ->      usize {      self.bit_flags[ grid.x as usize ][ grid.y as usize ] }
     fn bits_mut( &mut self, grid: IVec2 ) -> &mut usize { &mut self.bit_flags[ grid.x as usize ][ grid.y as usize ] }
@@ -112,7 +111,7 @@ impl Map
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//demo用のマップ情報
+//demo用のマップ情報Resource
 #[derive( Resource, Default )]
 pub struct DemoMapParams
 {   dots_rect : IVec2Rect,                          //dotsを内包する最小の矩形
@@ -121,10 +120,7 @@ pub struct DemoMapParams
 }
 
 #[derive( Default )]
-struct IVec2Rect
-{   min: IVec2,
-    max: IVec2,
-}
+struct IVec2Rect { min: IVec2, max: IVec2 }
 
 impl DemoMapParams
 {   pub fn dots_sum_x    ( &    self, x: i32 ) ->      i32 {      self.dots_sum_x[ x as usize ] }

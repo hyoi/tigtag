@@ -128,9 +128,6 @@ pub const VOLUME_SOUND_BEEP: f32 = 0.1;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// //マップのスクリーン上の原点
-// pub const MAP_ORIGIN_GRID: Grid = Grid::new( 0, 1 );
-
 //画面デザイン(枠)
 pub const SCREEN_FRAME_SPACE_CHAR : char = ' ';
 pub const SCREEN_FRAME_LABEL_REGEX: &str = r"[a-zA-Z0-9\.]+";
@@ -169,7 +166,7 @@ pub static SCREEN_FRAME: Lazy<ScreenFrame> = Lazy::new
 );
 
 //エラーメッセージ
-const ER_BAD_SCREEN_DESIGN: &str = "Frame design unmatch width/height parameters.";
+const ER_BAD_SCREEN_DESIGN: &str = "Frame design unmatch screen width/height.";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -199,19 +196,9 @@ pub const MAP_GRIDS_HEIGHT: i32 = SCREEN_GRIDS_HEIGHT - 2;
 pub const MAP_GRIDS_X_RANGE: Range<i32> = 0..MAP_GRIDS_WIDTH;
 pub const MAP_GRIDS_Y_RANGE: Range<i32> = 0..MAP_GRIDS_HEIGHT;
 
-//外壁を含まないレンジ
-// pub const MAP_GRIDS_X_RANGE_INNER: Range<i32> = 1..MAP_GRIDS_WIDTH  - 1;
-// pub const MAP_GRIDS_Y_RANGE_INNER: Range<i32> = 1..MAP_GRIDS_HEIGHT - 1;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 //Playerの設定値
-// pub const PLAYER_TURN_COEF: f32 = 3.5;
-// pub const PLAYER_MOVE_COEF: f32 = 3.5;
-
-// pub const UNIT_TURN: f32 = FRAC_PI_2;
-// pub const UNIT_MOVE: f32 = 1.0;
-
 pub const PLAYER_WAIT: f32 = 0.09;                               //移動のウェイト
 pub const PLAYER_MOVE_COEF: f32 = PIXELS_PER_GRID / PLAYER_WAIT; //移動の中割係数
 
@@ -237,7 +224,7 @@ pub const NA2  : &str = "##";
 pub const NA5  : &str = "#####";
 pub const NA2_5: &str = "##-#####";
 pub const NA3_2: &str = "###.##";
-const PLACE_HOLDERS_HEAD_FOOT: &[ &str ] = &[  NA2, NA5, NA2_5, NA3_2 ];
+const PLACE_HOLDERS_HEAD_FOOT: &[ &str ] = &[ NA2, NA5, NA2_5, NA3_2 ];
 
 //ヘッダーの設定
 pub const TEXT_HEADER_LEFT: &[ MessageSect ] =

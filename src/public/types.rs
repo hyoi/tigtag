@@ -45,8 +45,8 @@ pub enum MyState
 }
 
 impl MyState
-{   pub fn is_pause     ( &self ) -> bool { *self == MyState::Pause      }
-    pub fn is_demoplay  ( &self ) -> bool { *self == MyState::TitleDemo || *self == MyState::DemoLoop }
+{   pub fn is_pause   ( &self ) -> bool { *self == MyState::Pause }
+    pub fn is_demoplay( &self ) -> bool { *self == MyState::TitleDemo || *self == MyState::DemoLoop }
 }
 
 //Stateの遷移に使うTrait
@@ -138,12 +138,12 @@ pub type MessageSect<'a> =
 pub struct ConnectedGamepad ( Option<Gamepad> );
 
 pub trait TraitGamepad
-{   fn id( &self ) -> Option<Gamepad>;
+{   fn id    ( &    self ) ->      Option<Gamepad>;
     fn id_mut( &mut self ) -> &mut Option<Gamepad>;
 }
 
 impl TraitGamepad for ConnectedGamepad
-{   fn id( &self ) -> Option<Gamepad> { self.0 }
+{   fn id    ( &    self ) ->      Option<Gamepad> {      self.0 }
     fn id_mut( &mut self ) -> &mut Option<Gamepad> { &mut self.0 }
 }
 
@@ -294,7 +294,7 @@ impl Default for Chaser
     }
 }
 
-//関数ポインタ型(追手の移動方向を決める関数)
+//関数ポインタ型(チェイサーの移動方向を決める関数)
 pub type FnChasing = fn( &mut Chaser, &Player, &[News] ) -> News;
 
 ////////////////////////////////////////////////////////////////////////////////

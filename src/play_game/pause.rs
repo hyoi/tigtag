@@ -7,14 +7,11 @@ pub struct Schedule;
 impl Plugin for Schedule
 {   fn build( &self, app: &mut App )
     {   app
-        //PAUSE用UIをspawnする
         .add_systems
         (   OnExit ( MyState::GameStart ),
-            ui::center::spawn_in_hidden_frame::<Pause>
+            ui::center::spawn_in_hidden_frame::<Pause> //PAUSE用UIをspawnする
         )
-
-        //PAUSE処理
-        .add_systems( Update, pause )
+        .add_systems( Update, pause ) //PAUSE処理
         ;
     }
 }

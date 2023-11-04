@@ -21,7 +21,7 @@ impl Plugin for Schedule
         .add_systems
         (   OnExit ( MyState::InitApp ),
             (   spawn_ui_footer, //フッターを表示
-                //OnEnter ( MyState::InitApp ) に書いてもフッターはspawnされない。
+                //OnEnter ( MyState::InitApp ) に書いてもspawnされない。
                 //原因は親である隠しフレームのspawnが遅延実行されるため。
             )
         )

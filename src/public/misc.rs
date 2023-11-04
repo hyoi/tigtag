@@ -4,13 +4,13 @@ use super::*;
 
 //2D cameraをspawnする
 pub fn spawn_2d_camera( mut cmds: Commands )
-{   //2Dカメラを第四象限に移動する
-    //左↑隅が(0,0)、X軸はプラス方向へ伸び、Y軸はマイナス方向へ上がる
+{   //2Dカメラを第四象限に移動する。
+    //左↑隅が(0,0)、X軸はプラス方向へ伸び、Y軸はマイナス方向へ伸びる
     let translation = Vec3::X * SCREEN_PIXELS_WIDTH  * 0.5
                     - Vec3::Y * SCREEN_PIXELS_HEIGHT * 0.5;
 
     //タイトルバーのWクリックや最大化ボタンによるウィンドウ最大化時に
-    //表示が著しく崩れることを緩和するためviewportを設定しておく
+    //表示が著しく崩れることを緩和するためviewportを設定しておく(根本的な対策ではない)
     let zero = UVec2::new( 0, 0 );
     let size = Vec2::new( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT ).as_uvec2();
     let viewport = Some
@@ -52,7 +52,7 @@ pub fn choose_gamepad_connection
     *gamepad.id_mut() = gamepads.iter().next();
 
     #[cfg( debug_assertions )]
-    if gamepad.id().is_some() { dbg!( gamepad.id() ); }
+    if gamepad.id().is_some() { dbg!( gamepad.id() ); } //for debug
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ pub fn change_state_with_res<T: Resource + GotoState>
 (   opt_state: Option<Res<T>>,
     mut next_state: ResMut<NextState<MyState>>
 )
-{   let Some ( state ) = opt_state else { warn!( "No exists State." ); return };
+{   let Some ( state ) = opt_state else { warn!( "opt_state is None." ); return };
 
     next_state.set( state.next() );
 }

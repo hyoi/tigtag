@@ -32,8 +32,7 @@ impl Plugin for Schedule
         (   OnExit ( MyState::LoadAssets ),
             (   misc::despawn::<SpriteTile>, //スプライトの削除
             )
-        )
-        ;
+        );
     }
 }
 
