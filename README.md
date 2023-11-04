@@ -21,24 +21,25 @@ Note: Japanese text only.
 - 十字ボタンで上下左右に移動。
 
 ## コンパイル方法
-デスクトップアプリにするなら`cargo run -r`でOK。   
+- デスクトップアプリにするなら`cargo run -r`でOK。   
 ※`cargo run`だとデバッグモード。
 ```
 cargo run -r    
 ```
-WASMの場合は`--target`を指定してコンパイル後、`wasm-bindgen`で整えます。
+- WASMの場合は`--target`を指定してコンパイル後、`wasm-bindgen`で環境を整えます。   
+※`wasm-bindgen`コマンドの各ディレクトリーは作業環境に合わせてください   
 ```
 cargo build -r --target wasm32-unknown-unknown
 wasm-bindgen --out-dir ./wasm --target web --no-typescript ./target/wasm32-unknown-unknown/release/tigtag.wasm
 ```
-※`wasm-bindgen`コマンドの各ディレクトリーは作業環境に合わせてください   
-※WASMのコンパイルには事前にRustのtarget追加とwasm-bindgenのインストールが必要です  
-※wasm-bindgenを実行するとバージョン違いで警告が出ることがあります。その時は素直にバージョン上げましょう  
+- WASMのコンパイルには事前にRustのtarget追加とwasm-bindgenのインストールが必要です  
+- wasm-bindgenを実行すると警告が出ることがあります。その時はバージョン上げましょう  
+- [Unofficial Bevy Cheat Book - 13.5. Browser (WebAssembly)](https://bevy-cheatbook.github.io/platforms/wasm.html)をご参考に   
 ```
 rustup target install wasm32-unknown-unknown
 cargo install -f wasm-bindgen-cli
 ```
-　[Unofficial Bevy Cheat Book - 13.5. Browser (WebAssembly)](https://bevy-cheatbook.github.io/platforms/wasm.html)をご参考に。   
+
 
 ## お世話になりました
 - [bevy](https://bevyengine.org/)と[その仲間たち](https://crates.io/search?q=bevy)
@@ -51,7 +52,5 @@ cargo install -f wasm-bindgen-cli
   - Rustだから蟹 <img src="./tigtag/assets/sprites/kani_DOTOWN.png" width="22" height="16" style="vertical-align: bottom;">  
 
 ## 宿題
-- [x] bevyの最新リリースに対応させる。v0.10 対応完了。
-- [x] Schedule v3へ最適化したい。
 - [ ] スマホでプレーできるようにしたい。
   - [ ] タッチ操作できたらブラウザ＆WASMでスマホ上で遊べるかも？
