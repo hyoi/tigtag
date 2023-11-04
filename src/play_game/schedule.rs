@@ -28,7 +28,7 @@ impl Plugin for Schedule
         .add_systems
         (   OnEnter ( MyState::GameStart ),
             (   //中央に表示するメッセージの作成
-                ui::center::spawn_in_hidden_frame::<ui::center::Title>,
+                ui::center::spawn_title,
                 ui::center::spawn_in_hidden_frame::<ui::center::Start>,
                 ui::center::spawn_in_hidden_frame::<ui::center::Clear>,
                 ui::center::spawn_in_hidden_frame::<ui::center::Over>,

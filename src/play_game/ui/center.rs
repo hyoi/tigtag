@@ -138,15 +138,24 @@ impl<'a> Default for Over<'a>
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 //タイトルのComponent
 #[derive( Component, Clone, Copy )]
 pub struct Title<'a>
-{   message    : &'a [ MessageSect<'a> ],
-    shortcut   : MyState,
+{   title: &'a [ MessageSect<'a> ],
+    demo : &'a [ MessageSect<'a> ],
+    shortcut: MyState,
 }
 
-impl<'a> TextUI for Title<'a>
-{   fn message( &self ) -> &[ MessageSect ] { self.message }
+trait TitleUI
+{   fn title( &self ) -> &[ MessageSect ];
+    fn demo ( &self ) -> &[ MessageSect ];
+}
+
+impl<'a> TitleUI for Title<'a>
+{   fn title( &self ) -> &[ MessageSect ] { self.title }
+    fn demo ( &self ) -> &[ MessageSect ] { self.demo  }
 }
 
 impl<'a> HitAnyKey for Title<'a>
@@ -156,13 +165,52 @@ impl<'a> HitAnyKey for Title<'a>
 impl<'a> Default for Title<'a>
 {   fn default() -> Self
     {   Self
-        {   message : UI_TITLE,
+        {   title: UI_TITLE,
+            demo : UI_DEMO,
             shortcut: MyState::StageStart,
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+//タイトルをspawnする
+pub fn spawn_title
+(   qry_hidden_frame: Query<Entity, With<HiddenFrameCenter>>,
+    mut cmds: Commands,
+    asset_svr: Res<AssetServer>,
+)
+{   let Ok ( hidden_frame ) = qry_hidden_frame.get_single() else { return };
+
+    //メッセージの準備
+    let component = Title::default();
+    let mut ui_title = misc::text_ui( component.title(), &asset_svr );
+    let mut ui_demo  = misc::text_ui( component.demo (), &asset_svr );
+    ui_title.text.alignment = TextAlignment::Right;  //右寄せ
+    ui_demo.text.alignment  = TextAlignment::Center; //センタリング
+    ui_title.style.position_type = PositionType::Relative;
+    ui_demo.style.position_type  = PositionType::Relative;
+    ui_title.visibility = Visibility::Inherited; //親のvisibility.is_visibleで表示を制御する
+    ui_demo.visibility  = Visibility::Inherited; //親のvisibility.is_visibleで表示を制御する
+
+    //レイアウト用の隠しフレームの中に子要素を作成する
+    let title_frame = NodeBundle
+    {   style: Style
+        {   flex_direction: FlexDirection::Column,
+            align_items   : AlignItems::Center,
+            ..default()
+        },
+        background_color: BackgroundColor( Color::NONE ),
+        ..default()
+    };
+    let child_id = cmds.spawn( ( title_frame, component ) ).with_children
+    (   | cmds |
+        {   cmds.spawn( ui_title );
+            cmds.spawn( ui_demo  );
+        }
+    ).id();
+    cmds.entity( hidden_frame ).add_child( child_id );
+}
 
 //UIをspawnする
 pub fn spawn_in_hidden_frame<T: Component + Default + Copy + TextUI>
