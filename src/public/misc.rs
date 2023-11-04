@@ -2,98 +2,147 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//.run_if( condition )用
-pub const DEBUG: fn() -> bool = || cfg!( debug_assertions );
-pub const WASM : fn() -> bool = || cfg!( target_arch = "wasm32" );
+//2D cameraをspawnする
+pub fn spawn_2d_camera( mut cmds: Commands )
+{   //2Dカメラを第四象限に移動する。
+    //左↑隅が(0,0)、X軸はプラス方向へ伸び、Y軸はマイナス方向へ伸びる
+    let translation = Vec3::X * SCREEN_PIXELS_WIDTH  * 0.5
+                    - Vec3::Y * SCREEN_PIXELS_HEIGHT * 0.5;
+
+    //タイトルバーのWクリックや最大化ボタンによるウィンドウ最大化時に
+    //表示が著しく崩れることを緩和するためviewportを設定しておく(根本的な対策ではない)
+    let zero = UVec2::new( 0, 0 );
+    let size = Vec2::new( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT ).as_uvec2();
+    let viewport = Some
+    (   camera::Viewport
+        {   physical_position: zero,
+            physical_size    : size,
+            ..default()
+        }
+    );
+
+    cmds.spawn( Camera2dBundle::default() )
+    .insert( Camera { viewport, ..default() } )
+    .insert( Transform::from_translation( translation) )
+    ;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//2D cameraをspawnする
-pub fn spawn_2d_camera( mut cmds: Commands )
-{   cmds.spawn( Camera2dBundle::default() )
-    // .insert( Camera { order: CAMERA2D_ORDER, ..default() } )
-    // .insert( Camera2d { clear_color: CAMERA2D_BGCOLOR } )
-    ;
+//操作を受け付けるgamepadを切り替える
+pub fn choose_gamepad_connection
+(   opt_gamepad: Option<ResMut<ConnectedGamepad>>,
+    gamepads: Res<Gamepads>,
+)
+{   let Some ( mut gamepad ) = opt_gamepad else { return };
+
+    //IDが保存されている場合
+    if let Some ( id ) = gamepad.id()
+    {   //IDのgamepadがまだ接続されている
+        if gamepads.contains( id ) { return }
+
+        //gamepadが１つも接続されていない
+        if gamepads.iter().count() == 0
+        {   *gamepad.id_mut() = None; //IDが無効
+            return;
+        }
+    }
+
+    //gamepadsから１つ取り出してIDを保存する
+    *gamepad.id_mut() = gamepads.iter().next();
+
+    #[cfg( debug_assertions )]
+    if gamepad.id().is_some() { dbg!( gamepad.id() ); } //for debug
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //ウィンドウとフルスクリーンの切換(トグル動作)
 pub fn toggle_window_mode
-(   mut q_window: Query<&mut Window>,
+(   mut qry_window: Query<&mut Window>,
+    opt_gamepad: Option<Res<ConnectedGamepad>>,
     inkey: Res<Input<KeyCode>>,
     inbtn: Res<Input<GamepadButton>>,
-    o_now_gamepad: Option<Res<NowGamepad>>,
 )
-{   //トラブル除け
-    let Ok( mut window ) = q_window.get_single_mut() else { return };
+{   let Ok( mut window ) = qry_window.get_single_mut() else { return };
+    let mut is_pressed = false;
 
     //キーの状態
-    let mut is_key_pressed = false;
-    for ( o_modifier, key ) in FULL_SCREEN_KEYS
-    {   if inkey.just_pressed( key )
-        {   if let Some ( modifier ) = o_modifier
-            {   //修飾キーが設定されている＆押されていない
-                if ! inkey.pressed( modifier ) { continue }
-            }
-            is_key_pressed = true;
-            break;
-        }
-    }
-
-    //パッドのボタンの状態
-    let mut is_btn_pressed = false;
-    if let Some ( now_gamepad ) = o_now_gamepad
-    {   if let Some ( gamepad ) = now_gamepad.0
-        {   if inbtn.just_pressed( GamepadButton::new( gamepad, FULL_SCREEN_BUTTON ) )
-            {   is_btn_pressed = true;
+    if inkey.just_pressed( FULL_SCREEN_KEY )
+    {   //装飾キー
+        for key in FULL_SCREEN_KEY_MODIFIER
+        {   if inkey.pressed( key )
+            {   is_pressed = true;
+                break;
             }
         }
     }
 
-    //入力がないなら
-    if ! is_key_pressed && ! is_btn_pressed { return }
+    //ゲームパッドのボタンの状態
+    if ! is_pressed
+    {   let Some ( gamepad ) = opt_gamepad else { return }; //Resource未登録
+        let Some ( id ) = gamepad.id() else { return };     //gamepad未接続
+        is_pressed = inbtn.just_pressed( GamepadButton::new( id, FULL_SCREEN_BUTTON ) )
+    }
 
-    //ウィンドウとフルスクリーンを切り替える(トグル処理)
-    window.mode = match window.mode
-    {   Windowed => SizedFullscreen,
-        _        => Windowed,
-    };
+    //ウィンドウとフルスクリーンを切り替える
+    if is_pressed
+    {   window.mode = match window.mode
+        {   WindowMode::Windowed => WindowMode::SizedFullscreen,
+            _                    => WindowMode::Windowed,
+        };
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//Stateの無条件遷移
+pub fn change_state<T: Send + Sync + Default + GotoState>
+(   state: Local<T>,
+    mut next_state: ResMut<NextState<MyState>>
+)
+{   next_state.set( state.next() );
+}
+
+//Stateの無条件遷移（Resourceで遷移先指定）
+pub fn change_state_with_res<T: Resource + GotoState>
+(   opt_state: Option<Res<T>>,
+    mut next_state: ResMut<NextState<MyState>>
+)
+{   let Some ( state ) = opt_state else { warn!( "opt_state is None." ); return };
+
+    next_state.set( state.next() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //QueryしたEnityを再帰的に削除する
-pub fn despawn_entity<T: Component>
-(   q: Query<Entity, With<T>>,
+pub fn despawn<T: Component>
+(   qry_entity: Query<Entity, With<T>>,
     mut cmds: Commands,
 )
-{   q.for_each( | ent | cmds.entity( ent ).despawn_recursive() );
+{   qry_entity.for_each( | id | cmds.entity( id ).despawn_recursive() );
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
 //QueryしたComponentを見せる
-pub fn show_component<T: Component>
-(   mut q: Query<&mut Visibility, With<T>>,
+pub fn show<T: Component>
+(   mut qry: Query<&mut Visibility, With<T>>,
 )
-{// q.for_each_mut( | mut vis | *vis = Visibility::Inherited );
-    q.for_each_mut( | mut vis | *vis = Visibility::Visible );
+{   qry.for_each_mut( | mut vis | *vis = Visibility::Visible );
 }
 
 //QueryしたComponentを隠す
-pub fn hide_component<T: Component>
-(   mut q: Query<&mut Visibility, With<T>>,
+pub fn hide<T: Component>
+(   mut qry: Query<&mut Visibility, With<T>>,
 )
-{   q.for_each_mut( | mut vis | *vis = Visibility::Hidden );
+{   qry.for_each_mut( | mut vis | *vis = Visibility::Hidden );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//指定の情報からTextBundleを作る
+//TextBundleを作る
 pub fn text_ui
 (   message: &[ MessageSect ],
-    alignment: TextAlignment,
     asset_svr: &Res<AssetServer>,
 ) -> TextBundle
 {   let mut sections = Vec::new();
@@ -106,6 +155,7 @@ pub fn text_ui
         };
         sections.push( TextSection { value, style } );
     }
+    let alignment = TextAlignment::Center;
     let position_type = PositionType::Absolute;
 
     let text  = Text { sections, alignment, ..default() };
@@ -115,33 +165,4 @@ pub fn text_ui
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//操作を受け付けるgamepadを切り替える
-pub fn catch_gamepad_connection_changes
-(   o_now_gamepad: Option<ResMut<NowGamepad>>,
-    gamepads: Res<Gamepads>,
-)
-{   //トラブル除け
-    let Some ( mut now_gamepad ) = o_now_gamepad else { return };
-    
-    //記録済のgamepadがまだ接続中なら
-    if now_gamepad.0
-        .is_some_and( | gamepad | gamepads.contains( gamepad ) ) { return }
-
-    //gamepadが一つも接続されていないなら
-    if gamepads.iter().count() == 0
-    {   if now_gamepad.0.is_some()
-        {   //gamepadが取り外された場合
-            now_gamepad.0 = None;
-        }
-        return;
-    }
-
-    //gamepadsの中から1つ取り出して記録する
-    if let Some ( gamepad ) = gamepads.iter().next()
-    {   now_gamepad.0 = Some ( gamepad );
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//End of cooe.
+//End of code.
