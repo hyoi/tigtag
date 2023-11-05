@@ -4,7 +4,7 @@ use bevy::
     log::LogPlugin,
     window::WindowMode,
     render::camera,
-    asset::LoadState,
+    asset::{ LoadState, LoadedUntypedAsset },
     diagnostic::{ DiagnosticsStore, FrameTimeDiagnosticsPlugin },
     sprite::{ Anchor, MaterialMesh2dBundle },
     utils::HashSet,

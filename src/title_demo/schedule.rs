@@ -115,7 +115,7 @@ fn update_data_for_demo
     let Some ( mut demo ) = opt_demo else { return };
 
     //直前のスコアリングでドットを削除していない場合
-    if evt_eatdot.iter().next().is_none() { return }
+    if evt_eatdot.read().next().is_none() { return }
 
     //プレイヤーの位置の列・行のdotsを減らす
     *demo.dots_sum_x_mut( player.grid.x ) -= 1;

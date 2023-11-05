@@ -20,7 +20,7 @@ impl Plugin for Schedule
 
 //PauseメッセージのComponent
 #[derive( Component, Clone, Copy )]
-pub struct Pause<'a> ( &'a [ MessageSect<'a> ] );
+pub struct Pause<'a> ( &'a [ MessageSect ] );
 
 impl<'a> Default for Pause<'a>
 {   fn default() -> Self { Self ( UI_PAUSE ) }

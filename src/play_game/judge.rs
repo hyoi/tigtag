@@ -93,7 +93,7 @@ pub fn detect_collisions
 {   let Some ( _record ) = opt_record else { return };
 
     //直前の判定でクリアしていたら衝突判定しない
-    if evt_clear.iter().next().is_some() { return }
+    if evt_clear.read().next().is_some() { return }
     
     //衝突判定が真なら
     if is_collision( qry_player, qry_chaser )

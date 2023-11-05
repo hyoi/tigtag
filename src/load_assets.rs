@@ -40,7 +40,7 @@ impl Plugin for Schedule
 
 //ロードしたAssetsのハンドルの保存先
 #[derive( Resource )]
-struct LoadedAssets { handles: Vec<HandleUntyped> }
+struct LoadedAssets { handles: Vec<Handle<LoadedUntypedAsset>> }
 
 //ローディング完了フラグ
 #[derive( Resource )]
@@ -112,16 +112,16 @@ fn is_loading_done
 {   //事前ロードが完了したか？
     for handle in assets.handles.iter()
     {   match asset_svr.get_load_state( handle )
-        {   LoadState::Loaded => (), //ロード完了
-            LoadState::Failed =>
+        {   Some ( LoadState::Loaded ) => (), //ロード完了
+            Some ( LoadState::Failed ) =>
             {   //ロード失敗⇒パニック
                 let mut filename = "Unknown".to_string();
-                if let Some ( asset_path ) = asset_svr.get_handle_path( handle )
+                if let Some ( asset_path ) = handle.path()
                 {   if let Some ( s ) = asset_path.path().to_str()
                     {   filename = s.to_string();
                     }
                 }
-                panic!( "Pre-loading failed asset-file \"{filename}\"" );
+                panic!( "Failed pre-loading asset-file \"{filename}\"" );
             },
             _ => return, //UPDATEなので関数は繰り返し呼び出される
         }

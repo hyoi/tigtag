@@ -121,8 +121,8 @@ pub fn move_sprite
     let Some ( map ) = opt_map else { return };
     
     //直前の判定でクリア／オーバーしていたらスプライトを移動させない
-    if evt_clear.iter().next().is_some() { return }
-    if evt_over .iter().next().is_some() { return }
+    if evt_clear.read().next().is_some() { return }
+    if evt_over .read().next().is_some() { return }
 
     //前回からの経過時間
     let time_delta = time.delta();

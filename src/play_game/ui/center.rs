@@ -44,7 +44,7 @@ pub trait HitAnyKey
 pub struct Start<'a>
 {   count     : i32,
     next_state: MyState,
-    message   : &'a [ MessageSect<'a> ],
+    message   : &'a [ MessageSect ],
     string    : fn ( i32 ) -> String,
 }
 
@@ -75,7 +75,7 @@ impl<'a> Default for Start<'a>
 pub struct Clear<'a>
 {   count     : i32,
     next_state: MyState,
-    message   : &'a [ MessageSect<'a> ],
+    message   : &'a [ MessageSect ],
     string    : fn ( i32 ) -> String,
 }
 
@@ -106,7 +106,7 @@ impl<'a> Default for Clear<'a>
 pub struct Over<'a>
 {   count     : i32,
     next_state: MyState,
-    message   : &'a [ MessageSect<'a> ],
+    message   : &'a [ MessageSect ],
     string    : fn ( i32 ) -> String,
     shortcut  : MyState,
 }
@@ -143,8 +143,8 @@ impl<'a> Default for Over<'a>
 //タイトルのComponent
 #[derive( Component, Clone, Copy )]
 pub struct Title<'a>
-{   title: &'a [ MessageSect<'a> ],
-    demo : &'a [ MessageSect<'a> ],
+{   title: &'a [ MessageSect ],
+    demo : &'a [ MessageSect ],
     shortcut: MyState,
 }
 
