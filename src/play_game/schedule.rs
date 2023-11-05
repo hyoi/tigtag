@@ -14,7 +14,7 @@ impl Plugin for Schedule
         .add_event::<EventOver>()   //ゲームオーバーイベントの伝達
         .add_event::<EventEatDot>() //スコアリングイベントの伝達（demo用）
         .init_resource::<input::CrossDirection>()      //十字方向の入力状態
-        .init_resource::<ui::center::CountDownTimer>() //カウントダウンタイマー
+        .init_resource::<ui::effect::CountDownTimer>() //カウントダウンタイマー
 
         //submoduleのplugin
         .add_plugins( ui::header::Schedule ) //ヘッダー(Stage、Score、HiScore)
@@ -46,7 +46,8 @@ impl Plugin for Schedule
         )
         .add_systems
         (   Update,
-            (   ui::center::hit_any_key::<ui::center::Title>, //Hit ANY Key
+            (   ui::effect::hit_any_key::<ui::center::Title>,  //Hit ANY Key
+                ui::effect::blinking_text::<ui::center::Demo>, //文字の明滅
             )
             .run_if( in_state( MyState::TitleDemo ) )
         )
@@ -70,14 +71,14 @@ impl Plugin for Schedule
                 ).chain(),
 
                 //ステージ開始メッセージの表示
-                (   ui::center::init_countdown::<ui::center::Start>, //カウントダウン初期化
+                (   ui::effect::init_countdown::<ui::center::Start>, //カウントダウン初期化
                     misc::show::<ui::center::Start>, //メッセージ表示
                 ).chain(),
             )
         )
         .add_systems
         (   Update,
-            (   ui::center::counting_down::<ui::center::Start>, //カウントダウン
+            (   ui::effect::counting_down::<ui::center::Start>, //カウントダウン
             )
             .run_if( in_state( MyState::StageStart ) )
         )
@@ -111,14 +112,14 @@ impl Plugin for Schedule
         //ステージクリアの処理
         .add_systems
         (   OnEnter ( MyState::StageClear ),
-            (   ui::center::init_countdown::<ui::center::Clear>, //カウントダウン初期化
+            (   ui::effect::init_countdown::<ui::center::Clear>, //カウントダウン初期化
                 misc::show::<ui::center::Clear>, //メッセージ表示
             )
             .chain()
         )
         .add_systems
         (   Update,
-            (   ui::center::counting_down::<ui::center::Clear>, //カウントダウン
+            (   ui::effect::counting_down::<ui::center::Clear>, //カウントダウン
             )
             .run_if( in_state( MyState::StageClear ) )
         )
@@ -132,15 +133,15 @@ impl Plugin for Schedule
         //ゲームオーバーの処理
         .add_systems
         (   OnEnter ( MyState::GameOver ),
-            (   ui::center::init_countdown::<ui::center::Over>, //カウントダウン初期化
+            (   ui::effect::init_countdown::<ui::center::Over>, //カウントダウン初期化
                 misc::show::<ui::center::Over>, //メッセージ表示
             )
             .chain()
         )
         .add_systems
         (   Update,
-            (   ui::center::counting_down::<ui::center::Over>, //カウントダウン後Titleへ
-                ui::center::hit_any_key::<ui::center::Over>,   //Hit ANY keyでReplay
+            (   ui::effect::counting_down::<ui::center::Over>, //カウントダウン後Titleへ
+                ui::effect::hit_any_key::<ui::center::Over>,   //Hit ANY keyでReplay
             )
             .run_if( in_state( MyState::GameOver ) )
         )
