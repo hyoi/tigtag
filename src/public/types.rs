@@ -124,9 +124,9 @@ impl Record
 #[derive( Component )] pub struct HiddenFrameFooter;
 
 //UIのテキストメッセージセクションの型
-pub type MessageSect<'a> =
-(   &'a str, //表示文字列
-    &'a str, //フォントのAssets
+pub type MessageSect =
+(   &'static str, //表示文字列
+    &'static str, //フォントのAssets
     f32,     //フォントのサイズ
     Color,   //フォントの色
 );
