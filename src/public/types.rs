@@ -41,7 +41,7 @@ impl GridToPixel for IVec2
 pub enum MyState
 {   #[default] LoadAssets, InitApp,
     GameStart, TitleDemo, DemoLoop, StageStart, MainLoop, StageClear, GameOver,
-    Pause, Debug,
+    Pause,
 }
 
 impl MyState
