@@ -2,6 +2,11 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//UIレイアウト用隠しフレーム(中央)のComponent
+#[derive( Component )] pub struct HiddenFrameCenter;
+
+////////////////////////////////////////////////////////////////////////////////
+
 //ゲームスタートメッセージのComponent
 #[derive( Component, Clone, Copy )]
 pub struct Start<'a>
@@ -156,6 +161,19 @@ impl effect::BlinkingText for Demo
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//UI用の隠しフレームをspawnする
+pub fn spawn_hidden_frame
+(   mut cmds: Commands,
+)
+{   //隠しフレームを作成する(画面の中央 寄せ)
+    let hidden_frame_middle = misc::hidden_ui_frame( JustifyContent::Center );
+
+    //隠しフレームを作成する
+    cmds.spawn( ( hidden_frame_middle, HiddenFrameCenter ) );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //UIをspawnする
 pub fn spawn_in_hidden_frame<T: Component + Default + Copy + effect::TextUI>
 (   component: Local<T>,
@@ -194,13 +212,16 @@ pub fn spawn_title
     ui_demo.visibility  = Visibility::Inherited; //親のvisibility.is_visibleで表示を制御する
 
     //レイアウト用の隠しフレームの中に子要素を作成する
+    let border = UiRect::all( Val::Px( 1.0 ) );
     let title_frame = NodeBundle
     {   style: Style
         {   flex_direction: FlexDirection::Column,
             align_items   : AlignItems::Center,
+            border,
             ..default()
         },
-        background_color: BackgroundColor( Color::NONE ),
+        background_color: Color::NONE.into(),
+        // border_color: Color::RED.into(),
         ..default()
     };
     let child_id = cmds.spawn( ( title_frame, component ) ).with_children

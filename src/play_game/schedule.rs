@@ -27,13 +27,18 @@ impl Plugin for Schedule
         //ゲーム開始
         .add_systems
         (   OnEnter ( MyState::GameStart ),
+            (   ui::center::spawn_hidden_frame,  //UIレイアウト用隠しフレーム作成
+                misc::change_state::<TitleDemo>, //無条件遷移
+            )
+        )
+        .add_systems
+        (   OnExit ( MyState::GameStart ),
             (   //中央に表示するメッセージの作成
+                //※OnExitに分離したのは隠しフレームのspawnが完了している必要がある為
                 ui::center::spawn_title,
                 ui::center::spawn_in_hidden_frame::<ui::center::Start>,
                 ui::center::spawn_in_hidden_frame::<ui::center::Clear>,
                 ui::center::spawn_in_hidden_frame::<ui::center::Over>,
-
-                misc::change_state::<TitleDemo>, //無条件遷移
             )
         )
 

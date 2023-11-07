@@ -118,11 +118,6 @@ impl Record
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//UI用の隠しフレームのComponent
-#[derive( Component )] pub struct HiddenFrameHeader;
-#[derive( Component )] pub struct HiddenFrameCenter;
-#[derive( Component )] pub struct HiddenFrameFooter;
-
 //UIのテキストメッセージセクションの型
 pub type MessageSect =
 (   &'static str, //表示文字列

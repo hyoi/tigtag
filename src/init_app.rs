@@ -13,16 +13,9 @@ impl Plugin for Schedule
         //ゲーム枠とフッターを表示する
         .add_systems
         (   OnEnter ( MyState::InitApp ),
-            (   spawn_screen_frame,    //ゲーム枠を表示
-                spawn_ui_hidden_frame, //UI用の隠しフレーム作成
+            (   spawn_screen_frame, //ゲーム枠を表示
+                spawn_ui_footer,    //フッターを表示
                 misc::change_state::<GameStart>, //無条件遷移
-            )
-        )
-        .add_systems
-        (   OnExit ( MyState::InitApp ),
-            (   spawn_ui_footer, //フッターを表示
-                //OnEnter ( MyState::InitApp ) に書いてもspawnされない。
-                //原因は親である隠しフレームのspawnが遅延実行されるため。
             )
         )
 
@@ -89,72 +82,13 @@ fn spawn_screen_frame
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//UI用の隠しフレームをspawnする
-fn spawn_ui_hidden_frame
-(   mut cmds: Commands,
-)
-{   let width  = Val::Px( SCREEN_PIXELS_WIDTH  );
-    let height = Val::Px( SCREEN_PIXELS_HEIGHT );
-    let background_color = BackgroundColor ( Color::NONE );
-
-    //ヘッダー
-    let hidden_frame_header = NodeBundle
-    {   style: Style
-        {   width,
-            height,
-            position_type  : PositionType::Absolute,
-            flex_direction : FlexDirection::Column,
-            justify_content: JustifyContent::FlexStart, //画面の上端
-            ..default()
-        },
-        background_color,
-        ..default()
-    };
-
-    //センター
-    let hidden_frame_middle = NodeBundle
-    {   style: Style
-        {   width,
-            height,
-            position_type  : PositionType::Absolute,
-            flex_direction : FlexDirection::Column,
-            justify_content: JustifyContent::Center, //画面の中央
-            align_items    : AlignItems::Center,     //中央揃え
-            ..default()
-        },
-        background_color,
-        ..default()
-    };
-
-    //フッター
-    let hidden_frame_footer = NodeBundle
-    {   style: Style
-        {   width,
-            height,
-            position_type  : PositionType::Absolute,
-            flex_direction : FlexDirection::Column,
-            justify_content: JustifyContent::FlexEnd, //画面の下端
-            ..default()
-        },
-        background_color,
-        ..default()
-    };
-
-    //隠しフレームを作成する
-    cmds.spawn( ( hidden_frame_header, HiddenFrameHeader ) );
-    cmds.spawn( ( hidden_frame_middle, HiddenFrameCenter ) );
-    cmds.spawn( ( hidden_frame_footer, HiddenFrameFooter ) );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 //フッターをspawnする
 fn spawn_ui_footer
-(   qry_hidden_frame: Query<Entity, With<HiddenFrameFooter>>,
-    mut cmds: Commands,
+(   mut cmds: Commands,
     asset_svr: Res<AssetServer>,
 )
-{   let Ok ( hidden_frame ) = qry_hidden_frame.get_single() else { return };
+{   //隠しフレームを作成する(画面の下端 寄せ)
+    let hidden_frame = misc::hidden_ui_frame( JustifyContent::FlexEnd );
 
     //フッターの準備
     let mut footer_left   = misc::text_ui( TEXT_FOOTER_LEFT  , &asset_svr );
@@ -164,13 +98,14 @@ fn spawn_ui_footer
     footer_center.style.align_self = AlignSelf::Center;
     footer_right.style.align_self  = AlignSelf::FlexEnd;
 
-    //レイアウト用の隠しフレームの中に子要素を作成する
-    let child_left   = cmds.spawn( ( footer_left, UiFps ) ).id();
-    let child_center = cmds.spawn(   footer_center        ).id();
-    let child_right  = cmds.spawn(   footer_right         ).id();
-    cmds.entity( hidden_frame ).add_child( child_left   );
-    cmds.entity( hidden_frame ).add_child( child_center );
-    cmds.entity( hidden_frame ).add_child( child_right  );
+    //隠しフレームの中に子要素を作成する
+    cmds.spawn( hidden_frame ).with_children
+    (   |cmds|
+        {   cmds.spawn( ( footer_left, UiFps ) );
+            cmds.spawn(   footer_center        );
+            cmds.spawn(   footer_right         );
+        }
+    );
 
     //おまけ(蟹)
     let custom_size = Some ( SIZE_GRID * MAGNIFY_SPRITE_KANI );

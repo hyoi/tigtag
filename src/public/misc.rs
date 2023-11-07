@@ -140,7 +140,7 @@ pub fn hide<T: Component>
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//TextBundleを作る
+//UI用のTextBundleを作る
 pub fn text_ui
 (   message: &[ MessageSect ],
     asset_svr: &Res<AssetServer>,
@@ -161,6 +161,30 @@ pub fn text_ui
     let text  = Text { sections, alignment, ..default() };
     let style = Style { position_type, ..default() };
     TextBundle { text, style, ..default() }
+}
+
+//UIレイアウト用の隠しフレームを作る
+pub fn hidden_ui_frame
+(   justify_content: JustifyContent,
+) -> NodeBundle
+{   let mut style = Style
+    {   width : Val::Px( SCREEN_PIXELS_WIDTH  ),
+        height: Val::Px( SCREEN_PIXELS_HEIGHT ),
+        flex_direction : FlexDirection::Column,
+        align_items    : AlignItems::Center,
+        justify_content,
+        ..default()
+    };
+    if misc::DEBUG() { style.border = UiRect::all( Val::Px( 1.0 ) ); }
+
+    let mut hidden_frame = NodeBundle
+    {   style,
+        background_color: Color::NONE.into(),
+        ..default()
+    };
+    if misc::DEBUG() { hidden_frame.border_color = Color::RED.into() }
+
+    hidden_frame
 }
 
 ////////////////////////////////////////////////////////////////////////////////
