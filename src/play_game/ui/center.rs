@@ -172,8 +172,6 @@ pub fn spawn_hidden_frame
     cmds.spawn( ( hidden_frame_middle, HiddenFrameCenter ) );
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
 //UIをspawnする
 pub fn spawn_in_hidden_frame<T: Component + Default + Copy + effect::TextUI>
 (   component: Local<T>,
