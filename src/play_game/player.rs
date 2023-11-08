@@ -39,7 +39,7 @@ pub fn spawn_sprite
         next         : grid,
         px_start     : vec2,
         px_end       : vec2,
-        opt_autodrive: Some ( title_demo::algorithm::which_way_player_goes ), //default()に任せるとNone
+        opt_autodrive: Some ( title_demo::auto_drive::which_way_player_goes ), //default()に任せるとNone
         ..default()
     };
     let triangle = MaterialMesh2dBundle
