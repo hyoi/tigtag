@@ -3,7 +3,7 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////
 
 //デモ時の自走プレイヤーの移動方向を決める関数
-pub fn which_way_player_goes
+pub fn choice_way
 (   player: &Player,
     qry_chasers: Query<&Chaser>,
     map: Res<Map>,
