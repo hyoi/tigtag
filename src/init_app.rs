@@ -49,7 +49,7 @@ fn spawn_screen_frame
         for ( x, char ) in line.chars().enumerate()
         {   if char == SCREEN_FRAME_SPACE_CHAR { continue }
 
-            let vec2 = IVec2::new( x as i32, y as i32 ).to_sprite_pixels();
+            let vec2 = IVec2::new( x as i32, y as i32 ).to_vec2_on_screen();
             let vec3 = vec2.extend( DEPTH_SPRITE_GAME_FRAME );
 
             cmds.spawn( SpriteBundle::default() )
@@ -68,7 +68,7 @@ fn spawn_screen_frame
                 color    : Color::SILVER,
             };
             let sections = vec![ TextSection { value, style } ];
-            let vec2 = IVec2::new( m.start() as i32, y as i32 ).to_sprite_pixels() - adjust;
+            let vec2 = IVec2::new( m.start() as i32, y as i32 ).to_vec2_on_screen() - adjust;
             let vec3 = vec2.extend( DEPTH_SPRITE_GAME_FRAME + 1.0 );
 
             cmds.spawn( Text2dBundle::default() )
@@ -110,7 +110,7 @@ fn spawn_ui_footer
     //おまけ(蟹)
     let custom_size = Some ( SIZE_GRID * MAGNIFY_SPRITE_KANI );
     let color = COLOR_SPRITE_KANI;
-    let vec2 = IVec2::new( GRID_X_KANI, GRID_Y_KANI ).to_sprite_pixels();
+    let vec2 = IVec2::new( GRID_X_KANI, GRID_Y_KANI ).to_vec2_on_screen();
     let vec3 = vec2.extend( DEPTH_SPRITE_KANI_DOTOWN );
     cmds.spawn( SpriteBundle::default() )
     .insert( Sprite { custom_size, color, ..default() } )
