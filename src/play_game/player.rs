@@ -30,7 +30,7 @@ pub fn spawn_sprite
         player_grid.y = map.rng.gen_range( y1..=y2 );
         if map.is_passage( player_grid ) { break }
     }
-    let sprite_vec2 = player_grid.to_sprite_pixels() + ADJUSTER_MAP_SPRITES;
+    let sprite_vec2 = player_grid.to_vec2_on_map();
     let translation = sprite_vec2.extend( DEPTH_SPRITE_PLAYER );
 
     //プレイヤーのスプライトを配置する
@@ -82,7 +82,7 @@ pub fn move_sprite
     {   //スプライトの表示位置をグリッドにそろえる
         if player.dx_start != player.dx_end
         {   player.dx_start = player.dx_end;
-            player.dx_end   = player.next_grid.to_sprite_pixels() + ADJUSTER_MAP_SPRITES;
+            player.dx_end   = player.next_grid.to_vec2_on_map();
             transform.translation = player.dx_end.extend( DEPTH_SPRITE_PLAYER );
         }
 

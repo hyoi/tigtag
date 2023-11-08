@@ -16,6 +16,7 @@ pub struct ScreenFrame<'a>
 //glamの型にメソッドを追加する準備
 pub trait GridToPixel
 {   fn to_sprite_pixels( &self ) -> Vec2;
+    fn to_vec2_on_map( &self ) -> Vec2;
     fn to_screen_pixels( &self ) -> Vec2;
 }
 
@@ -25,6 +26,11 @@ impl GridToPixel for IVec2
     //アンカーはグリッドの中央
     fn to_sprite_pixels( &self ) -> Vec2
     {   ( self.as_vec2() + 0.5 ) * PIXELS_PER_GRID * Vec2::new( 1.0, -1.0 )
+    }
+
+    //マップデータからスプライト座標を計算する場合の調整値を加算した座標を返す
+    fn to_vec2_on_map( &self ) -> Vec2
+    {   self.to_sprite_pixels() + ADJUSTER_MAP_SPRITES
     }
 
     //平面座標(IVec2)から画面第一象限の座標(Vec2)を算出する

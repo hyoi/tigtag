@@ -69,7 +69,7 @@ pub fn spawn_sprite
     ( 0.. ).zip( CHASER_INIT_POSITION ).for_each
     (   | ( i, ( x, y ) ) |
         {   let chaser_grid = IVec2::new( x, y );
-            let chaser_vec2 = chaser_grid.to_sprite_pixels() + ADJUSTER_MAP_SPRITES;
+            let chaser_vec2 = chaser_grid.to_vec2_on_map();
             let index = ( ( i + record.stage() - 1 ) % 4 ) as usize;
             let ( color, opt_fn_chasing ) = COLOR_SPRITE_CHASERS[ index ];
             let chaser = Chaser
@@ -137,7 +137,7 @@ pub fn move_sprite
         {   //スプライトの表示位置をグリッドにそろえる
             if chaser.dx_start != chaser.dx_end
             {   chaser.dx_start = chaser.dx_end;
-                chaser.dx_end   = chaser.next_grid.to_sprite_pixels() + ADJUSTER_MAP_SPRITES;
+                chaser.dx_end   = chaser.next_grid.to_vec2_on_map();
                 transform.translation = chaser.dx_end.extend( DEPTH_SPRITE_CHASER );
             }
     

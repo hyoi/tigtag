@@ -101,7 +101,7 @@ pub fn spawn_sprite
     for y in MAP_GRIDS_Y_RANGE
     {   for x in MAP_GRIDS_X_RANGE
         {   let grid = IVec2::new( x, y );
-            let pixel = grid.to_sprite_pixels() + ADJUSTER_MAP_SPRITES;
+            let pixel = grid.to_vec2_on_map();
 
             if map.is_wall( grid )
             {   cmds
