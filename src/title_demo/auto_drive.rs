@@ -14,20 +14,20 @@ pub fn which_way_player_goes
     let mut goals = Vec::with_capacity( qry_chasers.iter().len() );
     qry_chasers.for_each
     (   | chaser |
-        if chaser.next != player.next
+        if chaser.next_grid != player.next_grid
         {   //追手が遠くにいる場合、終点(追手の座標)のリストを作る
-            goals.push( chaser.next );
+            goals.push( chaser.next_grid );
         }
         else
         {   //衝突寸前で緊急回避が必要な場合
             let bad_move =
-            {   if chaser.side == player.side
+            {   if chaser.direction == player.direction
                 {   //進行方向が同じなら追突を避ける
-                    player.side
+                    player.direction
                 }
                 else
                 {   //追手に対し正面衝突する方向を避ける
-                    match chaser.side
+                    match chaser.direction
                     {   News::East  => News::West ,
                         News::West  => News::East ,
                         News::South => News::North,
@@ -53,7 +53,7 @@ pub fn which_way_player_goes
     let mut risk_rating = Vec::with_capacity( 3 ); //最大で十字路(3)
     let mut risk_none   = Vec::with_capacity( 3 ); //最大で十字路(3)
     for side in sides
-    {   let byway = player.next + side; //わき道の座標
+    {   let byway = player.next_grid + side; //わき道の座標
         let risk = check_risk( byway, player, &goals, &map );
 
         if let Some ( risk ) = risk
@@ -95,9 +95,9 @@ pub fn which_way_player_goes
         }
         else
         {   //道が複数ある場合
-            if ! demo.is_inside_rect( player.next )
+            if ! demo.is_inside_rect( player.next_grid )
             {   //自機が残dotsを含む最小の矩形の外にいる場合
-                if let Some ( side ) = heuristic_dots_rect( player.next, ptr_sides, demo )
+                if let Some ( side ) = heuristic_dots_rect( player.next_grid, ptr_sides, demo )
                 {   return side
                 }
             }
@@ -159,7 +159,7 @@ fn check_risk
     if goals.is_empty() { return None }
 
     let mut target    = byway;       //脇道の入口の座標
-    let mut previous  = player.next; //戻り路の座標
+    let mut previous  = player.next_grid; //戻り路の座標
     let mut path_open = VecDeque::from( [ Vec::from( [ previous, target ] ) ] );
     let mut crossing: Option<_> = None;
 

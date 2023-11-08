@@ -118,33 +118,33 @@ fn is_collision
     let Ok ( player ) = qry_player.get_single() else { return is_collision };
 
     //自機の移動区間を a1➜a2 とする
-    let mut a1 = player.px_start;
-    let mut a2 = player.px_end;
+    let mut a1 = player.dx_start;
+    let mut a2 = player.dx_end;
     if a1.x > a2.x { std::mem::swap( &mut a1.x, &mut a2.x ) } //a1.x < a2.xにする
     if a1.y > a2.y { std::mem::swap( &mut a1.y, &mut a2.y ) } //a1.y < a2.yにする
 
     //各追手ごとの処理
     for chaser in qry_chaser.iter()
     {   //同じグリッドにいる場合
-        if player.px_end == chaser.px_end
+        if player.dx_end == chaser.dx_end
         {   is_collision = true;
             break;
         }
 
         //追手の移動区間を b1➜b2 とする
-        let mut b1 = chaser.px_start;
-        let mut b2 = chaser.px_end;
+        let mut b1 = chaser.dx_start;
+        let mut b2 = chaser.dx_end;
         if b1.x > b2.x { std::mem::swap( &mut b1.x, &mut b2.x ) } //b1.x < b2.xにする
         if b1.y > b2.y { std::mem::swap( &mut b1.y, &mut b2.y ) } //b1.y < b2.yにする
 
         //移動した微小区間の重なりを判定する
-        if player.px_end.y == chaser.px_end.y
+        if player.dx_end.y == chaser.dx_end.y
         {   //Y軸が一致する場合
-            is_collision = is_overlap( a1.x, a2.x, b1.x, b2.x, player.side, chaser.side );
+            is_collision = is_overlap( a1.x, a2.x, b1.x, b2.x, player.direction, chaser.direction );
         }
-        else if player.px_end.x == chaser.px_end.x
+        else if player.dx_end.x == chaser.dx_end.x
         {   //X軸が一致する場合
-            is_collision = is_overlap( a1.y, a2.y, b1.y, b2.y, player.side, chaser.side );
+            is_collision = is_overlap( a1.y, a2.y, b1.y, b2.y, player.direction, chaser.direction );
         }
         if is_collision { break }
     }
