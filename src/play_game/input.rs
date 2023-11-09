@@ -13,7 +13,7 @@ impl Default for CrossDirection
 }
 
 impl CrossDirection
-{   pub fn sides( &self ) -> &[ News ] { &self.0 }
+{   pub fn direction( &self ) -> &[ News ] { &self.0 }
     pub fn clear( &mut self ) { self.0.clear() }
     pub fn push( &mut self, dxdy: News ) { self.0.push( dxdy ) }
 }

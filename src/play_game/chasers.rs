@@ -142,8 +142,8 @@ pub fn move_sprite
             }
     
             //四方の脇道を取得する
-            let mut sides = map.get_byways_list( chaser.next_grid );         //脇道のリスト
-            sides.retain( | side | chaser.next_grid + side != chaser.grid ); //戻り路を排除
+            let mut sides = map.get_side_spaces_list( chaser.next_grid ); //脇道のリスト
+            sides.retain( | side | chaser.next_grid + side != chaser.grid ); //戻り路を取り除く
 
             //チェイサーの向きを決める（プレーヤーのキー入力に相当）
             chaser.is_stop = false;

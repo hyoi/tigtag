@@ -139,7 +139,7 @@ impl Map
         let mut count = i32::from( self.opt_entity( center ).is_some() ); //true:1,false:0
 
         //四方にドットはあるか
-        self.get_byways_list( center ).iter().for_each
+        self.get_side_spaces_list( center ).iter().for_each
         (   | side |
             count += i32::from( self.opt_entity( center + side ).is_some() ) //true:1,false:0
         );
@@ -175,7 +175,7 @@ fn check_risk
                     //交差点を探し、あればその距離を記録する
                     let mut work: Option<_> = None;
                     for i in 2..path_open[ 0 ].len() //２×２領域で回り続けないよう、[2]から調べる
-                    {   let count_byways = map.get_byways_list( path_open[ 0 ][ i ] ).len();
+                    {   let count_byways = map.get_side_spaces_list( path_open[ 0 ][ i ] ).len();
                         if count_byways >= 3
                         {   work = Some ( i );
                             break
@@ -193,7 +193,7 @@ fn check_risk
             }
 
             //交差点か調べる
-            let mut sides = map.get_byways_list( target );      //脇道のリスト
+            let mut sides = map.get_side_spaces_list( target ); //脇道のリスト
             sides.retain( | side | target + side != previous ); //戻り路を排除
             let count = sides.len(); //一本道(1)、Ｔ字路(2)、十字路(3) ※行止り(0)はない
 

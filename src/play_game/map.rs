@@ -130,7 +130,7 @@ pub fn spawn_sprite
                 );
             }
 
-            if map.is_passage( grid )
+            if map.is_space( grid )
             {   let circle = MaterialMesh2dBundle //type annotations neededが出ないからこの書き方が良い
                 {   mesh: meshes.add( shape::Circle::new( radius ).into() ).into(),
                     material: materials.add( ColorMaterial::from( COLOR_SPRITE_DOT ) ),

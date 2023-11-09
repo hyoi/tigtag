@@ -70,7 +70,7 @@ impl Map
     {   if ! self.is_inside( grid ) { return true } //範囲外は壁
         self.bits( grid ) & BIT_WALL != 0
     }
-    pub fn is_passage( &self, grid: IVec2 ) -> bool
+    pub fn is_space( &self, grid: IVec2 ) -> bool
     {   if ! self.is_inside( grid ) { return false } //範囲外は通路ではない
         self.bits( grid ) & BIT_WALL == 0
     }
@@ -88,15 +88,15 @@ impl Map
     {   for y in MAP_GRIDS_Y_RANGE
         {   for x in MAP_GRIDS_X_RANGE
             {   let grid = IVec2::new( x, y );
-                if self.is_passage( grid + News::East  ) { *self.bits_mut( grid ) |= BIT_WAY_RIGHT } else { *self.bits_mut( grid ) &= ! BIT_WAY_RIGHT }
-                if self.is_passage( grid + News::West  ) { *self.bits_mut( grid ) |= BIT_WAY_LEFT  } else { *self.bits_mut( grid ) &= ! BIT_WAY_LEFT  }
-                if self.is_passage( grid + News::South ) { *self.bits_mut( grid ) |= BIT_WAY_DOWN  } else { *self.bits_mut( grid ) &= ! BIT_WAY_DOWN  }
-                if self.is_passage( grid + News::North ) { *self.bits_mut( grid ) |= BIT_WAY_UP    } else { *self.bits_mut( grid ) &= ! BIT_WAY_UP    }
+                if self.is_space( grid + News::East  ) { *self.bits_mut( grid ) |= BIT_WAY_RIGHT } else { *self.bits_mut( grid ) &= ! BIT_WAY_RIGHT }
+                if self.is_space( grid + News::West  ) { *self.bits_mut( grid ) |= BIT_WAY_LEFT  } else { *self.bits_mut( grid ) &= ! BIT_WAY_LEFT  }
+                if self.is_space( grid + News::South ) { *self.bits_mut( grid ) |= BIT_WAY_DOWN  } else { *self.bits_mut( grid ) &= ! BIT_WAY_DOWN  }
+                if self.is_space( grid + News::North ) { *self.bits_mut( grid ) |= BIT_WAY_UP    } else { *self.bits_mut( grid ) &= ! BIT_WAY_UP    }
             }
         }
     }
 
-    pub fn get_byways_list( &self, grid: IVec2 ) -> Vec<News>
+    pub fn get_side_spaces_list( &self, grid: IVec2 ) -> Vec<News>
     {   let mut vec = Vec::<News>::with_capacity( 4 );
         if self.is_inside( grid )
         {   let bits = self.bits( grid );

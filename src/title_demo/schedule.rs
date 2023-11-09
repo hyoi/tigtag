@@ -91,7 +91,7 @@ fn make_data_for_demo
     (   | y |
         *demo.dots_sum_y_mut( y ) =
         {   MAP_GRIDS_X_RANGE
-            .filter( | &x | map.is_passage( IVec2::new( x, y ) ) )
+            .filter( | &x | map.is_space( IVec2::new( x, y ) ) )
             .count() as i32
         }
     );
@@ -99,7 +99,7 @@ fn make_data_for_demo
     (   | x |
         *demo.dots_sum_x_mut( x ) =
         {   MAP_GRIDS_Y_RANGE
-            .filter( | &y | map.is_passage( IVec2::new( x, y ) ) )
+            .filter( | &y | map.is_space( IVec2::new( x, y ) ) )
             .count() as i32
         }
     );
