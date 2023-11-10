@@ -14,11 +14,7 @@ pub fn choice_way
     let mut goals = Vec::with_capacity( qry_chasers.iter().len() );
     qry_chasers.for_each
     (   | chaser |
-        if chaser.next_grid != player.next_grid
-        {   //追手が遠くにいる場合、終点(追手の座標)のリストを作る
-            goals.push( chaser.next_grid );
-        }
-        else
+        if chaser.next_grid == player.next_grid
         {   //衝突寸前で緊急回避が必要な場合
             let bad_move =
             {   if chaser.direction == player.direction
@@ -38,15 +34,19 @@ pub fn choice_way
             //bad_moveを除く
             sides.retain( | side | *side != bad_move );
         }
+        else
+        {   //ぶつからないなら、チェイサーの座標のリストを作る
+            goals.push( chaser.next_grid );
+        }
     );
 
-    //sidesが空なら運任せ
+    //緊急回避でbad_moveを除いた結果sidesが空なら運任せ
     if sides.is_empty()
     {   let mut rng = rand::thread_rng();
         return org_sides[ rng.gen_range( 0..org_sides.len() ) ]
     }
 
-    //sidesの要素数が１なら
+    //sidesの要素数が１なら決まり
     if sides.len() == 1 { return sides[ 0 ] }
 
     //sidesの要素数が２以上なら、リスクを評価する
@@ -158,7 +158,7 @@ fn check_risk
 {   //goalsが空の場合(全ての追手が目前にいる場合)、わき道はリスクがない
     if goals.is_empty() { return None }
 
-    let mut target    = byway;       //脇道の入口の座標
+    let mut target    = byway; //脇道の入口の座標
     let mut previous  = player.next_grid; //戻り路の座標
     let mut path_open = VecDeque::from( [ Vec::from( [ previous, target ] ) ] );
     let mut crossing: Option<_> = None;
