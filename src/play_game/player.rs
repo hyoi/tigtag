@@ -154,7 +154,7 @@ pub fn move_sprite
     }
     else if ! player.is_stop
     {   //移動中の中割アニメーション
-        let delta = PLAYER_MOVE_COEF * time_delta.as_secs_f32();
+        let delta = PLAYER_SPEED * time_delta.as_secs_f32();
         match player.direction
         {   News::North => transform.translation.y += delta,
             News::South => transform.translation.y -= delta,
