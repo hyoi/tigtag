@@ -13,7 +13,7 @@ impl Default for CrossDirection
 }
 
 impl CrossDirection
-{   pub fn sides( &self ) -> &[ News ] { &self.0 }
+{   pub fn direction( &self ) -> &[ News ] { &self.0 }
     pub fn clear( &mut self ) { self.0.clear() }
     pub fn push( &mut self, dxdy: News ) { self.0.push( dxdy ) }
 }
@@ -87,30 +87,30 @@ pub fn catch_player_operation
     }
 
     //要素数が２なら
-    if player.stop
+    if player.is_stop
     {   //停止中なら
-        if pressed_cross.remove( &player.side ) //前進が入力されている場合
-        {   cross.push( player.side ); //前進
+        if pressed_cross.remove( &player.direction ) //前進が入力されている場合
+        {   cross.push( player.direction ); //前進
             cross.push( *pressed_cross.iter().next().unwrap() ); //右折／左折
             return;
         }
 
         //後進と右折／左折のどちらか
-        let back = player.side.back_side();
+        let back = player.direction.back_side();
         pressed_cross.remove( &back );
         cross.push( back ); //後進
         cross.push( *pressed_cross.iter().next().unwrap() );
     }
     else
     {   //移動中なら
-        if pressed_cross.remove( &player.side ) //前進が入力されている場合
+        if pressed_cross.remove( &player.direction ) //前進が入力されている場合
         {   cross.push( *pressed_cross.iter().next().unwrap() ); //右折／左折
-            cross.push( player.side ); //前進
+            cross.push( player.direction ); //前進
             return;
         }
 
         //後進と右折／左折のどちらか
-        let back = player.side.back_side();
+        let back = player.direction.back_side();
         pressed_cross.remove( &back );
         cross.push( *pressed_cross.iter().next().unwrap() ); //右折／左折
         cross.push( back ); //後進

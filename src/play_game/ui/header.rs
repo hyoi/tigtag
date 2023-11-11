@@ -33,11 +33,11 @@ impl Plugin for Schedule
 
 //フッターをspawnする
 fn spawn_ui_header
-(   qry_hidden_frame: Query<Entity, With<HiddenFrameHeader>>,
-    mut cmds: Commands,
+(   mut cmds: Commands,
     asset_svr: Res<AssetServer>,
 )
-{   let Ok ( hidden_frame ) = qry_hidden_frame.get_single() else { return };
+{   //隠しフレームを作成する(画面の上端 寄せ)
+    let hidden_frame = misc::hidden_ui_frame( JustifyContent::FlexStart );
 
     //ヘッダーの準備
     let mut header_left   = misc::text_ui( TEXT_HEADER_LEFT  , &asset_svr );
@@ -47,13 +47,14 @@ fn spawn_ui_header
     header_center.style.align_self = AlignSelf::Center;
     header_right.style.align_self  = AlignSelf::FlexEnd;
 
-    //レイアウト用の隠しフレームの中に子要素を作成する
-    let child_left   = cmds.spawn( ( header_left  , Stage   ) ).id();
-    let child_center = cmds.spawn( ( header_center, Score   ) ).id();
-    let child_right  = cmds.spawn( ( header_right , HiScore ) ).id();
-    cmds.entity( hidden_frame ).add_child( child_left   );
-    cmds.entity( hidden_frame ).add_child( child_center );
-    cmds.entity( hidden_frame ).add_child( child_right  );
+    //隠しフレームの中に子要素を作成する
+    cmds.spawn( hidden_frame ).with_children
+    (   |cmds|
+        {   cmds.spawn( ( header_left  , Stage   ) );
+            cmds.spawn( ( header_center, Score   ) );
+            cmds.spawn( ( header_right , HiScore ) );
+        }
+    );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -19,6 +19,7 @@ use regex::Regex;
 use std::ops::{ Range, Add, AddAssign };
 use std::cmp::Ordering;
 use std::collections::VecDeque;
+use std::f32::consts::TAU;
 
 //internal submodules
 mod public;

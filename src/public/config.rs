@@ -118,15 +118,15 @@ pub const MAGNIFY_SPRITE_DOT   : f32 = 0.08;
 pub const MAGNIFY_SPRITE_PLAYER: f32 = 0.4;
 pub const MAGNIFY_SPRITE_CHASER: f32 = 0.5;
 
-//調整値
-pub const ADJUSTER_MAP_SPRITES: Vec2 = Vec2::new( 0.0, -1.0 * PIXELS_PER_GRID );
-
 //SEボリューム
 pub const VOLUME_SOUND_BEEP: f32 = 0.1;
 // pub const VOLUME_SOUND_BEEP: Volume = Volume::Relative ( VolumeLevel::new( 0.1 ) );
 //と書きたいがVolumeLevel::new()がnon-const fnなので書けない。
 
 ////////////////////////////////////////////////////////////////////////////////
+
+//マップデータからスプライト座標を計算する場合の調整値
+pub const ADJUSTER_MAP_SPRITES: Vec2 = Vec2::new( 0.0, -1.0 * PIXELS_PER_GRID );
 
 //画面デザイン(枠)
 pub const SCREEN_FRAME_SPACE_CHAR : char = ' ';
@@ -198,21 +198,21 @@ pub const MAP_GRIDS_Y_RANGE: Range<i32> = 0..MAP_GRIDS_HEIGHT;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//Playerの設定値
-pub const PLAYER_WAIT: f32 = 0.09;                               //移動のウェイト
-pub const PLAYER_MOVE_COEF: f32 = PIXELS_PER_GRID / PLAYER_WAIT; //移動の中割係数
+//プレイヤーの設定値
+pub const PLAYER_TIME_PER_GRID: f32 = 0.09; //１グリッド進むために必要な時間
+pub const PLAYER_SPEED: f32 = PIXELS_PER_GRID / PLAYER_TIME_PER_GRID; //速度
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//Chaserの設定値
-pub const CHASER_WAIT: f32 = 0.13;                               //移動のウェイト
-pub const CHASER_MOVE_COEF: f32 = PIXELS_PER_GRID / CHASER_WAIT; //移動の中割係数
-pub const CHASER_ACCEL: f32 = 0.4;                               //スピードアップの割増
-pub const CHASER_INIT_POSITION: [ ( i32, i32 ); 4 ] =            //スタート座標(Grid)
-[   ( 1    , 1     ),
-    ( 1    , MAX_Y ),
-    ( MAX_X, 1     ),
-    ( MAX_X, MAX_Y ),
+//チェイサーの設定値
+pub const CHASER_TIME_PER_GRID: f32 = 0.13; //１グリッド進むために必要な時間
+pub const CHASER_SPEED: f32 = PIXELS_PER_GRID / CHASER_TIME_PER_GRID; //速度
+pub const CHASER_ACCEL: f32 = 0.4; //スピードアップの割増
+pub const CHASER_START_POSITION: [ IVec2; 4 ] = //スタート座標
+[   IVec2::new( 1    , 1     ),
+    IVec2::new( 1    , MAX_Y ),
+    IVec2::new( MAX_X, 1     ),
+    IVec2::new( MAX_X, MAX_Y ),
 ];
 const MAX_X: i32 = MAP_GRIDS_WIDTH  - 2;
 const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;

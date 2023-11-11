@@ -15,20 +15,25 @@ pub struct ScreenFrame<'a>
 
 //glamの型にメソッドを追加する準備
 pub trait GridToPixel
-{   fn to_sprite_pixels( &self ) -> Vec2;
+{   fn to_vec2_on_screen( &self ) -> Vec2;
+    fn to_vec2_on_map( &self ) -> Vec2;
     fn to_screen_pixels( &self ) -> Vec2;
 }
 
 //glamの型にメソッドを追加する
 impl GridToPixel for IVec2
-{   //平面座標(IVec2)から画面第一象限の座標(Vec2)を算出する
-    //アンカーはグリッドの中央
-    fn to_sprite_pixels( &self ) -> Vec2
+{   //平面座標(IVec2)から画面第四象限の座標(Vec2)を算出する
+    //アンカーがグリッドの中央になるよう補正する（スプライト等が中央座標で配置されるため）
+    fn to_vec2_on_screen( &self ) -> Vec2
     {   ( self.as_vec2() + 0.5 ) * PIXELS_PER_GRID * Vec2::new( 1.0, -1.0 )
     }
 
-    //平面座標(IVec2)から画面第一象限の座標(Vec2)を算出する
-    //アンカーはグリッドの左下
+    //マップデータからスプライト座標を計算する場合の調整値を加算した座標を返す
+    fn to_vec2_on_map( &self ) -> Vec2
+    {   self.to_vec2_on_screen() + ADJUSTER_MAP_SPRITES
+    }
+
+    //平面座標(IVec2)から画面第四象限の座標(Vec2)を算出する
     fn to_screen_pixels( &self ) -> Vec2
     {   self.as_vec2() * PIXELS_PER_GRID * Vec2::new( 1.0, -1.0 )
     }
@@ -117,11 +122,6 @@ impl Record
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-//UI用の隠しフレームのComponent
-#[derive( Component )] pub struct HiddenFrameHeader;
-#[derive( Component )] pub struct HiddenFrameCenter;
-#[derive( Component )] pub struct HiddenFrameFooter;
 
 //UIのテキストメッセージセクションの型
 pub type MessageSect =
@@ -230,29 +230,29 @@ impl AddAssign<News> for IVec2
 //プレイヤーのComponent
 #[derive( Component )]
 pub struct Player
-{   pub grid         : IVec2,               //移動中は移動元の座標、停止中はその場の座標
-    pub next         : IVec2,               //移動中は移動先の座標、停止中はその場の座標
-    pub side         : News,                //移動向き
-    pub wait         : Timer,               //移動ウエイト
-    pub stop         : bool,                //移動停止フラグ
-    pub speedup      : f32,                 //スピードアップ係数
-    pub px_start     : Vec2,                //移動した微小区間の始点
-    pub px_end       : Vec2,                //移動した微小区間の終点
-    pub opt_autodrive: Option<FnAutoDrive>, //デモ時の自走プレイヤーの移動方向を決める関数ポインタ
+{   pub grid     : IVec2, //移動中は移動元の座標、停止中はその場の座標
+    pub next_grid: IVec2, //移動中は移動先の座標、停止中はその場の座標
+    pub direction: News,  //移動向き
+    pub timer    : Timer, //移動タイマー
+    pub is_stop  : bool,  //移動停止フラグ
+    pub speedup  : f32,   //スピードアップ係数
+    pub dx_start : Vec2,  //移動した微小区間の始点
+    pub dx_end   : Vec2,  //移動した微小区間の終点
+    pub opt_fn_autodrive: Option<FnAutoDrive>, //デモ時の自走プレイヤーの移動方向を決める関数
 }
 
 impl Default for Player
 {   fn default() -> Self
     {   Self
-        {   grid         : IVec2::default(),
-            next         : IVec2::default(),
-            side         : News::default(),
-            wait         : Timer::from_seconds( PLAYER_WAIT, TimerMode::Once ),
-            stop         : true,
-            speedup      : 1.0,
-            px_start     : Vec2::default(),
-            px_end       : Vec2::default(),
-            opt_autodrive: None,
+        {   grid     : IVec2::default(),
+            next_grid: IVec2::default(),
+            direction: News::default(),
+            timer    : Timer::from_seconds( PLAYER_TIME_PER_GRID, TimerMode::Once ),
+            is_stop  : true,
+            speedup  : 1.0,
+            dx_start : Vec2::default(),
+            dx_end   : Vec2::default(),
+            opt_fn_autodrive: None,
         }
     }
 }
@@ -265,31 +265,31 @@ type FnAutoDrive = fn( &Player, Query<&Chaser>, Res<Map>, Res<DemoMapParams>, &[
 //チェイサーのComponent
 #[derive( Component )]
 pub struct Chaser
-{   pub grid      : IVec2,             //移動中は移動元の座標、停止中はその場の座標
-    pub next      : IVec2,             //移動中は移動先の座標、停止中はその場の座標
-    pub side      : News,              //移動向き
-    pub wait      : Timer,             //移動ウエイト
-    pub stop      : bool,              //移動停止フラグ
-    pub speedup   : f32,               //スピードアップ係数(1.0未満なら減速、1.0より大きいと増速)
-    pub px_start  : Vec2,              //移動した微小区間の始点
-    pub px_end    : Vec2,              //移動した微小区間の終点
-    pub color     : Color,             //表示色
-    pub fn_chasing: Option<FnChasing>, //チェイサーの移動方向を決める関数ポインタ
+{   pub grid     : IVec2, //移動中は移動元の座標、停止中はその場の座標
+    pub next_grid: IVec2, //移動中は移動先の座標、停止中はその場の座標
+    pub direction: News,  //移動向き
+    pub timer    : Timer, //移動タイマー
+    pub is_stop  : bool,  //移動停止フラグ
+    pub speedup  : f32,   //スピードアップ係数(1.0未満なら減速、1.0より大きいと増速)
+    pub dx_start : Vec2,  //移動した微小区間の始点
+    pub dx_end   : Vec2,  //移動した微小区間の終点
+    pub opt_fn_chasing: Option<FnChasing>, //チェイサーの移動方向を決める関数
+    pub color    : Color, //表示色
 }
 
 impl Default for Chaser
 {   fn default() -> Self
     {   Self
-        {   grid      : IVec2::default(),
-            next      : IVec2::default(),
-            side      : News::default(),
-            wait      : Timer::from_seconds( CHASER_WAIT, TimerMode::Once ),
-            stop      : true,
-            speedup   : 1.0,
-            px_start  : Vec2::default(),
-            px_end    : Vec2::default(),
-            color     : Color::NONE,
-            fn_chasing: None,
+        {   grid     : IVec2::default(),
+            next_grid: IVec2::default(),
+            direction: News::default(),
+            timer    : Timer::from_seconds( CHASER_TIME_PER_GRID, TimerMode::Once ),
+            is_stop  : true,
+            speedup  : 1.0,
+            dx_start : Vec2::default(),
+            dx_end   : Vec2::default(),
+            opt_fn_chasing: None,
+            color    : Color::NONE,
         }
     }
 }

@@ -45,8 +45,14 @@ impl Plugin for Schedule
                 misc::change_state::<TitleDemo>, //無条件遷移
             )
             .chain()
-        )
-        ;
+        );
+
+        //demo用情報のdebug表示
+        #[cfg( debug_assertions )]
+        app.add_systems
+        (   Update,
+            view_min_rect_contains_dots.run_if( in_state( MyState::TitleDemo ) )
+        );
     }
 }
 
@@ -85,7 +91,7 @@ fn make_data_for_demo
     (   | y |
         *demo.dots_sum_y_mut( y ) =
         {   MAP_GRIDS_X_RANGE
-            .filter( | &x | map.is_passage( IVec2::new( x, y ) ) )
+            .filter( | &x | map.is_space( IVec2::new( x, y ) ) )
             .count() as i32
         }
     );
@@ -93,7 +99,7 @@ fn make_data_for_demo
     (   | x |
         *demo.dots_sum_x_mut( x ) =
         {   MAP_GRIDS_Y_RANGE
-            .filter( | &y | map.is_passage( IVec2::new( x, y ) ) )
+            .filter( | &y | map.is_space( IVec2::new( x, y ) ) )
             .count() as i32
         }
     );
@@ -164,6 +170,25 @@ impl DemoMapParams
 
         dx + dy
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//demo用情報のdebug表示
+#[cfg( debug_assertions )]
+fn view_min_rect_contains_dots
+(   opt_demo: Option<Res<DemoMapParams>>,
+    mut gizmos: Gizmos
+)
+{   let Some ( demo ) = opt_demo else { return };
+    let min = demo.dots_rect_min().to_screen_pixels() + ADJUSTER_MAP_SPRITES;
+    let max = demo.dots_rect_max().to_screen_pixels() + ADJUSTER_MAP_SPRITES;
+    let width  = max.x - min.x + PIXELS_PER_GRID;
+    let height = max.y - min.y - PIXELS_PER_GRID;
+    let size = Vec2::new( width, height );
+    let position = min + size / 2.0;
+
+    gizmos.rect_2d( position, 0.0, size, Color::GREEN );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

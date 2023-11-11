@@ -4,48 +4,48 @@ use super::*;
 
 //チェイサーの色と移動方向の決定関数
 const COLOR_SPRITE_CHASERS: [ ( Color, Option<FnChasing> ); 4 ] = 
-[   ( Color::RED,   Some ( which_way_red_goes   ) ),
-    ( Color::GREEN, Some ( which_way_green_goes ) ),
-    ( Color::PINK,  Some ( which_way_pink_goes  ) ),
-    ( Color::BLUE,  Some ( which_way_blue_goes  ) ),
+[   ( Color::RED,   Some ( choice_way_red   ) ),
+    ( Color::GREEN, Some ( choice_way_green ) ),
+    ( Color::PINK,  Some ( choice_way_pink  ) ),
+    ( Color::BLUE,  Some ( choice_way_blue  ) ),
 ];
 
-//移動方向を決める(赤)
-fn which_way_red_goes( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
-{        if sides.contains( &News::West  ) && player.next.x < chaser.grid.x { return News::West  }
-    else if sides.contains( &News::East  ) && player.next.x > chaser.grid.x { return News::East  }
-    else if sides.contains( &News::North ) && player.next.y < chaser.grid.y { return News::North }
-    else if sides.contains( &News::South ) && player.next.y > chaser.grid.y { return News::South }
+//進む方向を決める(赤)
+fn choice_way_red( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
+{        if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
+    else if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
+    else if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
+    else if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
     let mut rng = rand::thread_rng();
     sides[ rng.gen_range( 0..sides.len() ) ]
 }
 
-//移動方向を決める(青)
-fn which_way_blue_goes( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
-{        if sides.contains( &News::South ) && player.next.y > chaser.grid.y { return News::South }
-    else if sides.contains( &News::West  ) && player.next.x < chaser.grid.x { return News::West  }
-    else if sides.contains( &News::East  ) && player.next.x > chaser.grid.x { return News::East  }
-    else if sides.contains( &News::North ) && player.next.y < chaser.grid.y { return News::North }
+//進む方向を決める(青)
+fn choice_way_blue( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
+{        if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
+    else if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
+    else if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
+    else if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
     let mut rng = rand::thread_rng();
     sides[ rng.gen_range( 0..sides.len() ) ]
 }
 
-//移動方向を決める(緑)
-fn which_way_green_goes( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
-{        if sides.contains( &News::North ) && player.next.y < chaser.grid.y { return News::North }
-    else if sides.contains( &News::South ) && player.next.y > chaser.grid.y { return News::South }
-    else if sides.contains( &News::West  ) && player.next.x < chaser.grid.x { return News::West  }
-    else if sides.contains( &News::East  ) && player.next.x > chaser.grid.x { return News::East  }
+//進む方向を決める(緑)
+fn choice_way_green( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
+{        if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
+    else if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
+    else if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
+    else if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
     let mut rng = rand::thread_rng();
     sides[ rng.gen_range( 0..sides.len() ) ]
 }
 
-//移動方向を決める(ピンク)
-fn which_way_pink_goes( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
-{        if sides.contains( &News::East  ) && player.next.x > chaser.grid.x { return News::East  }
-    else if sides.contains( &News::North ) && player.next.y < chaser.grid.y { return News::North }
-    else if sides.contains( &News::South ) && player.next.y > chaser.grid.y { return News::South }
-    else if sides.contains( &News::West  ) && player.next.x < chaser.grid.x { return News::West  }
+//進む方向を決める(ピンク)
+fn choice_way_pink( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
+{        if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
+    else if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
+    else if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
+    else if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
     let mut rng = rand::thread_rng();
     sides[ rng.gen_range( 0..sides.len() ) ]
 }
@@ -63,29 +63,28 @@ pub fn spawn_sprite
     //スプライトがあれば削除する
     qry_player.for_each( | id | cmds.entity( id ).despawn_recursive() );
 
-    //追手のスプライトを配置する
+    //チェイサーのスプライトを配置する
     let custom_size = Some ( SIZE_GRID * MAGNIFY_SPRITE_CHASER );
 
-    ( 0.. ).zip( CHASER_INIT_POSITION ).for_each
-    (   | ( i, ( x, y ) ) |
-        {   let grid  = IVec2::new( x, y );
-            let pixel = grid.to_sprite_pixels() + ADJUSTER_MAP_SPRITES;
+    ( 0.. ).zip( CHASER_START_POSITION ).for_each
+    (   | ( i, chaser_grid ) |
+        {   let chaser_vec2 = chaser_grid.to_vec2_on_map();
             let index = ( ( i + record.stage() - 1 ) % 4 ) as usize;
-            let ( color, fn_chasing ) = COLOR_SPRITE_CHASERS[ index ];
+            let ( color, opt_fn_chasing ) = COLOR_SPRITE_CHASERS[ index ];
             let chaser = Chaser
-            {   grid,
-                next    : grid,
-                px_start: pixel,
-                px_end  : pixel,
+            {   grid     : chaser_grid,
+                next_grid: chaser_grid,
+                dx_start : chaser_vec2,
+                dx_end   : chaser_vec2,
                 color,
-                fn_chasing,
+                opt_fn_chasing,
                 ..default()
             };
 
             cmds
             .spawn( ( SpriteBundle::default(), chaser ) )
             .insert( Sprite { color, custom_size, ..default() } )
-            .insert( Transform::from_translation( pixel.extend( DEPTH_SPRITE_CHASER ) ) )
+            .insert( Transform::from_translation( chaser_vec2.extend( DEPTH_SPRITE_CHASER ) ) )
             ;
         }
     );
@@ -93,14 +92,14 @@ pub fn spawn_sprite
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//チェイサーを回転させる
+//チェイサーのスプライトを回転させる
 pub fn rotate
 (   mut qry_chaser: Query<&mut Transform, With<Chaser>>,
     time: Res<Time>,
 )
 {   let time_delta = time.delta().as_secs_f32();
-    let angle = 360.0 * time_delta;
-    let quat = Quat::from_rotation_z( angle.to_radians() );
+    let radian = TAU * time_delta;
+    let quat = Quat::from_rotation_z( radian );
 
     //回転させる
     qry_chaser.for_each_mut( | mut transform | transform.rotate( quat ) );
@@ -110,9 +109,9 @@ pub fn rotate
 
 //チェイサーを移動させる
 pub fn move_sprite
-(   qry_player: Query<&Player>,
-    mut qry_chaser: Query<(&mut Chaser, &mut Transform)>,
+(   mut qry_chaser: Query<(&mut Chaser, &mut Transform)>,
     opt_map: Option<Res<Map>>,
+    qry_player: Query<&Player>,
     mut evt_clear : EventReader<EventClear>,
     mut evt_over  : EventReader<EventOver>,
     time: Res<Time>,
@@ -129,78 +128,80 @@ pub fn move_sprite
 
     //チェイサーは複数なのでループ処理する
     for ( mut chaser, mut transform ) in qry_chaser.iter_mut()
-    {   //スピードアップを反映する
+    {   //経過時間にスピードアップを反映する
         let time_delta = time_delta.mul_f32( chaser.speedup );
 
-        //待ち時間が完了したら or ストップ状態だったら ⇒ 移動方向を決めて移動開始
-        if chaser.wait.tick( time_delta ).finished() || chaser.stop
-        {   //スプライトの表示位置をグリッドにそろえる
-            if chaser.px_start != chaser.px_end
-            {   chaser.px_start = chaser.px_end;
-                chaser.px_end   = chaser.next.to_sprite_pixels() + ADJUSTER_MAP_SPRITES;
-                transform.translation = chaser.px_end.extend( DEPTH_SPRITE_CHASER );
+        //タイマーが完了したら or ストップ状態だったら ⇒ 移動方向を決めて移動開始
+        if chaser.timer.tick( time_delta ).finished() || chaser.is_stop
+        {   //スプライトをchaser.next_gridにそろえる
+            if chaser.dx_start != chaser.dx_end
+            {   chaser.dx_start = chaser.dx_end;
+                chaser.dx_end   = chaser.next_grid.to_vec2_on_map();
+                transform.translation = chaser.dx_end.extend( DEPTH_SPRITE_CHASER );
             }
     
             //四方の脇道を取得する
-            let mut sides = map.get_byways_list( chaser.next );         //脇道のリスト
-            sides.retain( | side | chaser.next + side != chaser.grid ); //戻り路を排除
+            let mut sides = map.get_side_spaces_list( chaser.next_grid ); //脇道のリスト
+            sides.retain( | side | chaser.next_grid + side != chaser.grid ); //戻り路を取り除く
 
-            //チェイサーの向きを決める（プレーヤーのキー入力に相当）
-            chaser.stop = false;
-            chaser.side =
-                match sides.len().cmp( &1 ) //sides要素数は１以上(このゲームのマップに行き止まりが無いので)
-                {   Ordering::Equal =>
-                        sides[ 0 ], //一本道なら道なりに進む
-                    Ordering::Greater =>
-                        if let Some ( fnx ) = chaser.fn_chasing
-                        {   fnx( &mut chaser, player, &sides ) //分かれ道なら外部関数で進行方向を決める
-                        }
-                        else
-                        {   chaser.stop = true; //外部関数がない(None)なら停止フラグを立てる
-                            chaser.side
-                        },
-                    Ordering::Less =>
-                        match chaser.side //行き止まりなら逆走する(このゲームに行き止まりはないけど)
-                        {   News::North => News::South,
-                            News::South => News::North,
-                            News::East  => News::West ,
-                            News::West  => News::East ,
-                        },
-                };
+            //チェイサーが次に進む方向を決める（プレーヤーのキー入力に相当）
+            chaser.is_stop = false;
+            chaser.direction =
+            match sides.len().cmp( &1 ) //sides要素数は１以上(このゲームのマップに行き止まりが無いので)
+            {   Ordering::Equal => //一本道 ⇒ 道なりに進む
+                    sides[ 0 ],
+                Ordering::Greater => //三叉路または十字路
+                    if let Some ( chasing ) = chaser.opt_fn_chasing
+                    {   //外部関数で進行方向を決める
+                        chasing( &mut chaser, player, &sides )
+                    }
+                    else
+                    {   //外部関数を使えないなら停止フラグを立てる
+                        chaser.is_stop = true;
+                        chaser.direction
+                    },
+                Ordering::Less => //行き止まり ⇒ 逆走 (このゲームに行き止まりはないけど)
+                    match chaser.direction
+                    {   News::North => News::South,
+                        News::South => News::North,
+                        News::East  => News::West ,
+                        News::West  => News::East ,
+                    },
+            };
 
             //現在の位置と次の位置を更新する
-            chaser.grid = chaser.next;
-            if ! chaser.stop
-            {   let side = chaser.side; //chaser.side += chaser.next すると、
-                chaser.next += side;    //error[E0502]: cannot borrow `chaser` as 
-            }                           //immutable because it is also borrowed as mutable
+            chaser.grid = chaser.next_grid;
+            if ! chaser.is_stop
+            {   let side = chaser.direction; //chaser.direction += chaser.next_grid すると、
+                chaser.next_grid += side;    //error[E0502]: cannot borrow `chaser` as 
+            }                                //immutable because it is also borrowed as mutable
 
-            //waitをリセットする
-            chaser.wait.reset();
+            //タイマーをリセットする
+            chaser.timer.reset();
         }
-        else if ! chaser.stop
-        {   //移動中ならスプライトを中割の位置に移動する
-            let delta = CHASER_MOVE_COEF * time_delta.as_secs_f32();
-            match chaser.side
+        else if ! chaser.is_stop
+        {   //移動中の中割アニメーション
+            let delta = CHASER_SPEED * time_delta.as_secs_f32();
+            match chaser.direction
             {   News::North => transform.translation.y += delta,
                 News::South => transform.translation.y -= delta,
                 News::East  => transform.translation.x += delta,
                 News::West  => transform.translation.x -= delta,
             }
-            chaser.px_start = chaser.px_end;
-            chaser.px_end   = transform.translation.truncate();
+            chaser.dx_start = chaser.dx_end;
+            chaser.dx_end   = transform.translation.truncate();
         }
     }
 
     //チェイサーは重なるとスピードアップする
     let mut color_grid = Vec::with_capacity( qry_chaser.iter().len() );
     for ( mut chaser, _ ) in qry_chaser.iter_mut()
-    {   color_grid.push( ( chaser.color, chaser.next ) );
+    {   color_grid.push( ( chaser.color, chaser.next_grid ) );
         chaser.speedup = 1.0;
     }
     for ( color, grid ) in color_grid
     {   for ( mut chaser, _ ) in qry_chaser.iter_mut()
-        {   if grid != chaser.next || color == chaser.color { continue }
+        {   if grid != chaser.next_grid || color == chaser.color { continue }
             chaser.speedup += CHASER_ACCEL;
         }
     }

@@ -26,7 +26,7 @@ impl<'a> Default for Pause<'a>
 {   fn default() -> Self { Self ( UI_PAUSE ) }
 }
 
-impl<'a> ui::center::TextUI for Pause<'a>
+impl<'a> ui::effect::TextUI for Pause<'a>
 {   fn message( &self ) -> & [ MessageSect ] { self.0 }
 }
 
