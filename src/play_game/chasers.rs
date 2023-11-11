@@ -98,8 +98,8 @@ pub fn rotate
     time: Res<Time>,
 )
 {   let time_delta = time.delta().as_secs_f32();
-    let angle = 360.0 * time_delta;
-    let quat = Quat::from_rotation_z( angle.to_radians() );
+    let radian = TAU * time_delta;
+    let quat = Quat::from_rotation_z( radian );
 
     //回転させる
     qry_chaser.for_each_mut( | mut transform | transform.rotate( quat ) );

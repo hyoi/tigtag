@@ -151,11 +151,11 @@ pub struct Demo ( f32 );
 
 impl effect::BlinkingText for Demo
 {   fn alpha( &mut self, time_delta: f32 ) -> f32
-    {   let angle = &mut self.0;
-        *angle += 360.0 * time_delta;
-        *angle -= if *angle > 360.0 { 360.0 } else { 0.0 };
+    {   let radian = &mut self.0;
+        *radian += TAU * time_delta;
+        *radian -= if *radian > TAU { TAU } else { 0.0 };
 
-        ( *angle ).to_radians().sin() //sin波
+        ( *radian ).sin() * 0.5 + 0.5 //0.0 ～ 1.0
     }
 }
 
