@@ -11,7 +11,7 @@ pub fn choice_way
     org_sides: &[ News ], //交差点が前提なので、要素数は2(三叉路)～3(十字路)
 ) -> News
 {   let mut sides = Vec::from( org_sides );
-    let mut goals = Vec::with_capacity( qry_chasers.iter().len() );
+    let mut chasers = Vec::with_capacity( qry_chasers.iter().len() );
     qry_chasers.for_each
     (   | chaser |
         if chaser.next_grid == player.next_grid
@@ -31,12 +31,11 @@ pub fn choice_way
                     }
                 }
             };
-            //bad_moveを除く
-            sides.retain( | side | *side != bad_move );
+            sides.retain( | side | *side != bad_move ); //bad_moveを除く
         }
         else
-        {   //ぶつからないなら、チェイサーの座標のリストを作る
-            goals.push( chaser.next_grid );
+        {   //ぶつからないなら(遠くにいるなら)、リスク評価用に追手の座標リストを作る
+            chasers.push( chaser.next_grid );
         }
     );
 
@@ -46,15 +45,15 @@ pub fn choice_way
         return org_sides[ rng.gen_range( 0..org_sides.len() ) ]
     }
 
-    //sidesの要素数が１なら決まり
+    //sidesの要素数が１ならそれで決まり
     if sides.len() == 1 { return sides[ 0 ] }
 
     //sidesの要素数が２以上なら、リスクを評価する
     let mut risk_rating = Vec::with_capacity( 3 ); //最大で十字路(3)
     let mut risk_none   = Vec::with_capacity( 3 ); //最大で十字路(3)
     for side in sides
-    {   let byway = player.next_grid + side; //わき道の座標
-        let risk = check_risk( byway, player.next_grid, &goals, &map );
+    {   let byway = player.next_grid + side; //脇道の入口の座標
+        let risk = check_byway_risk( byway, player.next_grid, &chasers, &map );
 
         if let Some ( risk ) = risk
         {   //リスクがある場合
@@ -66,17 +65,8 @@ pub fn choice_way
         }
     }
 
-    //リスクなしの道があるか？によって対象を変える
-    let ptr_sides =
-    {   if risk_none.is_empty()
-        {   //全ての道にリスクがあるなら
-            &mut risk_rating
-        }
-        else
-        {   //リスクなしの道があるなら
-            &mut risk_none
-        }
-    };
+    //リスクなしの道があるか？によって操作対象のVecを変える
+    let ptr_sides = if risk_none.is_empty() { &mut risk_rating } else { &mut risk_none };
 
     //進む道を決める
     if ptr_sides.len() == 1
@@ -85,7 +75,7 @@ pub fn choice_way
     }
     else
     {   //道が複数ある場合(２～３)
-        ptr_sides.sort_by( | a, b | b.1.cmp( &a.1 ) ); //大きい順にソート
+        ptr_sides.sort_by( | a, b | b.1.cmp( &a.1 ) ); //大きい順(＝安全な順or高得点な順)にソート
         let max_val = ptr_sides[ 0 ].1;                //先頭の最大値
         ptr_sides.retain( | x | x.1 >= max_val );      //最大値だけのリストにする
 
@@ -102,14 +92,14 @@ pub fn choice_way
                 }
             }
 
-            //自機が残dotsを含む最小の矩形の中にいる場合、運頼み
+            //プレイヤーが残dotsを含む最小の矩形の中にいる場合、乱数で決める
             let mut rng = rand::thread_rng();
             ptr_sides[ rng.gen_range( 0..ptr_sides.len() ) ].0
         }
     }
 }
 
-//自機が残dotsを含む最小の矩形の外にいる場合のheuristic関数
+//プレイヤーが残dotsを含む最小の矩形の外にいる場合のheuristic関数
 fn heuristic_dots_rect
 (   grid: IVec2,
     sides: &[ ( News, i32 ) ],
@@ -149,7 +139,7 @@ impl Map
 }
 
 //脇道を走査してリスクを評価する
-fn check_risk
+fn check_byway_risk
 (   mut target  : IVec2, //初期値：player.next_grid + side
     mut previous: IVec2, //初期値：player.next_grid
     chasers: &[ IVec2 ], //chaser.next_gridのリスト
@@ -220,7 +210,7 @@ fn check_risk
             target   = byway;
         }
 
-        //paths[ 0 ]を調べ終わったので削除して、空になればチェック完了
+        //paths[ 0 ]を調べ終わったので削除してpathsが空になればチェック完了
         paths.pop_front();
         if paths.is_empty() { break 'Outside }
 
@@ -229,12 +219,13 @@ fn check_risk
         previous = paths[ 0 ][ paths[ 0 ].len() - 2 ];
     }
 
-    //十分手前に交差点があれば(曲がって逃げられるから)リスクなしと判定する
+    //チェイサーとの間に交差点がないか、あっても中央よりチェイサー側にある場合はリスクあり
     if crossing.is_none() || crossing.unwrap() * 2 >= risk.unwrap() - 1
     {   risk
     }
     else
-    {   None
+    {   //チェイサーとの間で中央より手前に交差点があればリスクなし(曲がって逃げられるから)
+        None
     }
 }
 
