@@ -54,7 +54,7 @@ pub fn choice_way
     let mut risk_none   = Vec::with_capacity( 3 ); //最大で十字路(3)
     for side in sides
     {   let byway = player.next_grid + side; //わき道の座標
-        let risk = check_risk( byway, player, &goals, &map );
+        let risk = check_risk( byway, player.next_grid, &goals, &map );
 
         if let Some ( risk ) = risk
         {   //リスクがある場合
@@ -148,34 +148,34 @@ impl Map
     }
 }
 
-//リスクを評価する
+//脇道を走査してリスクを評価する
 fn check_risk
-(   byway: IVec2,
-    player: &Player,
-    goals: &[ IVec2 ],
+(   mut target  : IVec2, //初期値：player.next_grid + side
+    mut previous: IVec2, //初期値：player.next_grid
+    chasers: &[ IVec2 ], //chaser.next_gridのリスト
     map: &Res<Map>,
 ) -> Option<usize>
-{   //goalsが空の場合(全ての追手が目前にいる場合)、わき道はリスクがない
-    if goals.is_empty() { return None }
+{   //chasersが空の場合(全ての追手が衝突寸前)、脇道にはリスクがない
+    if chasers.is_empty() { return None }
 
-    let mut target    = byway; //脇道の入口の座標
-    let mut previous  = player.next_grid; //戻り路の座標
-    let mut path_open = VecDeque::from( [ Vec::from( [ previous, target ] ) ] );
-    let mut crossing: Option<_> = None;
+    let mut paths = VecDeque::from( [ Vec::from( [ previous, target ] ) ] );
+    let mut risk = None;
+    let mut crossing = None;
 
-    let mut risk: Option<usize> = None;
-    loop //枝道ぶんを調べる
-    {   loop //path_open[ 0 ]を調べる
-        {   //終点に到達したら
-            if goals.contains( &target )
-            {   //最短距離を更新する
-                if risk.is_none() || risk.unwrap() > path_open[ 0 ].len()
-                {   risk = Some ( path_open[ 0 ].len() );
+    'Outside: loop //全pathsを調べるループ
+    {   'Inside: loop //paths[ 0 ]を調べるループ
+        {   let path_0_len = paths[ 0 ].len();
+
+            //chaserのどれかにぶつかれば、そのpathの調査は終わり
+            if chasers.contains( &target )
+            {   if risk.is_none() || path_0_len < risk.unwrap()
+                {   //最短距離を更新する
+                    risk = Some ( path_0_len );
 
                     //交差点を探し、あればその距離を記録する
-                    let mut work: Option<_> = None;
-                    for i in 2..path_open[ 0 ].len() //２×２領域で回り続けないよう、[2]から調べる
-                    {   let count_byways = map.get_side_spaces_list( path_open[ 0 ][ i ] ).len();
+                    let mut work = None;
+                    for i in 2..path_0_len //２×２領域で回り続けないよう、[2]から調べる
+                    {   let count_byways = map.get_side_spaces_list( paths[ 0 ][ i ] ).len();
                         if count_byways >= 3
                         {   work = Some ( i );
                             break
@@ -184,57 +184,50 @@ fn check_risk
                     crossing = work;
                 }
 
-                break
+                break 'Inside;
             }
 
             //既に見つかっている最短経路より長くなるなら、それ以上調べない
-            if let Some ( shortest ) = risk
-            {   if path_open[ 0 ].len() >= shortest { break }
-            }
+            if risk.is_some_and( |x| path_0_len >= x ) { break 'Inside }
 
-            //交差点か調べる
+            //targetが交差点か調べる
             let mut sides = map.get_side_spaces_list( target ); //脇道のリスト
             sides.retain( | side | target + side != previous ); //戻り路を排除
-            let count = sides.len(); //一本道(1)、Ｔ字路(2)、十字路(3) ※行止り(0)はない
 
-            //ざっくり追手に近いと推測される順に並べ替える
-            sides.sort_by_key( | side | heuristic( target + side, goals ) );
+            //ざっくりチェイサーに近い順に交差点の入り口を並べ替える
+            sides.sort_by_key( | side | heuristic( target + side, chasers ) );
 
-            //Ｔ字路(2)、十字路(3)の場合
-            for side in sides.iter().take( count ).skip( 1 ) //一本道(1)はループに入らない
+            //Ｔ字路(2)か十字路(3)の場合、分岐PATHを作る
+            for side in sides.iter().skip( 1 ) //一本道(1)はループに入らない
             {   let byway = target + side;
 
-                //それまで通った道に到達したら（蛇が胴体にかみついた）
-                if path_open[ 0 ].contains( &byway ) { continue }
+                //それまで通った道に入り込まない（蛇の頭が自分の胴体にかみついた）
+                if paths[ 0 ].contains( &byway ) { continue }
 
-                //それまでの経路(path_open[ 0 ])を複製した後、脇道を追加
-                path_open.push_back( path_open[ 0 ].clone() );
-                let last_index = path_open.len() - 1;
-                path_open[ last_index ].push( byway );
+                //それまでの経路(paths[ 0 ])を複製し、脇道を追加
+                paths.push_back( paths[ 0 ].clone() );
+                let last_index = paths.len() - 1;
+                paths[ last_index ].push( byway );
             }
 
-            //それまで通った道に到達した場合、それ以上調べない（蛇が胴体にかみついた）
+            //それまで通った道に到達したらそれ以上調べない（蛇の頭が自分の胴体にかみついた）
             let byway = target + sides[ 0 ];
-            if path_open[ 0 ].contains( &byway ) { break }
-            path_open[ 0 ].push( byway );
+            if paths[ 0 ].contains( &byway ) { break 'Inside }
 
             //一歩進む
+            paths[ 0 ].push( byway );
             previous = target;
             target   = byway;
         }
-        //loop end
 
-        //path_open[ 0 ]を調べ終わったので削除して、空になればチェック完了
-        path_open.pop_front();
-        if path_open.is_empty() { break }
+        //paths[ 0 ]を調べ終わったので削除して、空になればチェック完了
+        paths.pop_front();
+        if paths.is_empty() { break 'Outside }
 
-        //脇道がまだ残っているので、調べるためtargetとpreviousを準備する
-        let last_index1 = path_open[ 0 ].len() - 1;
-        let last_index2 = path_open[ 0 ].len() - 2;
-        target   = path_open[ 0 ][ last_index1 ];
-        previous = path_open[ 0 ][ last_index2 ];
+        //次のpath[ 0 ]を調べる準備
+        target   = paths[ 0 ][ paths[ 0 ].len() - 1 ];
+        previous = paths[ 0 ][ paths[ 0 ].len() - 2 ];
     }
-    //loop end
 
     //十分手前に交差点があれば(曲がって逃げられるから)リスクなしと判定する
     if crossing.is_none() || crossing.unwrap() * 2 >= risk.unwrap() - 1
@@ -245,11 +238,13 @@ fn check_risk
     }
 }
 
-//ざっくり追手との距離を測って最小値を返す
-fn heuristic( byway: IVec2, goals: &[ IVec2 ] ) -> i32
+//ざっくりチェイサーとの距離を測って最小値を返す
+fn heuristic( target: IVec2, chasers: &[ IVec2 ] ) -> i32
 {   let mut shortest = MAP_GRIDS_WIDTH + MAP_GRIDS_HEIGHT;
-    for goal in goals
-    {   shortest = shortest.min( ( byway.x - goal.x ).abs() + ( byway.y - goal.y ).abs() );
+    for chaser in chasers
+    {   let w_and_h = ( target.x - chaser.x ).abs()
+                    + ( target.y - chaser.y ).abs();
+        shortest = shortest.min( w_and_h );
     }
     shortest
 }
