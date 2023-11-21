@@ -16,4 +16,11 @@
     "editor.renderControlCharacters": true,   // 制御文字を表示する
     "editor.renderLineHighlight": "all",      // 現在の選択行をハイライトする
     "editor.renderWhitespace": "boundary",    // 半角スペースを・で表示する
+
+    "editor.trimAutoWhitespace": true,
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "[markdown]":
+    {   "files.trimTrailingWhitespace": false
+    }
 }
