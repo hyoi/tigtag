@@ -70,9 +70,10 @@ pub const LOG_LEVEL_REL: &str = "error"; //リリース
 ////////////////////////////////////////////////////////////////////////////////
 
 //assets（スプライト）
-pub const ASSETS_SPRITE_DEBUG_GRID : &str = "sprites/debug_grid.png";
-pub const ASSETS_SPRITE_BRICK_WALL : &str = "sprites/brick_wall.png";
-pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "sprites/kani_DOTOWN.png";
+pub const ASSETS_SPRITE_DEBUG_GRID  : &str = "sprites/debug_grid.png";
+pub const ASSETS_SPRITE_BRICK_WALL  : &str = "sprites/brick_wall.png";
+pub const ASSETS_SPRITE_KANI_DOTOWN : &str = "sprites/kani_DOTOWN.png";
+pub const ASSETS_SPRITE_SHEET_PLAYER: &str = "sprites/player.png";
 
 //assets（フォント）
 pub const ASSETS_FONT_ORBITRON_BLACK      : &str = "fonts/Orbitron-Black.ttf";
@@ -88,11 +89,22 @@ counted_array!
     [   ASSETS_SPRITE_DEBUG_GRID,
         ASSETS_SPRITE_BRICK_WALL,
         ASSETS_SPRITE_KANI_DOTOWN,
+        ASSETS_SPRITE_SHEET_PLAYER,
         ASSETS_FONT_ORBITRON_BLACK,
         ASSETS_FONT_PRESSSTART2P_REGULAR,
         ASSETS_FONT_REGGAEONE_REGULAR,
         ASSETS_SOUND_BEEP,
     ]
+);
+
+////////////////////////////////////////////////////////////////////////////////
+
+//アニメーションするスプライトの大きさ
+const ANIME_SPRITE_SIZE: Vec2 = Vec2::new( 8.0, 8.0 );
+
+//アニメーションするスプライトの個別情報
+pub const ANIME_PARAMS_PLAYER: AnimeSpriteParams = AnimeSpriteParams
+(   ASSETS_SPRITE_SHEET_PLAYER, ANIME_SPRITE_SIZE, 4, 1, 0.15,
 );
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -111,11 +123,11 @@ pub const DEPTH_SPRITE_BRICK_WALL : f32 = 400.0;
 
 //スプライト色
 pub const COLOR_SPRITE_DOT   : Color = Color::rgb( 1.0, 1.0, 0.7 );
-pub const COLOR_SPRITE_PLAYER: Color = Color::YELLOW;
+// pub const COLOR_SPRITE_PLAYER: Color = Color::YELLOW;
 
 //スプライト拡縮
 pub const MAGNIFY_SPRITE_DOT   : f32 = 0.08;
-pub const MAGNIFY_SPRITE_PLAYER: f32 = 0.4;
+// pub const MAGNIFY_SPRITE_PLAYER: f32 = 0.4;
 pub const MAGNIFY_SPRITE_CHASER: f32 = 0.5;
 
 //SEボリューム

@@ -189,4 +189,21 @@ pub fn hidden_ui_frame
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//スプライトをアニメーションさせる
+pub fn animating_sprites
+(   mut qry_target: Query<( &mut TextureAtlasSprite, &mut AnimationParams )>,
+    time: Res<Time>,
+)
+{   for ( mut anime_sprite, mut anime_params ) in &mut qry_target
+    {   if anime_params.timer.tick( time.delta() ).just_finished()
+        {   anime_sprite.index += 1;
+            if anime_sprite.index >= anime_params.frame_count
+            {   anime_sprite.index = 0;
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.

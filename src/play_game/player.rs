@@ -7,8 +7,10 @@ pub fn spawn_sprite
 (   qry_player: Query<Entity, With<Player>>,
     opt_map: Option<ResMut<Map>>,
     mut cmds: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    asset_svr: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    // mut meshes: ResMut<Assets<Mesh>>,
+    // mut materials: ResMut<Assets<ColorMaterial>>,
 )
 {   let Some ( mut map ) = opt_map else { return };
 
@@ -42,16 +44,36 @@ pub fn spawn_sprite
         opt_fn_autodrive: Some ( title_demo::auto_drive::choice_way ), //default()に任せるとNone
         ..default()
     };
-    let radius = PIXELS_PER_GRID * MAGNIFY_SPRITE_PLAYER;
-    let shape = shape::RegularPolygon::new( radius, 3 ).into();
-    let triangle = MaterialMesh2dBundle
-    {   mesh: meshes.add( shape ).into(),
-        material: materials.add( COLOR_SPRITE_PLAYER.into() ),
-        ..default()
+
+    //スプライトシートからテクスチャアトラスを作る
+    let texture_atlas = asset_svr.texture_atlas( ANIME_PARAMS_PLAYER );
+    let texture_atlas_hdl = texture_atlases.add( texture_atlas );
+
+    let custom_size = Some( SIZE_GRID );
+    let texture_atlas_sprite = TextureAtlasSprite { custom_size, ..default() };
+
+    let anime_params = AnimationParams
+    {   timer: Timer::from_seconds( ANIME_PARAMS_PLAYER.4, TimerMode::Repeating ),
+        frame_count: ANIME_PARAMS_PLAYER.2,
     };
-    cmds.spawn( ( triangle, player ) )
+
+    cmds.spawn( ( SpriteSheetBundle::default(), player, anime_params ) )
+    .insert( texture_atlas_hdl )
+    .insert( texture_atlas_sprite )
     .insert( Transform::from_translation( translation ) )
     ;
+
+    //三角形のメッシュ
+    // let radius = PIXELS_PER_GRID * MAGNIFY_SPRITE_PLAYER;
+    // let shape = shape::RegularPolygon::new( radius, 3 ).into();
+    // let triangle = MaterialMesh2dBundle
+    // {   mesh: meshes.add( shape ).into(),
+    //     material: materials.add( COLOR_SPRITE_PLAYER.into() ),
+    //     ..default()
+    // };
+    // cmds.spawn( ( triangle, player ) )
+    // .insert( Transform::from_translation( translation ) )
+    // ;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +94,7 @@ pub fn move_sprite
 {   let Ok ( ( mut player, mut transform ) ) = qry_player.get_single_mut() else { return };
     let Some ( input ) = opt_input else { return };
     let Some ( map ) = opt_map else { return };
-    
+
     //直前の判定でクリア／オーバーしていたらスプライトを移動させない
     if evt_clear.read().next().is_some() { return }
     if evt_over .read().next().is_some() { return }
@@ -93,7 +115,7 @@ pub fn move_sprite
         let mut new_side = player.direction;
         player.is_stop = true; //停止フラグを立てる
 
-        if ! state.get().is_demoplay() 
+        if ! state.get().is_demoplay()
         {   //demoではない場合、プレイヤーの十字方向の入力に対応する
             for &side in input.direction() //入力の要素数は０～２
             {   //壁でない場合
@@ -141,7 +163,7 @@ pub fn move_sprite
 
         //プレイヤーの進む向きが変わったらスプライトを回転させる
         if player.direction != new_side
-        {   rotate_player_sprite( &player, &mut transform, new_side );
+        {   //rotate_player_sprite( &player, &mut transform, new_side );
             player.direction = new_side;
         }
 
@@ -167,33 +189,33 @@ pub fn move_sprite
 }
 
 //自機の向きとキー入力から角度の差分を求めてスプライトを回転させる
-fn rotate_player_sprite
-(   player: &Player,
-    transform: &mut Mut<Transform>,
-    input: News
-)
-{   let angle: f32 = match player.direction
-    {   News::North =>
-                 if input == News::West {  90.0 }
-            else if input == News::East { -90.0 }
-            else                        { 180.0 },
-        News::South =>
-                 if input == News::East {  90.0 }
-            else if input == News::West { -90.0 }
-            else                        { 180.0 },
-        News::East =>
-                 if input == News::North {  90.0 }
-            else if input == News::South { -90.0 }
-            else                         { 180.0 },
-        News::West =>
-                 if input == News::South {  90.0 }
-            else if input == News::North { -90.0 }
-            else                         { 180.0 },
-    };
+// fn rotate_player_sprite
+// (   player: &Player,
+//     transform: &mut Mut<Transform>,
+//     input: News
+// )
+// {   let angle: f32 = match player.direction
+//     {   News::North =>
+//                  if input == News::West {  90.0 }
+//             else if input == News::East { -90.0 }
+//             else                        { 180.0 },
+//         News::South =>
+//                  if input == News::East {  90.0 }
+//             else if input == News::West { -90.0 }
+//             else                        { 180.0 },
+//         News::East =>
+//                  if input == News::North {  90.0 }
+//             else if input == News::South { -90.0 }
+//             else                         { 180.0 },
+//         News::West =>
+//                  if input == News::South {  90.0 }
+//             else if input == News::North { -90.0 }
+//             else                         { 180.0 },
+//     };
 
-    let quat = Quat::from_rotation_z( angle.to_radians() );
-    transform.rotate( quat );
-}
+//     let quat = Quat::from_rotation_z( angle.to_radians() );
+//     transform.rotate( quat );
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 

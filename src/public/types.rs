@@ -299,4 +299,39 @@ pub type FnChasing = fn( &mut Chaser, &Player, &[News] ) -> News;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//アニメーションするスプライトに関係する型
+pub struct AnimeSpriteParams
+(   pub &'static str, //スプライトシートのアセットファイル名
+    pub Vec2,  //１セルのサイズ（ｗ、ｈ）
+    pub usize, //スプライトシートの横方向の列数
+    pub usize, //スプライトシートの縦方向の行数
+    pub f32,   //アニメーションの１フレーム秒数
+);
+
+#[derive( Component )]
+pub struct AnimationParams
+{   pub timer: Timer,       //アニメーションタイマー
+    pub frame_count: usize, //フレームの総数
+}
+
+//AnimeSpriteParamsからTextureAtlasを作るメソッドをAssetServerに追加
+pub trait AnimeParams
+{   fn texture_atlas( &self, params: AnimeSpriteParams ) -> TextureAtlas;
+}
+
+impl AnimeParams for AssetServer
+{   fn texture_atlas( &self, params: AnimeSpriteParams ) -> TextureAtlas
+    {   TextureAtlas::from_grid
+        (   self.load( params.0 ),
+            params.1,
+            params.2,
+            params.3,
+            None,
+            None
+        )
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.

@@ -20,8 +20,13 @@ impl Plugin for Schedule
         .add_plugins( ui::header::Schedule ) //ヘッダー(Stage、Score、HiScore)
         .add_plugins( pause::Schedule )      //Pause処理
 
-        //チェイサーの回転アニメーション
-        .add_systems( Update, chasers::rotate )
+        //Updateに登録することでStateに関係なく(ゲーム中もPAUSE中も)アニメーションさせる
+        .add_systems
+        (   Update,
+            (   chasers::rotate,         //チェイサーの回転
+                misc::animating_sprites, //アニメーションするスプライト
+            )
+        )
 
         ////////////////////////////////////////////////////////////////////////
         //ゲーム開始
