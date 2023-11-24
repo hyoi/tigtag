@@ -7,7 +7,7 @@ use bevy::
     asset::{ LoadState, LoadedUntypedAsset },
     diagnostic::{ DiagnosticsStore, FrameTimeDiagnosticsPlugin },
     sprite::{ Anchor, MaterialMesh2dBundle },
-    utils::HashSet,
+    utils::{ HashSet, HashMap },
     audio::{ Volume, VolumeLevel },
 };
 use once_cell::sync::Lazy;
