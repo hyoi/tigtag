@@ -246,7 +246,7 @@ impl Default for Player
     {   Self
         {   grid     : IVec2::default(),
             next_grid: IVec2::default(),
-            direction: News::default(),
+            direction: News::South,
             timer    : Timer::from_seconds( PLAYER_TIME_PER_GRID, TimerMode::Once ),
             is_stop  : true,
             speedup  : 1.0,
@@ -299,38 +299,36 @@ pub type FnChasing = fn( &mut Chaser, &Player, &[News] ) -> News;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//アニメーションするスプライトに関係する型
-pub struct AnimeSpriteParams
-(   pub &'static str, //スプライトシートのアセットファイル名
-    pub Vec2,  //１セルのサイズ（ｗ、ｈ）
-    pub usize, //スプライトシートの横方向の列数
-    pub usize, //スプライトシートの縦方向の行数
-    pub f32,   //アニメーションの１フレーム秒数
-);
-
+//アニメーションするスプライトのComponent
 #[derive( Component )]
 pub struct AnimationParams
 {   pub timer: Timer,       //アニメーションタイマー
     pub frame_count: usize, //フレームの総数
 }
 
-//AnimeSpriteParamsからTextureAtlasを作るメソッドをAssetServerに追加
-pub trait AnimeParams
-{   fn texture_atlas( &self, params: AnimeSpriteParams ) -> TextureAtlas;
+//TextureAtlasを作るメソッドをAssetServerに追加
+pub trait GenAnimeSprite
+{   fn gen_player_texture_atlas( &self, asset: &'static str ) -> TextureAtlas;
 }
 
-impl AnimeParams for AssetServer
-{   fn texture_atlas( &self, params: AnimeSpriteParams ) -> TextureAtlas
+impl GenAnimeSprite for AssetServer
+{   fn gen_player_texture_atlas( &self, asset: &'static str ) -> TextureAtlas
     {   TextureAtlas::from_grid
-        (   self.load( params.0 ),
-            params.1,
-            params.2,
-            params.3,
+        (   self.load( asset ),
+            ANIME_PLAYER_SIZE,
+            ANIME_PLAYER_COLS,
+            ANIME_PLAYER_ROWS,
             None,
             None
         )
     }
 }
+
+//TextureAtlasのハンドルとアニメのコマ数、アニメのウェイト
+#[derive( Resource, Deref )]
+pub struct AnimationSpritePlayer
+(   pub HashMap< News, ( Handle<TextureAtlas>, usize, f32 ) >,
+);
 
 ////////////////////////////////////////////////////////////////////////////////
 

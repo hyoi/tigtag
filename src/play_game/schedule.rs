@@ -33,6 +33,7 @@ impl Plugin for Schedule
         .add_systems
         (   OnEnter ( MyState::GameStart ),
             (   ui::center::spawn_hidden_frame,  //UIレイアウト用隠しフレーム作成
+                player::load_sprite_sheet,       //playerのスプライトアニメをResourceに登録
                 misc::change_state::<TitleDemo>, //無条件遷移
             )
         )

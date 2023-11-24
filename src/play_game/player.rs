@@ -2,15 +2,34 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//スプライトシートを読み込んでResourceに登録する
+pub fn load_sprite_sheet
+(   mut cmds: Commands,
+    asset_svr: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+)
+{   let mut hash_hdls = HashMap::with_capacity( 4 );
+
+    for ( news, asset ) in ANIME_PLAYER_ASSETS
+    {   let texture_atlas = asset_svr.gen_player_texture_atlas( asset );
+        let texture_atlas_hdl = texture_atlases.add( texture_atlas );
+        let values = ( texture_atlas_hdl, ANIME_PLAYER_COLS, ANIME_PLAYER_TIMER );
+        hash_hdls.insert( *news, values );
+    }
+
+    cmds.insert_resource( AnimationSpritePlayer ( hash_hdls ) );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //プレイヤーをspawnする
 pub fn spawn_sprite
 (   qry_player: Query<Entity, With<Player>>,
     opt_map: Option<ResMut<Map>>,
+    opt_anime_sprite_player: Option<Res<AnimationSpritePlayer>>,
     mut cmds: Commands,
-    asset_svr: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-    // mut meshes: ResMut<Assets<Mesh>>,
-    // mut materials: ResMut<Assets<ColorMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 )
 {   let Some ( mut map ) = opt_map else { return };
 
@@ -45,35 +64,38 @@ pub fn spawn_sprite
         ..default()
     };
 
-    //スプライトシートからテクスチャアトラスを作る
-    let texture_atlas = asset_svr.texture_atlas( ANIME_PARAMS_PLAYER );
-    let texture_atlas_hdl = texture_atlases.add( texture_atlas );
+    //アニメーションするスプライトをspawnする
+    if let Some ( anime_sprite ) = opt_anime_sprite_player
+    {   let ( texture_atlas_hdl, cols, wait ) = anime_sprite.get( &player.direction ).unwrap();
 
-    let custom_size = Some( SIZE_GRID );
-    let texture_atlas_sprite = TextureAtlasSprite { custom_size, ..default() };
+        let custom_size = Some( SIZE_GRID );
+        let texture_atlas_sprite = TextureAtlasSprite { custom_size, ..default() };
+        let anime_params = AnimationParams
+        {   timer: Timer::from_seconds( *wait, TimerMode::Repeating ),
+            frame_count: *cols,
+        };
 
-    let anime_params = AnimationParams
-    {   timer: Timer::from_seconds( ANIME_PARAMS_PLAYER.4, TimerMode::Repeating ),
-        frame_count: ANIME_PARAMS_PLAYER.2,
-    };
+        cmds.spawn( ( SpriteSheetBundle::default(), player, anime_params ) )
+        .insert( ( *texture_atlas_hdl ).clone() )
+        .insert( texture_atlas_sprite )
+        .insert( Transform::from_translation( translation ) )
+        ;
+    }
+    else
+    {   //三角形のメッシュ
+        let radius = PIXELS_PER_GRID * MAGNIFY_SPRITE_PLAYER;
+        let shape = shape::RegularPolygon::new( radius, 3 ).into();
+        let triangle = MaterialMesh2dBundle
+        {   mesh: meshes.add( shape ).into(),
+            material: materials.add( COLOR_SPRITE_PLAYER.into() ),
+            ..default()
+        };
 
-    cmds.spawn( ( SpriteSheetBundle::default(), player, anime_params ) )
-    .insert( texture_atlas_hdl )
-    .insert( texture_atlas_sprite )
-    .insert( Transform::from_translation( translation ) )
-    ;
-
-    //三角形のメッシュ
-    // let radius = PIXELS_PER_GRID * MAGNIFY_SPRITE_PLAYER;
-    // let shape = shape::RegularPolygon::new( radius, 3 ).into();
-    // let triangle = MaterialMesh2dBundle
-    // {   mesh: meshes.add( shape ).into(),
-    //     material: materials.add( COLOR_SPRITE_PLAYER.into() ),
-    //     ..default()
-    // };
-    // cmds.spawn( ( triangle, player ) )
-    // .insert( Transform::from_translation( translation ) )
-    // ;
+        let quat = Quat::from_rotation_z( PI ); //News::South
+        cmds.spawn( ( triangle, player ) )
+        .insert( Transform::from_translation( translation ).with_rotation( quat ) )
+        ;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +104,8 @@ pub fn spawn_sprite
 #[allow(clippy::too_many_arguments)]
 pub fn move_sprite
 (   mut qry_player: Query<( &mut Player, &mut Transform )>,
+    mut qry_texture_atlas_hdl: Query<&mut Handle<TextureAtlas>, With<Player>>,
+    opt_anime_sprite_player: Option<Res<AnimationSpritePlayer>>,
     opt_input: Option<Res<input::CrossDirection>>,
     opt_map: Option<Res<Map>>,
     opt_demo: Option<Res<DemoMapParams>>,
@@ -163,7 +187,14 @@ pub fn move_sprite
 
         //プレイヤーの進む向きが変わったらスプライトを回転させる
         if player.direction != new_side
-        {   //rotate_player_sprite( &player, &mut transform, new_side );
+        {   if let Some ( anime_sprite ) = opt_anime_sprite_player
+            {   if let Ok ( mut texture_atlas_hdl ) = qry_texture_atlas_hdl.get_single_mut()
+                {   *texture_atlas_hdl = anime_sprite.get( &new_side ).unwrap().0.clone();
+                }
+            }
+            else
+            {   rotate_player_sprite( &player, &mut transform, new_side );
+            }
             player.direction = new_side;
         }
 
@@ -189,33 +220,33 @@ pub fn move_sprite
 }
 
 //自機の向きとキー入力から角度の差分を求めてスプライトを回転させる
-// fn rotate_player_sprite
-// (   player: &Player,
-//     transform: &mut Mut<Transform>,
-//     input: News
-// )
-// {   let angle: f32 = match player.direction
-//     {   News::North =>
-//                  if input == News::West {  90.0 }
-//             else if input == News::East { -90.0 }
-//             else                        { 180.0 },
-//         News::South =>
-//                  if input == News::East {  90.0 }
-//             else if input == News::West { -90.0 }
-//             else                        { 180.0 },
-//         News::East =>
-//                  if input == News::North {  90.0 }
-//             else if input == News::South { -90.0 }
-//             else                         { 180.0 },
-//         News::West =>
-//                  if input == News::South {  90.0 }
-//             else if input == News::North { -90.0 }
-//             else                         { 180.0 },
-//     };
+fn rotate_player_sprite
+(   player: &Player,
+    transform: &mut Mut<Transform>,
+    input: News
+)
+{   let angle: f32 = match player.direction
+    {   News::North =>
+                 if input == News::West { PI /  2.0 }
+            else if input == News::East { PI / -2.0 }
+            else                        { PI },
+        News::South =>
+                 if input == News::East { PI /  2.0 }
+            else if input == News::West { PI / -2.0 }
+            else                        { PI },
+        News::East =>
+                 if input == News::North { PI /  2.0 }
+            else if input == News::South { PI / -2.0 }
+            else                         { PI },
+        News::West =>
+                 if input == News::South { PI /  2.0 }
+            else if input == News::North { PI / -2.0 }
+            else                         { PI },
+    };
 
-//     let quat = Quat::from_rotation_z( angle.to_radians() );
-//     transform.rotate( quat );
-// }
+    let quat = Quat::from_rotation_z( angle );
+    transform.rotate( quat );
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
