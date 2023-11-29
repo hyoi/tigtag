@@ -23,7 +23,8 @@ impl Plugin for Schedule
         //Updateに登録することでStateに関係なく(ゲーム中もPAUSE中も)アニメーションさせる
         .add_systems
         (   Update,
-            (   chasers::rotate,         //チェイサーの回転
+            (   chasers::rotate //チェイサーの回転
+                    .run_if( not( resource_exists::<AnimationSpriteChasers>() ) ),
                 misc::animating_sprites, //アニメーションするスプライト
             )
         )
@@ -34,6 +35,7 @@ impl Plugin for Schedule
         (   OnEnter ( MyState::GameStart ),
             (   ui::center::spawn_hidden_frame,  //UIレイアウト用隠しフレーム作成
                 player::load_sprite_sheet,       //playerのスプライトアニメをResourceに登録
+                chasers::load_sprite_sheet,      //chaserのスプライトアニメをResourceに登録
                 misc::change_state::<TitleDemo>, //無条件遷移
             )
         )

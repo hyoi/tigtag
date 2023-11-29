@@ -306,12 +306,26 @@ pub struct AnimationParams
     pub frame_count: usize, //フレームの総数
 }
 
-//TextureAtlasを作るメソッドをAssetServerに追加
-pub trait GenAnimeSprite
-{   fn gen_player_texture_atlas( &self, asset: &'static str ) -> TextureAtlas;
+//アニメーションするスプライトのResource
+#[derive( Resource, Deref )]
+pub struct AnimationSpritePlayer
+(   pub HashMap< News, ( Handle<TextureAtlas>, usize, f32 ) >,
+);
+
+#[derive( Resource, Default )]
+pub struct AnimationSpriteChasers
+{   pub hdls: Vec< HashMap<News, Handle<TextureAtlas>> >,
+    pub cols: usize,
+    pub wait: f32,
 }
 
-impl GenAnimeSprite for AssetServer
+////////////////////////////////////////////////////////////////////////////////
+
+//TextureAtlasを作るメソッドをAssetServerに追加
+pub trait GenAnimeSpritePlayer
+{   fn gen_player_texture_atlas( &self, asset: &'static str ) -> TextureAtlas;
+}
+impl GenAnimeSpritePlayer for AssetServer
 {   fn gen_player_texture_atlas( &self, asset: &'static str ) -> TextureAtlas
     {   TextureAtlas::from_grid
         (   self.load( asset ),
@@ -324,11 +338,21 @@ impl GenAnimeSprite for AssetServer
     }
 }
 
-//TextureAtlasのハンドルとアニメのコマ数、アニメのウェイト
-#[derive( Resource, Deref )]
-pub struct AnimationSpritePlayer
-(   pub HashMap< News, ( Handle<TextureAtlas>, usize, f32 ) >,
-);
+pub trait GenAnimeSpriteChaser
+{   fn gen_chaser_texture_atlas( &self, asset: &'static str ) -> TextureAtlas;
+}
+impl GenAnimeSpriteChaser for AssetServer
+{   fn gen_chaser_texture_atlas( &self, asset: &'static str ) -> TextureAtlas
+    {   TextureAtlas::from_grid
+        (   self.load( asset ),
+            ANIME_CHASER_SIZE,
+            ANIME_CHASER_COLS,
+            ANIME_CHASER_ROWS,
+            None,
+            None
+        )
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

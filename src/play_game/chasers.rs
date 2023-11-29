@@ -3,8 +3,8 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////
 
 //チェイサーの色と移動方向の決定関数
-const COLOR_SPRITE_CHASERS: [ ( Color, Option<FnChasing> ); 4 ] = 
-[   ( Color::RED,   Some ( choice_way_red   ) ),
+const COLOR_SPRITE_CHASERS: &[ ( Color, Option<FnChasing> ) ] =
+&[  ( Color::RED,   Some ( choice_way_red   ) ),
     ( Color::GREEN, Some ( choice_way_green ) ),
     ( Color::PINK,  Some ( choice_way_pink  ) ),
     ( Color::BLUE,  Some ( choice_way_blue  ) ),
@@ -52,40 +52,91 @@ fn choice_way_pink( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> 
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//スプライトシートを読み込んでResourceに登録する
+pub fn load_sprite_sheet
+(   mut cmds: Commands,
+    asset_svr: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+)
+{   let mut animation_sprites = AnimationSpriteChasers
+    {   cols: ANIME_CHASER_COLS,
+        wait: ANIME_CHASER_TIMER,
+        ..default()
+    };
+
+    for array in ANIME_CHASERS_ASSETS
+    {   let mut hash_hdls = HashMap::with_capacity( 4 );
+        for ( news, asset ) in array.iter()
+        {   let texture_atlas = asset_svr.gen_player_texture_atlas( asset );
+            let texture_atlas_hdl = texture_atlases.add( texture_atlas );
+            hash_hdls.insert( *news, texture_atlas_hdl );
+        }
+        animation_sprites.hdls.push( hash_hdls );
+    }
+
+    cmds.insert_resource( animation_sprites );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //チェイサーをspawnする
 pub fn spawn_sprite
-(   qry_player: Query<Entity, With<Chaser>>,
+(   qry_chaser: Query<Entity, With<Chaser>>,
+    opt_anime_sprite_chasers: Option<Res<AnimationSpriteChasers>>,
     opt_record: Option<Res<Record>>,
     mut cmds: Commands,
 )
 {   let Some ( record ) = opt_record else { return };
 
     //スプライトがあれば削除する
-    qry_player.for_each( | id | cmds.entity( id ).despawn_recursive() );
+    qry_chaser.for_each( | id | cmds.entity( id ).despawn_recursive() );
 
     //チェイサーのスプライトを配置する
-    let custom_size = Some ( SIZE_GRID * MAGNIFY_SPRITE_CHASER );
-
     ( 0.. ).zip( CHASER_START_POSITION ).for_each
     (   | ( i, chaser_grid ) |
         {   let chaser_vec2 = chaser_grid.to_vec2_on_map();
             let index = ( ( i + record.stage() - 1 ) % 4 ) as usize;
             let ( color, opt_fn_chasing ) = COLOR_SPRITE_CHASERS[ index ];
             let chaser = Chaser
-            {   grid     : chaser_grid,
-                next_grid: chaser_grid,
+            {   grid     : *chaser_grid,
+                next_grid: *chaser_grid,
                 dx_start : chaser_vec2,
                 dx_end   : chaser_vec2,
                 color,
                 opt_fn_chasing,
                 ..default()
             };
+            let translation = chaser_vec2.extend( DEPTH_SPRITE_CHASER );
 
-            cmds
-            .spawn( ( SpriteBundle::default(), chaser ) )
-            .insert( Sprite { color, custom_size, ..default() } )
-            .insert( Transform::from_translation( chaser_vec2.extend( DEPTH_SPRITE_CHASER ) ) )
-            ;
+            //アニメーションするスプライトをspawnする
+            if let Some ( ref anime_sprites ) = opt_anime_sprite_chasers
+            {   let hdls = &anime_sprites.hdls;
+                let texture_atlas_hdl = hdls[ index ].get( &chaser.direction ).unwrap();
+                let cols = anime_sprites.cols;
+                let wait = anime_sprites.wait;
+
+                let custom_size = Some( SIZE_GRID );
+                let texture_atlas_sprite = TextureAtlasSprite { custom_size, ..default() };
+                let anime_params = AnimationParams
+                {   timer: Timer::from_seconds( wait, TimerMode::Repeating ),
+                    frame_count: cols,
+                };
+
+                cmds.spawn( ( SpriteSheetBundle::default(), chaser, anime_params ) )
+                .insert( texture_atlas_hdl.clone() )
+                .insert( texture_atlas_sprite )
+                .insert( Transform::from_translation( translation ) )
+                ;
+            }
+            else
+            {   //正方形のメッシュ
+                let custom_size = Some ( SIZE_GRID * MAGNIFY_SPRITE_CHASER );
+                cmds
+                .spawn( ( SpriteBundle::default(), chaser ) )
+                .insert( Sprite { color, custom_size, ..default() } )
+                .insert( Transform::from_translation( translation ) )
+                ;
+            }
         }
     );
 }
@@ -118,7 +169,7 @@ pub fn move_sprite
 )
 {   let Ok ( player ) = qry_player.get_single() else { return };
     let Some ( map ) = opt_map else { return };
-    
+
     //直前の判定でクリア／オーバーしていたらスプライトを移動させない
     if evt_clear.read().next().is_some() { return }
     if evt_over .read().next().is_some() { return }
@@ -139,7 +190,7 @@ pub fn move_sprite
                 chaser.dx_end   = chaser.next_grid.to_vec2_on_map();
                 transform.translation = chaser.dx_end.extend( DEPTH_SPRITE_CHASER );
             }
-    
+
             //四方の脇道を取得する
             let mut sides = map.get_side_spaces_list( chaser.next_grid ); //脇道のリスト
             sides.retain( | side | chaser.next_grid + side != chaser.grid ); //戻り路を取り除く
@@ -173,7 +224,7 @@ pub fn move_sprite
             chaser.grid = chaser.next_grid;
             if ! chaser.is_stop
             {   let side = chaser.direction; //chaser.direction += chaser.next_grid すると、
-                chaser.next_grid += side;    //error[E0502]: cannot borrow `chaser` as 
+                chaser.next_grid += side;    //error[E0502]: cannot borrow `chaser` as
             }                                //immutable because it is also borrowed as mutable
 
             //タイマーをリセットする
