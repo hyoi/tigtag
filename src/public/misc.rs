@@ -71,7 +71,7 @@ pub fn toggle_window_mode
     if inkey.just_pressed( FULL_SCREEN_KEY )
     {   //装飾キー
         for key in FULL_SCREEN_KEY_MODIFIER
-        {   if inkey.pressed( key )
+        {   if inkey.pressed( *key )
             {   is_pressed = true;
                 break;
             }
