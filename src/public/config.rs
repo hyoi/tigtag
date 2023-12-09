@@ -74,6 +74,31 @@ pub const ASSETS_SPRITE_DEBUG_GRID : &str = "sprites/debug_grid.png";
 pub const ASSETS_SPRITE_BRICK_WALL : &str = "sprites/brick_wall.png";
 pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "sprites/kani_DOTOWN.png";
 
+pub const ASSETS_SPRITE_SHEET_PLAYER_NORTH: &str = "sprites/player/sheet_player_north.png";
+pub const ASSETS_SPRITE_SHEET_PLAYER_EAST : &str = "sprites/player/sheet_player_east.png";
+pub const ASSETS_SPRITE_SHEET_PLAYER_WEST : &str = "sprites/player/sheet_player_west.png";
+pub const ASSETS_SPRITE_SHEET_PLAYER_SOUTH: &str = "sprites/player/sheet_player_south.png";
+
+pub const ASSETS_SPRITE_SHEET_CHASER_1_NORTH: &str = "sprites/chasers/sheet_chaser_red_north.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_1_EAST : &str = "sprites/chasers/sheet_chaser_red_east.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_1_WEST : &str = "sprites/chasers/sheet_chaser_red_west.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_1_SOUTH: &str = "sprites/chasers/sheet_chaser_red_south.png";
+
+pub const ASSETS_SPRITE_SHEET_CHASER_2_NORTH: &str = "sprites/chasers/sheet_chaser_blue_north.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_2_EAST : &str = "sprites/chasers/sheet_chaser_blue_east.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_2_WEST : &str = "sprites/chasers/sheet_chaser_blue_west.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_2_SOUTH: &str = "sprites/chasers/sheet_chaser_blue_south.png";
+
+pub const ASSETS_SPRITE_SHEET_CHASER_3_NORTH: &str = "sprites/chasers/sheet_chaser_green_north.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_3_EAST : &str = "sprites/chasers/sheet_chaser_green_east.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_3_WEST : &str = "sprites/chasers/sheet_chaser_green_west.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_3_SOUTH: &str = "sprites/chasers/sheet_chaser_green_south.png";
+
+pub const ASSETS_SPRITE_SHEET_CHASER_4_NORTH: &str = "sprites/chasers/sheet_chaser_pink_north.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_4_EAST : &str = "sprites/chasers/sheet_chaser_pink_east.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_4_WEST : &str = "sprites/chasers/sheet_chaser_pink_west.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_4_SOUTH: &str = "sprites/chasers/sheet_chaser_pink_south.png";
+
 //assets（フォント）
 pub const ASSETS_FONT_ORBITRON_BLACK      : &str = "fonts/Orbitron-Black.ttf";
 pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "fonts/PressStart2P-Regular.ttf";
@@ -83,17 +108,83 @@ pub const ASSETS_FONT_REGGAEONE_REGULAR   : &str = "fonts/ReggaeOne-Regular.ttf"
 pub const ASSETS_SOUND_BEEP: &str = "audio/sounds/beep.ogg";
 
 //事前ロード対象
-counted_array!
-(   pub const PRELOAD_ASSETS: [ &str; _ ] =
-    [   ASSETS_SPRITE_DEBUG_GRID,
-        ASSETS_SPRITE_BRICK_WALL,
-        ASSETS_SPRITE_KANI_DOTOWN,
-        ASSETS_FONT_ORBITRON_BLACK,
-        ASSETS_FONT_PRESSSTART2P_REGULAR,
-        ASSETS_FONT_REGGAEONE_REGULAR,
-        ASSETS_SOUND_BEEP,
-    ]
-);
+pub const PRELOAD_ASSETS: &[ &str  ] =
+&[  ASSETS_SPRITE_DEBUG_GRID,
+    ASSETS_SPRITE_BRICK_WALL,
+    ASSETS_SPRITE_KANI_DOTOWN,
+
+    ASSETS_SPRITE_SHEET_PLAYER_NORTH,
+    ASSETS_SPRITE_SHEET_PLAYER_EAST,
+    ASSETS_SPRITE_SHEET_PLAYER_WEST,
+    ASSETS_SPRITE_SHEET_PLAYER_SOUTH,
+
+    ASSETS_SPRITE_SHEET_CHASER_1_NORTH,
+    ASSETS_SPRITE_SHEET_CHASER_1_EAST ,
+    ASSETS_SPRITE_SHEET_CHASER_1_WEST ,
+    ASSETS_SPRITE_SHEET_CHASER_1_SOUTH,
+
+    ASSETS_SPRITE_SHEET_CHASER_2_NORTH,
+    ASSETS_SPRITE_SHEET_CHASER_2_EAST ,
+    ASSETS_SPRITE_SHEET_CHASER_2_WEST ,
+    ASSETS_SPRITE_SHEET_CHASER_2_SOUTH,
+
+    ASSETS_SPRITE_SHEET_CHASER_3_NORTH,
+    ASSETS_SPRITE_SHEET_CHASER_3_EAST ,
+    ASSETS_SPRITE_SHEET_CHASER_3_WEST ,
+    ASSETS_SPRITE_SHEET_CHASER_3_SOUTH,
+
+    ASSETS_SPRITE_SHEET_CHASER_4_NORTH,
+    ASSETS_SPRITE_SHEET_CHASER_4_EAST ,
+    ASSETS_SPRITE_SHEET_CHASER_4_WEST ,
+    ASSETS_SPRITE_SHEET_CHASER_4_SOUTH,
+
+    ASSETS_FONT_ORBITRON_BLACK,
+    ASSETS_FONT_PRESSSTART2P_REGULAR,
+    ASSETS_FONT_REGGAEONE_REGULAR,
+    ASSETS_SOUND_BEEP,
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//アニメーションするスプライトの情報（player）
+pub const ANIME_PLAYER_ASSETS: &[ ( News, &str ) ] =
+&[  ( News::North, ASSETS_SPRITE_SHEET_PLAYER_NORTH ),
+    ( News::East , ASSETS_SPRITE_SHEET_PLAYER_EAST  ),
+    ( News::West , ASSETS_SPRITE_SHEET_PLAYER_WEST  ),
+    ( News::South, ASSETS_SPRITE_SHEET_PLAYER_SOUTH ),
+];
+pub const ANIME_PLAYER_SIZE : Vec2  = Vec2::new( 8.0, 8.0 );
+pub const ANIME_PLAYER_COLS : usize = 4;
+pub const ANIME_PLAYER_ROWS : usize = 4;
+pub const ANIME_PLAYER_TIMER: f32   = 0.15;
+
+//アニメーションするスプライトの情報（chaser）
+pub const ANIME_CHASERS_ASSETS: &[ &[ ( News, &str ) ] ] =
+&[  &[  ( News::North, ASSETS_SPRITE_SHEET_CHASER_1_NORTH ),
+        ( News::East , ASSETS_SPRITE_SHEET_CHASER_1_EAST  ),
+        ( News::West , ASSETS_SPRITE_SHEET_CHASER_1_WEST  ),
+        ( News::South, ASSETS_SPRITE_SHEET_CHASER_1_SOUTH ),
+    ],
+    &[  ( News::North, ASSETS_SPRITE_SHEET_CHASER_2_NORTH ),
+        ( News::East , ASSETS_SPRITE_SHEET_CHASER_2_EAST  ),
+        ( News::West , ASSETS_SPRITE_SHEET_CHASER_2_WEST  ),
+        ( News::South, ASSETS_SPRITE_SHEET_CHASER_2_SOUTH ),
+    ],
+    &[  ( News::North, ASSETS_SPRITE_SHEET_CHASER_3_NORTH ),
+        ( News::East , ASSETS_SPRITE_SHEET_CHASER_3_EAST  ),
+        ( News::West , ASSETS_SPRITE_SHEET_CHASER_3_WEST  ),
+        ( News::South, ASSETS_SPRITE_SHEET_CHASER_3_SOUTH ),
+    ],
+    &[  ( News::North, ASSETS_SPRITE_SHEET_CHASER_4_NORTH ),
+        ( News::East , ASSETS_SPRITE_SHEET_CHASER_4_EAST  ),
+        ( News::West , ASSETS_SPRITE_SHEET_CHASER_4_WEST  ),
+        ( News::South, ASSETS_SPRITE_SHEET_CHASER_4_SOUTH ),
+    ],
+];
+pub const ANIME_CHASER_SIZE : Vec2  = Vec2::new( 8.0, 8.0 );
+pub const ANIME_CHASER_COLS : usize = 4;
+pub const ANIME_CHASER_ROWS : usize = 4;
+pub const ANIME_CHASER_TIMER: f32   = 0.15;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -178,12 +269,10 @@ pub const PAUSE_BUTTON: GamepadButtonType = GamepadButtonType::Select; //PS4[SHA
 
 //フルスクリーンのキー／ボタン
 pub const FULL_SCREEN_KEY: KeyCode = KeyCode::Return;
-counted_array!
-(   pub const FULL_SCREEN_KEY_MODIFIER: [ KeyCode; _ ] =
-    [   KeyCode::AltRight,
-        KeyCode::AltLeft,
-    ]
-);
+pub const FULL_SCREEN_KEY_MODIFIER: &[ KeyCode ] =
+&[  KeyCode::AltRight,
+    KeyCode::AltLeft,
+];
 pub const FULL_SCREEN_BUTTON: GamepadButtonType = GamepadButtonType::Start; //ps4[OPTIONS]
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -199,17 +288,17 @@ pub const MAP_GRIDS_Y_RANGE: Range<i32> = 0..MAP_GRIDS_HEIGHT;
 ////////////////////////////////////////////////////////////////////////////////
 
 //プレイヤーの設定値
-pub const PLAYER_TIME_PER_GRID: f32 = 0.09; //１グリッド進むために必要な時間
+pub const PLAYER_TIME_PER_GRID: f32 = 0.15;//0.09; //１グリッド進むために必要な時間
 pub const PLAYER_SPEED: f32 = PIXELS_PER_GRID / PLAYER_TIME_PER_GRID; //速度
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //チェイサーの設定値
-pub const CHASER_TIME_PER_GRID: f32 = 0.13; //１グリッド進むために必要な時間
+pub const CHASER_TIME_PER_GRID: f32 = 0.20;//0.13; //１グリッド進むために必要な時間
 pub const CHASER_SPEED: f32 = PIXELS_PER_GRID / CHASER_TIME_PER_GRID; //速度
 pub const CHASER_ACCEL: f32 = 0.4; //スピードアップの割増
-pub const CHASER_START_POSITION: [ IVec2; 4 ] = //スタート座標
-[   IVec2::new( 1    , 1     ),
+pub const CHASER_START_POSITION: &[ IVec2 ] = //スタート座標
+&[  IVec2::new( 1    , 1     ),
     IVec2::new( 1    , MAX_Y ),
     IVec2::new( MAX_X, 1     ),
     IVec2::new( MAX_X, MAX_Y ),

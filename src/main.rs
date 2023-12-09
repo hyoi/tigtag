@@ -7,11 +7,10 @@ use bevy::
     asset::{ LoadState, LoadedUntypedAsset },
     diagnostic::{ DiagnosticsStore, FrameTimeDiagnosticsPlugin },
     sprite::{ Anchor, MaterialMesh2dBundle },
-    utils::HashSet,
+    utils::{ HashSet, HashMap },
     audio::{ Volume, VolumeLevel },
 };
 use once_cell::sync::Lazy;
-use counted_array::counted_array;
 use rand::prelude::*;
 use regex::Regex;
 
@@ -19,7 +18,7 @@ use regex::Regex;
 use std::ops::{ Range, Add, AddAssign };
 use std::cmp::Ordering;
 use std::collections::VecDeque;
-use std::f32::consts::TAU;
+use std::f32::consts::{ PI, TAU };
 
 //internal submodules
 mod public;

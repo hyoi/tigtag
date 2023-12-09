@@ -71,7 +71,7 @@ pub fn toggle_window_mode
     if inkey.just_pressed( FULL_SCREEN_KEY )
     {   //装飾キー
         for key in FULL_SCREEN_KEY_MODIFIER
-        {   if inkey.pressed( key )
+        {   if inkey.pressed( *key )
             {   is_pressed = true;
                 break;
             }
@@ -185,6 +185,23 @@ pub fn hidden_ui_frame
     if misc::DEBUG() { hidden_frame.border_color = Color::RED.into() }
 
     hidden_frame
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//スプライトをアニメーションさせる
+pub fn animating_sprites
+(   mut qry_target: Query<( &mut TextureAtlasSprite, &mut AnimationParams )>,
+    time: Res<Time>,
+)
+{   for ( mut anime_sprite, mut anime_params ) in &mut qry_target
+    {   if anime_params.timer.tick( time.delta() ).just_finished()
+        {   anime_sprite.index += 1;
+            if anime_sprite.index >= anime_params.frame_count
+            {   anime_sprite.index = 0;
+            }
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

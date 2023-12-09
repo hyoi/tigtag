@@ -246,7 +246,7 @@ impl Default for Player
     {   Self
         {   grid     : IVec2::default(),
             next_grid: IVec2::default(),
-            direction: News::default(),
+            direction: News::South,
             timer    : Timer::from_seconds( PLAYER_TIME_PER_GRID, TimerMode::Once ),
             is_stop  : true,
             speedup  : 1.0,
@@ -275,6 +275,7 @@ pub struct Chaser
     pub dx_end   : Vec2,  //移動した微小区間の終点
     pub opt_fn_chasing: Option<FnChasing>, //チェイサーの移動方向を決める関数
     pub color    : Color, //表示色
+    pub hdls     : HashMap<News, Handle<TextureAtlas>>, //スプライトのアニメ
 }
 
 impl Default for Chaser
@@ -290,12 +291,65 @@ impl Default for Chaser
             dx_end   : Vec2::default(),
             opt_fn_chasing: None,
             color    : Color::NONE,
+            hdls     : HashMap::with_capacity( 4 ), //Newsの四方
         }
     }
 }
 
 //関数ポインタ型(チェイサーの移動方向を決める関数)
 pub type FnChasing = fn( &mut Chaser, &Player, &[News] ) -> News;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//アニメーションするスプライトのComponent
+#[derive( Component )]
+pub struct AnimationParams
+{   pub timer: Timer,       //アニメーションタイマー
+    pub frame_count: usize, //フレームの総数
+}
+
+//アニメーションするスプライト(player)のResource
+#[derive( Resource, Deref )]
+pub struct AnimationSpritePlayer
+(   pub HashMap< News, ( Handle<TextureAtlas>, usize, f32 ) >,
+);
+
+//アニメーションするスプライト(chaser)のResource
+type NewsSpriteAnimeHdl = HashMap<News, Handle<TextureAtlas>>;
+#[derive( Resource, Default )]
+pub struct AnimationSpriteChasers
+{   pub hdls: Vec< NewsSpriteAnimeHdl >,
+    pub cols: usize,
+    pub wait: f32,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//TextureAtlasを作るメソッドをAssetServerに追加
+pub trait GenAnimeSprite
+{   fn gen_player_texture_atlas( &self, asset: &'static str ) -> TextureAtlas;
+    fn gen_chaser_texture_atlas( &self, asset: &'static str ) -> TextureAtlas;
+}
+impl GenAnimeSprite for AssetServer
+{   fn gen_player_texture_atlas( &self, asset: &'static str ) -> TextureAtlas
+    {   TextureAtlas::from_grid
+        (   self.load( asset ),
+            ANIME_PLAYER_SIZE,
+            ANIME_PLAYER_COLS,
+            ANIME_PLAYER_ROWS,
+            None, None
+        )
+    }
+    fn gen_chaser_texture_atlas( &self, asset: &'static str ) -> TextureAtlas
+    {   TextureAtlas::from_grid
+        (   self.load( asset ),
+            ANIME_CHASER_SIZE,
+            ANIME_CHASER_COLS,
+            ANIME_CHASER_ROWS,
+            None, None
+        )
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
