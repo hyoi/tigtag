@@ -275,6 +275,7 @@ pub struct Chaser
     pub dx_end   : Vec2,  //移動した微小区間の終点
     pub opt_fn_chasing: Option<FnChasing>, //チェイサーの移動方向を決める関数
     pub color    : Color, //表示色
+    pub hdls     : HashMap<News, Handle<TextureAtlas>>, //スプライトのアニメ
 }
 
 impl Default for Chaser
@@ -290,6 +291,7 @@ impl Default for Chaser
             dx_end   : Vec2::default(),
             opt_fn_chasing: None,
             color    : Color::NONE,
+            hdls     : HashMap::with_capacity( 4 ), //Newsの四方
         }
     }
 }
@@ -313,9 +315,10 @@ pub struct AnimationSpritePlayer
 );
 
 //アニメーションするスプライト(chaser)のResource
+type NewsSpriteAnimeHdl = HashMap<News, Handle<TextureAtlas>>;
 #[derive( Resource, Default )]
 pub struct AnimationSpriteChasers
-{   pub hdls: Vec< HashMap<News, Handle<TextureAtlas>> >,
+{   pub hdls: Vec< NewsSpriteAnimeHdl >,
     pub cols: usize,
     pub wait: f32,
 }
