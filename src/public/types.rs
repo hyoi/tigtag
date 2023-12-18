@@ -239,6 +239,9 @@ pub struct Player
     pub dx_start : Vec2,  //移動した微小区間の始点
     pub dx_end   : Vec2,  //移動した微小区間の終点
     pub opt_fn_autodrive: Option<FnAutoDrive>, //デモ時の自走プレイヤーの移動方向を決める関数
+    pub anime_timer: Timer,                           //アニメーションのタイマー
+    pub sprite_sheet_frame: usize,                    //アニメーションのフレーム数
+    pub sprite_sheet_indexes: HashMap< News, usize >, //アニメーションの先頭位置(offset値)
 }
 
 impl Default for Player
@@ -253,6 +256,9 @@ impl Default for Player
             dx_start : Vec2::default(),
             dx_end   : Vec2::default(),
             opt_fn_autodrive: None,
+            anime_timer: Timer::from_seconds( ANIME_TIMER_PLAYER, TimerMode::Repeating ),
+            sprite_sheet_frame: SPRITE_SHEET_COLS_PLAYER,
+            sprite_sheet_indexes: ( *SPRITE_SHEET_IDXS_PLAYER ).clone(),
         }
     }
 }
@@ -275,7 +281,9 @@ pub struct Chaser
     pub dx_end   : Vec2,  //移動した微小区間の終点
     pub opt_fn_chasing: Option<FnChasing>, //チェイサーの移動方向を決める関数
     pub color    : Color, //表示色
-    pub hdls     : HashMap<News, Handle<TextureAtlas>>, //スプライトのアニメ
+    pub anime_timer: Timer,                           //アニメーションのタイマー
+    pub sprite_sheet_frame: usize,                    //アニメーションのフレーム数
+    pub sprite_sheet_indexes: HashMap< News, usize >, //アニメーションの先頭位置(offset値)
 }
 
 impl Default for Chaser
@@ -291,7 +299,9 @@ impl Default for Chaser
             dx_end   : Vec2::default(),
             opt_fn_chasing: None,
             color    : Color::NONE,
-            hdls     : HashMap::with_capacity( 4 ), //Newsの四方
+            anime_timer: Timer::from_seconds( ANIME_TIMER_CHASER, TimerMode::Repeating ),
+            sprite_sheet_frame: SPRITE_SHEET_COLS_CHASER,
+            sprite_sheet_indexes: ( *SPRITE_SHEET_IDXS_CHASER ).clone(),
         }
     }
 }
@@ -301,51 +311,69 @@ pub type FnChasing = fn( &mut Chaser, &Player, &[News] ) -> News;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//アニメーションするスプライトのComponent
-#[derive( Component )]
-pub struct AnimationParams
-{   pub timer: Timer,       //アニメーションタイマー
-    pub frame_count: usize, //フレームの総数
+//スプライトシートでアニメーションするためのトレイト
+pub trait CharacterAnimation
+{   fn anime_timer_mut( &mut self ) -> &mut Timer;
+    fn sprite_sheet_frame( &self ) -> usize;
+    fn sprite_sheet_offset( &self, news: News ) -> usize;
+    fn direction( &self ) -> News;
 }
 
-//アニメーションするスプライト(player)のResource
-#[derive( Resource, Deref )]
-pub struct AnimationSpritePlayer
-(   pub HashMap< News, ( Handle<TextureAtlas>, usize, f32 ) >,
-);
+//Playerのトレイト実装
+impl CharacterAnimation for Player
+{   fn anime_timer_mut( &mut self ) -> &mut Timer
+    {   &mut self.anime_timer
+    }
+    fn sprite_sheet_frame( &self ) -> usize
+    {   self.sprite_sheet_frame
+    }
+    fn sprite_sheet_offset( &self, news: News ) -> usize
+    {   *self.sprite_sheet_indexes.get( &news ).unwrap()
+    }
+    fn direction( &self ) -> News
+    {   self.direction
+    }
+}
 
-//アニメーションするスプライト(chaser)のResource
-type NewsSpriteAnimeHdl = HashMap<News, Handle<TextureAtlas>>;
-#[derive( Resource, Default )]
-pub struct AnimationSpriteChasers
-{   pub hdls: Vec< NewsSpriteAnimeHdl >,
-    pub cols: usize,
-    pub wait: f32,
+//Chaserのトレイト実装
+impl CharacterAnimation for Chaser
+{   fn anime_timer_mut( &mut self ) -> &mut Timer
+    {   &mut self.anime_timer
+    }
+    fn sprite_sheet_frame( &self ) -> usize
+    {   self.sprite_sheet_frame
+    }
+    fn sprite_sheet_offset( &self, news: News ) -> usize
+    {   *self.sprite_sheet_indexes.get( &news ).unwrap()
+    }
+    fn direction( &self ) -> News
+    {   self.direction
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//TextureAtlasを作るメソッドをAssetServerに追加
+//AssetServerにTextureAtlasを作るメソッドを追加
 pub trait GenAnimeSprite
-{   fn gen_player_texture_atlas( &self, asset: &'static str ) -> TextureAtlas;
-    fn gen_chaser_texture_atlas( &self, asset: &'static str ) -> TextureAtlas;
+{   fn gen_texture_atlas_player( &self ) -> TextureAtlas;
+    fn gen_texture_atlas_chaser( &self, asset: &'static str ) -> TextureAtlas;
 }
 impl GenAnimeSprite for AssetServer
-{   fn gen_player_texture_atlas( &self, asset: &'static str ) -> TextureAtlas
+{   fn gen_texture_atlas_player( &self ) -> TextureAtlas
     {   TextureAtlas::from_grid
-        (   self.load( asset ),
-            ANIME_PLAYER_SIZE,
-            ANIME_PLAYER_COLS,
-            ANIME_PLAYER_ROWS,
+        (   self.load( ASSETS_SPRITE_SHEET_PLAYER ),
+            SPRITE_SHEET_SIZE_PLAYER,
+            SPRITE_SHEET_COLS_PLAYER,
+            SPRITE_SHEET_ROWS_PLAYER,
             None, None
         )
     }
-    fn gen_chaser_texture_atlas( &self, asset: &'static str ) -> TextureAtlas
+    fn gen_texture_atlas_chaser( &self, asset: &'static str ) -> TextureAtlas
     {   TextureAtlas::from_grid
         (   self.load( asset ),
-            ANIME_CHASER_SIZE,
-            ANIME_CHASER_COLS,
-            ANIME_CHASER_ROWS,
+            SPRITE_SHEET_SIZE_CHASER,
+            SPRITE_SHEET_COLS_CHASER,
+            SPRITE_SHEET_ROWS_CHASER,
             None, None
         )
     }

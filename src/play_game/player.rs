@@ -2,34 +2,15 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//スプライトシートを読み込んでResourceに登録する
-pub fn load_sprite_sheet
-(   mut cmds: Commands,
-    asset_svr: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-)
-{   let mut hash_hdls = HashMap::with_capacity( 4 );
-
-    for ( news, asset ) in ANIME_PLAYER_ASSETS
-    {   let texture_atlas = asset_svr.gen_player_texture_atlas( asset );
-        let texture_atlas_hdl = texture_atlases.add( texture_atlas );
-        let values = ( texture_atlas_hdl, ANIME_PLAYER_COLS, ANIME_PLAYER_TIMER );
-        hash_hdls.insert( *news, values );
-    }
-
-    cmds.insert_resource( AnimationSpritePlayer ( hash_hdls ) );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 //プレイヤーをspawnする
 pub fn spawn_sprite
 (   qry_player: Query<Entity, With<Player>>,
     opt_map: Option<ResMut<Map>>,
-    opt_anime_sprite_player: Option<Res<AnimationSpritePlayer>>,
     mut cmds: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    asset_svr: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    // mut meshes: ResMut<Assets<Mesh>>,
+    // mut materials: ResMut<Assets<ColorMaterial>>,
 )
 {   let Some ( mut map ) = opt_map else { return };
 
@@ -65,37 +46,30 @@ pub fn spawn_sprite
     };
 
     //アニメーションするスプライトをspawnする
-    if let Some ( anime_sprite ) = opt_anime_sprite_player
-    {   let ( texture_atlas_hdl, cols, wait ) = anime_sprite.get( &player.direction ).unwrap();
+    let texture_atlas = asset_svr.gen_texture_atlas_player();
+    let texture_atlas_hdl = texture_atlases.add( texture_atlas );
+    let custom_size = Some( SIZE_GRID );
+    let index = player.sprite_sheet_offset( player.direction() );
+    let texture_atlas_sprite = TextureAtlasSprite { custom_size, index, ..default() };
+    cmds.spawn( ( SpriteSheetBundle::default(), player ) )
+    .insert( texture_atlas_hdl )
+    .insert( texture_atlas_sprite )
+    .insert( Transform::from_translation( translation ) )
+    ;
 
-        let custom_size = Some( SIZE_GRID );
-        let texture_atlas_sprite = TextureAtlasSprite { custom_size, ..default() };
-        let anime_params = AnimationParams
-        {   timer: Timer::from_seconds( *wait, TimerMode::Repeating ),
-            frame_count: *cols,
-        };
-
-        cmds.spawn( ( SpriteSheetBundle::default(), player, anime_params ) )
-        .insert( ( *texture_atlas_hdl ).clone() )
-        .insert( texture_atlas_sprite )
-        .insert( Transform::from_translation( translation ) )
-        ;
-    }
-    else
-    {   //三角形のメッシュ
-        let radius = PIXELS_PER_GRID * MAGNIFY_SPRITE_PLAYER;
-        let shape = shape::RegularPolygon::new( radius, 3 ).into();
-        let triangle = MaterialMesh2dBundle
-        {   mesh: meshes.add( shape ).into(),
-            material: materials.add( COLOR_SPRITE_PLAYER.into() ),
-            ..default()
-        };
-
-        let quat = Quat::from_rotation_z( PI ); //News::South
-        cmds.spawn( ( triangle, player ) )
-        .insert( Transform::from_translation( translation ).with_rotation( quat ) )
-        ;
-    }
+    //三角形のメッシュ
+    // let radius = PIXELS_PER_GRID * MAGNIFY_SPRITE_PLAYER;
+    // let shape = shape::RegularPolygon::new( radius, 3 ).into();
+    // let triangle = MaterialMesh2dBundle
+    // {   mesh: meshes.add( shape ).into(),
+    //     material: materials.add( COLOR_SPRITE_PLAYER.into() ),
+    //     ..default()
+    // };
+    // let quat = Quat::from_rotation_z( PI ); //News::South
+    // cmds.spawn( ( triangle, player ) )
+    // .insert( Transform::from_translation( translation ).with_rotation( quat ) )
+    // .insert( TextureAtlasSprite::default() ) //move_sprite()のqry_playerの検索条件を満たすためのdummy
+    // ;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,9 +77,7 @@ pub fn spawn_sprite
 //プレイヤーを移動させる
 #[allow(clippy::too_many_arguments)]
 pub fn move_sprite
-(   mut qry_player: Query<( &mut Player, &mut Transform )>,
-    mut qry_texture_atlas_hdl: Query<&mut Handle<TextureAtlas>, With<Player>>,
-    opt_anime_sprite_player: Option<Res<AnimationSpritePlayer>>,
+(   mut qry_player: Query<( &mut Player, &mut Transform, &mut TextureAtlasSprite )>,
     opt_input: Option<Res<input::CrossDirection>>,
     opt_map: Option<Res<Map>>,
     opt_demo: Option<Res<DemoMapParams>>,
@@ -115,7 +87,7 @@ pub fn move_sprite
     mut evt_over: EventReader<EventOver>,
     time: Res<Time>,
 )
-{   let Ok ( ( mut player, mut transform ) ) = qry_player.get_single_mut() else { return };
+{   let Ok ( ( mut player, mut transform, mut sprite ) ) = qry_player.get_single_mut() else { return };
     let Some ( input ) = opt_input else { return };
     let Some ( map ) = opt_map else { return };
 
@@ -187,10 +159,10 @@ pub fn move_sprite
 
         //プレイヤーの進む向きが変わったらスプライトを回転させる
         if player.direction != new_side
-        {   if let Some ( anime_sprite ) = opt_anime_sprite_player
-            {   if let Ok ( mut texture_atlas_hdl ) = qry_texture_atlas_hdl.get_single_mut()
-                {   *texture_atlas_hdl = anime_sprite.get( &new_side ).unwrap().0.clone();
-                }
+        {   if sprite.custom_size.is_some()
+            {   let old_offset = player.sprite_sheet_offset( player.direction );
+                let new_offset = player.sprite_sheet_offset( new_side         );
+                sprite.index = sprite.index - old_offset + new_offset;
             }
             else
             {   rotate_player_sprite( &player, &mut transform, new_side );
