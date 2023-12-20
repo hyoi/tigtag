@@ -70,34 +70,16 @@ pub const LOG_LEVEL_REL: &str = "error"; //リリース
 ////////////////////////////////////////////////////////////////////////////////
 
 //assets（スプライト）
-pub const ASSETS_SPRITE_DEBUG_GRID : &str = "sprites/debug_grid.png";
-pub const ASSETS_SPRITE_BRICK_WALL : &str = "sprites/brick_wall.png";
-pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "sprites/kani_DOTOWN.png";
+pub const ASSETS_SPRITE_DEBUG_GRID : &str = "images/sprite/debug_grid.png";
+pub const ASSETS_SPRITE_BRICK_WALL : &str = "images/sprite/brick_wall.png";
+pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "images/sprite/kani_DOTOWN.png";
 
-pub const ASSETS_SPRITE_SHEET_PLAYER_NORTH: &str = "sprites/player/sheet_player_north.png";
-pub const ASSETS_SPRITE_SHEET_PLAYER_EAST : &str = "sprites/player/sheet_player_east.png";
-pub const ASSETS_SPRITE_SHEET_PLAYER_WEST : &str = "sprites/player/sheet_player_west.png";
-pub const ASSETS_SPRITE_SHEET_PLAYER_SOUTH: &str = "sprites/player/sheet_player_south.png";
-
-pub const ASSETS_SPRITE_SHEET_CHASER_1_NORTH: &str = "sprites/chasers/sheet_chaser_red_north.png";
-pub const ASSETS_SPRITE_SHEET_CHASER_1_EAST : &str = "sprites/chasers/sheet_chaser_red_east.png";
-pub const ASSETS_SPRITE_SHEET_CHASER_1_WEST : &str = "sprites/chasers/sheet_chaser_red_west.png";
-pub const ASSETS_SPRITE_SHEET_CHASER_1_SOUTH: &str = "sprites/chasers/sheet_chaser_red_south.png";
-
-pub const ASSETS_SPRITE_SHEET_CHASER_2_NORTH: &str = "sprites/chasers/sheet_chaser_blue_north.png";
-pub const ASSETS_SPRITE_SHEET_CHASER_2_EAST : &str = "sprites/chasers/sheet_chaser_blue_east.png";
-pub const ASSETS_SPRITE_SHEET_CHASER_2_WEST : &str = "sprites/chasers/sheet_chaser_blue_west.png";
-pub const ASSETS_SPRITE_SHEET_CHASER_2_SOUTH: &str = "sprites/chasers/sheet_chaser_blue_south.png";
-
-pub const ASSETS_SPRITE_SHEET_CHASER_3_NORTH: &str = "sprites/chasers/sheet_chaser_green_north.png";
-pub const ASSETS_SPRITE_SHEET_CHASER_3_EAST : &str = "sprites/chasers/sheet_chaser_green_east.png";
-pub const ASSETS_SPRITE_SHEET_CHASER_3_WEST : &str = "sprites/chasers/sheet_chaser_green_west.png";
-pub const ASSETS_SPRITE_SHEET_CHASER_3_SOUTH: &str = "sprites/chasers/sheet_chaser_green_south.png";
-
-pub const ASSETS_SPRITE_SHEET_CHASER_4_NORTH: &str = "sprites/chasers/sheet_chaser_pink_north.png";
-pub const ASSETS_SPRITE_SHEET_CHASER_4_EAST : &str = "sprites/chasers/sheet_chaser_pink_east.png";
-pub const ASSETS_SPRITE_SHEET_CHASER_4_WEST : &str = "sprites/chasers/sheet_chaser_pink_west.png";
-pub const ASSETS_SPRITE_SHEET_CHASER_4_SOUTH: &str = "sprites/chasers/sheet_chaser_pink_south.png";
+//assets（スプライトシート）
+pub const ASSETS_SPRITE_SHEET_PLAYER      : &str = "images/sprite_sheet/player.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_RED  : &str = "images/sprite_sheet/chaser_red.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_GREEN: &str = "images/sprite_sheet/chaser_green.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_BLUE : &str = "images/sprite_sheet/chaser_blue.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_PINK : &str = "images/sprite_sheet/chaser_pink.png";
 
 //assets（フォント）
 pub const ASSETS_FONT_ORBITRON_BLACK      : &str = "fonts/Orbitron-Black.ttf";
@@ -112,32 +94,11 @@ pub const PRELOAD_ASSETS: &[ &str  ] =
 &[  ASSETS_SPRITE_DEBUG_GRID,
     ASSETS_SPRITE_BRICK_WALL,
     ASSETS_SPRITE_KANI_DOTOWN,
-
-    ASSETS_SPRITE_SHEET_PLAYER_NORTH,
-    ASSETS_SPRITE_SHEET_PLAYER_EAST,
-    ASSETS_SPRITE_SHEET_PLAYER_WEST,
-    ASSETS_SPRITE_SHEET_PLAYER_SOUTH,
-
-    ASSETS_SPRITE_SHEET_CHASER_1_NORTH,
-    ASSETS_SPRITE_SHEET_CHASER_1_EAST ,
-    ASSETS_SPRITE_SHEET_CHASER_1_WEST ,
-    ASSETS_SPRITE_SHEET_CHASER_1_SOUTH,
-
-    ASSETS_SPRITE_SHEET_CHASER_2_NORTH,
-    ASSETS_SPRITE_SHEET_CHASER_2_EAST ,
-    ASSETS_SPRITE_SHEET_CHASER_2_WEST ,
-    ASSETS_SPRITE_SHEET_CHASER_2_SOUTH,
-
-    ASSETS_SPRITE_SHEET_CHASER_3_NORTH,
-    ASSETS_SPRITE_SHEET_CHASER_3_EAST ,
-    ASSETS_SPRITE_SHEET_CHASER_3_WEST ,
-    ASSETS_SPRITE_SHEET_CHASER_3_SOUTH,
-
-    ASSETS_SPRITE_SHEET_CHASER_4_NORTH,
-    ASSETS_SPRITE_SHEET_CHASER_4_EAST ,
-    ASSETS_SPRITE_SHEET_CHASER_4_WEST ,
-    ASSETS_SPRITE_SHEET_CHASER_4_SOUTH,
-
+    ASSETS_SPRITE_SHEET_PLAYER,
+    ASSETS_SPRITE_SHEET_CHASER_RED,
+    ASSETS_SPRITE_SHEET_CHASER_GREEN,
+    ASSETS_SPRITE_SHEET_CHASER_BLUE,
+    ASSETS_SPRITE_SHEET_CHASER_PINK,
     ASSETS_FONT_ORBITRON_BLACK,
     ASSETS_FONT_PRESSSTART2P_REGULAR,
     ASSETS_FONT_REGGAEONE_REGULAR,
@@ -146,45 +107,43 @@ pub const PRELOAD_ASSETS: &[ &str  ] =
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//アニメーションするスプライトの情報（player）
-pub const ANIME_PLAYER_ASSETS: &[ ( News, &str ) ] =
-&[  ( News::North, ASSETS_SPRITE_SHEET_PLAYER_NORTH ),
-    ( News::East , ASSETS_SPRITE_SHEET_PLAYER_EAST  ),
-    ( News::West , ASSETS_SPRITE_SHEET_PLAYER_WEST  ),
-    ( News::South, ASSETS_SPRITE_SHEET_PLAYER_SOUTH ),
-];
-pub const ANIME_PLAYER_SIZE : Vec2  = Vec2::new( 8.0, 8.0 );
-pub const ANIME_PLAYER_COLS : usize = 4;
-pub const ANIME_PLAYER_ROWS : usize = 4;
-pub const ANIME_PLAYER_TIMER: f32   = 0.15;
+//スプライトシートを使ったアニメーションの情報（player）
+pub const  SPRITE_SHEET_SIZE_PLAYER: Vec2 = Vec2::new( 8.0, 8.0 );
+pub const  SPRITE_SHEET_COLS_PLAYER: usize = 4;
+pub const  SPRITE_SHEET_ROWS_PLAYER: usize = 4;
+pub static SPRITE_SHEET_IDXS_PLAYER: Lazy<HashMap<News,usize>> = Lazy::new
+(   ||
+    HashMap::from
+    (   [   ( News::North,  0 ),
+            ( News::East ,  4 ),
+            ( News::West ,  8 ),
+            ( News::South, 12 ),
+        ]
+    )
+);
+pub const ANIME_TIMER_PLAYER: f32 = 0.15;
 
-//アニメーションするスプライトの情報（chaser）
-pub const ANIME_CHASERS_ASSETS: &[ &[ ( News, &str ) ] ] =
-&[  &[  ( News::North, ASSETS_SPRITE_SHEET_CHASER_1_NORTH ),
-        ( News::East , ASSETS_SPRITE_SHEET_CHASER_1_EAST  ),
-        ( News::West , ASSETS_SPRITE_SHEET_CHASER_1_WEST  ),
-        ( News::South, ASSETS_SPRITE_SHEET_CHASER_1_SOUTH ),
-    ],
-    &[  ( News::North, ASSETS_SPRITE_SHEET_CHASER_2_NORTH ),
-        ( News::East , ASSETS_SPRITE_SHEET_CHASER_2_EAST  ),
-        ( News::West , ASSETS_SPRITE_SHEET_CHASER_2_WEST  ),
-        ( News::South, ASSETS_SPRITE_SHEET_CHASER_2_SOUTH ),
-    ],
-    &[  ( News::North, ASSETS_SPRITE_SHEET_CHASER_3_NORTH ),
-        ( News::East , ASSETS_SPRITE_SHEET_CHASER_3_EAST  ),
-        ( News::West , ASSETS_SPRITE_SHEET_CHASER_3_WEST  ),
-        ( News::South, ASSETS_SPRITE_SHEET_CHASER_3_SOUTH ),
-    ],
-    &[  ( News::North, ASSETS_SPRITE_SHEET_CHASER_4_NORTH ),
-        ( News::East , ASSETS_SPRITE_SHEET_CHASER_4_EAST  ),
-        ( News::West , ASSETS_SPRITE_SHEET_CHASER_4_WEST  ),
-        ( News::South, ASSETS_SPRITE_SHEET_CHASER_4_SOUTH ),
-    ],
+//スプライトシートを使ったアニメーションの情報（chaser）
+pub const  SPRITE_SHEET_SIZE_CHASER: Vec2 = Vec2::new( 8.0, 8.0 );
+pub const  SPRITE_SHEET_COLS_CHASER: usize = 4;
+pub const  SPRITE_SHEET_ROWS_CHASER: usize = 4;
+pub static SPRITE_SHEET_IDXS_CHASER: Lazy<HashMap<News,usize>> = Lazy::new
+(   ||
+    HashMap::from
+    (   [   ( News::North,  0 ),
+            ( News::East ,  4 ),
+            ( News::West ,  8 ),
+            ( News::South, 12 ),
+        ]
+    )
+);
+pub const SPRITE_SHEET_CHASERS: &[ &str ] =
+&[  ASSETS_SPRITE_SHEET_CHASER_RED,
+    ASSETS_SPRITE_SHEET_CHASER_GREEN,
+    ASSETS_SPRITE_SHEET_CHASER_BLUE,
+    ASSETS_SPRITE_SHEET_CHASER_PINK,
 ];
-pub const ANIME_CHASER_SIZE : Vec2  = Vec2::new( 8.0, 8.0 );
-pub const ANIME_CHASER_COLS : usize = 4;
-pub const ANIME_CHASER_ROWS : usize = 4;
-pub const ANIME_CHASER_TIMER: f32   = 0.15;
+pub const ANIME_TIMER_CHASER: f32 = 0.15;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -202,12 +161,12 @@ pub const DEPTH_SPRITE_BRICK_WALL : f32 = 400.0;
 
 //スプライト色
 pub const COLOR_SPRITE_DOT   : Color = Color::rgb( 1.0, 1.0, 0.7 );
-pub const COLOR_SPRITE_PLAYER: Color = Color::YELLOW;
+// pub const COLOR_SPRITE_PLAYER: Color = Color::YELLOW;
 
 //スプライト拡縮
 pub const MAGNIFY_SPRITE_DOT   : f32 = 0.08;
-pub const MAGNIFY_SPRITE_PLAYER: f32 = 0.4;
-pub const MAGNIFY_SPRITE_CHASER: f32 = 0.5;
+// pub const MAGNIFY_SPRITE_PLAYER: f32 = 0.4;
+// pub const MAGNIFY_SPRITE_CHASER: f32 = 0.5;
 
 //SEボリューム
 pub const VOLUME_SOUND_BEEP: f32 = 0.1;
