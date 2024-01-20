@@ -91,7 +91,7 @@ pub fn hit_any_key<T: Component + HitAnyKey>
 {   let Ok ( ui ) = qry_ui.get_single() else { return };
 
     //無視キー以外のキー入力はあるか
-    for key in HAK_IGNORE_KEYS { if inkey.pressed( *key ) { return } }
+    if inkey.any_pressed( HAK_IGNORE_KEYS.iter().copied() ) { return }
     let mut is_pressed = inkey.get_just_pressed().len();
 
     //無視ボタン以外のボタン入力はあるか

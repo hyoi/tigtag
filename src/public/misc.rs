@@ -65,18 +65,11 @@ pub fn toggle_window_mode
     inbtn: Res<Input<GamepadButton>>,
 )
 {   let Ok( mut window ) = qry_window.get_single_mut() else { return };
-    let mut is_pressed = false;
 
     //キーの状態
-    if inkey.just_pressed( FULL_SCREEN_KEY )
-    {   //装飾キー
-        for key in FULL_SCREEN_KEY_MODIFIER
-        {   if inkey.pressed( *key )
-            {   is_pressed = true;
-                break;
-            }
-        }
-    }
+    let mut is_pressed =
+        inkey.pressed( FULL_SCREEN_KEY ) &&
+        inkey.any_pressed( FULL_SCREEN_KEY_MODIFIER.iter().copied() );
 
     //ゲームパッドのボタンの状態
     if ! is_pressed
