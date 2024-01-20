@@ -90,7 +90,7 @@ pub const ASSETS_FONT_REGGAEONE_REGULAR   : &str = "fonts/ReggaeOne-Regular.ttf"
 pub const ASSETS_SOUND_BEEP: &str = "audio/sounds/beep.ogg";
 
 //事前ロード対象
-pub const PRELOAD_ASSETS: &[ &str  ] =
+pub const PRELOAD_ASSETS: &[ &str ] =
 &[  ASSETS_SPRITE_DEBUG_GRID,
     ASSETS_SPRITE_BRICK_WALL,
     ASSETS_SPRITE_KANI_DOTOWN,
