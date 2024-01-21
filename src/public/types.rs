@@ -133,18 +133,13 @@ pub type MessageSect =
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//操作を受け付けるgamepadを保存するResource
+//操作を受付けるgamepadのIDを保存するResource
 #[derive( Resource, Default )]
-pub struct ConnectedGamepad ( Option<Gamepad> );
+pub struct TargetGamepad ( Option<Gamepad> );
 
-pub trait TraitGamepad
-{   fn id    ( &    self ) ->      Option<Gamepad>;
-    fn id_mut( &mut self ) -> &mut Option<Gamepad>;
-}
-
-impl TraitGamepad for ConnectedGamepad
-{   fn id    ( &    self ) ->      Option<Gamepad> {      self.0 }
-    fn id_mut( &mut self ) -> &mut Option<Gamepad> { &mut self.0 }
+impl TargetGamepad
+{   pub fn id    ( &    self ) ->      Option<Gamepad> {      self.0 }
+    pub fn id_mut( &mut self ) -> &mut Option<Gamepad> { &mut self.0 }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

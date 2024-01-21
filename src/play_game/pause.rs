@@ -35,7 +35,7 @@ impl<'a> ui::effect::TextUI for Pause<'a>
 //PAUSE処理
 fn pause
 (   qry_text: Query<&mut Visibility, With<Pause<'static>>>,
-    opt_gamepad: Option<Res<ConnectedGamepad>>,
+    opt_gamepad: Option<Res<TargetGamepad>>,
     mut state: ResMut<State<MyState>>,
     mut saved_in: Local<MyState>,
     inkey: Res<Input<KeyCode>>,

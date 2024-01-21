@@ -29,26 +29,30 @@ pub fn spawn_2d_camera( mut cmds: Commands )
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//操作を受け付けるgamepadを切り替える
-pub fn choose_gamepad_connection
-(   opt_gamepad: Option<ResMut<ConnectedGamepad>>,
+//操作を受付けるgamepadを切り替える
+pub fn change_gamepad_connection
+(   opt_gamepad: Option<ResMut<TargetGamepad>>,
     gamepads: Res<Gamepads>,
 )
 {   let Some ( mut gamepad ) = opt_gamepad else { return };
 
     //IDが保存されている場合
     if let Some ( id ) = gamepad.id()
-    {   //IDのgamepadがまだ接続されている
+    {   //該当gamepadが接続中なら
         if gamepads.contains( id ) { return }
 
-        //gamepadが１つも接続されていない
+        //gamepadが接続されていない（＝全部外された）
         if gamepads.iter().count() == 0
-        {   *gamepad.id_mut() = None; //IDが無効
+        {   *gamepad.id_mut() = None;
+
+            #[cfg( debug_assertions )]
+            dbg!( gamepad.id() ); //for debug
+
             return;
         }
     }
 
-    //gamepadsから１つ取り出してIDを保存する
+    //接続中のものを１つ取り出して切り替える
     *gamepad.id_mut() = gamepads.iter().next();
 
     #[cfg( debug_assertions )]
@@ -60,7 +64,7 @@ pub fn choose_gamepad_connection
 //ウィンドウとフルスクリーンの切換(トグル動作)
 pub fn toggle_window_mode
 (   mut qry_window: Query<&mut Window>,
-    opt_gamepad: Option<Res<ConnectedGamepad>>,
+    opt_gamepad: Option<Res<TargetGamepad>>,
     inkey: Res<Input<KeyCode>>,
     inbtn: Res<Input<GamepadButton>>,
 )

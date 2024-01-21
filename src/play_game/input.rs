@@ -24,7 +24,7 @@ impl CrossDirection
 pub fn catch_player_operation
 (   qry_player: Query<&Player>,
     opt_cross: Option<ResMut<CrossDirection>>,
-    opt_gamepad: Option<Res<ConnectedGamepad>>,
+    opt_gamepad: Option<Res<TargetGamepad>>,
     keys: Res<Input<KeyCode>>,
     buttons: Res<Input<GamepadButton>>,
 )

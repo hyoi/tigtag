@@ -60,10 +60,10 @@ fn main()
             .run_if( not( resource_exists::<Map>() ) ) //debug表示が被るので
         )
     )
-    .init_resource::<ConnectedGamepad>() //操作を受け付けるgamepadのID
+    .init_resource::<TargetGamepad>() //操作を受付けるゲームパッドのID
     .add_systems
     (   Update,
-        (   misc::choose_gamepad_connection, //<ConnectedGamepad>を設定
+        (   misc::change_gamepad_connection, //ゲームパッドの検出と切替
             (   misc::toggle_window_mode,    //フルスクリーン切換
                 // bevy::window::close_on_esc,  //[ESC]で終了
             )
