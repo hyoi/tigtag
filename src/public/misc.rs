@@ -72,7 +72,7 @@ pub fn toggle_window_mode
 
     //キーの状態
     let mut is_pressed =
-        inkey.pressed( FULL_SCREEN_KEY ) &&
+        inkey.just_pressed( FULL_SCREEN_KEY ) &&
         inkey.any_pressed( FULL_SCREEN_KEY_MODIFIER.iter().copied() );
 
     //ゲームパッドのボタンの状態
