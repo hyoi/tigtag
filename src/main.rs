@@ -2,8 +2,7 @@
 use bevy::
 {   prelude::*,
     log::LogPlugin,
-    window::WindowMode,
-    render::camera,
+    window::{ WindowMode, EnabledButtons },
     asset::{ LoadState, LoadedUntypedAsset },
     diagnostic::{ DiagnosticsStore, FrameTimeDiagnosticsPlugin },
     sprite::{ Anchor, MaterialMesh2dBundle },

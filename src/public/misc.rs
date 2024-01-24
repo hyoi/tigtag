@@ -9,20 +9,7 @@ pub fn spawn_2d_camera( mut cmds: Commands )
     let translation = Vec3::X * SCREEN_PIXELS_WIDTH  * 0.5
                     - Vec3::Y * SCREEN_PIXELS_HEIGHT * 0.5;
 
-    //タイトルバーのWクリックや最大化ボタンによるウィンドウ最大化時に
-    //表示が著しく崩れることを緩和するためviewportを設定しておく(根本的な対策ではない)
-    let zero = UVec2::new( 0, 0 );
-    let size = Vec2::new( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT ).as_uvec2();
-    let viewport = Some
-    (   camera::Viewport
-        {   physical_position: zero,
-            physical_size    : size,
-            ..default()
-        }
-    );
-
     cmds.spawn( Camera2dBundle::default() )
-    .insert( Camera { viewport, ..default() } )
     .insert( Transform::from_translation( translation) )
     ;
 }

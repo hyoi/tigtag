@@ -16,6 +16,11 @@ pub static MAIN_WINDOW: Lazy<Option<Window>> = Lazy::new
         {   title,
             resolution: ( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT ).into(),
             resizable: false,
+            enabled_buttons: EnabledButtons
+            {   minimize: false,
+                maximize: false,
+                close   : true,
+            },
             // fit_canvas_to_parent: true, //不具合が発生した場合コメントアウトする
             ..default()
         };
