@@ -105,21 +105,21 @@ pub fn despawn<T: Component>
 (   qry_entity: Query<Entity, With<T>>,
     mut cmds: Commands,
 )
-{   qry_entity.for_each( | id | cmds.entity( id ).despawn_recursive() );
+{   qry_entity.iter().for_each( | id | cmds.entity( id ).despawn_recursive() );
 }
 
 //QueryしたComponentを見せる
 pub fn show<T: Component>
 (   mut qry: Query<&mut Visibility, With<T>>,
 )
-{   qry.for_each_mut( | mut vis | *vis = Visibility::Visible );
+{   qry.iter_mut().for_each( | mut vis | *vis = Visibility::Visible );
 }
 
 //QueryしたComponentを隠す
 pub fn hide<T: Component>
 (   mut qry: Query<&mut Visibility, With<T>>,
 )
-{   qry.for_each_mut( | mut vis | *vis = Visibility::Hidden );
+{   qry.iter_mut().for_each( | mut vis | *vis = Visibility::Hidden );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

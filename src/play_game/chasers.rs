@@ -63,7 +63,7 @@ pub fn spawn_sprite
 {   let Some ( record ) = opt_record else { return };
 
     //スプライトがあれば削除する
-    qry_chaser.for_each( | id | cmds.entity( id ).despawn_recursive() );
+    qry_chaser.iter().for_each( | id | cmds.entity( id ).despawn_recursive() );
 
     //チェイサーのスプライトを配置する
     ( 0.. ).zip( CHASER_START_POSITION ).zip( SPRITE_SHEET_CHASERS ).for_each

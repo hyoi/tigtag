@@ -172,7 +172,7 @@ fn move_sprite
     let scaling = SCREEN_PIXELS_WIDTH / NOWLOADING.width; //横方向に長いので
     let adjuster_y = ( SCREEN_PIXELS_HEIGHT - NOWLOADING.height * scaling ) * -0.5;
 
-    qry_transform.for_each_mut
+    qry_transform.iter_mut().for_each
     (   | ( mut transform, goal ) |
         {   //座標の調整
             let mut goal = goal.grid.to_vec2_on_screen() * scaling;

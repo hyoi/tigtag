@@ -92,7 +92,7 @@ pub fn spawn_sprite
 {   let Some ( mut map ) = opt_map else { return };
 
     //スプライトがあれば削除する
-    qry_entity.for_each( | id | cmds.entity( id ).despawn_recursive() );
+    qry_entity.iter().for_each( | id | cmds.entity( id ).despawn_recursive() );
 
     //壁とドットのスプライトを配置する
     let custom_size = Some( SIZE_GRID );
