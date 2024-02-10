@@ -23,8 +23,8 @@ use std::f32::consts::{ PI, TAU };
 mod public;
 use public::*;
 
-// mod load_assets;
-// mod init_app;
+mod load_assets;
+mod init_app;
 // mod play_game;
 // mod title_demo;
 
@@ -71,13 +71,13 @@ fn main()
     );
 
     //メイン処理
-    // app
-    // .add_state::<MyState>() //Stateを初期化する。enumの#[default]で初期値指定
-    // .add_plugins( load_assets::Schedule ) //assetsの事前ロード
-    // .add_plugins( init_app::Schedule )    //ゲーム枠・FPSの表示等、事前処理
+    app
+    .init_state::<MyState>() //Stateを初期化する。enumの#[default]で初期値指定
+    .add_plugins( load_assets::Schedule ) //assetsの事前ロード
+    .add_plugins( init_app::Schedule )    //ゲーム枠・FPSの表示等、事前処理
     // .add_plugins( play_game::Schedule )   //ゲームロジック
     // .add_plugins( title_demo::Schedule )  //タイトルデモ
-    // ;
+    ;
 
     //アプリの実行
     app.run();

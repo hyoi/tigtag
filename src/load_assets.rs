@@ -22,8 +22,8 @@ impl Plugin for Schedule
 
                 //ループ脱出：事前ロードが完了した ＆ 遷移先がセットされている
                 misc::change_state_with_res::<AfterLoadAssetsTo<MyState>>
-                .run_if( resource_exists::<LoadingFinished>() ) //フラグ
-                .run_if( resource_exists::<AfterLoadAssetsTo<MyState>>() ), //遷移先
+                .run_if( resource_exists::<LoadingFinished> ) //フラグ
+                .run_if( resource_exists::<AfterLoadAssetsTo<MyState>> ), //遷移先
             )
             .run_if( in_state( MyState::LoadAssets ) )
         )
