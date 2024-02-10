@@ -59,7 +59,7 @@ pub fn spawn_sprite
 
     //三角形のメッシュ
     let radius = PIXELS_PER_GRID * _MAGNIFY_SPRITE_PLAYER;
-    let shape = shape::RegularPolygon::new( radius, 3 );
+    let shape = RegularPolygon::new( radius, 3 ).mesh();
     let triangle = MaterialMesh2dBundle
     {   mesh: meshes.add( shape ).into(),
         material: materials.add( _COLOR_SPRITE_PLAYER ),

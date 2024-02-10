@@ -132,7 +132,7 @@ pub fn spawn_sprite
 
             if map.is_space( grid )
             {   let circle = MaterialMesh2dBundle //type annotations neededが出ないからこの書き方が良い
-                {   mesh: meshes.add( shape::Circle::new( radius ) ).into(),
+                {   mesh: meshes.add( Circle::new( radius ).mesh().resolution( 64 ).build() ).into(),
                     material: materials.add( ColorMaterial::from( COLOR_SPRITE_DOT ) ),
                     ..default()
                 };
