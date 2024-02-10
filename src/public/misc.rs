@@ -52,8 +52,8 @@ pub fn change_gamepad_connection
 pub fn toggle_window_mode
 (   mut qry_window: Query<&mut Window>,
     opt_gamepad: Option<Res<TargetGamepad>>,
-    inkey: Res<Input<KeyCode>>,
-    inbtn: Res<Input<GamepadButton>>,
+    inkey: Res<ButtonInput<KeyCode>>,
+    inbtn: Res<ButtonInput<GamepadButton>>,
 )
 {   let Ok( mut window ) = qry_window.get_single_mut() else { return };
 
@@ -139,10 +139,10 @@ pub fn text_ui
         };
         sections.push( TextSection { value, style } );
     }
-    let alignment = TextAlignment::Center;
+    let justify = JustifyText::Center;
     let position_type = PositionType::Absolute;
 
-    let text  = Text { sections, alignment, ..default() };
+    let text  = Text { sections, justify, ..default() };
     let style = Style { position_type, ..default() };
     TextBundle { text, style, ..default() }
 }
@@ -173,20 +173,20 @@ pub fn hidden_ui_frame
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//キャラクターをアニメーションさせる
-pub fn animating_sprites<T: Component + CharacterAnimation>
-(   mut qry_target: Query<( &mut TextureAtlasSprite, &mut T )>,
-    time: Res<Time>,
-)
-{   for ( mut sprite, mut character ) in &mut qry_target
-    {   if character.anime_timer_mut().tick( time.delta() ).just_finished()
-        {   sprite.index += 1;
-            let offset = character.sprite_sheet_offset( character.direction() );
-            let frame  = character.sprite_sheet_frame();
-            if sprite.index >= offset + frame { sprite.index = offset }
-        }
-    }
-}
+// //キャラクターをアニメーションさせる
+// pub fn animating_sprites<T: Component + CharacterAnimation>
+// (   mut qry_target: Query<( &mut TextureAtlasSprite, &mut T )>,
+//     time: Res<Time>,
+// )
+// {   for ( mut sprite, mut character ) in &mut qry_target
+//     {   if character.anime_timer_mut().tick( time.delta() ).just_finished()
+//         {   sprite.index += 1;
+//             let offset = character.sprite_sheet_offset( character.direction() );
+//             let frame  = character.sprite_sheet_frame();
+//             if sprite.index >= offset + frame { sprite.index = offset }
+//         }
+//     }
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
