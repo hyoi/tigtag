@@ -26,7 +26,7 @@ use public::*;
 mod load_assets;
 mod init_app;
 mod play_game;
-// mod title_demo;
+mod title_demo;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -76,7 +76,7 @@ fn main()
     .add_plugins( load_assets::Schedule ) //assetsの事前ロード
     .add_plugins( init_app::Schedule )    //ゲーム枠・FPSの表示等、事前処理
     .add_plugins( play_game::Schedule )   //ゲームロジック
-    // .add_plugins( title_demo::Schedule )  //タイトルデモ
+    .add_plugins( title_demo::Schedule )  //タイトルデモ
     ;
 
     //アプリの実行
