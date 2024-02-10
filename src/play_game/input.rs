@@ -25,8 +25,8 @@ pub fn catch_player_operation
 (   qry_player: Query<&Player>,
     opt_cross: Option<ResMut<CrossDirection>>,
     opt_gamepad: Option<Res<TargetGamepad>>,
-    keys: Res<Input<KeyCode>>,
-    buttons: Res<Input<GamepadButton>>,
+    keys: Res<ButtonInput<KeyCode>>,
+    buttons: Res<ButtonInput<GamepadButton>>,
 )
 {   let Ok ( player ) = qry_player.get_single() else { return };
 
@@ -57,10 +57,10 @@ pub fn catch_player_operation
         .filter_map
         (   | keycode |
             match keycode
-            {   KeyCode::Up    => Some ( News::North ),
-                KeyCode::Right => Some ( News::East  ),
-                KeyCode::Left  => Some ( News::West  ),
-                KeyCode::Down  => Some ( News::South ),
+            {   KeyCode::ArrowUp    => Some ( News::North ),
+                KeyCode::ArrowRight => Some ( News::East  ),
+                KeyCode::ArrowLeft  => Some ( News::West  ),
+                KeyCode::ArrowDown  => Some ( News::South ),
                 _ => None,
             }
         )

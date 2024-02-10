@@ -38,8 +38,8 @@ fn pause
     opt_gamepad: Option<Res<TargetGamepad>>,
     mut state: ResMut<State<MyState>>,
     mut saved_in: Local<MyState>,
-    inkey: Res<Input<KeyCode>>,
-    inbtn: Res<Input<GamepadButton>>,
+    inkey: Res<ButtonInput<KeyCode>>,
+    inbtn: Res<ButtonInput<GamepadButton>>,
 )
 {   //キーの状態
     let mut is_pressed = inkey.just_pressed( PAUSE_KEY );

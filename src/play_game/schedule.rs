@@ -23,10 +23,10 @@ impl Plugin for Schedule
         //Updateに登録することでStateに関係なく(ゲーム中もPAUSE中も)アニメーションさせる
         .add_systems
         (   Update,
-            (   misc::animating_sprites::<Player>, //アニメーションするスプライト
-                misc::animating_sprites::<Chaser>, //アニメーションするスプライト
-                // chasers::rotate, //チェイサーの回転(スプライトシートアニメが無い時に使った)
-            )
+        //     (   misc::animating_sprites::<Player>, //アニメーションするスプライト
+        //         misc::animating_sprites::<Chaser>, //アニメーションするスプライト
+                chasers::rotate, //チェイサーの回転(スプライトシートアニメが無い時に使った)
+        //     )
         )
 
         ////////////////////////////////////////////////////////////////////////

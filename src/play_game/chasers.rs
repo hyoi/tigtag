@@ -57,8 +57,8 @@ pub fn spawn_sprite
 (   qry_chaser: Query<Entity, With<Chaser>>,
     opt_record: Option<Res<Record>>,
     mut cmds: Commands,
-    asset_svr: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    // asset_svr: Res<AssetServer>,
+    // mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 )
 {   let Some ( record ) = opt_record else { return };
 
@@ -82,25 +82,25 @@ pub fn spawn_sprite
             };
             let translation = chaser_vec2.extend( DEPTH_SPRITE_CHASER );
 
-            //アニメーションするスプライトをspawnする
-            let texture_atlas = asset_svr.gen_texture_atlas_chaser( asset );
-            let texture_atlas_hdl = texture_atlases.add( texture_atlas );
-            let custom_size = Some( SIZE_GRID );
-            let texture_atlas_sprite = TextureAtlasSprite { custom_size, ..default() };
-            cmds.spawn( ( SpriteSheetBundle::default(), chaser ) )
-            .insert( texture_atlas_hdl.clone() )
-            .insert( texture_atlas_sprite )
-            .insert( Transform::from_translation( translation ) )
-            ;
+            // //アニメーションするスプライトをspawnする
+            // let texture_atlas = asset_svr.gen_texture_atlas_chaser( asset );
+            // let texture_atlas_hdl = texture_atlases.add( texture_atlas );
+            // let custom_size = Some( SIZE_GRID );
+            // let texture_atlas_sprite = TextureAtlasSprite { custom_size, ..default() };
+            // cmds.spawn( ( SpriteSheetBundle::default(), chaser ) )
+            // .insert( texture_atlas_hdl.clone() )
+            // .insert( texture_atlas_sprite )
+            // .insert( Transform::from_translation( translation ) )
+            // ;
 
             //正方形のメッシュ
-            // let custom_size = Some ( SIZE_GRID * MAGNIFY_SPRITE_CHASER );
-            // cmds
-            // .spawn( ( SpriteBundle::default(), chaser ) )
-            // .insert( Sprite { color, custom_size, ..default() } )
-            // .insert( Transform::from_translation( translation ) )
+            let custom_size = Some ( SIZE_GRID * _MAGNIFY_SPRITE_CHASER );
+            cmds
+            .spawn( ( SpriteBundle::default(), chaser ) )
+            .insert( Sprite { color, custom_size, ..default() } )
+            .insert( Transform::from_translation( translation ) )
             // .insert( TextureAtlasSprite::default() ) //move_sprite()のqry_playerの検索条件を満たすためのdummy
-            // ;
+            ;
         }
     );
 }
@@ -108,23 +108,23 @@ pub fn spawn_sprite
 ////////////////////////////////////////////////////////////////////////////////
 
 //チェイサー（正方形のメッシュの場合）のスプライトを回転させる
-// pub fn rotate
-// (   mut qry_chaser: Query<&mut Transform, With<Chaser>>,
-//     time: Res<Time>,
-// )
-// {   let time_delta = time.delta().as_secs_f32();
-//     let radian = TAU * time_delta;
-//     let quat = Quat::from_rotation_z( radian );
+pub fn rotate
+(   mut qry_chaser: Query<&mut Transform, With<Chaser>>,
+    time: Res<Time>,
+)
+{   let time_delta = time.delta().as_secs_f32();
+    let radian = TAU * time_delta;
+    let quat = Quat::from_rotation_z( radian );
 
-//     //回転させる
-//     qry_chaser.for_each_mut( | mut transform | transform.rotate( quat ) );
-// }
+    //回転させる
+    qry_chaser.iter_mut().for_each( | mut transform | transform.rotate( quat ) );
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //チェイサーを移動させる
 pub fn move_sprite
-(   mut qry_chaser: Query<( &mut Chaser, &mut Transform, &mut TextureAtlasSprite )>,
+(   mut qry_chaser: Query<( &mut Chaser, &mut Transform, /*&mut TextureAtlasSprite*/ )>,
     opt_map: Option<Res<Map>>,
     qry_player: Query<&Player>,
     mut evt_clear : EventReader<EventClear>,
@@ -142,7 +142,7 @@ pub fn move_sprite
     let time_delta = time.delta();
 
     //チェイサーは複数なのでループ処理する
-    for ( mut chaser, mut transform, mut sprite ) in qry_chaser.iter_mut()
+    for ( mut chaser, mut transform, /*mut sprite*/ ) in qry_chaser.iter_mut()
     {   //経過時間にスピードアップを反映する
         let time_delta = time_delta.mul_f32( chaser.speedup );
 
@@ -183,12 +183,12 @@ pub fn move_sprite
                     },
             };
 
-            //チェイサーの向きが変わったらスプライトアニメのテクスチャハンドルを差し替える
-            if chaser.direction != new_side
-            {   let old_offset = chaser.sprite_sheet_offset( chaser.direction );
-                let new_offset = chaser.sprite_sheet_offset( new_side         );
-                sprite.index = sprite.index - old_offset + new_offset;
-            }
+            // //チェイサーの向きが変わったらスプライトアニメのテクスチャハンドルを差し替える
+            // if chaser.direction != new_side
+            // {   let old_offset = chaser.sprite_sheet_offset( chaser.direction );
+            //     let new_offset = chaser.sprite_sheet_offset( new_side         );
+            //     sprite.index = sprite.index - old_offset + new_offset;
+            // }
             chaser.direction = new_side;
 
             //現在の位置と次の位置を更新する
@@ -217,12 +217,12 @@ pub fn move_sprite
 
     //チェイサーは重なるとスピードアップする
     let mut color_grid = Vec::with_capacity( qry_chaser.iter().len() );
-    for ( mut chaser, _, _ ) in qry_chaser.iter_mut()
+    for ( mut chaser, _, /*_*/ ) in qry_chaser.iter_mut()
     {   color_grid.push( ( chaser.color, chaser.next_grid ) );
         chaser.speedup = 1.0;
     }
     for ( color, grid ) in color_grid
-    {   for ( mut chaser, _, _ ) in qry_chaser.iter_mut()
+    {   for ( mut chaser, _, /*_*/ ) in qry_chaser.iter_mut()
         {   if grid != chaser.next_grid || color == chaser.color { continue }
             chaser.speedup += CHASER_ACCEL;
         }

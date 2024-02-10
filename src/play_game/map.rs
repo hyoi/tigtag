@@ -9,7 +9,7 @@ pub fn make_new_data
 )
 {   let Some ( mut map ) = opt_map else { return };
     let Some ( mut record ) = opt_record else { return };
-    
+
     let half_w = MAP_GRIDS_WIDTH  / 2;
     let half_h = MAP_GRIDS_HEIGHT / 2;
     let short_side = if half_w >= half_h { half_h } else { half_w };
@@ -114,15 +114,15 @@ pub fn spawn_sprite
                     {   #[cfg( debug_assertions )]
                         {   let value = format!( "{:02}\n{:02}", x, y ).to_string();
                             let style = TextStyle
-                            {   font     : asset_svr.load( ASSETS_FONT_PRESSSTART2P_REGULAR ),
-                                font_size: PIXELS_PER_GRID * 0.3,
+                            {   font_size: PIXELS_PER_GRID * 0.4,
                                 color    : Color::YELLOW,
+                                ..default()
                             };
-                            let sections  = vec![ TextSection { value, style } ];
-                            let alignment = TextAlignment::Center;
-        
+                            let sections = vec![ TextSection { value, style } ];
+                            let justify = JustifyText::Center;
+
                             _cmds.spawn( Text2dBundle::default() )
-                            .insert( Text { sections, alignment, ..default() } )
+                            .insert( Text { sections, justify, ..default() } )
                             .insert( Transform::from_translation( Vec3::Z ) )
                             ;
                         }
@@ -132,7 +132,7 @@ pub fn spawn_sprite
 
             if map.is_space( grid )
             {   let circle = MaterialMesh2dBundle //type annotations neededが出ないからこの書き方が良い
-                {   mesh: meshes.add( shape::Circle::new( radius ).into() ).into(),
+                {   mesh: meshes.add( shape::Circle::new( radius ) ).into(),
                     material: materials.add( ColorMaterial::from( COLOR_SPRITE_DOT ) ),
                     ..default()
                 };

@@ -165,12 +165,12 @@ pub const DEPTH_SPRITE_BRICK_WALL : f32 = 400.0;
 
 //スプライト色
 pub const COLOR_SPRITE_DOT   : Color = Color::rgb( 1.0, 1.0, 0.7 );
-// pub const COLOR_SPRITE_PLAYER: Color = Color::YELLOW;
+pub const _COLOR_SPRITE_PLAYER: Color = Color::YELLOW;
 
 //スプライト拡縮
 pub const MAGNIFY_SPRITE_DOT   : f32 = 0.08;
-// pub const MAGNIFY_SPRITE_PLAYER: f32 = 0.4;
-// pub const MAGNIFY_SPRITE_CHASER: f32 = 0.5;
+pub const _MAGNIFY_SPRITE_PLAYER: f32 = 0.4;
+pub const _MAGNIFY_SPRITE_CHASER: f32 = 0.5;
 
 //SEボリューム
 pub const VOLUME_SOUND_BEEP: f32 = 0.1;
