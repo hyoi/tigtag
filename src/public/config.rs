@@ -174,8 +174,6 @@ pub const _MAGNIFY_SPRITE_CHASER: f32 = 0.5;
 
 //SEボリューム
 pub const VOLUME_SOUND_BEEP: f32 = 0.1;
-// pub const VOLUME_SOUND_BEEP: Volume = Volume::Relative ( VolumeLevel::new( 0.1 ) );
-//と書きたいがVolumeLevel::new()がnon-const fnなので書けない。
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -50,13 +50,13 @@ pub fn scoring_and_stageclear
     *record.score_mut() += 1;
     map.remaining_dots -= 1;
 
-    // //1度beepを鳴らす(despawn処理付き)
-    // let volume = Volume::Relative ( VolumeLevel::new( VOLUME_SOUND_BEEP ) );
-    // let sound_beep = AudioBundle
-    // {   source: asset_svr.load( ASSETS_SOUND_BEEP ),
-    //     settings: PlaybackSettings::DESPAWN.with_volume( volume ),
-    // };
-    // cmds.spawn( sound_beep );
+    //1度beepを鳴らす(despawn処理付き)
+    let volume = Volume::new( VOLUME_SOUND_BEEP );
+    let sound_beep = AudioBundle
+    {   source: asset_svr.load( ASSETS_SOUND_BEEP ),
+        settings: PlaybackSettings::DESPAWN.with_volume( volume ),
+    };
+    cmds.spawn( sound_beep );
 
     //ハイスコアの更新
     if ! state.get().is_demoplay() && record.score() > record.hi_score()
