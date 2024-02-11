@@ -173,20 +173,20 @@ pub fn hidden_ui_frame
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// //キャラクターをアニメーションさせる
-// pub fn animating_sprites<T: Component + CharacterAnimation>
-// (   mut qry_target: Query<( &mut TextureAtlasSprite, &mut T )>,
-//     time: Res<Time>,
-// )
-// {   for ( mut sprite, mut character ) in &mut qry_target
-//     {   if character.anime_timer_mut().tick( time.delta() ).just_finished()
-//         {   sprite.index += 1;
-//             let offset = character.sprite_sheet_offset( character.direction() );
-//             let frame  = character.sprite_sheet_frame();
-//             if sprite.index >= offset + frame { sprite.index = offset }
-//         }
-//     }
-// }
+//キャラクターをアニメーションさせる
+pub fn animating_sprites<T: Component + CharacterAnimation>
+(   mut qry_target: Query<( &mut TextureAtlas, &mut T )>,
+    time: Res<Time>,
+)
+{   for ( mut sprite, mut character ) in &mut qry_target
+    {   if character.anime_timer_mut().tick( time.delta() ).just_finished()
+        {   sprite.index += 1;
+            let offset = character.sprite_sheet_offset( character.direction() );
+            let frame  = character.sprite_sheet_frame();
+            if sprite.index >= offset + frame { sprite.index = offset }
+        }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
