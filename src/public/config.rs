@@ -310,7 +310,7 @@ pub const TEXT_FOOTER_LEFT: &[ MessageSect ] =
 ];
 
 pub const TEXT_FOOTER_CENTER: &[ MessageSect ] =
-&[  ( "hyoi 2021 - 2023", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
+&[  ( "hyoi 2021 - 2024", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
 ];
 
 pub const TEXT_FOOTER_RIGHT: &[ MessageSect ] =
