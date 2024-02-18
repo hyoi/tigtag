@@ -85,8 +85,8 @@ pub fn hit_any_key<T: Component + HitAnyKey>
 (   qry_ui: Query<&T>,
     opt_gamepad: Option<Res<TargetGamepad>>,
     mut next_state: ResMut<NextState<MyState>>,
-    inkey: Res<Input<KeyCode>>,
-    inbtn: Res<Input<GamepadButton>>,
+    inkey: Res<ButtonInput<KeyCode>>,
+    inbtn: Res<ButtonInput<GamepadButton>>,
 )
 {   let Ok ( ui ) = qry_ui.get_single() else { return };
 

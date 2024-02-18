@@ -12,7 +12,7 @@ pub fn choice_way
 ) -> News
 {   let mut sides = Vec::from( org_sides );
     let mut chasers = Vec::with_capacity( qry_chasers.iter().len() );
-    qry_chasers.for_each
+    qry_chasers.iter().for_each
     (   | chaser |
         if chaser.next_grid == player.next_grid
         {   //衝突寸前で緊急回避が必要な場合

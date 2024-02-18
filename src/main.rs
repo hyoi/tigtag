@@ -7,7 +7,7 @@ use bevy::
     diagnostic::{ DiagnosticsStore, FrameTimeDiagnosticsPlugin },
     sprite::{ Anchor, MaterialMesh2dBundle },
     utils::{ HashSet, HashMap },
-    audio::{ Volume, VolumeLevel },
+    audio::Volume,
 };
 use once_cell::sync::Lazy;
 use rand::prelude::*;
@@ -56,7 +56,7 @@ fn main()
             //テスト用：オブジェクト表示
             debug::spawn_2d_sprites //2D表示テスト
             .run_if( DEBUG )
-            .run_if( not( resource_exists::<Map>() ) ) //debug表示が被るので
+            .run_if( not( resource_exists::<Map> ) ) //debug表示が被るので
         )
     )
     .init_resource::<TargetGamepad>() //操作を受付けるゲームパッドのID
@@ -72,7 +72,7 @@ fn main()
 
     //メイン処理
     app
-    .add_state::<MyState>() //Stateを初期化する。enumの#[default]で初期値指定
+    .init_state::<MyState>() //Stateを初期化する。enumの#[default]で初期値指定
     .add_plugins( load_assets::Schedule ) //assetsの事前ロード
     .add_plugins( init_app::Schedule )    //ゲーム枠・FPSの表示等、事前処理
     .add_plugins( play_game::Schedule )   //ゲームロジック

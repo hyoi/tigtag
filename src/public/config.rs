@@ -21,7 +21,6 @@ pub static MAIN_WINDOW: Lazy<Option<Window>> = Lazy::new
                 maximize: false,
                 close   : true,
             },
-            // fit_canvas_to_parent: true, //不具合が発生した場合コメントアウトする
             ..default()
         };
 
@@ -166,17 +165,15 @@ pub const DEPTH_SPRITE_BRICK_WALL : f32 = 400.0;
 
 //スプライト色
 pub const COLOR_SPRITE_DOT   : Color = Color::rgb( 1.0, 1.0, 0.7 );
-// pub const COLOR_SPRITE_PLAYER: Color = Color::YELLOW;
+pub const _COLOR_SPRITE_PLAYER: Color = Color::YELLOW;
 
 //スプライト拡縮
 pub const MAGNIFY_SPRITE_DOT   : f32 = 0.08;
-// pub const MAGNIFY_SPRITE_PLAYER: f32 = 0.4;
-// pub const MAGNIFY_SPRITE_CHASER: f32 = 0.5;
+pub const _MAGNIFY_SPRITE_PLAYER: f32 = 0.4;
+pub const _MAGNIFY_SPRITE_CHASER: f32 = 0.5;
 
 //SEボリューム
 pub const VOLUME_SOUND_BEEP: f32 = 0.1;
-// pub const VOLUME_SOUND_BEEP: Volume = Volume::Relative ( VolumeLevel::new( 0.1 ) );
-//と書きたいがVolumeLevel::new()がnon-const fnなので書けない。
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -232,7 +229,7 @@ pub const PAUSE_BUTTON: GamepadButtonType = GamepadButtonType::Select; //PS4[SHA
 ////////////////////////////////////////////////////////////////////////////////
 
 //フルスクリーンのキー／ボタン
-pub const FULL_SCREEN_KEY: KeyCode = KeyCode::Return;
+pub const FULL_SCREEN_KEY: KeyCode = KeyCode::Enter;
 pub const FULL_SCREEN_KEY_MODIFIER: &[ KeyCode ] =
 &[  KeyCode::AltRight,
     KeyCode::AltLeft,
@@ -313,7 +310,7 @@ pub const TEXT_FOOTER_LEFT: &[ MessageSect ] =
 ];
 
 pub const TEXT_FOOTER_CENTER: &[ MessageSect ] =
-&[  ( "hyoi 2021 - 2023", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
+&[  ( "hyoi 2021 - 2024", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
 ];
 
 pub const TEXT_FOOTER_RIGHT: &[ MessageSect ] =

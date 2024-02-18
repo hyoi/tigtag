@@ -52,8 +52,8 @@ pub fn change_gamepad_connection
 pub fn toggle_window_mode
 (   mut qry_window: Query<&mut Window>,
     opt_gamepad: Option<Res<TargetGamepad>>,
-    inkey: Res<Input<KeyCode>>,
-    inbtn: Res<Input<GamepadButton>>,
+    inkey: Res<ButtonInput<KeyCode>>,
+    inbtn: Res<ButtonInput<GamepadButton>>,
 )
 {   let Ok( mut window ) = qry_window.get_single_mut() else { return };
 
@@ -105,21 +105,21 @@ pub fn despawn<T: Component>
 (   qry_entity: Query<Entity, With<T>>,
     mut cmds: Commands,
 )
-{   qry_entity.for_each( | id | cmds.entity( id ).despawn_recursive() );
+{   qry_entity.iter().for_each( | id | cmds.entity( id ).despawn_recursive() );
 }
 
 //QueryしたComponentを見せる
 pub fn show<T: Component>
 (   mut qry: Query<&mut Visibility, With<T>>,
 )
-{   qry.for_each_mut( | mut vis | *vis = Visibility::Visible );
+{   qry.iter_mut().for_each( | mut vis | *vis = Visibility::Visible );
 }
 
 //QueryしたComponentを隠す
 pub fn hide<T: Component>
 (   mut qry: Query<&mut Visibility, With<T>>,
 )
-{   qry.for_each_mut( | mut vis | *vis = Visibility::Hidden );
+{   qry.iter_mut().for_each( | mut vis | *vis = Visibility::Hidden );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -139,10 +139,10 @@ pub fn text_ui
         };
         sections.push( TextSection { value, style } );
     }
-    let alignment = TextAlignment::Center;
+    let justify = JustifyText::Center;
     let position_type = PositionType::Absolute;
 
-    let text  = Text { sections, alignment, ..default() };
+    let text  = Text { sections, justify, ..default() };
     let style = Style { position_type, ..default() };
     TextBundle { text, style, ..default() }
 }
@@ -175,7 +175,7 @@ pub fn hidden_ui_frame
 
 //キャラクターをアニメーションさせる
 pub fn animating_sprites<T: Component + CharacterAnimation>
-(   mut qry_target: Query<( &mut TextureAtlasSprite, &mut T )>,
+(   mut qry_target: Query<( &mut TextureAtlas, &mut T )>,
     time: Res<Time>,
 )
 {   for ( mut sprite, mut character ) in &mut qry_target

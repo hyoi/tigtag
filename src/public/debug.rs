@@ -28,15 +28,15 @@ pub fn spawn_2d_sprites
             (   | cmds |
                 {   let value = format!( "{:02}\n{:02}", x, y ).to_string();
                     let style = TextStyle
-                    {   font     : asset_svr.load( ASSETS_FONT_PRESSSTART2P_REGULAR ),
-                        font_size: PIXELS_PER_GRID * 0.25,
-                        color    : Color::DARK_GREEN,
+                    {   font_size: PIXELS_PER_GRID * 0.4,
+                        color    : Color::GRAY,
+                        ..default()
                     };
-                    let sections  = vec![ TextSection { value, style } ];
-                    let alignment = TextAlignment::Center;
+                    let sections = vec![ TextSection { value, style } ];
+                    let justify = JustifyText::Center;
 
                     cmds.spawn( Text2dBundle::default() )
-                    .insert( Text { sections, alignment, ..default() } )
+                    .insert( Text { sections, justify, ..default() } )
                     .insert( Transform::from_translation( Vec3::Z ) )
                     ;
                 }

@@ -8,14 +8,14 @@ pub fn spawn_sprite
     opt_map: Option<ResMut<Map>>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut texture_atlases_layout: ResMut<Assets<TextureAtlasLayout>>,
     // mut meshes: ResMut<Assets<Mesh>>,
     // mut materials: ResMut<Assets<ColorMaterial>>,
 )
 {   let Some ( mut map ) = opt_map else { return };
 
     //スプライトがあれば削除する
-    qry_player.for_each( | id | cmds.entity( id ).despawn_recursive() );
+    qry_player.iter().for_each( | id | cmds.entity( id ).despawn_recursive() );
 
     //乱数で初期位置を決める(マップ中央付近の通路)
     let half_w = MAP_GRIDS_WIDTH  / 2;
@@ -35,7 +35,7 @@ pub fn spawn_sprite
     let sprite_vec2 = player_grid.to_vec2_on_map();
     let translation = sprite_vec2.extend( DEPTH_SPRITE_PLAYER );
 
-    //プレイヤーのスプライトを配置する
+    //プレイヤーのComponentを初期化する
     let player = Player
     {   grid     : player_grid,
         next_grid: player_grid,
@@ -46,41 +46,53 @@ pub fn spawn_sprite
     };
 
     //アニメーションするスプライトをspawnする
-    let texture_atlas = asset_svr.gen_texture_atlas_player();
-    let texture_atlas_hdl = texture_atlases.add( texture_atlas );
     let custom_size = Some( SIZE_GRID );
+    let layout = texture_atlases_layout.add
+    (   TextureAtlasLayout::from_grid
+        (   SPRITE_SHEET_SIZE_PLAYER,
+            SPRITE_SHEET_COLS_PLAYER,
+            SPRITE_SHEET_ROWS_PLAYER,
+            None, None
+        )
+    );
     let index = player.sprite_sheet_offset( player.direction() );
-    let texture_atlas_sprite = TextureAtlasSprite { custom_size, index, ..default() };
     cmds.spawn( ( SpriteSheetBundle::default(), player ) )
-    .insert( texture_atlas_hdl )
-    .insert( texture_atlas_sprite )
+    .insert( Sprite { custom_size, ..default() } )
+    .insert( asset_svr.load( ASSETS_SPRITE_SHEET_PLAYER ) as Handle<Image> )
+    .insert( TextureAtlas { layout, index } )
     .insert( Transform::from_translation( translation ) )
     ;
 
-    //三角形のメッシュ
-    // let radius = PIXELS_PER_GRID * MAGNIFY_SPRITE_PLAYER;
-    // let shape = shape::RegularPolygon::new( radius, 3 ).into();
+    // //三角形のメッシュ
+    // let radius = PIXELS_PER_GRID * _MAGNIFY_SPRITE_PLAYER;
+    // let shape = RegularPolygon::new( radius, 3 ).mesh();
     // let triangle = MaterialMesh2dBundle
     // {   mesh: meshes.add( shape ).into(),
-    //     material: materials.add( COLOR_SPRITE_PLAYER.into() ),
+    //     material: materials.add( _COLOR_SPRITE_PLAYER ),
     //     ..default()
     // };
     // let quat = Quat::from_rotation_z( PI ); //News::South
     // cmds.spawn( ( triangle, player ) )
     // .insert( Transform::from_translation( translation ).with_rotation( quat ) )
-    // .insert( TextureAtlasSprite::default() ) //move_sprite()のqry_playerの検索条件を満たすためのdummy
+    // .insert( TextureAtlas::default() ) //move_sprite()のqry_playerの検索条件を満たすためのdummy
     // ;
+    // cmds.insert_resource( FlagPlayerTriangle ); //move_sprite()内処理の切替用フラグ
 }
+
+//三角形メッシュを使う場合のフラグResource
+#[derive( Resource )]
+pub struct FlagPlayerTriangle;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //プレイヤーを移動させる
 #[allow(clippy::too_many_arguments)]
 pub fn move_sprite
-(   mut qry_player: Query<( &mut Player, &mut Transform, &mut TextureAtlasSprite )>,
+(   mut qry_player: Query<( &mut Player, &mut Transform, &mut TextureAtlas )>,
     opt_input: Option<Res<input::CrossDirection>>,
     opt_map: Option<Res<Map>>,
     opt_demo: Option<Res<DemoMapParams>>,
+    opt_triangle: Option<Res<FlagPlayerTriangle>>,
     qry_chasers: Query<&Chaser>,
     state: ResMut<State<MyState>>,
     mut evt_clear: EventReader<EventClear>,
@@ -159,7 +171,7 @@ pub fn move_sprite
 
         //プレイヤーの進む向きが変わったらスプライトを回転させる
         if player.direction != new_side
-        {   if sprite.custom_size.is_some()
+        {   if opt_triangle.is_none()
             {   let old_offset = player.sprite_sheet_offset( player.direction );
                 let new_offset = player.sprite_sheet_offset( new_side         );
                 sprite.index = sprite.index - old_offset + new_offset;

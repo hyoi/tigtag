@@ -348,32 +348,4 @@ impl CharacterAnimation for Chaser
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//AssetServerにTextureAtlasを作るメソッドを追加
-pub trait GenAnimeSprite
-{   fn gen_texture_atlas_player( &self ) -> TextureAtlas;
-    fn gen_texture_atlas_chaser( &self, asset: &'static str ) -> TextureAtlas;
-}
-impl GenAnimeSprite for AssetServer
-{   fn gen_texture_atlas_player( &self ) -> TextureAtlas
-    {   TextureAtlas::from_grid
-        (   self.load( ASSETS_SPRITE_SHEET_PLAYER ),
-            SPRITE_SHEET_SIZE_PLAYER,
-            SPRITE_SHEET_COLS_PLAYER,
-            SPRITE_SHEET_ROWS_PLAYER,
-            None, None
-        )
-    }
-    fn gen_texture_atlas_chaser( &self, asset: &'static str ) -> TextureAtlas
-    {   TextureAtlas::from_grid
-        (   self.load( asset ),
-            SPRITE_SHEET_SIZE_CHASER,
-            SPRITE_SHEET_COLS_CHASER,
-            SPRITE_SHEET_ROWS_CHASER,
-            None, None
-        )
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 //End of code.

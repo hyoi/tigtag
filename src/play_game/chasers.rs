@@ -58,48 +58,58 @@ pub fn spawn_sprite
     opt_record: Option<Res<Record>>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut texture_atlases_layout: ResMut<Assets<TextureAtlasLayout>>,
 )
 {   let Some ( record ) = opt_record else { return };
 
     //スプライトがあれば削除する
-    qry_chaser.for_each( | id | cmds.entity( id ).despawn_recursive() );
+    qry_chaser.iter().for_each( | id | cmds.entity( id ).despawn_recursive() );
 
     //チェイサーのスプライトを配置する
     ( 0.. ).zip( CHASER_START_POSITION ).zip( SPRITE_SHEET_CHASERS ).for_each
-    (   | ( ( i, chaser_grid ), asset ) |
-        {   let chaser_vec2 = chaser_grid.to_vec2_on_map();
-            let index = ( ( i + record.stage() - 1 ) % 4 ) as usize;
+    (   | ( ( i, chaser_grid ), asset_file ) |
+        {   let index = ( ( i + record.stage() - 1 ) % 4 ) as usize;
             let ( color, opt_fn_chasing ) = COLOR_SPRITE_CHASERS[ index ];
+
+            let sprite_vec2 = chaser_grid.to_vec2_on_map();
+            let translation = sprite_vec2.extend( DEPTH_SPRITE_CHASER );
+
+            //チェイサーのComponentを初期化する
             let chaser = Chaser
             {   grid     : *chaser_grid,
                 next_grid: *chaser_grid,
-                dx_start : chaser_vec2,
-                dx_end   : chaser_vec2,
+                dx_start : sprite_vec2,
+                dx_end   : sprite_vec2,
                 color,
                 opt_fn_chasing,
                 ..default()
             };
-            let translation = chaser_vec2.extend( DEPTH_SPRITE_CHASER );
 
             //アニメーションするスプライトをspawnする
-            let texture_atlas = asset_svr.gen_texture_atlas_chaser( asset );
-            let texture_atlas_hdl = texture_atlases.add( texture_atlas );
             let custom_size = Some( SIZE_GRID );
-            let texture_atlas_sprite = TextureAtlasSprite { custom_size, ..default() };
+            let layout = texture_atlases_layout.add
+            (   TextureAtlasLayout::from_grid
+                (   SPRITE_SHEET_SIZE_CHASER,
+                    SPRITE_SHEET_COLS_CHASER,
+                    SPRITE_SHEET_ROWS_CHASER,
+                    None, None
+                )
+            );
+            let index = chaser.sprite_sheet_offset( chaser.direction() );
             cmds.spawn( ( SpriteSheetBundle::default(), chaser ) )
-            .insert( texture_atlas_hdl.clone() )
-            .insert( texture_atlas_sprite )
+            .insert( Sprite { custom_size, ..default() } )
+            .insert( asset_svr.load( *asset_file ) as Handle<Image> )
+            .insert( TextureAtlas { layout, index } )
             .insert( Transform::from_translation( translation ) )
             ;
 
-            //正方形のメッシュ
-            // let custom_size = Some ( SIZE_GRID * MAGNIFY_SPRITE_CHASER );
+            // //正方形のメッシュ
+            // let custom_size = Some ( SIZE_GRID * _MAGNIFY_SPRITE_CHASER );
             // cmds
             // .spawn( ( SpriteBundle::default(), chaser ) )
             // .insert( Sprite { color, custom_size, ..default() } )
             // .insert( Transform::from_translation( translation ) )
-            // .insert( TextureAtlasSprite::default() ) //move_sprite()のqry_playerの検索条件を満たすためのdummy
+            // // .insert( TextureAtlas::default() ) //move_sprite()のqry_playerの検索条件を満たすためのdummy
             // ;
         }
     );
@@ -117,14 +127,14 @@ pub fn spawn_sprite
 //     let quat = Quat::from_rotation_z( radian );
 
 //     //回転させる
-//     qry_chaser.for_each_mut( | mut transform | transform.rotate( quat ) );
+//     qry_chaser.iter_mut().for_each( | mut transform | transform.rotate( quat ) );
 // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //チェイサーを移動させる
 pub fn move_sprite
-(   mut qry_chaser: Query<( &mut Chaser, &mut Transform, &mut TextureAtlasSprite )>,
+(   mut qry_chaser: Query<( &mut Chaser, &mut Transform, &mut TextureAtlas )>,
     opt_map: Option<Res<Map>>,
     qry_player: Query<&Player>,
     mut evt_clear : EventReader<EventClear>,

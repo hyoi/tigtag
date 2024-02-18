@@ -129,7 +129,7 @@ fn update_fps
 {   let Ok( mut text ) = qry_text.get_single_mut() else { return };
 
     let fps_avr = diag_store
-    .get( FrameTimeDiagnosticsPlugin::FPS )
+    .get( &FrameTimeDiagnosticsPlugin::FPS )
     .map_or
     (   NA3_2.to_string(),
         | fps |

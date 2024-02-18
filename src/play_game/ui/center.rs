@@ -202,8 +202,8 @@ pub fn spawn_title
     let component = Title::default();
     let mut ui_title = misc::text_ui( component.title(), &asset_svr );
     let mut ui_demo  = misc::text_ui( component.demo (), &asset_svr );
-    ui_title.text.alignment = TextAlignment::Right;  //右寄せ
-    ui_demo.text.alignment  = TextAlignment::Center; //センタリング
+    ui_title.text.justify = JustifyText::Right;  //右寄せ
+    ui_demo.text.justify  = JustifyText::Center; //センタリング
     ui_title.style.position_type = PositionType::Relative;
     ui_demo.style.position_type  = PositionType::Relative;
     ui_title.visibility = Visibility::Inherited; //親のvisibility.is_visibleで表示を制御する
