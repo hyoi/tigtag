@@ -1,0 +1,125 @@
+use super::*;
+
+////////////////////////////////////////////////////////////////////////////////
+//Blinking
+
+//テキスト明滅のトレイト
+pub trait BlinkingText
+{   fn alpha( &mut self, time_delta: f32 ) -> f32;
+}
+
+//テキストを明滅させる
+pub fn blinking<T: Component + BlinkingText>
+(   mut qry_text: Query<( &mut Text, &mut T )>,
+    time: Res<Time>,
+)
+{   let Ok ( ( mut text, mut ui ) ) = qry_text.get_single_mut() else { return };
+
+    //text.sectionsをイテレーターで回して色を変化させる
+    let alpha = ui.alpha( time.delta().as_secs_f32() );
+    text.sections.iter_mut().for_each( |x| { x.style.color.set_a( alpha ); } );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//Hit ANY Key!
+
+//Hit ANY Keyの処理で無視するキーとボタン
+pub const HAK_IGNORE_KEYS: &[ KeyCode ] =
+&[  KeyCode::AltLeft    , KeyCode::AltRight,
+    KeyCode::ControlLeft, KeyCode::ControlRight,
+    KeyCode::ShiftLeft  , KeyCode::ShiftRight,
+    KeyCode::ArrowUp    , KeyCode::ArrowDown,
+    KeyCode::ArrowRight , KeyCode::ArrowLeft,
+    pause::PAUSE_KEY,
+];
+pub const HAK_IGNORE_BUTTONS: &[ GamepadButtonType ] =
+&[  FULL_SCREEN_BUTTON,
+    GamepadButtonType::DPadUp,    GamepadButtonType::DPadDown,
+    GamepadButtonType::DPadRight, GamepadButtonType::DPadLeft,
+    pause::PAUSE_BUTTON,
+];
+
+//入力があればStateを変更する
+pub fn hit_any_key<T: Send + Sync + Default + ChangeState>
+(   next: Local<T>,
+    opt_gamepad: Option<Res<TargetGamepad>>,
+    mut next_state: ResMut<NextState<MyState>>,
+    inkey: Res<ButtonInput<KeyCode>>,
+    inbtn: Res<ButtonInput<GamepadButton>>,
+)
+{   //無視キー以外のキー入力はあるか
+    if inkey.any_pressed( HAK_IGNORE_KEYS.iter().copied() ) { return }
+    let mut is_pressed = inkey.get_just_pressed().len();
+
+    //無視ボタン以外のボタン入力はあるか
+    if is_pressed == 0
+    {   let Some ( gamepad ) = opt_gamepad else { return };
+        let Some ( id ) = gamepad.id() else { return };
+        for buton in HAK_IGNORE_BUTTONS
+        {   if inbtn.pressed( GamepadButton::new( id, *buton ) ) { return }
+        }
+        is_pressed = inbtn.get_just_pressed().filter( |x| x.gamepad == id ).count();
+    }
+
+    //Stateを遷移させる
+    if is_pressed > 0
+    {   next_state.set( next.state() );
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Countdown
+
+//カウントダウンUIのプレイスホルダー
+pub const CDPH: &str = "__Placeholder_for_countdown__";
+
+//カウントダウンのトレイト
+pub trait CountDown
+{   fn count_down( &mut self ) -> &mut i32;
+    fn next_state( &self ) -> MyState;
+    fn timer( &mut self ) -> &mut Timer;
+    fn gen_message( &self, n: i32 ) -> String;
+    fn placeholder( &self ) -> Option<usize>;
+    fn initialize( &mut self );
+}
+
+//カウントダウンを初期化する
+pub fn init_counting<T: Component + CountDown>
+(   mut qrt_ui: Query<&mut T>,
+)
+{   let Ok ( mut ui ) = qrt_ui.get_single_mut() else { return };
+
+    ui.initialize();
+}
+
+//カウントダウンを表示しゼロになったらStateを変更する
+pub fn counting_down<T: Component + CountDown>
+(   mut qry_text_ui: Query<( &mut Text, &mut T )>,
+    mut next_state: ResMut<NextState<MyState>>,
+    time: Res<Time>,
+)
+{   let Ok ( ( mut text, mut ui ) ) = qry_text_ui.get_single_mut() else { return };
+    let Some ( placeholder ) = ui.placeholder() else { return };
+
+    //1秒経過したら
+    if ui.timer().tick( time.delta() ).finished()
+    {   *ui.count_down() -= 1;  //カウントダウン
+        ui.timer().reset(); //1秒タイマーリセット
+    }
+
+    //カウントダウンが続いているなら
+    let count_down = *ui.count_down();
+    if count_down >= 0
+    {   //カウントダウンの表示を更新する
+        let message = ui.gen_message( count_down );
+        text.sections[ placeholder ].value = message;
+    }
+    else
+    {   //そうでないならStateを変更する
+        next_state.set( ui.next_state() );
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//End of code.
