@@ -9,7 +9,7 @@ use bevy::
     diagnostic::{ FrameTimeDiagnosticsPlugin, DiagnosticsStore },
     utils::Duration,
     ecs::query::QueryFilter,
-//===============================================================
+  //=============================================================
     sprite::MaterialMesh2dBundle,
     utils::{ HashMap, HashSet },
     audio::Volume,
@@ -21,7 +21,7 @@ use rand::prelude::*;
 use std::
 {   ops::Range,
     f32::consts::{ PI, TAU },
-//================================
+  //=========================
     ops::{ Add, AddAssign },
     cmp::Ordering,
     collections::VecDeque,
@@ -109,7 +109,7 @@ fn main()
     app
     .init_state::<MyState>() //Stateを初期化する。enumの#[default]で初期値指定
     .add_plugins( load_assets::Schedule ) //assetsの事前ロード
-    .add_plugins( init_app::Schedule    ) //ゲーム枠・FPSの表示等、事前処理
+    .add_plugins( init_app::Schedule    ) //事前処理
     .add_plugins( play_game::Schedule   ) //ゲームロジック
     ;
 
