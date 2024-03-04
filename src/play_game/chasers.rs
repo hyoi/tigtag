@@ -206,7 +206,7 @@ pub fn move_sprite
     let time_delta = time.delta();
 
     //敵キャラは複数なのでループ処理する
-    for ( mut chaser, mut transform, mut sprite_seet ) in qry_chaser.iter_mut()
+    for ( mut chaser, mut transform, mut sprite_sheet ) in qry_chaser.iter_mut()
     {   //自動追尾の関数がセットされているか？
         let Some ( autochase ) = chaser.opt_fn_autochase else { return };
 
@@ -258,7 +258,7 @@ pub fn move_sprite
             if ! SPRITE_SHEET_OFF() && chaser.direction != new_side
             {   let old_offset = chaser.sprite_sheet_offset( chaser.direction );
                 let new_offset = chaser.sprite_sheet_offset( new_side         );
-                sprite_seet.index = sprite_seet.index - old_offset + new_offset;
+                sprite_sheet.index = sprite_sheet.index - old_offset + new_offset;
             }
             chaser.direction = new_side;
 

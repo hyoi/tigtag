@@ -187,7 +187,7 @@ pub fn move_sprite
     mut evt_clear: EventReader<EventClear>,
     mut evt_over: EventReader<EventOver>,
 )
-{   let Ok ( ( mut player, mut transform, mut sprite_seet ) ) = qry_player.get_single_mut() else { return };
+{   let Ok ( ( mut player, mut transform, mut sprite_sheet ) ) = qry_player.get_single_mut() else { return };
     let Some ( map ) = opt_map else { return };
     let Some ( input_direction ) = opt_input_direction else { return };
 
@@ -281,7 +281,7 @@ pub fn move_sprite
             {   //スプライトシートのindexを変更する
                 let old_offset = player.sprite_sheet_offset( player.direction );
                 let new_offset = player.sprite_sheet_offset( new_side         );
-                sprite_seet.index = sprite_seet.index - old_offset + new_offset;
+                sprite_sheet.index = sprite_sheet.index - old_offset + new_offset;
             }
             player.direction = new_side;
         }

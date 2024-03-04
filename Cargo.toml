@@ -16,4 +16,4 @@ chrono = "0.4"
 # getrandom = { version = "0.2.4", features = [ "wasm-bindgen" ] }
 
 [features]
-sprite_seet_off = [] # cargo run --features sprite_seet_off
+sprite_sheet_off = [] # cargo run --features sprite_sheet_off
