@@ -42,7 +42,7 @@ impl effect::CountDown for StageStartCD
     fn timer( &mut self ) -> &mut Timer { &mut self.timer }
     fn gen_message( &self, n: i32 ) -> String { if n == 0 { "Go!!".to_string() } else { n.to_string() } }
     fn placeholder( &self ) -> Option<usize> { UI_STAGE_START.iter().position( |x| x.0 == effect::CDPH ) }
-    fn initialize( &mut self ) { *self = StageStartCD::default(); }
+    fn initialize( &mut self ) { *self = Self::default(); }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

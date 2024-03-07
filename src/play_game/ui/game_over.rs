@@ -51,7 +51,7 @@ impl effect::CountDown for GameOverCD
     fn timer( &mut self ) -> &mut Timer { &mut self.timer }
     fn gen_message( &self, n: i32 ) -> String { n.to_string() }
     fn placeholder( &self ) -> Option<usize> { UI_HIT_ANY_KEY.iter().position( |x| x.0 == effect::CDPH ) }
-    fn initialize( &mut self ) { *self = GameOverCD::default(); }
+    fn initialize( &mut self ) { *self = Self::default(); }
 }
 
 //明滅効果を適用するためのComponent

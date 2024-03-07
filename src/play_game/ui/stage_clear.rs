@@ -42,7 +42,7 @@ impl effect::CountDown for StageClearCD
     fn timer( &mut self ) -> &mut Timer { &mut self.timer }
     fn gen_message( &self, n: i32 ) -> String { ( n + 6 ).to_string() }
     fn placeholder( &self ) -> Option<usize> { UI_STAGE_CLEAR.iter().position( |x| x.0 == effect::CDPH ) }
-    fn initialize( &mut self ) { *self = StageClearCD::default(); }
+    fn initialize( &mut self ) { *self = Self::default(); }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
