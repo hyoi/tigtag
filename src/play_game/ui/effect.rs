@@ -1,15 +1,14 @@
 use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
-//Blinking
 
 //テキスト明滅のトレイト
-pub trait BlinkingText
+pub trait Blinking
 {   fn alpha( &mut self, time_delta: f32 ) -> f32;
 }
 
 //テキストを明滅させる
-pub fn blinking<T: Component + BlinkingText>
+pub fn blinking<T: Component + Blinking>
 (   mut qry_text: Query<( &mut Text, &mut T )>,
     time: Res<Time>,
 )
@@ -21,7 +20,6 @@ pub fn blinking<T: Component + BlinkingText>
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//Hit ANY Key!
 
 //Hit ANY Keyの処理で無視するキーとボタン
 pub const HAK_IGNORE_KEYS: &[ KeyCode ] =
@@ -68,7 +66,6 @@ pub fn hit_any_key<T: Send + Sync + Default + ChangeState>
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Countdown
 
 //カウントダウンUIのプレイスホルダー
 pub const CDPH: &str = "__Placeholder_for_countdown__";
@@ -84,7 +81,7 @@ pub trait CountDown
 }
 
 //カウントダウンを初期化する
-pub fn init_counting<T: Component + CountDown>
+pub fn init_count<T: Component + CountDown>
 (   mut qrt_ui: Query<&mut T>,
 )
 {   let Ok ( mut ui ) = qrt_ui.get_single_mut() else { return };
@@ -93,7 +90,7 @@ pub fn init_counting<T: Component + CountDown>
 }
 
 //カウントダウンを表示しゼロになったらStateを変更する
-pub fn counting_down<T: Component + CountDown>
+pub fn count_down<T: Component + CountDown>
 (   mut qry_text_ui: Query<( &mut Text, &mut T )>,
     mut next_state: ResMut<NextState<MyState>>,
     time: Res<Time>,

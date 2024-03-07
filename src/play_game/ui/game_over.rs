@@ -60,7 +60,7 @@ impl effect::CountDown for GameOverCD
 pub struct GameOver_Replay ( f32 );
 
 //明滅させるためのトレイトの実装
-impl effect::BlinkingText for GameOver_Replay
+impl effect::Blinking for GameOver_Replay
 {   fn alpha( &mut self, time_delta: f32 ) -> f32
     {   let radian = &mut self.0;
         *radian += TAU * time_delta;

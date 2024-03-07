@@ -36,7 +36,7 @@ pub struct GameTitle;
 pub struct GameTitle_Demo ( f32 );
 
 //明滅させるためのトレイトの実装
-impl effect::BlinkingText for GameTitle_Demo
+impl effect::Blinking for GameTitle_Demo
 {   fn alpha( &mut self, time_delta: f32 ) -> f32
     {   let radian = &mut self.0;
         *radian += TAU * time_delta;

@@ -94,8 +94,8 @@ impl Plugin for Schedule
                 .chain(), //実行順の固定
 
                 (   //プレー開始メッセージの表示
-                    ui::effect::init_counting::<ui::StageStartCD>, //カウントダウン初期化
-                    misc::show_component::<ui::StageStart>,        //UI可視化
+                    ui::effect::init_count::<ui::StageStartCD>, //カウントダウン初期化
+                    misc::show_component::<ui::StageStart>,     //UI可視化
                 )
                 .chain(), //実行順の固定
             )
@@ -103,7 +103,7 @@ impl Plugin for Schedule
         .add_systems
         (   Update,
             (   //演出
-                ui::effect::counting_down::<ui::StageStartCD>, //カウントダウン
+                ui::effect::count_down::<ui::StageStartCD>, //カウントダウン
             )
             .run_if( in_state( MyState::StageStart ) )
         )
@@ -142,15 +142,15 @@ impl Plugin for Schedule
         .add_systems
         (   OnEnter ( MyState::StageClear ),
             (   //ステージクリアの表示
-                ui::effect::init_counting::<ui::StageClearCD>, //カウントダウン初期化
-                misc::show_component::<ui::StageClear>,        //UI可視化
+                ui::effect::init_count::<ui::StageClearCD>, //カウントダウン初期化
+                misc::show_component::<ui::StageClear>,     //UI可視化
             )
             .chain(), //実行順の固定
         )
         .add_systems
         (   Update,
             (   //演出
-                ui::effect::counting_down::<ui::StageClearCD>, //カウントダウン
+                ui::effect::count_down::<ui::StageClearCD>, //カウントダウン
             )
             .run_if( in_state( MyState::StageClear ) )
         )
@@ -166,15 +166,15 @@ impl Plugin for Schedule
         .add_systems
         (   OnEnter ( MyState::GameOver ),
             (   //ゲームオーバーの表示
-                ui::effect::init_counting::<ui::GameOverCD>, //カウントダウン初期化
-                misc::show_component::<ui::GameOver>,        //UI可視化
+                ui::effect::init_count::<ui::GameOverCD>, //カウントダウン初期化
+                misc::show_component::<ui::GameOver>,     //UI可視化
             )
             .chain() //実行順の固定
         )
         .add_systems
         (   Update,
             (   //演出＆入力待ち
-                ui::effect::counting_down::<ui::GameOverCD>, //カウントダウン
+                ui::effect::count_down::<ui::GameOverCD>,    //カウントダウン
                 ui::effect::blinking::<ui::GameOver_Replay>, //Replay? の明滅
                 ui::effect::hit_any_key::<StageStart>,       //Hit ANY Key
             )
