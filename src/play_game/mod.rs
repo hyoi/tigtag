@@ -11,6 +11,7 @@ use common::*;
 //UIの処理
 mod header;
 mod ui;
+use ui::*;
 
 //マップ、自機、追手の処理
 mod map;

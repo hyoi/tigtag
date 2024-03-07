@@ -19,16 +19,18 @@ pub struct StageStart;
 
 //カウントダウンを適用するためのComponent
 #[derive( Component )]
-pub struct StageStartCD
-{   count_down  : i32,
-    next_state  : MyState,
-    timer       : Timer,
+pub struct CountDown<'a>
+{   count_down: i32,
+    count_text: &'a [ MessageSect ],
+    next_state: MyState,
+    timer     : Timer,
 }
 
-impl Default for StageStartCD
+impl<'a> Default for CountDown<'a>
 {   fn default() -> Self
     {   Self
         {   count_down: 5, //カウントダウンの最大値
+            count_text: UI_STAGE_START,
             next_state: MyState::MainLoop,
             timer     : Timer::from_seconds( 1.0, TimerMode::Once ),
         }
@@ -36,12 +38,12 @@ impl Default for StageStartCD
 }
 
 //カウントダウンのトレイトの実装
-impl effect::CountDown for StageStartCD
+impl<'a> effect::CountDown for CountDown<'a>
 {   fn count_down( &mut self ) -> &mut i32 { &mut self.count_down }
     fn next_state( &self ) -> MyState { self.next_state }
     fn timer( &mut self ) -> &mut Timer { &mut self.timer }
     fn gen_message( &self, n: i32 ) -> String { if n == 0 { "Go!!".to_string() } else { n.to_string() } }
-    fn placeholder( &self ) -> Option<usize> { UI_STAGE_START.iter().position( |x| x.0 == effect::CDPH ) }
+    fn placeholder( &self ) -> Option<usize> { self.count_text.iter().position( |x| x.0 == effect::CDPH ) }
     fn initialize( &mut self ) { *self = Self::default(); }
 }
 
@@ -65,7 +67,7 @@ pub fn spawn_text
     ui.visibility         = Visibility::Hidden; //初期状態
 
     //レイアウト用の隠しフレームの中に子要素を作成する
-    let child_id = cmds.spawn( ( ui, StageStart, StageStartCD::default() ) ).id();
+    let child_id = cmds.spawn( ( ui, StageStart, CountDown::default() ) ).id();
     cmds.entity( hidden_node ).add_child( child_id );
 }
 

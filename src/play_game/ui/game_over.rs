@@ -28,16 +28,18 @@ pub struct GameOver;
 
 //カウントダウンを適用するためのComponent
 #[derive( Component )]
-pub struct GameOverCD
+pub struct CountDown<'a>
 {   count_down: i32,
+    count_text: &'a [ MessageSect ],
     next_state: MyState,
     timer     : Timer,
 }
 
-impl Default for GameOverCD
+impl<'a> Default for CountDown<'a>
 {   fn default() -> Self
     {   Self
         {   count_down: 10, //カウントダウンの最大値
+            count_text: UI_HIT_ANY_KEY,
             next_state: MyState::TitleDemo,
             timer     : Timer::from_seconds( 1.0, TimerMode::Once ),
         }
@@ -45,24 +47,23 @@ impl Default for GameOverCD
 }
 
 //カウントダウンのトレイトの実装
-impl effect::CountDown for GameOverCD
+impl<'a> effect::CountDown for CountDown<'a>
 {   fn count_down( &mut self ) -> &mut i32 { &mut self.count_down }
     fn next_state( &self ) -> MyState { self.next_state }
     fn timer( &mut self ) -> &mut Timer { &mut self.timer }
     fn gen_message( &self, n: i32 ) -> String { n.to_string() }
-    fn placeholder( &self ) -> Option<usize> { UI_HIT_ANY_KEY.iter().position( |x| x.0 == effect::CDPH ) }
+    fn placeholder( &self ) -> Option<usize> { self.count_text.iter().position( |x| x.0 == effect::CDPH ) }
     fn initialize( &mut self ) { *self = Self::default(); }
 }
 
 //明滅効果を適用するためのComponent
-#[allow( non_camel_case_types )]
 #[derive( Component, Default )]
-pub struct GameOver_Replay ( f32 );
+pub struct Blinking { blink_cycle: f32 }
 
 //明滅させるためのトレイトの実装
-impl effect::Blinking for GameOver_Replay
+impl effect::Blinking for Blinking
 {   fn alpha( &mut self, time_delta: f32 ) -> f32
-    {   let radian = &mut self.0;
+    {   let radian = &mut self.blink_cycle;
         *radian += TAU * time_delta;
         *radian -= if *radian > TAU { TAU } else { 0.0 };
 
@@ -88,9 +89,9 @@ pub fn spawn_text
     ui_hakey.text.justify = JustifyText::Center; //センタリング
 
     let children =
-    &[  cmds.spawn(   ui_game_over                            ).id(),
-        cmds.spawn( ( ui_replay, GameOver_Replay::default() ) ).id(),
-        cmds.spawn( ( ui_hakey , GameOverCD::default()      ) ).id(),
+    &[  cmds.spawn(   ui_game_over                      ).id(),
+        cmds.spawn( ( ui_replay, Blinking::default()  ) ).id(),
+        cmds.spawn( ( ui_hakey , CountDown::default() ) ).id(),
     ];
 
     //レイアウト用の隠しノードの中に子要素を作成する

@@ -31,14 +31,13 @@ const UI_HIT_ANY_KEY: &[ MessageSect ] =
 pub struct GameTitle;
 
 //明滅効果を適用するためのComponent
-#[allow( non_camel_case_types )]
 #[derive( Component, Default )]
-pub struct GameTitle_Demo ( f32 );
+pub struct Blinking { blink_cycle: f32 }
 
 //明滅させるためのトレイトの実装
-impl effect::Blinking for GameTitle_Demo
+impl effect::Blinking for Blinking
 {   fn alpha( &mut self, time_delta: f32 ) -> f32
-    {   let radian = &mut self.0;
+    {   let radian = &mut self.blink_cycle;
         *radian += TAU * time_delta;
         *radian -= if *radian > TAU { TAU } else { 0.0 };
 
@@ -66,7 +65,7 @@ pub fn spawn_text
 
     let children =
     &[  cmds.spawn(   ui_title                             ).id(),
-        cmds.spawn( ( ui_demo, GameTitle_Demo::default() ) ).id(),
+        cmds.spawn( ( ui_demo, Blinking::default() ) ).id(),
         cmds.spawn(   ui_hakey                             ).id(),
     ];
 
