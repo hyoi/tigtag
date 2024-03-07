@@ -64,9 +64,9 @@ pub fn spawn_text
     ui_hakey.text.justify = JustifyText::Center; //センタリング
 
     let children =
-    &[  cmds.spawn(   ui_title                             ).id(),
+    &[  cmds.spawn(   ui_title                       ).id(),
         cmds.spawn( ( ui_demo, Blinking::default() ) ).id(),
-        cmds.spawn(   ui_hakey                             ).id(),
+        cmds.spawn(   ui_hakey                       ).id(),
     ];
 
     //レイアウト用の隠しノードの中に子要素を作成する
