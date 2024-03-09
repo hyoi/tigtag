@@ -13,11 +13,19 @@ impl Plugin for Schedule
         //plugin
         .add_plugins( footer::Schedule ) //フッター(demo record)
 
+        //debug表示(Gizumo)
+        .add_systems
+        (   Update,
+            view_data_for_demo
+                .run_if( DEBUG )
+                .run_if( in_state( MyState::TitleDemo ) )
+        )
+
         ////////////////////////////////////////////////////////////////////////
         //デモプレイ
         .add_systems
         (   OnEnter ( MyState::TitleDemo ),
-            (   //マップデータの作成
+            (   //マップデータ生成
                 play_game::map::make_new_data,
                 make_data_for_demo, //デモ用マップ情報を収集
 
@@ -31,10 +39,13 @@ impl Plugin for Schedule
         )
         .add_systems
         (   Update,
-            (   //ループ脱出条件の判定
+            (   //ループ脱出条件
                 detection::scoring_and_stage_clear, //スコアリング＆クリア判定
-                update_data_for_demo,               //デモ用マップ情報を更新
+                misc::change_state::<DemoLoop>.run_if( on_event::<EventClear>() ),
+                update_data_for_demo.run_if( on_event::<EventEatDot>() ),
+
                 detection::collisions_and_gameover, //衝突判定
+                misc::change_state::<DemoLoop>.run_if( on_event::<EventOver>() ),
 
                 //スプライトの移動
                 (   play_game::player::move_sprite,  //自キャラ
@@ -53,16 +64,6 @@ impl Plugin for Schedule
                 misc::change_state::<TitleDemo>,
             )
             .chain() //実行順の固定
-        );
-
-        ////////////////////////////////////////////////////////////////////////
-        //debug表示
-        app.add_systems
-        (   Update,
-            (   view_min_rect_contains_dots,
-            )
-            .run_if( DEBUG )
-            .run_if( in_state( MyState::TitleDemo ) )
         )
         ;
     }
@@ -132,13 +133,13 @@ fn make_data_for_demo
 fn update_data_for_demo
 (   qry_player: Query<&player::Player>,
     opt_demo: Option<ResMut<DemoMapParams>>,
-    mut evt_eatdot: EventReader<EventEatDot>,
+    // mut evt_eatdot: EventReader<EventEatDot>,
 )
 {   let Ok ( player ) = qry_player.get_single() else { return };
     let Some ( mut demo ) = opt_demo else { return };
 
-    //直前のスコアリングでドットを削除していない場合
-    if evt_eatdot.read().next().is_none() { return }
+    // //直前のスコアリングでドットを削除していない場合
+    // if evt_eatdot.read().next().is_none() { return }
 
     //プレイヤーの位置の列・行のdotsを減らす
     *demo.dots_sum_x_mut( player.grid.x ) -= 1;
@@ -192,7 +193,7 @@ impl DemoMapParams
 ////////////////////////////////////////////////////////////////////////////////
 
 //demo用情報のdebug表示
-fn view_min_rect_contains_dots
+fn view_data_for_demo
 (   opt_demo: Option<Res<DemoMapParams>>,
     mut gizmos: Gizmos
 )

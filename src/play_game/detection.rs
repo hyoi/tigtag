@@ -14,7 +14,6 @@ pub fn scoring_and_stage_clear
     opt_map: Option<ResMut<map::Map>>,
     opt_record: Option<ResMut<Record>>,
     state: Res<State<MyState>>,
-    mut next_state: ResMut<NextState<MyState>>,
     mut evt_clear: EventWriter<EventClear>,
     mut evt_eatdot: EventWriter<EventEatDot>,
     mut cmds: Commands,
@@ -51,14 +50,7 @@ pub fn scoring_and_stage_clear
 
     //全ドットを拾ったらステージクリア
     if map.remaining_dots <= 0
-    {   next_state.set
-        (   match state.get()
-            {   MyState::MainLoop  => MyState::StageClear,
-                MyState::TitleDemo => MyState::DemoLoop,
-                _ => unreachable!( "Bad state: {:?}", state.get() ),
-            }
-        );
-        *record.is_clear_mut() = true;
+    {   *record.is_clear_mut() = true;
         evt_clear.send( EventClear ); //後続の処理にステージクリアを伝達する
     }
 }
@@ -70,21 +62,15 @@ pub fn scoring_and_stage_clear
 pub fn collisions_and_gameover
 (   qry_player: Query<&player::Player>,
     qry_chaser: Query<&chasers::Chaser>,
-    // opt_record: Option<Res<Record>>,
-    state: Res<State<MyState>>,
-    mut next_state: ResMut<NextState<MyState>>,
     mut evt_clear: EventReader<EventClear>,
     mut evt_over: EventWriter<EventOver>,
 )
-{   //let Some ( _record ) = opt_record else { return };
-
-    //直前の判定でクリアしていたら衝突判定しない
+{   //直前の判定でクリアしていたら衝突判定しない
     if evt_clear.read().next().is_some() { return }
 
     //衝突判定が真なら
     if is_collision( qry_player, qry_chaser )
-    {   next_state.set( state.gameover_next() );
-        evt_over.send( EventOver ); //後続の処理にゲームオーバーを伝える
+    {   evt_over.send( EventOver ); //後続の処理にゲームオーバーを伝える
     }
 }
 

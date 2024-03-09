@@ -175,7 +175,6 @@ pub fn spawn_sprite
 ////////////////////////////////////////////////////////////////////////////////
 
 //自キャラを移動させる
-#[allow(clippy::too_many_arguments)]
 pub fn move_sprite
 (   mut qry_player: Query<( &mut Player, &mut Transform, &mut TextureAtlas )>,
     opt_map: Option<Res<map::Map>>,
@@ -184,16 +183,10 @@ pub fn move_sprite
     qry_chasers: Query<&chasers::Chaser>,
     state: ResMut<State<MyState>>,
     time: Res<Time>,
-    mut evt_clear: EventReader<EventClear>,
-    mut evt_over: EventReader<EventOver>,
 )
 {   let Ok ( ( mut player, mut transform, mut sprite_sheet ) ) = qry_player.get_single_mut() else { return };
     let Some ( map ) = opt_map else { return };
     let Some ( input_direction ) = opt_input_direction else { return };
-
-    //直前の判定でクリア／オーバーしていたらスプライトを動かさない
-    if evt_clear.read().next().is_some() { return }
-    if evt_over .read().next().is_some() { return }
 
     //前回からの経過時間にスピードアップ係数をかける
     let time_delta = time.delta().mul_f32( player.speedup );

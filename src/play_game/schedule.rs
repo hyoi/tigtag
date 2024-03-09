@@ -10,19 +10,20 @@ impl Plugin for Schedule
         //InitAppの後にGameStartへ遷移させる
         .insert_resource( init_app::AfterInitApp ( MyState::InitGame ) )
 
-        //ResourceとEvent
+        //Resource
         .init_resource::<Record>()   //ゲームの成績
         .init_resource::<map::Map>() //マップ情報
         .init_resource::<player::InputDirection>() //プレイヤーの入力(十字方向)
 
-        .add_event::<EventClear>()  //ステージクリアイベントの伝達
-        .add_event::<EventOver>()   //ゲームオーバーイベントの伝達
-        .add_event::<EventEatDot>() //スコアリングイベントの伝達（demo用）
+        //Event
+        .add_event::<EventClear>()  //ステージクリアの伝達
+        .add_event::<EventOver>()   //ゲームオーバーの伝達
+        .add_event::<EventEatDot>() //スコアリングの伝達（demo用）
 
         //plugin
-        .add_plugins( header::Schedule )     //ヘッダー(Stage、Score、HiScore)
-        .add_plugins( title_demo::Schedule ) //デモ
-        .add_plugins( pause::Schedule )      //Pause処理
+        .add_plugins( header::Schedule ) //ヘッダー更新(Stage、Score、HiScore)
+        .add_plugins( title_demo::Schedule ) //タイトル画面のデモプレイ
+        .add_plugins( pause::Schedule ) //Pause処理
 
         //State縛りなくアニメーションさせる(ゲーム中もPAUSE中も)
         .add_systems
@@ -40,7 +41,7 @@ impl Plugin for Schedule
         //ゲーム初期化
         .add_systems
         (   OnEnter ( MyState::InitGame ),
-            (   //UIの準備
+            (   //TextUIの準備
                 game_title ::spawn_text,
                 stage_start::spawn_text,
                 stage_clear::spawn_text,
@@ -55,22 +56,22 @@ impl Plugin for Schedule
         //タイトル画面
         .add_systems
         (   OnEnter ( MyState::TitleDemo ),
-            (   //ゲームタイトの表示
-                misc::show_component::<game_title::GameTitle>, //UI可視化
+            (   //TextUIの可視化
+                misc::show_component::<game_title::GameTitle>,
             )
         )
         .add_systems
         (   Update,
-            (   //演出＆入力待ち
+            (   //TextUIの演出＆入力待ち
                 effect::blinking::<game_title::Blinking>, //Demo の明滅
-                effect::hit_any_key::<StageStart>,        //Hit ANY Key
+                effect::hit_any_key::<StageStart>, //Hit ANY Key
             )
             .run_if( in_state( MyState::TitleDemo ) )
         )
         .add_systems
         (   OnExit ( MyState::TitleDemo ),
-            (   //ゲームタイトの消去
-                misc::hide_component::<game_title::GameTitle>, //UI不可視化
+            (   //TextUIの不可視化
+                misc::hide_component::<game_title::GameTitle>,
             )
         )
 
@@ -78,11 +79,11 @@ impl Plugin for Schedule
         //ステージ初期化
         .add_systems
         (   OnEnter ( MyState::StageStart ),
-            (   //ゲーム画面表示
+            (   //ゲームステージの生成
                 (   //scoreとstageをゼロクリア
                     initialize_record_except_hi_score, //StageClearの場合何もしない
 
-                    //マップデータの作成
+                    //マップデータ生成
                     map::make_new_data,
 
                     //スプライトのspawn
@@ -93,24 +94,24 @@ impl Plugin for Schedule
                 )
                 .chain(), //実行順の固定
 
-                (   //プレー開始メッセージの表示
-                    effect::init_count::<stage_start::CountDown>,    //カウント初期化
-                    misc::show_component::<stage_start::StageStart>, //UI可視化
+                //TextUIの可視化
+                (   effect::init_count::<stage_start::CountDown>, //カウント初期化
+                    misc::show_component::<stage_start::StageStart>,
                 )
                 .chain(), //実行順の固定
             )
         )
         .add_systems
         (   Update,
-            (   //演出
+            (   //TextUIの演出
                 effect::count_down::<stage_start::CountDown>, //カウントダウン
             )
             .run_if( in_state( MyState::StageStart ) )
         )
         .add_systems
         (   OnExit ( MyState::StageStart ),
-            (   //プレー開始メッセージの消去
-                misc::hide_component::<stage_start::StageStart>, //UI不可視化
+            (   //TextUIの不可視化
+                misc::hide_component::<stage_start::StageStart>,
             )
         )
 
@@ -120,7 +121,10 @@ impl Plugin for Schedule
         (   Update,
             (   //ループ脱出条件
                 detection::scoring_and_stage_clear, //スコアリング＆クリア判定
+                misc::change_state::<StageClear>.run_if( on_event::<EventClear>() ),
+
                 detection::collisions_and_gameover, //衝突判定
+                misc::change_state::<GameOver>.run_if( on_event::<EventOver>() ),
 
                 //スプライトの移動
                 (   //自キャラ
@@ -141,23 +145,23 @@ impl Plugin for Schedule
         //ステージクリアの処理
         .add_systems
         (   OnEnter ( MyState::StageClear ),
-            (   //ステージクリアの表示
-                effect::init_count::<stage_clear::CountDown>,    //カウント初期化
-                misc::show_component::<stage_clear::StageClear>, //UI可視化
+            (   //TextUIの可視化
+                effect::init_count::<stage_clear::CountDown>, //カウント初期化
+                misc::show_component::<stage_clear::StageClear>,
             )
             .chain(), //実行順の固定
         )
         .add_systems
         (   Update,
-            (   //演出
+            (   //TextUIの演出
                 effect::count_down::<stage_clear::CountDown>, //カウントダウン
             )
             .run_if( in_state( MyState::StageClear ) )
         )
         .add_systems
         (   OnExit ( MyState::StageClear ),
-            (   //ステージクリアの消去
-                misc::hide_component::<stage_clear::StageClear>, //UI不可視化
+            (   //TextUIの不可視化
+                misc::hide_component::<stage_clear::StageClear>,
             )
         )
 
@@ -165,25 +169,25 @@ impl Plugin for Schedule
         //ゲームオーバーの処理
         .add_systems
         (   OnEnter ( MyState::GameOver ),
-            (   //ゲームオーバーの表示
-                effect::init_count::<game_over::CountDown>,  //カウント初期化
-                misc::show_component::<game_over::GameOver>, //UI可視化
+            (   //TextUIの可視化
+                effect::init_count::<game_over::CountDown>,//カウント初期化
+                misc::show_component::<game_over::GameOver>,
             )
             .chain() //実行順の固定
         )
         .add_systems
         (   Update,
-            (   //演出＆入力待ち
+            (   //TextUIの演出＆入力待ち
                 effect::count_down::<game_over::CountDown>, //カウントダウン
-                effect::blinking::<game_over::Blinking>,    //Replay? の明滅
-                effect::hit_any_key::<StageStart>,          //Hit ANY Key
+                effect::blinking::<game_over::Blinking>, //Replay? の明滅
+                effect::hit_any_key::<StageStart>, //Hit ANY Key
             )
             .run_if( in_state( MyState::GameOver ) )
         )
         .add_systems
         (   OnExit ( MyState::GameOver ),
-            (   //ゲームオーバーの消去
-                misc::hide_component::<game_over::GameOver>, //UI不可視化
+            (   //TextUIの不可視化
+                misc::hide_component::<game_over::GameOver>,
             )
         )
         ;

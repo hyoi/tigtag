@@ -192,15 +192,9 @@ pub fn move_sprite
     opt_map: Option<Res<map::Map>>,
     qry_player: Query<&player::Player>,
     time: Res<Time>,
-    mut evt_clear: EventReader<EventClear>,
-    mut evt_over : EventReader<EventOver>,
 )
 {   let Ok ( player ) = qry_player.get_single() else { return };
     let Some ( map ) = opt_map else { return };
-
-    //直前の判定でクリア／オーバーしていたらスプライトを動かさない
-    if evt_clear.read().next().is_some() { return }
-    if evt_over .read().next().is_some() { return }
 
     //前回からの経過時間
     let time_delta = time.delta();

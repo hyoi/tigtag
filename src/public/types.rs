@@ -17,26 +17,26 @@ pub enum MyState
 impl MyState
 {   pub fn is_pause   ( &self ) -> bool { *self == MyState::Pause }
     pub fn is_demoplay( &self ) -> bool { *self == MyState::TitleDemo || *self == MyState::DemoLoop }
-
-    //ゲームオーバー時の遷移先
-    pub fn gameover_next( &self ) -> MyState
-    {   match *self
-        {   MyState::TitleDemo => MyState::DemoLoop, //デモの場合
-            MyState::MainLoop  => MyState::GameOver, //ゲームのメイン処理の場合
-            _ => unreachable!( "Bad status: {:?}", *self ),
-        }
-    }
 }
 
-//State遷移Systemに使うTrait境界
+//Stateの遷移に使うTrait境界
 pub trait ChangeState { fn state( &self ) -> MyState; }
 
-//Stateの無条遷移に使う型
+//Stateの遷移に使う型
 #[derive(Default)] pub struct TitleDemo;
 impl ChangeState for TitleDemo { fn state( &self ) -> MyState { MyState::TitleDemo } }
 
 #[derive(Default)] pub struct StageStart;
 impl ChangeState for StageStart { fn state( &self ) -> MyState { MyState::StageStart } }
+
+#[derive(Default)] pub struct StageClear;
+impl ChangeState for StageClear { fn state( &self ) -> MyState { MyState::StageClear } }
+
+#[derive(Default)] pub struct GameOver;
+impl ChangeState for GameOver { fn state( &self ) -> MyState { MyState::GameOver } }
+
+#[derive(Default)] pub struct DemoLoop;
+impl ChangeState for DemoLoop { fn state( &self ) -> MyState { MyState::DemoLoop } }
 
 ////////////////////////////////////////////////////////////////////////////////
 
