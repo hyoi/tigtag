@@ -84,13 +84,18 @@ fn spawn_ui_header
 
     //グリッド１行目（ヘッダー）のレイアウト指定
     header_left.style.grid_row       = GridPlacement::start( 1 ); //ヘッダーに配置
-    header_left.style.align_self     = AlignSelf::FlexStart;      //上寄せ
+    header_left.style.grid_column    = GridPlacement::start( 1 ); //左端のセル
+    header_left.style.align_self     = AlignSelf::Center;         //中段寄せ
     header_left.style.justify_self   = JustifySelf::Start;        //左寄せ
+
     header_center.style.grid_row     = GridPlacement::start( 1 ); //ヘッダーに配置
-    header_center.style.align_self   = AlignSelf::FlexStart;      //上寄せ
+    header_center.style.grid_column  = GridPlacement::start( 2 ); //右端のセル
+    header_center.style.align_self   = AlignSelf::Center;         //中段寄せ
     header_center.style.justify_self = JustifySelf::Center;       //中央寄せ
+
     header_right.style.grid_row      = GridPlacement::start( 1 ); //ヘッダーに配置
-    header_right.style.align_self    = AlignSelf::FlexStart;      //上寄せ
+    header_right.style.grid_column   = GridPlacement::start( 3 ); //右端のセル
+    header_right.style.align_self    = AlignSelf::Center;         //中段寄せ
     header_right.style.justify_self  = JustifySelf::End;          //右寄せ
 
     //子要素をspawnして隠しフレームの養子にする
