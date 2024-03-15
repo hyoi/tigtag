@@ -63,7 +63,7 @@ impl Plugin for Schedule
         .add_systems
         (   Update,
             (   //TextUIの演出＆入力待ち
-                effect::blinking::<game_title::Blinking>, //Demo の明滅
+                effect::blinking_text::<game_title::Blinking>, //Demo の明滅
                 effect::hit_any_key::<StageStart>, //Hit ANY Key
             )
             .run_if( in_state( MyState::TitleDemo ) )
@@ -179,7 +179,7 @@ impl Plugin for Schedule
         (   Update,
             (   //TextUIの演出＆入力待ち
                 effect::count_down::<game_over::CountDown>, //カウントダウン
-                effect::blinking::<game_over::Blinking>, //Replay? の明滅
+                effect::blinking_text::<game_over::Blinking>, //Replay? の明滅
                 effect::hit_any_key::<StageStart>, //Hit ANY Key
             )
             .run_if( in_state( MyState::GameOver ) )

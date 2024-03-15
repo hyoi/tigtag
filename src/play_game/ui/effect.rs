@@ -8,7 +8,7 @@ pub trait Blinking
 }
 
 //テキストを明滅させる
-pub fn blinking<T: Component + Blinking>
+pub fn blinking_text<T: Component + Blinking>
 (   mut qry_text: Query<( &mut Text, &mut T )>,
     time: Res<Time>,
 )
@@ -114,6 +114,38 @@ pub fn count_down<T: Component + CountDown>
     else
     {   //そうでないならStateを変更する
         next_state.set( ui.next_state() );
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//テキスト拡縮のトレイト
+pub trait Scaling
+{   fn scale( &mut self, time_delta: f32 ) -> f32;
+}
+
+//テキストを拡縮させる
+pub fn repeat_scaling_text<T: Component + Scaling>
+(   mut qry_transform: Query<( &mut Transform, &mut T )>,
+    time: Res<Time>,
+)
+{   let time_delta = time.delta().as_secs_f32();
+
+    for ( mut transform, mut ui ) in qry_transform.iter_mut()
+    {   transform.scale = Vec3::ONE * ui.scale( time_delta );
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//Text型にトレイトを追加（オーファンルール対策）
+pub trait AddOnTraitForText
+{   fn set_color( &mut self, color: Color );
+}
+impl AddOnTraitForText for Text
+{   //Textのsectionsの色を一括で変更する
+    fn set_color( &mut self, color: Color )
+    {   self.sections.iter_mut().for_each( |x| x.style.color = color );
     }
 }
 
