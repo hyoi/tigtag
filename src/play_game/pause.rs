@@ -61,8 +61,9 @@ const KEY_DOWN: KeyCode = KeyCode::ArrowDown;
 const PAD_UP  : GamepadButtonType = GamepadButtonType::DPadUp;
 const PAD_DOWN: GamepadButtonType = GamepadButtonType::DPadDown;
 
-const KEYS_APPLY: &[ KeyCode ] = &[ KeyCode::Enter, KeyCode::Space ];
-const PAD_APPLY: GamepadButtonType = GamepadButtonType::East;
+const APPLY_KEYS: &[ KeyCode ] = &[ KeyCode::Enter, KeyCode::Space ];
+const APPLY_IGNORE_KEYS: &[ KeyCode ] = &[ KeyCode::AltLeft, KeyCode::AltRight ]; //無視するキー
+const APPLY_PAD: GamepadButtonType = GamepadButtonType::East;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -244,8 +245,9 @@ fn select_menu_item
                 {   new = PauseMenuItem::Exit
                 },
             _ =>
-                if ! apply
-                {   apply = KEYS_APPLY.contains( keycode );
+                if APPLY_KEYS.contains( keycode )
+                && ! input_keyboard.any_pressed( APPLY_IGNORE_KEYS.iter().copied() )
+                {   apply = true;
                 },
         }
     }
@@ -266,7 +268,7 @@ fn select_menu_item
                     if *old == PauseMenuItem::Pause && ! WASM()
                     {   new = PauseMenuItem::Exit
                     },
-                PAD_APPLY =>
+                APPLY_PAD =>
                     apply = true,
                 _ => (),
             }
