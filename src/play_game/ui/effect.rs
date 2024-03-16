@@ -14,9 +14,9 @@ pub fn blinking_text<T: Component + Blinking>
 )
 {   let Ok ( ( mut text, mut ui ) ) = qry_text.get_single_mut() else { return };
 
-    //text.sectionsをイテレーターで回して色を変化させる
+    //透明度を変化させる
     let alpha = ui.alpha( time.delta().as_secs_f32() );
-    text.sections.iter_mut().for_each( |x| { x.style.color.set_a( alpha ); } );
+    text.set_alpha( alpha );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -141,11 +141,16 @@ pub fn repeat_scaling_text<T: Component + Scaling>
 //Text型にトレイトを追加（オーファンルール対策）
 pub trait AddOnTraitForText
 {   fn set_color( &mut self, color: Color );
+    fn set_alpha( &mut self, alpha: f32 );
 }
 impl AddOnTraitForText for Text
 {   //Textのsectionsの色を一括で変更する
     fn set_color( &mut self, color: Color )
-    {   self.sections.iter_mut().for_each( |x| x.style.color = color );
+    {   self.sections.iter_mut().for_each( |x| { x.style.color = color; } );
+    }
+    //Textのsectionsの透明度を一括で変更する
+    fn set_alpha( &mut self, alpha: f32 )
+    {   self.sections.iter_mut().for_each( |x| { x.style.color.set_a( alpha ); } );
     }
 }
 

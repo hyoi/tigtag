@@ -28,14 +28,14 @@ const UI_HIT_ANY_KEY: &[ MessageSect ] =
 
 //可視化制御用のComponent
 #[derive( Component )]
-pub struct GameTitle;
+pub struct Message;
 
 //明滅効果を適用するためのComponent
 #[derive( Component, Default )]
-pub struct Blinking { blink_cycle: f32 }
+pub struct TextDEMO { blink_cycle: f32 }
 
 //明滅させるためのトレイトの実装
-impl effect::Blinking for Blinking
+impl effect::Blinking for TextDEMO
 {   fn alpha( &mut self, time_delta: f32 ) -> f32
     {   let radian = &mut self.blink_cycle;
         *radian += TAU * time_delta;
@@ -65,7 +65,7 @@ pub fn spawn_text
 
     let children =
     &[  cmds.spawn(   ui_title                       ).id(),
-        cmds.spawn( ( ui_demo, Blinking::default() ) ).id(),
+        cmds.spawn( ( ui_demo, TextDEMO::default() ) ).id(),
         cmds.spawn(   ui_hakey                       ).id(),
     ];
 
@@ -90,7 +90,7 @@ pub fn spawn_text
     }
 
     //レイアウト用の隠しフレームの中に子要素を作成する
-    let child = cmds.spawn( ( title_node, GameTitle ) ).push_children( children ).id();
+    let child = cmds.spawn( ( title_node, Message ) ).push_children( children ).id();
     cmds.entity( hidden_node ).add_child( child );
 }
 

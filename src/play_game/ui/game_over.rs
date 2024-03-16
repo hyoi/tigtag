@@ -24,7 +24,7 @@ const UI_HIT_ANY_KEY: &[ MessageSect ] =
 
 //可視化制御用のComponent
 #[derive( Component )]
-pub struct GameOver;
+pub struct Message;
 
 //カウントダウンを適用するためのComponent
 #[derive( Component )]
@@ -58,10 +58,10 @@ impl<'a> effect::CountDown for CountDown<'a>
 
 //明滅効果を適用するためのComponent
 #[derive( Component, Default )]
-pub struct Blinking { blink_cycle: f32 }
+pub struct TextREPLAY { blink_cycle: f32 }
 
 //明滅させるためのトレイトの実装
-impl effect::Blinking for Blinking
+impl effect::Blinking for TextREPLAY
 {   fn alpha( &mut self, time_delta: f32 ) -> f32
     {   let radian = &mut self.blink_cycle;
         *radian += TAU * time_delta;
@@ -89,9 +89,9 @@ pub fn spawn_text
     ui_hakey.text.justify = JustifyText::Center; //センタリング
 
     let children =
-    &[  cmds.spawn(   ui_game_over                      ).id(),
-        cmds.spawn( ( ui_replay, Blinking::default()  ) ).id(),
-        cmds.spawn( ( ui_hakey , CountDown::default() ) ).id(),
+    &[  cmds.spawn(   ui_game_over                       ).id(),
+        cmds.spawn( ( ui_replay, TextREPLAY::default() ) ).id(),
+        cmds.spawn( ( ui_hakey , CountDown::default()  ) ).id(),
     ];
 
     //レイアウト用の隠しノードの中に子要素を作成する
@@ -116,7 +116,7 @@ pub fn spawn_text
     }
 
     //レイアウト用の隠しフレームの中に子要素を作成する
-    let child = cmds.spawn( ( game_over_node, GameOver ) ).push_children( children ).id();
+    let child = cmds.spawn( ( game_over_node, Message ) ).push_children( children ).id();
     cmds.entity( hidden_node ).add_child( child );
 }
 

@@ -57,13 +57,13 @@ impl Plugin for Schedule
         .add_systems
         (   OnEnter ( MyState::TitleDemo ),
             (   //TextUIの可視化
-                misc::show_component::<game_title::GameTitle>,
+                misc::show_component::<game_title::Message>,
             )
         )
         .add_systems
         (   Update,
             (   //TextUIの演出＆入力待ち
-                effect::blinking_text::<game_title::Blinking>, //Demo の明滅
+                effect::blinking_text::<game_title::TextDEMO>, //Demo の明滅
                 effect::hit_any_key::<StageStart>, //Hit ANY Key
             )
             .run_if( in_state( MyState::TitleDemo ) )
@@ -71,7 +71,7 @@ impl Plugin for Schedule
         .add_systems
         (   OnExit ( MyState::TitleDemo ),
             (   //TextUIの不可視化
-                misc::hide_component::<game_title::GameTitle>,
+                misc::hide_component::<game_title::Message>,
             )
         )
 
@@ -96,7 +96,7 @@ impl Plugin for Schedule
 
                 //TextUIの可視化
                 (   effect::init_count::<stage_start::CountDown>, //カウント初期化
-                    misc::show_component::<stage_start::StageStart>,
+                    misc::show_component::<stage_start::Message>,
                 )
                 .chain(), //実行順の固定
             )
@@ -111,7 +111,7 @@ impl Plugin for Schedule
         .add_systems
         (   OnExit ( MyState::StageStart ),
             (   //TextUIの不可視化
-                misc::hide_component::<stage_start::StageStart>,
+                misc::hide_component::<stage_start::Message>,
             )
         )
 
@@ -147,7 +147,7 @@ impl Plugin for Schedule
         (   OnEnter ( MyState::StageClear ),
             (   //TextUIの可視化
                 effect::init_count::<stage_clear::CountDown>, //カウント初期化
-                misc::show_component::<stage_clear::StageClear>,
+                misc::show_component::<stage_clear::Message>,
             )
             .chain(), //実行順の固定
         )
@@ -161,7 +161,7 @@ impl Plugin for Schedule
         .add_systems
         (   OnExit ( MyState::StageClear ),
             (   //TextUIの不可視化
-                misc::hide_component::<stage_clear::StageClear>,
+                misc::hide_component::<stage_clear::Message>,
             )
         )
 
@@ -171,7 +171,7 @@ impl Plugin for Schedule
         (   OnEnter ( MyState::GameOver ),
             (   //TextUIの可視化
                 effect::init_count::<game_over::CountDown>,//カウント初期化
-                misc::show_component::<game_over::GameOver>,
+                misc::show_component::<game_over::Message>,
             )
             .chain() //実行順の固定
         )
@@ -179,7 +179,7 @@ impl Plugin for Schedule
         (   Update,
             (   //TextUIの演出＆入力待ち
                 effect::count_down::<game_over::CountDown>, //カウントダウン
-                effect::blinking_text::<game_over::Blinking>, //Replay? の明滅
+                effect::blinking_text::<game_over::TextREPLAY>, //Replay? の明滅
                 effect::hit_any_key::<StageStart>, //Hit ANY Key
             )
             .run_if( in_state( MyState::GameOver ) )
@@ -187,7 +187,7 @@ impl Plugin for Schedule
         .add_systems
         (   OnExit ( MyState::GameOver ),
             (   //TextUIの不可視化
-                misc::hide_component::<game_over::GameOver>,
+                misc::hide_component::<game_over::Message>,
             )
         )
         ;

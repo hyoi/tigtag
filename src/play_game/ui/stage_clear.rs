@@ -15,7 +15,7 @@ const UI_STAGE_CLEAR: &[ MessageSect ] =
 
 //可視化制御用のComponent
 #[derive( Component )]
-pub struct StageClear;
+pub struct Message;
 
 //カウントダウンを適用するためのComponent
 #[derive( Component )]
@@ -67,7 +67,7 @@ pub fn spawn_text
     ui.visibility         = Visibility::Hidden; //初期状態
 
     //レイアウト用の隠しフレームの中に子要素を作成する
-    let child_id = cmds.spawn( ( ui, StageClear, CountDown::default() ) ).id();
+    let child_id = cmds.spawn( ( ui, Message, CountDown::default() ) ).id();
     cmds.entity( hidden_node ).add_child( child_id );
 }
 

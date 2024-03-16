@@ -21,11 +21,11 @@ impl Plugin for Schedule
         )
         .add_systems
         (   Update,
-            (   //TextUIの演出
+            (   //選択中のメニューアイテムの演出
                 effect::repeat_scaling_text::<SelectedMenuItem>,
 
-                //メニューアイテムの選択
-                select_menu_item,
+                //メニューアイテムの選択と決定
+                select_and_apply,
             )
             .chain() //実行順の固定
             .run_if( in_state( MyState::Pause ) )
@@ -71,7 +71,7 @@ const APPLY_PAD: GamepadButtonType = GamepadButtonType::East;
 #[derive( Component, Default )]
 struct PauseMenu
 {   selected_item: PauseMenuItem,
-    back_to : MyState,
+    back_to: MyState,
 }
 
 //PAUSEメニューアイテムのComponent
@@ -81,7 +81,7 @@ enum PauseMenuItem
     Exit,
 }
 
-//強調表示で必要なQueryのパラメータ
+//強調表示で必要なQueryの定義
 type ParamsMenuItem<'a> = ( Entity, &'a mut Transform, &'a mut Text, &'a PauseMenuItem );
 
 //PAUSEメニューのメソッド
@@ -216,9 +216,9 @@ fn show_and_hide_pause_menu
     }
 }
 
-//PAUSEメニューアイテムの選択
+//PAUSEメニューアイテムの選択と決定
 #[allow(clippy::too_many_arguments)]
-fn select_menu_item
+fn select_and_apply
 (   mut qry_menu: Query<( &mut Visibility, &mut PauseMenu )>,
     qry_menu_items: Query<ParamsMenuItem>,
     mut qry_windows: Query<Entity, With<Window>>,
