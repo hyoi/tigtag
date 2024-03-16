@@ -139,8 +139,7 @@ pub fn spawn_sprite
             if SPRITE_SHEET_OFF()
             {   //正方形のメッシュ
                 let custom_size = Some ( GRID_CUSTOM_SIZE * CHASER_SPRITE_SCALING );
-                cmds
-                .spawn( ( SpriteBundle::default(), chaser ) )
+                cmds.spawn( ( SpriteBundle::default(), chaser ) )
                 .insert( Sprite { color, custom_size, ..default() } )
                 .insert( Transform::from_translation( translation ) )
                 .insert( TextureAtlas::default() ) //move_sprite()のqry_chaserの検索条件を満たすためのdummy
