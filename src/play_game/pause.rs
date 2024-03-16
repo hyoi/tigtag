@@ -43,11 +43,11 @@ const MENU_ITEM_COLOR_NORMAL  : Color = Color::CYAN;
 //メニューアイテムの設定
 const UI_PAUSE: &[ MessageSect ] =
 &[  ( "PAUSE", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 2.0, MENU_ITEM_COLOR_SELECTED ),
-    ( "\n "  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 2.0, Color::NONE              ),
 ];
 
 const UI_EXIT: &[ MessageSect ] =
-&[  ( "EXIT", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 2.0, MENU_ITEM_COLOR_NORMAL ),
+&[  ( " \n" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 2.0, Color::NONE            ),
+    ( "EXIT", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 2.0, MENU_ITEM_COLOR_NORMAL ),
 ];
 
 //PAUSEメニュー表示切替のキー／ボタン
@@ -129,10 +129,15 @@ fn spawn_ui_text
 {   let Ok ( hidden_node ) = qry_hidden_node.get_single() else { return };
 
     //メニューアイテムの準備
-    let children =
-    &[  cmds.spawn( ( misc::text_ui( UI_PAUSE, &asset_svr ), PauseMenuItem::Pause ) ).id(),
-        cmds.spawn( ( misc::text_ui( UI_EXIT , &asset_svr ), PauseMenuItem::Exit  ) ).id(),
-    ];
+    let items = &mut Vec::new();
+    let item = misc::text_ui( UI_PAUSE, &asset_svr );
+    items.push( cmds.spawn( ( item, PauseMenuItem::Pause ) ).id() );
+
+    if ! WASM()
+    {   //WASMの時はEXITのメニューアイテムを作らないようにする
+        let item = misc::text_ui( UI_EXIT , &asset_svr );
+        items.push( cmds.spawn( ( item, PauseMenuItem::Exit ) ).id() );
+    }
 
     //レイアウト用ノードの準備
     let mut layout_node = NodeBundle
@@ -156,7 +161,10 @@ fn spawn_ui_text
     }
 
     //PAUSEメニューのspawn
-    let child = cmds.spawn( ( layout_node, PauseMenu::default() ) ).push_children( children ).id();
+    let child = cmds
+        .spawn( ( layout_node, PauseMenu::default() ) )
+        .push_children( items )
+        .id();
     cmds.entity( hidden_node ).add_child( child );
 }
 
@@ -227,9 +235,18 @@ fn select_menu_item
     //キーの状態
     for keycode in input_keyboard.get_pressed()
     {   match *keycode
-        {   KEY_UP   if *old == PauseMenuItem::Exit  => new = PauseMenuItem::Pause,
-            KEY_DOWN if *old == PauseMenuItem::Pause => new = PauseMenuItem::Exit,
-            _ => if ! apply { apply = KEYS_APPLY.contains( keycode ); },
+        {   KEY_UP =>
+                if *old == PauseMenuItem::Exit
+                {   new = PauseMenuItem::Pause
+                },
+            KEY_DOWN =>
+                if *old == PauseMenuItem::Pause && ! WASM()
+                {   new = PauseMenuItem::Exit
+                },
+            _ =>
+                if ! apply
+                {   apply = KEYS_APPLY.contains( keycode );
+                },
         }
     }
 
@@ -241,9 +258,16 @@ fn select_menu_item
         for button in input_gamepad.get_pressed()
         {   if button.gamepad != id { continue } //ターゲットのゲームパッド以外は飛ばす
             match button.button_type
-            {   PAD_UP   if *old == PauseMenuItem::Exit  => new = PauseMenuItem::Pause,
-                PAD_DOWN if *old == PauseMenuItem::Pause => new = PauseMenuItem::Exit,
-                PAD_APPLY => apply = true,
+            {   PAD_UP =>
+                    if *old == PauseMenuItem::Exit
+                    {   new = PauseMenuItem::Pause
+                    },
+                PAD_DOWN =>
+                    if *old == PauseMenuItem::Pause && ! WASM()
+                    {   new = PauseMenuItem::Exit
+                    },
+                PAD_APPLY =>
+                    apply = true,
                 _ => (),
             }
         }
