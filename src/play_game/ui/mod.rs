@@ -4,7 +4,7 @@ use super::*;
 pub mod effect;
 pub use effect::AddOnTraitForText;
 
-pub mod game_title;
+pub mod title_demo;
 pub mod stage_start;
 pub mod stage_clear;
 pub mod game_over;

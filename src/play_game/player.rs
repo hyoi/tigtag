@@ -39,7 +39,7 @@ impl Default for Player
 }
 
 //関数ポインタ型(デモ時の自走自キャラの移動方向を決める関数)
-type FnAutoDrive = fn( &Player, Query<&chasers::Chaser>, Res<map::Map>, Res<title_demo::schedule::DemoMapParams>, &[News] ) -> News;
+type FnAutoDrive = fn( &Player, Query<&chasers::Chaser>, Res<map::Map>, Res<demo::schedule::DemoMapParams>, &[News] ) -> News;
 
 //自キャラの入力を保存するResource
 #[derive( Resource )]
@@ -132,7 +132,7 @@ pub fn spawn_sprite
         next_grid: player_grid,
         px_start : vec2,
         px_end   : vec2,
-        opt_fn_autodrive: Some ( title_demo::auto_drive::choice_way ), //default()に任せるとNone
+        opt_fn_autodrive: Some ( demo::auto_drive::choice_way ), //default()に任せるとNone
         ..default()
     };
 
@@ -179,7 +179,7 @@ pub fn move_sprite
 (   mut qry_player: Query<( &mut Player, &mut Transform, &mut TextureAtlas )>,
     opt_map: Option<Res<map::Map>>,
     opt_input_direction: Option<Res<InputDirection>>,
-    opt_demo: Option<Res<title_demo::schedule::DemoMapParams>>,
+    opt_demo: Option<Res<demo::schedule::DemoMapParams>>,
     qry_chasers: Query<&chasers::Chaser>,
     state: ResMut<State<MyState>>,
     time: Res<Time>,

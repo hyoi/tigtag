@@ -13,6 +13,9 @@ mod header;
 mod ui;
 use ui::*;
 
+//pause処理
+mod pause;
+
 //マップ、自機、追手の処理
 mod map;
 use map::GridToPixelOnMap;
@@ -21,9 +24,6 @@ mod chasers;
 mod detection;
 
 //デモ
-mod title_demo;
-
-//pause処理
-mod pause;
+mod demo;
 
 //End of code.

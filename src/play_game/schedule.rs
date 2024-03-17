@@ -22,7 +22,7 @@ impl Plugin for Schedule
 
         //plugin
         .add_plugins( header::Schedule ) //ヘッダー更新(Stage、Score、HiScore)
-        .add_plugins( title_demo::Schedule ) //タイトル画面のデモプレイ
+        .add_plugins( demo::Schedule ) //タイトル画面のデモプレイ
         .add_plugins( pause::Schedule ) //Pause処理
 
         //State縛りなくアニメーションさせる(ゲーム中もPAUSE中も)
@@ -42,7 +42,7 @@ impl Plugin for Schedule
         .add_systems
         (   OnEnter ( MyState::InitGame ),
             (   //TextUIの準備
-                game_title ::spawn_text,
+                title_demo ::spawn_text,
                 stage_start::spawn_text,
                 stage_clear::spawn_text,
                 game_over  ::spawn_text,
@@ -57,13 +57,13 @@ impl Plugin for Schedule
         .add_systems
         (   OnEnter ( MyState::TitleDemo ),
             (   //TextUIの可視化
-                misc::show_component::<game_title::Message>,
+                misc::show_component::<title_demo::Message>,
             )
         )
         .add_systems
         (   Update,
             (   //TextUIの演出＆入力待ち
-                effect::blinking_text::<game_title::TextDEMO>, //Demo の明滅
+                effect::blinking_text::<title_demo::TextDEMO>, //Demo の明滅
                 effect::hit_any_key::<StageStart>, //Hit ANY Key
             )
             .run_if( in_state( MyState::TitleDemo ) )
@@ -71,7 +71,7 @@ impl Plugin for Schedule
         .add_systems
         (   OnExit ( MyState::TitleDemo ),
             (   //TextUIの不可視化
-                misc::hide_component::<game_title::Message>,
+                misc::hide_component::<title_demo::Message>,
             )
         )
 
