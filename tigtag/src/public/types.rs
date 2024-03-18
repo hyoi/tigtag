@@ -19,25 +19,6 @@ impl MyState
     pub fn is_demoplay( &self ) -> bool { *self == MyState::TitleDemo || *self == MyState::DemoLoop }
 }
 
-// //Stateの遷移に使うTrait境界
-// pub trait ChangeState { fn state( &self ) -> MyState; }
-
-// //Stateの遷移に使う型
-// #[derive(Default)] pub struct TitleDemo;
-// impl ChangeState for TitleDemo { fn state( &self ) -> MyState { MyState::TitleDemo } }
-
-// #[derive(Default)] pub struct StageStart;
-// impl ChangeState for StageStart { fn state( &self ) -> MyState { MyState::StageStart } }
-
-// #[derive(Default)] pub struct StageClear;
-// impl ChangeState for StageClear { fn state( &self ) -> MyState { MyState::StageClear } }
-
-// #[derive(Default)] pub struct GameOver;
-// impl ChangeState for GameOver { fn state( &self ) -> MyState { MyState::GameOver } }
-
-// #[derive(Default)] pub struct DemoLoop;
-// impl ChangeState for DemoLoop { fn state( &self ) -> MyState { MyState::DemoLoop } }
-
 ////////////////////////////////////////////////////////////////////////////////
 
 //操作を受付けるgamepadのIDを保存するResource
@@ -52,12 +33,12 @@ impl TargetGamepad
 ////////////////////////////////////////////////////////////////////////////////
 
 //glamの型にメソッドを追加する準備
-pub trait GridToPixel
+pub trait AddOnTraitForIVec2
 {   fn to_vec2_on_screen( &self ) -> Vec2;
 }
 
 //glamの型にメソッドを追加する
-impl GridToPixel for IVec2
+impl AddOnTraitForIVec2 for IVec2
 {   //スプライト等のアンカーが左上ではなく中央にあるため「+0.5」する
     fn to_vec2_on_screen( &self ) -> Vec2
     {   ( self.as_vec2() + 0.5 ) * PIXELS_PER_GRID * Vec2::new( 1.0, -1.0 )

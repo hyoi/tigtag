@@ -9,7 +9,7 @@ impl Plugin for Schedule
     {   app
         .add_systems
         (   OnEnter ( MyState::InitGame ),
-            (   add_sections_to_ui_footerleft, //既存のフッターを改造する
+            (   add_sections_to_footerleft, //既存のフッターを改造する
             )
         )
         .add_systems
@@ -34,7 +34,7 @@ const PLACE_HOLDER_DEMO_RECORD: usize = 3; //text.sections[ 3 ]
 ////////////////////////////////////////////////////////////////////////////////
 
 //フッターのUIを改造する
-fn add_sections_to_ui_footerleft
+fn add_sections_to_footerleft
 (   mut qry_text: Query<&mut Text, With<init_app::UiFooterLeft>>,
     asset_svr: Res<AssetServer>,
 )

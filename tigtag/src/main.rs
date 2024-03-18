@@ -27,7 +27,7 @@ use std::
     collections::VecDeque,
 };
 
-//external proc-macro crates
+//proc-macro crates
 use macros::MyState;
 
 //internal submodules
@@ -55,8 +55,8 @@ fn main()
     .add_plugins
     (   DefaultPlugins
         .set( WindowPlugin { primary_window, ..default() } ) //主ウィンドウ
-        .set( ImagePlugin::default_nearest() )               //ピクセルパーフェクト
-        .set( LogPlugin { filter, ..default() } )            //ロギング
+        .set( ImagePlugin::default_nearest() ) //ピクセルパーフェクト
+        .set( LogPlugin { filter, ..default() } ) //ロギング
     )
     .add_systems
     (   Startup,
@@ -75,6 +75,11 @@ fn main()
             .run_if( not( state_exists::<MyState> ) )
         )
         // .chain() //実行順の固定
+        //※UIをどのカメラでレンダリングするか制御する場合は実行順の固定が必要。
+        //　UIのルートノードにTargetCameraの設定(EntityのID)が必要になるため。
+        //　fn debug::spawn_grid_layout_ui() を参照のこと。
+        // https://bevyengine.org/news/bevy-0-13/#camera-driven-ui
+        // https://docs.rs/bevy/0.13.0/bevy/ui/struct.TargetCamera.html
     )
     .init_resource::<TargetGamepad>() //操作を受付けるゲームパッドのID
     .add_systems

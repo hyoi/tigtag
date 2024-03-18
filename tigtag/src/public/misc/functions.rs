@@ -181,26 +181,6 @@ pub fn text_ui
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// //Stateの無条件遷移
-// pub fn change_state<T: Send + Sync + Default + ChangeState>
-// (   next: Local<T>,
-//     mut next_state: ResMut<NextState<MyState>>
-// )
-// {   next_state.set( next.state() );
-// }
-
-// //Stateの無条件遷移（Resourceで遷移先指定）
-// pub fn next_state<T: Resource + ChangeState>
-// (   opt_state: Option<Res<T>>,
-//     mut next_state: ResMut<NextState<MyState>>
-// )
-// {   let Some ( next ) = opt_state else { warn!( "opt_state is None." ); return };
-
-//     next_state.set( next.state() );
-// }
-
-////////////////////////////////////////////////////////////////////////////////
-
 //QueryしたComponentを可視化する
 pub fn show_component<T: Component>
 (   mut qry: Query<&mut Visibility, With<T>>,
