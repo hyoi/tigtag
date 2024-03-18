@@ -72,6 +72,9 @@ impl Plugin for Schedule
         (   OnExit ( MyState::TitleDemo ),
             (   //TextUIの不可視化
                 misc::hide_component::<title_demo::Message>,
+
+                //scoreとstageをゼロクリアする(DEMOでステージクリアの時はしない)
+                initialize_record_except_hi_score,
             )
         )
 
@@ -79,11 +82,7 @@ impl Plugin for Schedule
         //ステージ初期化
         .add_systems
         (   OnEnter ( MyState::StageStart ),
-            (   //ゲームステージの生成
-                (   //scoreとstageをゼロクリア
-                    initialize_record_except_hi_score, //StageClearの場合何もしない
-
-                    //マップデータ生成
+            (   (   //マップデータ生成
                     map::make_new_data,
 
                     //スプライトのspawn
@@ -188,6 +187,9 @@ impl Plugin for Schedule
         (   OnExit ( MyState::GameOver ),
             (   //TextUIの不可視化
                 misc::hide_component::<game_over::Message>,
+
+                //scoreとstageをゼロクリアする
+                initialize_record_except_hi_score
             )
         )
         ;

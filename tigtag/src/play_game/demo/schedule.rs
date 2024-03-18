@@ -57,13 +57,8 @@ impl Plugin for Schedule
         )
         .add_systems
         (   OnEnter ( MyState::DemoLoop ),
-            (   //scoreとstageをゼロクリア
-                play_game::schedule::initialize_record_except_hi_score,
-
-                //無条件遷移
-                change_state_to::<TitleDemo>,
+            (   change_state_to::<TitleDemo>, //無条件遷移
             )
-            .chain() //実行順の固定
         )
         ;
     }
