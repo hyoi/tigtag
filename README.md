@@ -5,24 +5,29 @@ Note: Japanese text only.
 逃げ回ってドットをすべて拾ったらステージクリアなゲーム。(よくあるヤツ)  
 昔のベーマガみたいなピコゲーを作りたかったのです。  
 逆襲なし、追手は重なるとスピードアップするマゾ仕様。  
-たいへん耳障りなSEが実装されています。ボリューム上げるな要注意っ (≧ω≦;)
+SEが実装されています。ボリューム上げるな要注意っ (≧ω≦;)
 
 ## WASM版
-[https://hyoi.github.io/tigtag/](https://hyoi.github.io/tigtag/)
+[https://hyoi.github.io/tigtag/tigtag/](https://hyoi.github.io/tigtag/tigtag/)  
+※Rustのworkspaceで作業するとディレクトリの切り方にセンス問われるなぁ‥‥  
 
 ## 操作方法
 
 ### キーボード
-- `⇧` `⇩` `⇦` `⇨` キーで上下左右に移動。
-- `Esc`キーで一時停止(Pause)。
-- `Alt`＋`Enter`でフルスクリーンとウインドウモード切替（デスクトップアプリ）。
+- `⇧` `⇩` `⇦` `⇨` キーで上下左右に移動  
+- `Esc`キーで一時停止(Pause)。（デスクトップアプリなら`EXIT`メニューあり）  
+- `Alt`＋`Enter`でフルスクリーンとウインドウモード切替（デスクトップアプリ）  
+- `Hit ANY Key!`が表示されてる時、一部のキーを除いて何か押せば反応するハズ  
 
 ### ゲームパッド🎮
-- 十字ボタンで上下左右に移動。
+- 十字ボタンで上下左右に移動。  
+- ps4 PADの`SHARE`で一時停止(Pause)。（デスクトップアプリなら`EXIT`メニューあり）  
+- ps4 PADの`OPTIOS`でフルスクリーンとウインドウモード切替（デスクトップアプリ）  
+※所有してないので他のPADでボタンがどれにアサインされるか不明‥‥
 
 ## コンパイル方法
 - デスクトップアプリにするなら`cargo run -r`でOK。   
-※`cargo run`だとデバッグモード。
+※`cargo run`だとデバッグモード。いろいろ余計に表示されます
 ```
 cargo run -r    
 ```
@@ -30,7 +35,7 @@ cargo run -r
 ※`wasm-bindgen`コマンドの各ディレクトリーは作業環境に合わせてください   
 ```
 cargo build -r --target wasm32-unknown-unknown
-wasm-bindgen --out-dir ./wasm --target web --no-typescript ./target/wasm32-unknown-unknown/release/tigtag.wasm
+wasm-bindgen --out-dir .\tigtag\wasm --target web --no-typescript .\target\wasm32-unknown-unknown\release\tigtag.wasm
 ```
 - WASMのコンパイルには事前にRustのtarget追加とwasm-bindgenのインストールが必要です  
 - wasm-bindgenを実行すると警告が出ることがあります。その時はバージョン上げましょう  
@@ -53,5 +58,5 @@ cargo install -f wasm-bindgen-cli
 
 ## 宿題
 - [ ] スマホでプレーできるようにしたい。
-  - [ ] スマホブラウザでちゃんと表示されるようにしたい
-  - [ ] タッチ操作できたらブラウザ＆WASMでスマホ上で遊べるかも？
+  - [ ] スマホのブラウザでちゃんと表示されるようにしたい
+  - [ ] タッチ操作できたらWASMでスマホ上で遊べるかも？
