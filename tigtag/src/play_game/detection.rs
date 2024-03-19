@@ -62,15 +62,19 @@ pub fn scoring_and_stage_clear
 pub fn collisions_and_gameover
 (   qry_player: Query<&player::Player>,
     qry_chaser: Query<&chasers::Chaser>,
+    opt_record: Option<ResMut<Record>>,
     mut evt_clear: EventReader<EventClear>,
     mut evt_over: EventWriter<EventOver>,
 )
-{   //直前の判定でクリアしていたら衝突判定しない
+{   let Some ( mut record ) = opt_record else { return };
+
+    //直前の判定でクリアしていたら衝突判定しない
     if evt_clear.read().next().is_some() { return }
 
     //衝突判定が真なら
     if is_collision( qry_player, qry_chaser )
-    {   evt_over.send( EventOver ); //後続の処理にゲームオーバーを伝える
+    {   *record.is_clear_mut() = false;
+        evt_over.send( EventOver ); //後続の処理にゲームオーバーを伝える
     }
 }
 
