@@ -5,25 +5,29 @@ Note: Japanese text only.
 逃げ回ってドットをすべて拾ったらステージクリアなゲーム。(よくあるヤツ)  
 昔のベーマガみたいなピコゲーを作りたかったのです。  
 逆襲なし、追手は重なるとスピードアップするマゾ仕様。  
-SEが実装されています。ボリューム上げるな要注意っ (≧ω≦;)
+SEが実装されています。音量要注意っ (≧ω≦;)
 
 ## WASM版
 [https://hyoi.github.io/tigtag/tigtag/](https://hyoi.github.io/tigtag/tigtag/)  
-※Rustのworkspaceで作業するとディレクトリの切り方にセンス問われるなぁ‥‥  
+※Rustのworkspaceで作業するとディレクトリの切り方にセンス問われるな‥‥  
 
 ## 操作方法
 
-### キーボード
-- `⇧` `⇩` `⇦` `⇨` キーで上下左右に移動  
-- `Esc`キーで一時停止(Pause)。（デスクトップアプリなら`EXIT`メニューあり）  
-- `Alt`＋`Enter`でフルスクリーンとウインドウモード切替（デスクトップアプリ）  
-- `Hit ANY Key!`が表示されてる時、一部のキーを除いて何か押せば反応するハズ  
+### キーボード⌨️
+- `↑` `↓` `←` `→` キーで上下左右に移動  
+- `Esc`キーで一時停止(Pause)  
+  - デスクトップアプリのみ`EXIT`メニューあり  
+`↑` `↓`で選択、`Space`か`Enter`で決定
+- `Alt`＋`Enter`でフルスクリーンとウインドウモード切替（デスクトップアプリのみ）  
+- `Hit ANY key!`が表示されてる時、一部のキーを除き何か押せば反応するハズ  
 
 ### ゲームパッド🎮
 - 十字ボタンで上下左右に移動。  
-- ps4 PADの`SHARE`で一時停止(Pause)。（デスクトップアプリなら`EXIT`メニューあり）  
-- ps4 PADの`OPTIOS`でフルスクリーンとウインドウモード切替（デスクトップアプリ）  
-※所有してないので他のPADでボタンがどれにアサインされるか不明‥‥
+- ps4 PADの`SHARE`で一時停止(Pause)  
+  - デスクトップアプリのみ`EXIT`メニューあり  
+`↑` `↓`で選択、`◯`で決定
+- ps4 PADの`OPTIOS`でフルスクリーンとウインドウモード切替（デスクトップアプリのみ）  
+※所有してないので他のPADでボタンがどれにアサインされるか分からない‥‥
 
 ## コンパイル方法
 - デスクトップアプリにするなら`cargo run -r`でOK。   
@@ -32,13 +36,13 @@ SEが実装されています。ボリューム上げるな要注意っ (≧ω�
 cargo run -r    
 ```
 - WASMの場合は`--target`を指定してコンパイル後、`wasm-bindgen`で環境を整えます。   
-※`wasm-bindgen`コマンドの各ディレクトリーは作業環境に合わせてください   
+※コマンドライン引数に書くディレクトリーは作業環境に合わせてください   
 ```
 cargo build -r --target wasm32-unknown-unknown
 wasm-bindgen --out-dir .\tigtag\wasm --target web --no-typescript .\target\wasm32-unknown-unknown\release\tigtag.wasm
 ```
 - WASMのコンパイルには事前にRustのtarget追加とwasm-bindgenのインストールが必要です  
-- wasm-bindgenを実行すると警告が出ることがあります。その時はバージョン上げましょう  
+- wasm-bindgenを実行するとバージョン違いの警告が出ることがあります。その時はバージョン上げましょう  
 - [Unofficial Bevy Cheat Book - 13.5. Browser (WebAssembly)](https://bevy-cheatbook.github.io/platforms/wasm.html)をご参考に   
 ```
 rustup target install wasm32-unknown-unknown
