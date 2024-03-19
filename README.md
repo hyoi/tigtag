@@ -58,7 +58,7 @@ cargo install -f wasm-bindgen-cli
   - [Orbitron](https://fonts.google.com/specimen/Orbitron)
   - [Reggae One](https://fonts.google.com/specimen/Reggae+One)
 - [ドット絵ダウンロードサイト DOTOWN](https://dotown.maeda-design-room.net/)
-  - Rustだから蟹 <img src="./tigtag/assets/images/sprite/kani_DOTOWN.png" width="22" height="16" style="vertical-align: bottom;">  
+  - Rustだから蟹 <img src="./tigtag/assets/image/sprite/kani_DOTOWN.png" width="22" height="16" style="vertical-align: bottom;">  
 
 ## 宿題
 - [ ] スマホでプレーできるようにしたい。
