@@ -26,13 +26,13 @@ impl Plugin for Schedule
         .add_systems
         (   OnEnter ( MyState::TitleDemo ),
             (   //マップデータ生成
-                play_game::map::make_new_data,
+                map::make_new_data,
                 make_data_for_demo, //デモ用マップ情報を収集
 
                 //スプライトのspawn
-                (   play_game::map::spawn_sprite,
-                    play_game::player::spawn_sprite,
-                    play_game::chasers::spawn_sprite,
+                (   map::spawn_sprite,
+                    player::spawn_sprite,
+                    chasers::spawn_sprite,
                 ),
             )
             .chain() //実行順の固定
@@ -48,8 +48,8 @@ impl Plugin for Schedule
                 change_state_to::<DemoLoop>.run_if( on_event::<EventOver>() ),
 
                 //スプライトの移動
-                (   play_game::player::move_sprite,  //自キャラ
-                    play_game::chasers::move_sprite, //敵キャラ
+                (   player::move_sprite,  //自キャラ
+                    chasers::move_sprite, //敵キャラ
                 )
             )
             .chain() //実行順の固定
