@@ -22,8 +22,8 @@ impl Plugin for Schedule
 
         //plugin
         .add_plugins( header::Schedule ) //ヘッダー更新(Stage、Score、HiScore)
-        .add_plugins( demo::Schedule ) //タイトル画面のデモプレイ
-        .add_plugins( pause::Schedule ) //Pause処理
+        .add_plugins( demo::Schedule   ) //タイトル画面のデモプレイ
+        .add_plugins( pause::Schedule  ) //Pause処理
 
         //State縛りなくアニメーションさせる(ゲーム中もPAUSE中も)
         .add_systems
