@@ -109,13 +109,13 @@ pub fn spawn_sprite
     qry_player.iter().for_each( | id | cmds.entity( id ).despawn_recursive() );
 
     //乱数で初期位置を決める(マップ中央付近の通路)
-    let half_w = map::MAP_GRIDS_WIDTH  / 2;
-    let half_h = map::MAP_GRIDS_HEIGHT / 2;
+    let half_w = MAP_GRIDS_WIDTH  / 2;
+    let half_h = MAP_GRIDS_HEIGHT / 2;
     let short_side = if half_w >= half_h { half_h } else { half_w };
     let x1 = short_side - 1;
     let y1 = short_side - 1;
-    let x2 = map::MAP_GRIDS_WIDTH  - short_side;
-    let y2 = map::MAP_GRIDS_HEIGHT - short_side;
+    let x2 = MAP_GRIDS_WIDTH  - short_side;
+    let y2 = MAP_GRIDS_HEIGHT - short_side;
 
     let mut player_grid = IVec2::new( 0, 0 );
     loop

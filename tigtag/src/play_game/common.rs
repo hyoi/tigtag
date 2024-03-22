@@ -2,6 +2,19 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//マップ縦横幅
+pub const MAP_GRIDS_WIDTH : i32 = SCREEN_GRIDS_WIDTH;
+pub const MAP_GRIDS_HEIGHT: i32 = SCREEN_GRIDS_HEIGHT - 2;
+
+//マップのレンジ（外壁含む）
+pub const MAP_GRIDS_X_RANGE: Range<i32> = 0..MAP_GRIDS_WIDTH;
+pub const MAP_GRIDS_Y_RANGE: Range<i32> = 0..MAP_GRIDS_HEIGHT;
+
+//マップ座標から画面座標へ変換する際の調整値
+pub const ADJUST_MAP_ON_SCREEN: IVec2 = IVec2::new( 0, 1 );
+
+////////////////////////////////////////////////////////////////////////////////
+
 //ゲームの成績記録用のResource
 #[derive( Resource, Default )]
 pub struct Record

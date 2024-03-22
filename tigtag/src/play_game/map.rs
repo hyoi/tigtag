@@ -107,13 +107,6 @@ impl Map
 #[derive( Component )] pub struct SpriteWall;
 #[derive( Component )] pub struct SpriteDot;
 
-//マップ縦横幅(Grid)
-pub const MAP_GRIDS_WIDTH : i32 = SCREEN_GRIDS_WIDTH;
-pub const MAP_GRIDS_HEIGHT: i32 = SCREEN_GRIDS_HEIGHT - 2;
-
-//マップの二次元配列の添え字から画面のグリッド座標へ変換する際の調整値
-const MAP_ADJUSTER_TO_SCREEN_GRID: IVec2 = IVec2::new( 0, 1 );
-
 //glamの型にメソッドを追加する準備
 pub trait GridToPixelOnMap
 {   fn to_vec2_on_game_map( &self ) -> Vec2;
@@ -123,13 +116,9 @@ pub trait GridToPixelOnMap
 impl GridToPixelOnMap for IVec2
 {   //マップと画面の座標調整値を加味してvec2へ変換する
     fn to_vec2_on_game_map( &self ) -> Vec2
-    {   ( *self + MAP_ADJUSTER_TO_SCREEN_GRID ).to_vec2_on_screen()
+    {   ( *self + ADJUST_MAP_ON_SCREEN ).to_vec2_on_screen()
     }
 }
-
-//マップのレンジ（外壁含む）
-pub const MAP_GRIDS_X_RANGE: Range<i32> = 0..MAP_GRIDS_WIDTH;
-pub const MAP_GRIDS_Y_RANGE: Range<i32> = 0..MAP_GRIDS_HEIGHT;
 
 //ドットのスプライトの情報
 const SPRITE_DOT_COLOR: Color = Color::rgb( 1.0, 1.0, 0.7 );

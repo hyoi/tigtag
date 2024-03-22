@@ -69,9 +69,9 @@ impl Plugin for Schedule
 //demo用のマップ情報Resource
 #[derive( Resource, Default )]
 pub struct DemoMapParams
-{   dots_rect : IVec2Rect,                               //dotsを内包する最小の矩形
-    dots_sum_x: [ i32; map::MAP_GRIDS_WIDTH  as usize ], //列に残っているdotsを数えた配列
-    dots_sum_y: [ i32; map::MAP_GRIDS_HEIGHT as usize ], //行に残っているdotsを数えた配列
+{   dots_rect : IVec2Rect,                          //dotsを内包する最小の矩形
+    dots_sum_x: [ i32; MAP_GRIDS_WIDTH  as usize ], //列に残っているdotsを数えた配列
+    dots_sum_y: [ i32; MAP_GRIDS_HEIGHT as usize ], //行に残っているdotsを数えた配列
 }
 
 #[derive( Default )]
@@ -100,18 +100,18 @@ fn make_data_for_demo
     let Some ( mut demo ) = opt_demo else { return };
 
     //dotではなく道を数える(マップデータ作成の直後なら必ず道にdotがある)
-    map::MAP_GRIDS_Y_RANGE.for_each
+    MAP_GRIDS_Y_RANGE.for_each
     (   | y |
         *demo.dots_sum_y_mut( y ) =
-        {   map::MAP_GRIDS_X_RANGE
+        {   MAP_GRIDS_X_RANGE
             .filter( | &x | map.is_space( IVec2::new( x, y ) ) )
             .count() as i32
         }
     );
-    map::MAP_GRIDS_X_RANGE.for_each
+    MAP_GRIDS_X_RANGE.for_each
     (   | x |
         *demo.dots_sum_x_mut( x ) =
-        {   map::MAP_GRIDS_Y_RANGE
+        {   MAP_GRIDS_Y_RANGE
             .filter( | &y | map.is_space( IVec2::new( x, y ) ) )
             .count() as i32
         }
@@ -119,7 +119,7 @@ fn make_data_for_demo
 
     //dotsを内包する最小の矩形の初期値は決め打ちでいい(Mapをそう作っているから)
     *demo.dots_rect_min_mut() = IVec2::new( 1, 1 );
-    *demo.dots_rect_max_mut() = IVec2::new( map::MAP_GRIDS_WIDTH - 2, map::MAP_GRIDS_HEIGHT - 2 );
+    *demo.dots_rect_max_mut() = IVec2::new( MAP_GRIDS_WIDTH - 2, MAP_GRIDS_HEIGHT - 2 );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,13 +128,9 @@ fn make_data_for_demo
 fn update_data_for_demo
 (   qry_player: Query<&player::Player>,
     opt_demo: Option<ResMut<DemoMapParams>>,
-    // mut evt_eatdot: EventReader<EventEatDot>,
 )
 {   let Ok ( player ) = qry_player.get_single() else { return };
     let Some ( mut demo ) = opt_demo else { return };
-
-    // //直前のスコアリングでドットを削除していない場合
-    // if evt_eatdot.read().next().is_none() { return }
 
     //プレイヤーの位置の列・行のdotsを減らす
     *demo.dots_sum_x_mut( player.grid.x ) -= 1;
@@ -142,20 +138,20 @@ fn update_data_for_demo
 
     //dotsを内包する最小の矩形のminを更新する
     let ( mut x, mut y ) = ( 0, 0 );
-    for _ in map::MAP_GRIDS_X_RANGE
+    for _ in MAP_GRIDS_X_RANGE
     {   if demo.dots_sum_x( x ) != 0 { break } else { x += 1; }
     }
-    for _ in map::MAP_GRIDS_Y_RANGE
+    for _ in MAP_GRIDS_Y_RANGE
     {   if demo.dots_sum_y( y ) != 0 { break } else { y += 1; }
     }
     *demo.dots_rect_min_mut() = IVec2::new( x, y );
 
     //dotsを内包する最小の矩形のmaxを更新する
-    ( x, y ) = ( map::MAP_GRIDS_WIDTH - 1, map::MAP_GRIDS_HEIGHT - 1 );
-    for _ in map::MAP_GRIDS_X_RANGE
+    ( x, y ) = ( MAP_GRIDS_WIDTH - 1, MAP_GRIDS_HEIGHT - 1 );
+    for _ in MAP_GRIDS_X_RANGE
     {   if demo.dots_sum_x( x ) != 0 { break } else { x -= 1; }
     }
-    for _ in map::MAP_GRIDS_Y_RANGE
+    for _ in MAP_GRIDS_Y_RANGE
     {   if demo.dots_sum_y( y ) != 0 { break } else { y -= 1; }
     }
     *demo.dots_rect_max_mut() = IVec2::new( x, y );

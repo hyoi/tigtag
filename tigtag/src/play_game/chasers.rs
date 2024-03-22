@@ -72,8 +72,8 @@ const CHASER_START_POSITION: &[ IVec2 ] = //スタート座標
     IVec2::new( MAX_X, 1     ),
     IVec2::new( MAX_X, MAX_Y ),
 ];
-const MAX_X: i32 = map::MAP_GRIDS_WIDTH  - 2;
-const MAX_Y: i32 = map::MAP_GRIDS_HEIGHT - 2;
+const MAX_X: i32 = MAP_GRIDS_WIDTH  - 2;
+const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
 
 //スプライトシートを使ったアニメーションの情報
 const  SPRITE_SHEET_SIZE_CHASER: Vec2 = Vec2::new( 8.0, 8.0 );
