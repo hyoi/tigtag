@@ -120,6 +120,10 @@ impl GridToPixelOnMap for IVec2
     }
 }
 
+//マップのレンジ（外壁含む）
+pub const MAP_GRIDS_X_RANGE: Range<i32> = 0..MAP_GRIDS_WIDTH;
+pub const MAP_GRIDS_Y_RANGE: Range<i32> = 0..MAP_GRIDS_HEIGHT;
+
 //ドットのスプライトの情報
 const SPRITE_DOT_COLOR: Color = Color::rgb( 1.0, 1.0, 0.7 );
 const SPRITE_DOT_SCALING: f32 = 0.08;
