@@ -32,16 +32,20 @@ impl TargetGamepad
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//glamの型にメソッドを追加する準備
+//glamのIVec2にメソッドを追加する準備
 pub trait AddOnTraitForIVec2
 {   fn to_vec2_on_screen( &self ) -> Vec2;
 }
 
-//glamの型にメソッドを追加する
+//glamのIVec2にメソッドを追加する
 impl AddOnTraitForIVec2 for IVec2
-{   //スプライト等のアンカーが左上ではなく中央にあるため「+0.5」する
+{   //スプライト用グリッドの座標(IVec2)をスクリーンのピクセル座標(Vec2)へ変換する
     fn to_vec2_on_screen( &self ) -> Vec2
-    {   ( self.as_vec2() + 0.5 ) * PIXELS_PER_GRID * Vec2::new( 1.0, -1.0 )
+    {   //スクリーン座標の基準単位（Ｙ軸はマイナスへ向く）
+        let unit = Vec2::new( 1.0, -1.0 ) * PIXELS_PER_GRID;
+
+        //アンカーが中央にあるため補正(+0.5)を加えてから変換する
+        ( self.as_vec2() + 0.5 ) * unit
     }
 }
 
