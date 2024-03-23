@@ -30,6 +30,10 @@ const UI_HIT_ANY_KEY: &[ MessageSect ] =
 #[derive( Component )]
 pub struct Message;
 
+//タイトルロゴのComponent
+#[derive( Component )]
+pub struct TextTitleLogo;
+
 //明滅効果を適用するためのComponent
 #[derive( Component, Default )]
 pub struct TextDEMO { blink_cycle: f32 }
@@ -64,9 +68,9 @@ pub fn spawn_text
     ui_hakey.text.justify = JustifyText::Center; //センタリング
 
     let children =
-    &[  cmds.spawn(   ui_title                       ).id(),
-        cmds.spawn( ( ui_demo, TextDEMO::default() ) ).id(),
-        cmds.spawn(   ui_hakey                       ).id(),
+    &[  cmds.spawn( ( ui_title, TextTitleLogo       ) ).id(),
+        cmds.spawn( ( ui_demo , TextDEMO::default() ) ).id(),
+        cmds.spawn(   ui_hakey                        ).id(),
     ];
 
     //レイアウト用の隠しノードの中に子要素を作成する
