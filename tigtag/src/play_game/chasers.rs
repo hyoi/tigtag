@@ -95,8 +95,8 @@ const ANIME_TIMER_CHASER: f32 = 0.15;
 const CHASERS_SPRITE_INFO: &[ ( Color, Option<FnAutoChase>, &str ) ] =
 &[  ( Color::RED,   Some ( choice_way_red   ), ASSETS_SPRITE_SHEET_CHASER_RED   ),
     ( Color::GREEN, Some ( choice_way_green ), ASSETS_SPRITE_SHEET_CHASER_GREEN ),
-    ( Color::PINK,  Some ( choice_way_pink  ), ASSETS_SPRITE_SHEET_CHASER_BLUE  ),
-    ( Color::BLUE,  Some ( choice_way_blue  ), ASSETS_SPRITE_SHEET_CHASER_PINK  ),
+    ( Color::PINK,  Some ( choice_way_pink  ), ASSETS_SPRITE_SHEET_CHASER_PINK  ),
+    ( Color::BLUE,  Some ( choice_way_blue  ), ASSETS_SPRITE_SHEET_CHASER_BLUE  ),
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
