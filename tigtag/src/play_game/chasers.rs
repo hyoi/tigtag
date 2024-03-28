@@ -62,7 +62,7 @@ impl CharacterAnimation for Chaser
 ////////////////////////////////////////////////////////////////////////////////
 
 //敵キャラの設定値
-const CHASER_TIME_PER_GRID: f32 = 0.20;//0.13; //１グリッド進むために必要な時間
+pub const CHASER_TIME_PER_GRID: f32 = 0.20;//0.13; //１グリッド進むために必要な時間
 const CHASER_SPEED: f32 = PIXELS_PER_GRID / CHASER_TIME_PER_GRID; //速度
 const CHASER_SPRITE_SCALING: f32 = 0.5; //primitive shape表示時の縮小係数
 const CHASER_ACCEL: f32 = 0.4; //スピードアップの割増
@@ -72,8 +72,8 @@ const CHASER_START_POSITION: &[ IVec2 ] = //スタート座標
     IVec2::new( MAX_X, 1     ),
     IVec2::new( MAX_X, MAX_Y ),
 ];
-const MAX_X: i32 = MAP_GRIDS_WIDTH  - 2;
-const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
+const MAX_X: i32 = map::MAP_GRIDS_WIDTH  - 2;
+const MAX_Y: i32 = map::MAP_GRIDS_HEIGHT - 2;
 
 //スプライトシートを使ったアニメーションの情報
 const  SPRITE_SHEET_SIZE_CHASER: Vec2 = Vec2::new( 8.0, 8.0 );
@@ -190,6 +190,7 @@ pub fn move_sprite
 (   mut qry_chaser: Query<( &mut Chaser, &mut Transform, &mut TextureAtlas )>,
     opt_map: Option<Res<map::Map>>,
     qry_player: Query<&player::Player>,
+    mut evt_timer: EventWriter<EventTimerChasers>,
     time: Res<Time>,
 )
 {   let Ok ( player ) = qry_player.get_single() else { return };
@@ -197,6 +198,7 @@ pub fn move_sprite
 
     //前回からの経過時間
     let time_delta = time.delta();
+    let mut chaser_timer_finished = Vec::new();
 
     //敵キャラは複数なのでループ処理する
     for ( mut chaser, mut transform, mut sprite_sheet ) in qry_chaser.iter_mut()
@@ -222,7 +224,9 @@ pub fn move_sprite
             }
         }
         else
-        {   //スプライトをグリッドに配置する
+        {   chaser_timer_finished.push( chaser.color ); //後続の処理にtimer finishedを伝達する
+
+            //スプライトをグリッドに配置する
             if chaser.px_start != chaser.px_end
             {   chaser.px_start = chaser.px_end;
                 chaser.px_end   = chaser.next_grid.to_vec2_on_game_map();
@@ -265,6 +269,11 @@ pub fn move_sprite
             //タイマーをリセットする
             chaser.timer.reset();
         }
+    }
+
+    //後続の処理にtimer finishedを伝達する
+    if ! chaser_timer_finished.is_empty()
+    {   evt_timer.send( EventTimerChasers ( chaser_timer_finished ) );
     }
 
     //敵キャラは重なるとスピードアップする

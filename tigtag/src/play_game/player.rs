@@ -70,7 +70,7 @@ impl CharacterAnimation for Player
 ////////////////////////////////////////////////////////////////////////////////
 
 //自キャラの設定値
-const PLAYER_TIME_PER_GRID: f32 = 0.15;//0.09; //１グリッド進むために必要な時間
+pub const PLAYER_TIME_PER_GRID: f32 = 0.15;//0.09; //１グリッド進むために必要な時間
 const PLAYER_SPEED: f32 = PIXELS_PER_GRID / PLAYER_TIME_PER_GRID; //速度
 const PLAYER_SPRITE_SCALING: f32 = 0.4; //primitive shape表示時の縮小係数
 const PLAYER_SPRITE_COLOR: Color = Color::YELLOW;
@@ -109,13 +109,13 @@ pub fn spawn_sprite
     qry_player.iter().for_each( | id | cmds.entity( id ).despawn_recursive() );
 
     //乱数で初期位置を決める(マップ中央付近の通路)
-    let half_w = MAP_GRIDS_WIDTH  / 2;
-    let half_h = MAP_GRIDS_HEIGHT / 2;
+    let half_w = map::MAP_GRIDS_WIDTH  / 2;
+    let half_h = map::MAP_GRIDS_HEIGHT / 2;
     let short_side = if half_w >= half_h { half_h } else { half_w };
     let x1 = short_side - 1;
     let y1 = short_side - 1;
-    let x2 = MAP_GRIDS_WIDTH  - short_side;
-    let y2 = MAP_GRIDS_HEIGHT - short_side;
+    let x2 = map::MAP_GRIDS_WIDTH  - short_side;
+    let y2 = map::MAP_GRIDS_HEIGHT - short_side;
 
     let mut player_grid = IVec2::new( 0, 0 );
     loop
@@ -175,6 +175,7 @@ pub fn spawn_sprite
 ////////////////////////////////////////////////////////////////////////////////
 
 //自キャラを移動させる
+#[allow(clippy::too_many_arguments)]
 pub fn move_sprite
 (   mut qry_player: Query<( &mut Player, &mut Transform, &mut TextureAtlas )>,
     opt_map: Option<Res<map::Map>>,
@@ -182,6 +183,7 @@ pub fn move_sprite
     opt_demo: Option<Res<demo::schedule::DemoMapParams>>,
     qry_chasers: Query<&chasers::Chaser>,
     state: ResMut<State<MyState>>,
+    mut evt_timer: EventWriter<EventTimerPlayer>,
     time: Res<Time>,
 )
 {   let Ok ( ( mut player, mut transform, mut sprite_sheet ) ) = qry_player.get_single_mut() else { return };
@@ -195,7 +197,7 @@ pub fn move_sprite
     if ! player.timer.tick( time_delta ).finished()
     {   if ! player.is_stop
         {   //移動中の中割座標
-            let delta = time_delta.as_secs_f32() * PLAYER_SPEED;
+            let delta = PLAYER_SPEED * time_delta.as_secs_f32();
             match player.direction
             {   News::North => transform.translation.y += delta,
                 News::South => transform.translation.y -= delta,
@@ -207,7 +209,9 @@ pub fn move_sprite
         }
     }
     else
-    {   //スプライトをグリッドに配置する
+    {   evt_timer.send( EventTimerPlayer ); //後続の処理にtimer finishedを伝達する
+
+        //スプライトをグリッドに配置する
         if player.px_start != player.px_end
         {   player.px_start = player.px_end;
             player.px_end   = player.next_grid.to_vec2_on_game_map();

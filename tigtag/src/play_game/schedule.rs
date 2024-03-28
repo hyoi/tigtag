@@ -18,7 +18,9 @@ impl Plugin for Schedule
         //Event
         .add_event::<EventClear>()  //ステージクリアの伝達
         .add_event::<EventOver>()   //ゲームオーバーの伝達
-        .add_event::<EventEatDot>() //スコアリングの伝達（demo用）
+        .add_event::<EventEatDot>() //スコアリングの伝達
+        .add_event::<EventTimerPlayer>()  //自キャラ移動タイマーのfinishedの伝達
+        .add_event::<EventTimerChasers>() //敵キャラ移動タイマーのfinishedの伝達
 
         //plugin
         .add_plugins( header::Schedule ) //ヘッダー更新(Stage、Score、HiScore)

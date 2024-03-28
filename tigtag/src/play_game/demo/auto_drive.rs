@@ -231,7 +231,7 @@ fn check_byway_risk
 
 //ざっくりチェイサーとの距離を測って最小値を返す
 fn heuristic( target: IVec2, chasers: &[ IVec2 ] ) -> i32
-{   let mut shortest = MAP_GRIDS_WIDTH + MAP_GRIDS_HEIGHT;
+{   let mut shortest = map::MAP_GRIDS_WIDTH + map::MAP_GRIDS_HEIGHT;
     for chaser in chasers
     {   let w_and_h = ( target.x - chaser.x ).abs()
                     + ( target.y - chaser.y ).abs();

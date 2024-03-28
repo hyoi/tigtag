@@ -2,15 +2,6 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//マップ縦横幅
-pub const MAP_GRIDS_WIDTH : i32 = SCREEN_GRIDS_WIDTH;      // w <= SCREEN_GRIDS_WIDTH;
-pub const MAP_GRIDS_HEIGHT: i32 = SCREEN_GRIDS_HEIGHT - 2; // h <= SCREEN_GRIDS_HEIGHT - 2;
-
-//マップ座標から画面座標へ変換する際の調整値
-pub const ADJUST_MAP_ON_SCREEN: IVec2 = IVec2::new( 0, 1 );
-
-////////////////////////////////////////////////////////////////////////////////
-
 //ゲームの成績記録用のResource
 #[derive( Resource, Default )]
 pub struct Record
@@ -51,7 +42,9 @@ impl Record
 //System間の通知用イベント
 #[derive( Event )] pub struct EventClear;
 #[derive( Event )] pub struct EventOver;
-#[derive( Event )] pub struct EventEatDot;
+#[derive( Event )] pub struct EventEatDot ( pub IVec2 );
+#[derive( Event )] pub struct EventTimerPlayer;
+#[derive( Event )] pub struct EventTimerChasers ( pub Vec<Color> );
 
 ////////////////////////////////////////////////////////////////////////////////
 
