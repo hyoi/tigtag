@@ -73,7 +73,7 @@ impl ChangeMyState for AfterInitApp
 
 //ヘッダー／フッターのComponent
 #[derive( Component )] pub struct UiHeaderLeft;   //日時表示
-// #[derive( Component )] pub struct UiHeaderCenter; //
+#[derive( Component )] pub struct UiHeaderCenter; //タイトル
 #[derive( Component )] pub struct UiHeaderRight;  //経過時間表示
 #[derive( Component )] pub struct UiFooterLeft;   //FPS表示
 #[derive( Component )] pub struct UiFooterCenter; //auther
@@ -85,18 +85,22 @@ const HEADER_LEFT: &[ MessageSect ] =
     ( ""        , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4, Color::SILVER ),
 ];
 
+const HEADER_CENTER: &[ MessageSect ] =
+&[  ( APP_TITLE, ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
+];
+
 const HEADER_RIGHT: &[ MessageSect ] =
 &[  ( "  Passed ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, Color::TEAL   ),
     ( ""         , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4, Color::SILVER ),
 ];
 
 const FOOTER_LEFT: &[ MessageSect ] =
-&[  ( "  Fps ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, Color::TEAL   ),
+&[  ( "  FPS ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, Color::TEAL   ),
     ( ""      , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4, Color::SILVER ),
 ];
 
 const FOOTER_CENTER: &[ MessageSect ] =
-&[  ( "hyoi 2021 - 2024", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
+&[  ( "hyoi 2023 - XXXX", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
 ];
 
 const FOOTER_RIGHT: &[ MessageSect ] =
@@ -142,6 +146,7 @@ fn spawn_header_footer
 
     //ヘッダー／フッターの準備
     let mut header_left   = misc::text_ui( HEADER_LEFT  , &asset_svr );
+    let mut header_center = misc::text_ui( HEADER_CENTER, &asset_svr );
     let mut header_right  = misc::text_ui( HEADER_RIGHT , &asset_svr );
     let mut footer_left   = misc::text_ui( FOOTER_LEFT  , &asset_svr );
     let mut footer_center = misc::text_ui( FOOTER_CENTER, &asset_svr );
@@ -151,11 +156,19 @@ fn spawn_header_footer
     header_left.style.grid_column    = GridPlacement::start( 1 ); //左端のセル
     header_left.style.align_self     = AlignSelf::FlexStart;      //セル内の上寄せ
     header_left.style.justify_self   = JustifySelf::Start;        //セル内の左寄せ
+    header_left.background_color     = Color::BLUE.into();
+
+    header_center.style.grid_row     = GridPlacement::start( 1 ); //ヘッダー
+    header_center.style.grid_column  = GridPlacement::start( 2 ); //中央のセル
+    header_center.style.align_self   = AlignSelf::FlexStart;      //セル内の上寄せ
+    header_center.style.justify_self = JustifySelf::Center;       //セル内の中央寄せ
+    header_center.background_color   = Color::BLUE.into();
 
     header_right.style.grid_row      = GridPlacement::start( 1 ); //ヘッダー
     header_right.style.grid_column   = GridPlacement::start( 3 ); //右端のセル
     header_right.style.align_self    = AlignSelf::FlexStart;      //セル内の上寄せ
     header_right.style.justify_self  = JustifySelf::End;          //セル内の右寄せ
+    header_right.background_color    = Color::BLUE.into();
 
     footer_left.style.grid_row       = GridPlacement::start( 3 ); //フッター
     footer_left.style.grid_column    = GridPlacement::start( 1 ); //左端のセル
@@ -176,6 +189,7 @@ fn spawn_header_footer
     cmds.spawn( ( hidden_node, HiddenNode ) ).with_children
     (   | cmds |
         {   cmds.spawn( ( header_left  , UiHeaderLeft   ) );
+            cmds.spawn( ( header_center, UiHeaderCenter ) );
             cmds.spawn( ( header_right , UiHeaderRight  ) );
             cmds.spawn( ( footer_left  , UiFooterLeft   ) );
             cmds.spawn( ( footer_center, UiFooterCenter ) );
