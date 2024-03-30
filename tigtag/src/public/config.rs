@@ -59,21 +59,30 @@ pub const FULL_SCREEN_BUTTON: GamepadButtonType = GamepadButtonType::Start; //ps
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//Cameraのレンダリングの重なり
+//カメラのレンダリングの重なり
 pub const CAMERA_ORDER_DEFAULT_2D: isize = 1; //2D デフォルトカメラ
 pub const CAMERA_ORDER_DEFAULT_3D: isize = 0; //3D デフォルトカメラが最下
 
-//Cameraの背景色
-pub const CAMERA_BGCOLOR_2D: ClearColorConfig = CAMERA_BG_TRANSPARENCY;
+//カメラの背景色
+pub const CAMERA_BGCOLOR_2D: ClearColorConfig = CAMERA_BG_THROUGH;
 pub const CAMERA_BGCOLOR_3D: ClearColorConfig = CAMERA_BG_COLOR;
 
-const CAMERA_BG_TRANSPARENCY: ClearColorConfig = ClearColorConfig::None;
-const CAMERA_BG_COLOR       : ClearColorConfig = ClearColorConfig::Custom( BG_COLOR );
-const BG_COLOR: Color = Color::BLACK; //rgb( 0.13, 0.13, 0.18 );
+const CAMERA_BG_THROUGH: ClearColorConfig = ClearColorConfig::None;
+const CAMERA_BG_COLOR  : ClearColorConfig = ClearColorConfig::Custom( Color::BLACK );
 
 //3Dライトの設定
 pub const LIGHT_3D_BRIGHTNESS : f32  = 3000.0; //明るさ
 pub const LIGHT_3D_TRANSLATION: Vec3 = Vec3::new( 30.0, 100.0, 40.0 ); //位置
+
+////////////////////////////////////////////////////////////////////////////////
+
+//デフォルト2Dカメラの位置
+//第四象限。左上隅が(0,0)で、X軸はプラス方向へ、Y軸はマイナス方向へ伸びる
+pub const CAMERA_POSITION_DEFAULT_2D: Vec3 = Vec3::new
+(   SCREEN_PIXELS_WIDTH  *  0.5,
+    SCREEN_PIXELS_HEIGHT * -0.5,
+    0.0
+);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -125,7 +134,7 @@ pub const PRELOAD_ASSETS: &[ &str ] =
 &[  ASSETS_SPRITE_KANI_DOTOWN,
     ASSETS_FONT_ORBITRON_BLACK,
     ASSETS_FONT_PRESSSTART2P_REGULAR,
-//===================================
+  //=================================
     ASSETS_SPRITE_BRICK_WALL,
     ASSETS_SPRITE_SHEET_PLAYER,
     ASSETS_SPRITE_SHEET_CHASER_RED,

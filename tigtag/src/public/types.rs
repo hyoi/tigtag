@@ -15,8 +15,7 @@ pub enum MyState
 }
 
 impl MyState
-{   pub fn is_pause   ( &self ) -> bool { *self == MyState::Pause }
-    pub fn is_demoplay( &self ) -> bool { *self == MyState::TitleDemo || *self == MyState::DemoLoop }
+{   pub fn is_demoplay( &self ) -> bool { self.is_titledemo() || self.is_demoloop() }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

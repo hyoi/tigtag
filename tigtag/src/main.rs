@@ -13,6 +13,7 @@ use bevy::
     sprite::MaterialMesh2dBundle,
     utils::{ HashMap, HashSet },
     audio::Volume,
+    input::keyboard::NativeKeyCode,
 };
 use once_cell::sync::Lazy;
 use rand::prelude::*;
@@ -61,8 +62,8 @@ fn main()
     .add_systems
     (   Startup,
         (   //カメラとライトを作る
-            (   misc::spawn_2d_camera,
-                misc::spawn_3d_camera,
+            (   misc::spawn_camera_2d,
+                misc::spawn_camera_3d,
                 misc::spawn_3d_light,
             ),
 
@@ -88,7 +89,7 @@ fn main()
                 misc::change_gamepad_connection,
 
                 //特殊な操作
-                (   // bevy::window::close_on_esc, //[ESC]で終了
+                (   bevy::window::close_on_esc, //[ESC]で終了
                     misc::toggle_window_mode,   //フルスクリーン切換
                 )
                 .run_if( not( WASM ) ),

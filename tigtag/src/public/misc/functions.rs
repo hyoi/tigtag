@@ -67,61 +67,30 @@ pub fn toggle_window_mode
 ////////////////////////////////////////////////////////////////////////////////
 
 //デフォルトカメラのComponent
-#[derive( Component )] pub struct Camera2dDefault;
-#[derive( Component )] pub struct Camera3dDefault;
+#[derive( Component )] pub struct CameraDefault2d;
+#[derive( Component )] pub struct CameraDefault3d;
 
-//2D cameraをspawnする
-pub fn spawn_2d_camera( mut cmds: Commands )
-{   //タイトルバーのWクリックや最大化ボタンによるウィンドウ最大化時に
-    //表示が著しく崩れることを緩和するためviewportを設定しておく
-    // let zero = UVec2::new( 0, 0 );
-    // let size = Vec2::new( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT );
-    // let viewport = Some
-    // (   bevy::render::camera::Viewport
-    //     {   physical_position: zero,
-    //         physical_size    : size.as_uvec2(),
-    //         ..default()
-    //     }
-    // );
-
-    //2Dカメラを第四象限にスライドする
-    //左上隅が(0,0)、X軸はプラス方向へ伸び、Y軸はマイナス方向へ下がる
-    let vec3 = Vec3::X     * SCREEN_PIXELS_WIDTH  * 0.5
-             + Vec3::NEG_Y * SCREEN_PIXELS_HEIGHT * 0.5;
-
-    cmds.spawn( ( Camera2dBundle::default(), Camera2dDefault ) )
+//デフォルト2Dカメラをspawnする
+pub fn spawn_camera_2d( mut cmds: Commands )
+{   cmds.spawn( ( Camera2dBundle::default(), CameraDefault2d ) )
     .insert( Camera
     {   order: CAMERA_ORDER_DEFAULT_2D,
         clear_color: CAMERA_BGCOLOR_2D,
-        // viewport,
         ..default()
     } )
-    .insert( Transform::from_translation( vec3 ) )
+    .insert( Transform::from_translation( CAMERA_POSITION_DEFAULT_2D ) )
     ;
 }
 
-//3D cameraをspawnする
-pub fn spawn_3d_camera( mut cmds: Commands )
-{   //タイトルバーのWクリックや最大化ボタンによるウィンドウ最大化時に
-    //表示が著しく崩れることを緩和するためviewportを設定しておく
-    // let zero = UVec2::new( 0, 0 );
-    // let size = Vec2::new( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT );
-    // let viewport = Some
-    // (   bevy::render::camera::Viewport
-    //     {   physical_position: zero,
-    //         physical_size    : size.as_uvec2(),
-    //         ..default()
-    //     }
-    // );
-
-    //3Dカメラの座標を初期化する（オービットカメラ）
+//デフォルト3Dカメラをspawnする
+pub fn spawn_camera_3d( mut cmds: Commands )
+{   //3Dカメラの座標を初期化する（オービットカメラ）
     let vec3 = Orbit::default().to_vec3();
 
-    cmds.spawn( ( Camera3dBundle:: default(), Camera3dDefault ) )
+    cmds.spawn( ( Camera3dBundle:: default(), CameraDefault3d ) )
     .insert( Camera
     {   order: CAMERA_ORDER_DEFAULT_3D,
         clear_color: CAMERA_BGCOLOR_3D,
-        // viewport,
         ..default()
     } )
     .insert( Transform::from_translation( vec3 ).looking_at( Vec3::ZERO, Vec3::Y ) )

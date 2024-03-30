@@ -28,7 +28,8 @@ pub const HAK_IGNORE_KEYS: &[ KeyCode ] =
     KeyCode::ShiftLeft  , KeyCode::ShiftRight,
     KeyCode::ArrowUp    , KeyCode::ArrowDown,
     KeyCode::ArrowRight , KeyCode::ArrowLeft,
-    pause::PAUSE_KEY,
+    KeyCode::Fn         , pause::ESC_KEY,
+    KeyCode::Unidentified ( NativeKeyCode::Windows ( 57443 ) ), //ThinkPad [Fn]
 ];
 pub const HAK_IGNORE_BUTTONS: &[ GamepadButtonType ] =
 &[  FULL_SCREEN_BUTTON,
@@ -46,8 +47,14 @@ pub fn hit_any_key<T: Send + Sync + Default + ChangeMyState>
     inbtn: Res<ButtonInput<GamepadButton>>,
 )
 {   //無視キー以外のキー入力はあるか
-    if inkey.any_pressed( HAK_IGNORE_KEYS.iter().copied() ) { return }
+    if inkey.any_pressed     ( HAK_IGNORE_KEYS.iter().copied() ) { return }
+    if inkey.any_just_pressed( HAK_IGNORE_KEYS.iter().copied() ) { return } //[Fn]対策
     let mut is_pressed = inkey.get_just_pressed().len();
+
+    #[cfg(debug_assertions)]
+    if is_pressed != 0
+    {   inkey.get_just_pressed().for_each( |key| { dbg!( key ); } );
+    }
 
     //無視ボタン以外のボタン入力はあるか
     if is_pressed == 0

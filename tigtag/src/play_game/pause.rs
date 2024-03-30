@@ -15,8 +15,8 @@ impl Plugin for Schedule
         )
         .add_systems
         (   Update,
-            (   //PAUSEメニュー表示／非表示のトグル処理
-                show_and_hide_pause_menu,
+            (   //PAUSEメニュー表示／非表示のトグル処理（close_on_escより前に実行する）
+                show_and_hide_pause_menu.before( bevy::window::close_on_esc ),
             )
         )
         .add_systems
@@ -51,7 +51,7 @@ const UI_EXIT: &[ MessageSect ] =
 ];
 
 //PAUSEメニュー表示切替のキー／ボタン
-pub const PAUSE_KEY: KeyCode = KeyCode::Escape;
+pub const ESC_KEY: KeyCode = KeyCode::Escape;
 pub const PAUSE_BUTTON: GamepadButtonType = GamepadButtonType::Select; //PS4[SHARE]
 
 //PAUSEメニューアイテム選択に使うキー／ボタン
@@ -176,7 +176,7 @@ fn show_and_hide_pause_menu
 (   mut qry_menu: Query<( &mut Visibility, &mut PauseMenu )>,
     qry_menu_items: Query<ParamsMenuItem>,
     opt_gamepad: Option<Res<TargetGamepad>>,
-    input_keyboard: Res<ButtonInput<KeyCode>>,
+    mut input_keyboard: ResMut<ButtonInput<KeyCode>>,
     input_gamepad: Res<ButtonInput<GamepadButton>>,
     mut state: ResMut<State<MyState>>,
     mut cmds: Commands,
@@ -186,7 +186,8 @@ fn show_and_hide_pause_menu
     let Ok ( ( mut visibility, mut menu ) ) = qry_menu.get_single_mut() else { return };
 
     //キーの状態
-    let mut is_pressed = input_keyboard.just_pressed( PAUSE_KEY );
+    let mut is_pressed = input_keyboard.just_pressed( ESC_KEY );
+    input_keyboard.reset( ESC_KEY ); //Note:[Esc]押下げをリセットする（close_on_esc対策）
 
     //ゲームパッドのボタンの状態
     if ! is_pressed

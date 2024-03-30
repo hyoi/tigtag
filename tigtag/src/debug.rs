@@ -92,8 +92,8 @@ pub fn update_gizmo
 
 //テキストUIを表示する
 pub fn spawn_grid_layout_ui
-(   // camera2d_id: Query<Entity, With<misc::Camera2dDefault>>,
-    // camera3d_id: Query<Entity, With<misc::Camera3dDefault>>,
+(   // camera2d_id: Query<Entity, With<misc::CameraDefault2d>>,
+    // camera3d_id: Query<Entity, With<misc::CameraDefault3d>>,
     mut cmds: Commands,
 )
 {   //ウィンドウ全体の隠しノードを作成する(グリッドレイアウト３列×３行)
