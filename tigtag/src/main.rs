@@ -2,13 +2,10 @@
 use bevy::
 {   prelude::*,
     log::LogPlugin,
-    window::WindowMode,
-    render::camera::ClearColorConfig,
     input::mouse::{ MouseMotion, MouseWheel },
     asset::{ LoadState, LoadedUntypedAsset },
     diagnostic::{ FrameTimeDiagnosticsPlugin, DiagnosticsStore },
     utils::Duration,
-    ecs::query::QueryFilter,
   //=============================================================
     sprite::MaterialMesh2dBundle,
     utils::{ HashMap, HashSet },
@@ -28,15 +25,11 @@ use std::
     collections::VecDeque,
 };
 
-//proc-macro crates
-use macros::MyState;
-
-//internal submodules
-mod public;
+//import names from other crates in this package
 use public::*;
 
+//internal submodules
 mod debug;
-
 mod load_assets;
 mod init_app;
 mod play_game;
