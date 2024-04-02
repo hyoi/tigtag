@@ -18,6 +18,13 @@ impl MyState
 {   pub fn is_demoplay( &self ) -> bool { self.is_titledemo() || self.is_demoloop() }
 }
 
+//InitAppの後の遷移先を登録するResource
+#[derive( Resource )]
+pub struct AfterInitApp ( pub MyState );
+impl ChangeMyState for AfterInitApp
+{   fn state( &self ) -> MyState { self.0 }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //操作を受付けるgamepadのIDを保存するResource
@@ -128,13 +135,6 @@ impl SquarePlane
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-//InitAppの後の遷移先を登録するResource
-#[derive( Resource )]
-pub struct AfterInitApp ( pub MyState );
-impl ChangeMyState for AfterInitApp
-{   fn state( &self ) -> MyState { self.0 }
-}
 
 //隠しノードのComponent
 #[derive( Component )] pub struct HiddenNode;
