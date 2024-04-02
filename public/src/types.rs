@@ -129,4 +129,24 @@ impl SquarePlane
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//InitAppの後の遷移先を登録するResource
+#[derive( Resource )]
+pub struct AfterInitApp ( pub MyState );
+impl ChangeMyState for AfterInitApp
+{   fn state( &self ) -> MyState { self.0 }
+}
+
+//隠しノードのComponent
+#[derive( Component )] pub struct HiddenNode;
+
+//ヘッダー／フッターのComponent
+#[derive( Component )] pub struct UiHeaderLeft;   //日時表示
+#[derive( Component )] pub struct UiHeaderCenter; //タイトル
+#[derive( Component )] pub struct UiHeaderRight;  //経過時間表示
+#[derive( Component )] pub struct UiFooterLeft;   //FPS表示
+#[derive( Component )] pub struct UiFooterCenter; //auther
+#[derive( Component )] pub struct UiFooterRight;  //Powered by
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.

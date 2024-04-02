@@ -9,6 +9,7 @@ once_cell.workspace = true
 rand.workspace = true
 chrono.workspace = true
 
+tigtag_inside.workspace = true
 public.workspace = true
 
 [features]

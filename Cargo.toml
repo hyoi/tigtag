@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = [ "tigtag", "public", "macros", "macros_inside" ]
+members = [ "tigtag", "tigtag_inside", "public", "macros", "macros_inside" ]
 
 [workspace.package]
 version = "0.13.0"
@@ -17,6 +17,7 @@ syn = "2"
 quote = "1"
 proc-macro2 = "1"
 
+tigtag_inside = { path = "tigtag_inside" }
 public        = { path = "public"        }
 macros        = { path = "macros"        }
 macros_inside = { path = "macros_inside" }

@@ -6,33 +6,21 @@ use bevy::
     asset::{ LoadState, LoadedUntypedAsset },
     diagnostic::{ FrameTimeDiagnosticsPlugin, DiagnosticsStore },
     utils::Duration,
-  //=============================================================
-    sprite::MaterialMesh2dBundle,
-    utils::{ HashMap, HashSet },
-    audio::Volume,
-    input::keyboard::NativeKeyCode,
 };
 use once_cell::sync::Lazy;
 use rand::prelude::*;
 
 //standard library
-use std::
-{   ops::Range,
-    f32::consts::{ PI, TAU },
-  //=========================
-    ops::{ Add, AddAssign },
-    cmp::Ordering,
-    collections::VecDeque,
-};
+use std::f32::consts::TAU;
 
 //import names from other crates in this package
 use public::*;
+use tigtag_inside as play_game;
 
 //internal submodules
 mod debug;
 mod load_assets;
 mod init_app;
-mod play_game;
 
 ////////////////////////////////////////////////////////////////////////////////
 
