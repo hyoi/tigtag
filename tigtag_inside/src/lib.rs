@@ -19,7 +19,7 @@ use std::
 };
 
 //import names from other crates in this package
-use public::*;
+use share::*;
 
 //ゲームロジック
 mod schedule;

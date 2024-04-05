@@ -1,5 +1,5 @@
 [package]
-name = "public"
+name = "share"
 version.workspace = true
 edition.workspace = true
 

@@ -10,4 +10,4 @@ bevy.workspace = true
 once_cell.workspace = true
 rand.workspace = true
 
-public.workspace = true
+share.workspace = true

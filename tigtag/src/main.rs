@@ -14,7 +14,7 @@ use rand::prelude::*;
 use std::f32::consts::TAU;
 
 //import names from other crates in this package
-use public::*;
+use share::*;
 use tigtag_inside as play_game;
 
 //internal submodules
