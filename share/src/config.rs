@@ -3,8 +3,8 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////
 
 //アプリの情報
-pub const APP_TITLE: &str = CARGO_TOML_NAME; //アプリタイトル
-pub const APP_VER  : &str = CARGO_TOML_VER;  //アプリのバージョン
+pub const APP_TITLE: &str = "TigTag";       //アプリタイトル
+pub const APP_VER  : &str = CARGO_TOML_VER; //アプリのバージョン
 
 //単位Gridの縦横(Pixel)
 const BASE_PIXELS: i32 = 8;

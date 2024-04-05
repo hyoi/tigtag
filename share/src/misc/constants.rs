@@ -3,8 +3,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 //アプリの情報
-pub const CARGO_TOML_NAME: &str = env!( "CARGO_PKG_NAME"    );
-pub const CARGO_TOML_VER : &str = env!( "CARGO_PKG_VERSION" );
+// pub const CARGO_TOML_NAME: &str = env!( "CARGO_PKG_NAME" ); //shareになってしまう
+pub const CARGO_TOML_VER: &str = env!( "CARGO_PKG_VERSION" );
 
 ////////////////////////////////////////////////////////////////////////////////
 
