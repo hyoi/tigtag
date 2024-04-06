@@ -8,8 +8,7 @@ Note: Japanese text only.
 SEが実装されています。音量要注意っ (≧ω≦;)
 
 ## WASM版
-[https://hyoi.github.io/tigtag/tigtag/](https://hyoi.github.io/tigtag/tigtag/)  
-※Rustのworkspaceで作業するとディレクトリの切り方にセンス問われるな‥‥  
+[https://hyoi.github.io/tigtag/](https://hyoi.github.io/tigtag/)  
 
 ## 操作方法
 
@@ -58,7 +57,7 @@ cargo install -f wasm-bindgen-cli
   - [Orbitron](https://fonts.google.com/specimen/Orbitron)
   - [Reggae One](https://fonts.google.com/specimen/Reggae+One)
 - [ドット絵ダウンロードサイト DOTOWN](https://dotown.maeda-design-room.net/)
-  - Rustだから蟹 <img src="./tigtag/assets/image/sprite/kani_DOTOWN.png" width="22" height="16" style="vertical-align: bottom;">  
+  - Rustだから蟹 <img src="./assets/image/sprite/kani_DOTOWN.png" width="22" height="16" style="vertical-align: bottom;">  
 
 ## 宿題
 - [ ] スマホでプレーできるようにしたい。
