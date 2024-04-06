@@ -41,6 +41,10 @@ impl Default for Player
 //関数ポインタ型(デモ時の自走自キャラの移動方向を決める関数)
 type FnAutoDrive = fn( &Player, Query<&chasers::Chaser>, Res<map::Map>, Res<demo::schedule::DemoMapParams>, &[News] ) -> News;
 
+//自キャラの三角スプライトのComponent
+#[derive( Component )]
+pub struct PlayerTriangle;
+
 //自キャラの入力を保存するResource
 #[derive( Resource )]
 pub struct InputDirection ( Vec<News> );
@@ -137,7 +141,7 @@ pub fn spawn_sprite
     };
 
     if SPRITE_SHEET_OFF()
-    {   //三角形のメッシュ
+    {   //三角形のメッシュを作る
         let radius = PIXELS_PER_GRID * PLAYER_SPRITE_SCALING;
         let shape = RegularPolygon::new( radius, 3 ).mesh();
         let triangle = MaterialMesh2dBundle
@@ -146,9 +150,13 @@ pub fn spawn_sprite
             ..default()
         };
         let quat = Quat::from_rotation_z( PI ); //News::South
-        cmds.spawn( ( triangle, player ) )
+        let triangle = cmds.spawn( ( triangle, PlayerTriangle ) ).id();
+
+        //三角形を不可視ルートノードの子にする
+        cmds.spawn( ( PbrBundle::default(), player ) )
         .insert( Transform::from_translation( translation ).with_rotation( quat ) )
         .insert( TextureAtlas::default() ) //move_sprite()のqry_playerの検索条件を満たすためのdummy
+        .push_children( &[ triangle ] )
         ;
     }
     else
@@ -176,8 +184,13 @@ pub fn spawn_sprite
 
 //自キャラを移動させる
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::type_complexity)]
 pub fn move_sprite
-(   mut qry_player: Query<( &mut Player, &mut Transform, &mut TextureAtlas )>,
+(   mut qry_player: Query<( &mut Player, &mut TextureAtlas )>,
+    mut pst_transform: ParamSet
+    <(  Query<&mut Transform, With<Player>>,
+        Query<&mut Transform, With<PlayerTriangle>>,
+    )>,
     opt_map: Option<Res<map::Map>>,
     opt_input_direction: Option<Res<InputDirection>>,
     opt_demo: Option<Res<demo::schedule::DemoMapParams>>,
@@ -186,7 +199,9 @@ pub fn move_sprite
     mut evt_timer: EventWriter<EventTimerPlayer>,
     time: Res<Time>,
 )
-{   let Ok ( ( mut player, mut transform, mut sprite_sheet ) ) = qry_player.get_single_mut() else { return };
+{   let Ok ( ( mut player, mut sprite_sheet ) ) = qry_player.get_single_mut() else { return };
+    let mut qry_transform = pst_transform.p0();
+    let Ok ( mut transform ) = qry_transform.get_single_mut() else { return };
     let Some ( map ) = opt_map else { return };
     let Some ( input_direction ) = opt_input_direction else { return };
 
@@ -272,7 +287,9 @@ pub fn move_sprite
         if player.direction != new_side
         {   if SPRITE_SHEET_OFF()
             {   //三角形を回転させる
-                rotate_player_sprite( &player, &mut transform, new_side );
+                if let Ok ( mut transform ) = pst_transform.p1().get_single_mut()
+                {   rotate_player_sprite( &player, &mut transform, new_side );
+                }
             }
             else
             {   //スプライトシートのindexを変更する
