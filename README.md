@@ -38,7 +38,7 @@ cargo run -r
 ※コマンドライン引数に書くディレクトリーは作業環境に合わせてください   
 ```
 cargo build -r --target wasm32-unknown-unknown
-wasm-bindgen --out-dir .\tigtag\wasm --target web --no-typescript .\target\wasm32-unknown-unknown\release\tigtag.wasm
+wasm-bindgen --out-dir .\wasm --target web --no-typescript .\target\wasm32-unknown-unknown\release\tigtag.wasm
 ```
 - WASMのコンパイルには事前にRustのtarget追加とwasm-bindgenのインストールが必要です  
 - wasm-bindgenを実行するとバージョン違いの警告が出ることがあります。その時はバージョン上げましょう  
