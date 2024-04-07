@@ -150,11 +150,15 @@ pub fn spawn_sprite
             ..default()
         };
         let quat = Quat::from_rotation_z( PI ); //News::South
-        let triangle = cmds.spawn( ( triangle, PlayerTriangle ) ).id();
+        let triangle =
+            cmds.spawn( ( triangle, PlayerTriangle ) )
+            .insert( Transform::from_rotation( quat ) )
+            .id()
+            ;
 
         //三角形を不可視ルートノードの子にする
         cmds.spawn( ( PbrBundle::default(), player ) )
-        .insert( Transform::from_translation( translation ).with_rotation( quat ) )
+        .insert( Transform::from_translation( translation ) )
         .insert( TextureAtlas::default() ) //move_sprite()のqry_playerの検索条件を満たすためのdummy
         .push_children( &[ triangle ] )
         ;
