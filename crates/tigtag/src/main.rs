@@ -70,8 +70,8 @@ fn main()
                 misc::change_gamepad_connection,
 
                 //特殊な操作
-                (   //bevy::window::close_on_esc, //[ESC]で終了
-                    misc::toggle_window_mode,   //フルスクリーン切換
+                (   misc::close_on_esc,       //[ESC]で終了
+                    misc::toggle_window_mode, //フルスクリーン切換
                 )
                 .run_if( not( WASM ) ),
             ),
