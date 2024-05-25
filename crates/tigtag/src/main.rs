@@ -19,7 +19,7 @@ use share::*;
 
 //internal submodules
 mod debug;
-// mod load_assets;
+mod load_assets;
 // mod init_app;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,12 +96,12 @@ fn main()
     ;
 
     //メイン処理
-    // app
-    // .init_state::<MyState>() //Stateを初期化する。enumの#[default]で初期値指定
-    // .add_plugins( load_assets::Schedule ) //assetsの事前ロード
+    app
+    .init_state::<MyState>() //Stateを初期化する。enumの#[default]で初期値指定
+    .add_plugins( load_assets::Schedule ) //assetsの事前ロード
     // .add_plugins( init_app::Schedule    ) //事前処理
     // .add_plugins( play_game::Schedule   ) //ゲームロジック
-    // ;
+    ;
 
     //アプリの実行
     app.run();

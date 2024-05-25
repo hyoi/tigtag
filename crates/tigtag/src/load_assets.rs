@@ -117,7 +117,7 @@ fn is_loading_done
     for handle in assets.handles.iter()
     {   match asset_svr.get_load_state( handle )
         {   Some ( LoadState::Loaded ) => (), //ロード完了
-            Some ( LoadState::Failed ) =>
+            Some ( LoadState::Failed (_) ) =>
             {   //ロード失敗⇒パニック
                 let mut filename = "Unknown".to_string();
                 if let Some ( asset_path ) = handle.path()
