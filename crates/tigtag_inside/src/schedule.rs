@@ -12,7 +12,7 @@ impl Plugin for Schedule
 
         //Resource
         .init_resource::<Record>()   //ゲームの成績
-        // .init_resource::<map::Map>() //マップ情報
+        .init_resource::<map::Map>() //マップ情報
         // .init_resource::<player::InputDirection>() //プレイヤーの入力(十字方向)
 
         //Event
@@ -84,16 +84,16 @@ impl Plugin for Schedule
         //ステージ初期化
         .add_systems
         (   OnEnter ( MyState::StageStart ),
-            (   // (   //マップデータ生成
-                //     map::make_new_data,
+            (   (   //マップデータ生成
+                    map::make_new_data,
 
-                //     //スプライトのspawn
-                //     (   map::spawn_sprite,
-                //         player::spawn_sprite,
-                //         chasers::spawn_sprite,
-                //     ),
-                // )
-                // .chain(), //実行順の固定
+                    //スプライトのspawn
+                    (   map::spawn_sprite,
+                        // player::spawn_sprite,
+                        // chasers::spawn_sprite,
+                    ),
+                )
+                .chain(), //実行順の固定
 
                 //TextUIの可視化
                 (   effect::init_count::<stage_start::CountDown>, //カウント初期化
