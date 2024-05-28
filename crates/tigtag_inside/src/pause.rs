@@ -16,7 +16,7 @@ impl Plugin for Schedule
         .add_systems
         (   Update,
             (   //PAUSEメニュー表示／非表示のトグル処理（close_on_escより前に実行する）
-                show_and_hide_pause_menu.before( bevy::window::close_on_esc ),
+                show_and_hide_pause_menu.before( misc::close_on_esc ),
             )
         )
         .add_systems
