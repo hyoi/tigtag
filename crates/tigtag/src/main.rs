@@ -15,12 +15,12 @@ use std::f32::consts::TAU;
 
 //import names from other crates in this package
 use share::*;
-// use tigtag_inside as play_game;
+use tigtag_inside as play_game;
 
 //internal submodules
 mod debug;
 mod load_assets;
-// mod init_app;
+mod init_app;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -99,8 +99,8 @@ fn main()
     app
     .init_state::<MyState>() //Stateを初期化する。enumの#[default]で初期値指定
     .add_plugins( load_assets::Schedule ) //assetsの事前ロード
-    // .add_plugins( init_app::Schedule    ) //事前処理
-    // .add_plugins( play_game::Schedule   ) //ゲームロジック
+    .add_plugins( init_app::Schedule    ) //事前処理
+    .add_plugins( play_game::Schedule   ) //ゲームロジック
     ;
 
     //アプリの実行
