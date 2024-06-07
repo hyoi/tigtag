@@ -17,8 +17,7 @@ pub const SPRITE_SHEET_OFF: fn() -> bool = || cfg!( feature = "sprite_sheet_off"
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//v0.14.0でWEBカラーの定数が廃止されたので、とりあえずの対応として自力で定数を追加
-//本来なら bevy::color::palettes::css の定数を使うべき
+//v0.14.0でカラー定数がmodule移動したので、とりあえず自力で追加
 
 //オーファンルール対策用trait
 pub trait ColorConstants
@@ -37,21 +36,21 @@ pub trait ColorConstants
     const PINK     : Color;
 }
 
-//WEBカラーの定数
+//カラー定数を bevy::prelude::Color へ追加（とりあえず）
 impl ColorConstants for bevy::prelude::Color
-{   const BISQUE   : Color = Color::srgb( 1.0 , 0.89, 0.77 );
-    const DARK_GRAY: Color = Color::srgb( 0.25, 0.25, 0.25 );
-    const RED      : Color = Color::srgb( 1.0 , 0.0 , 0.0  );
-    const GREEN    : Color = Color::srgb( 0.0 , 1.0 , 0.0  );
-    const BLUE     : Color = Color::srgb( 0.0 , 0.0 , 1.0  );
-    const GRAY     : Color = Color::srgb( 0.5 , 0.5 , 0.5  );
-    const YELLOW   : Color = Color::srgb( 1.0 , 1.0 , 0.0  );
-    const TEAL     : Color = Color::srgb( 0.0 , 0.5 , 0.5  );
-    const SILVER   : Color = Color::srgb( 0.75, 0.75, 0.75 );
-    const SEA_GREEN: Color = Color::srgb( 0.18, 0.55, 0.34 );
-    const GOLD     : Color = Color::srgb( 1.0 , 0.84, 0.0  );
-    const CYAN     : Color = Color::srgb( 0.0 , 1.0 , 1.0  );
-    const PINK     : Color = Color::srgb( 1.0 , 0.08, 0.58 );
+{   const BISQUE   : Color = Color::Srgba( css::BISQUE    );
+    const DARK_GRAY: Color = Color::Srgba( css::DARK_GRAY );
+    const RED      : Color = Color::Srgba( css::RED       );
+    const GREEN    : Color = Color::Srgba( css::GREEN     );
+    const BLUE     : Color = Color::Srgba( css::BLUE      );
+    const GRAY     : Color = Color::Srgba( css::GRAY      );
+    const YELLOW   : Color = Color::Srgba( css::YELLOW    );
+    const TEAL     : Color = Color::Srgba( css::TEAL      );
+    const SILVER   : Color = Color::Srgba( css::SILVER    );
+    const SEA_GREEN: Color = Color::Srgba( css::SEA_GREEN );
+    const GOLD     : Color = Color::Srgba( css::GOLD      );
+    const CYAN     : Color = Color::Srgba( css::AQUA      );
+    const PINK     : Color = Color::Srgba( css::PINK      );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
