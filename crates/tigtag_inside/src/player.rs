@@ -297,9 +297,9 @@ pub fn move_sprite
             }
             else
             {   //スプライトシートのindexを変更する
-                let old_offset = player.sprite_sheet_offset( player.direction );
-                let new_offset = player.sprite_sheet_offset( new_side         );
-                sprite_sheet.index += ( new_offset - old_offset ) as usize;
+                let old_offset = player.sprite_sheet_offset( player.direction ) as usize;
+                let new_offset = player.sprite_sheet_offset( new_side         ) as usize;
+                sprite_sheet.index = sprite_sheet.index + new_offset - old_offset;
             }
             player.direction = new_side;
         }
