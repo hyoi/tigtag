@@ -210,7 +210,7 @@ fn animating_sprites<T: Component + CharacterAnimation>
         {   sprite.index += 1;
             let offset = character.sprite_sheet_offset( character.direction() );
             let frame  = character.sprite_sheet_frame();
-            if sprite.index >= offset + frame { sprite.index = offset }
+            if sprite.index as u32 >= offset + frame { sprite.index = offset as usize }
         }
     }
 }

@@ -40,11 +40,12 @@ mod pause;
 //マップ、自機、追手の処理
 mod map;
 use map::GridToPixelOnMap;
-// mod player;
-// mod chasers;
-// mod detection;
+
+mod player;
+mod chasers;
+mod detection;
 
 //デモ
-// mod demo;
+mod demo;
 
 //End of code.

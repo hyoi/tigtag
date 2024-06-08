@@ -129,8 +129,8 @@ impl AddAssign<News> for IVec2
 //スプライトシートでアニメーションするためのトレイト
 pub trait CharacterAnimation
 {   fn anime_timer_mut( &mut self ) -> &mut Timer;
-    fn sprite_sheet_frame( &self ) -> usize;
-    fn sprite_sheet_offset( &self, news: News ) -> usize;
+    fn sprite_sheet_frame( &self ) -> u32;
+    fn sprite_sheet_offset( &self, news: News ) -> u32;
     fn direction( &self ) -> News;
 }
 
