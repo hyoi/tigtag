@@ -13,7 +13,7 @@ impl Plugin for Schedule
         //Resource
         .init_resource::<Record>()   //ゲームの成績
         .init_resource::<map::Map>() //マップ情報
-        // .init_resource::<player::InputDirection>() //プレイヤーの入力(十字方向)
+        .init_resource::<player::InputDirection>() //プレイヤーの入力(十字方向)
 
         //Event
         .add_event::<EventClear>()  //ステージクリアの伝達
@@ -24,20 +24,20 @@ impl Plugin for Schedule
 
         //plugin
         .add_plugins( header::Schedule ) //ヘッダー更新(Stage、Score、HiScore)
-        // .add_plugins( demo::Schedule   ) //タイトル画面のデモプレイ
+        .add_plugins( demo::Schedule   ) //タイトル画面のデモプレイ
         .add_plugins( pause::Schedule  ) //Pause処理
 
         //State縛りなくアニメーションさせる(ゲーム中もPAUSE中も)
-        // .add_systems
-        // (   Update,
-        //     (   //スプライトシートアニメーション
-        //         animating_sprites::<player::Player>,
-        //         animating_sprites::<chasers::Chaser>,
+        .add_systems
+        (   Update,
+            (   //スプライトシートアニメーション
+                animating_sprites::<player::Player>,
+                animating_sprites::<chasers::Chaser>,
 
-        //         //チェイサーの回転(スプライトシートがOFFの場合)
-        //         chasers::rotate_chaser_shape.run_if( SPRITE_SHEET_OFF ),
-        //     )
-        // )
+                //チェイサーの回転(スプライトシートがOFFの場合)
+                chasers::rotate_chaser_shape.run_if( SPRITE_SHEET_OFF ),
+            )
+        )
 
         ////////////////////////////////////////////////////////////////////////
         //ゲーム初期化
@@ -89,8 +89,8 @@ impl Plugin for Schedule
 
                     //スプライトのspawn
                     (   map::spawn_sprite,
-                        // player::spawn_sprite,
-                        // chasers::spawn_sprite,
+                        player::spawn_sprite,
+                        chasers::spawn_sprite,
                     ),
                 )
                 .chain(), //実行順の固定
@@ -118,29 +118,29 @@ impl Plugin for Schedule
 
         ////////////////////////////////////////////////////////////////////////
         //メインループ
-        // .add_systems
-        // (   Update,
-        //     (   //ループ脱出条件
-        //         detection::scoring_and_stage_clear, //スコアリング＆クリア判定
-        //         change_state_to::<StageClear>.run_if( on_event::<EventClear>() ),
+        .add_systems
+        (   Update,
+            (   //ループ脱出条件
+                detection::scoring_and_stage_clear, //スコアリング＆クリア判定
+                change_state_to::<StageClear>.run_if( on_event::<EventClear>() ),
 
-        //         detection::collisions_and_gameover, //衝突判定
-        //         change_state_to::<GameOver>.run_if( on_event::<EventOver>() ),
+                detection::collisions_and_gameover, //衝突判定
+                change_state_to::<GameOver>.run_if( on_event::<EventOver>() ),
 
-        //         //スプライトの移動
-        //         (   //自キャラ
-        //             (   player::catch_input_direction,
-        //                 player::move_sprite,
-        //             )
-        //             .chain(), //実行順の固定
+                //スプライトの移動
+                (   //自キャラ
+                    (   player::catch_input_direction,
+                        player::move_sprite,
+                    )
+                    .chain(), //実行順の固定
 
-        //             //敵キャラ
-        //             chasers::move_sprite,
-        //         )
-        //     )
-        //     .chain() //実行順の固定
-        //     .run_if( in_state( MyState::MainLoop ) )
-        // )
+                    //敵キャラ
+                    chasers::move_sprite,
+                )
+            )
+            .chain() //実行順の固定
+            .run_if( in_state( MyState::MainLoop ) )
+        )
 
         ////////////////////////////////////////////////////////////////////////
         //ステージクリアの処理
