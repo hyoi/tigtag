@@ -132,7 +132,7 @@ impl GridToPixelOnMap for IVec2
 }
 
 //ドットのスプライトの情報
-const SPRITE_DOT_COLOR: Color = Color::rgb( 1.0, 1.0, 0.7 );
+const SPRITE_DOT_COLOR: Color = Color::srgb( 1.0, 1.0, 0.7 );
 const SPRITE_DOT_SCALING: f32 = 0.08;
 
 ////////////////////////////////////////////////////////////////////////////////

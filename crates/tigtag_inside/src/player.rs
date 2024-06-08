@@ -175,7 +175,7 @@ pub fn spawn_sprite
             )
         );
         let index = player.sprite_sheet_offset( player.direction() ) as usize;
-        cmds.spawn( ( SpriteSheetBundle::default(), player ) )
+        cmds.spawn( ( SpriteBundle::default(), player ) )
         .insert( Sprite { custom_size, ..default() } )
         .insert( asset_svr.load( ASSETS_SPRITE_SHEET_PLAYER ) as Handle<Image> )
         .insert( TextureAtlas { layout, index } )

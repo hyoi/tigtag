@@ -150,7 +150,7 @@ fn spawn_ui_text
             grid_row       : GridPlacement::start_end( 2, 3 ), //２行目
             ..default()
         },
-        background_color: Color::rgba( 0.2, 0.2, 0.2, 0.9).into(),
+        background_color: Color::srgba( 0.2, 0.2, 0.2, 0.9).into(),
         visibility: Visibility::Hidden, //初期非表示
         ..default()
     };

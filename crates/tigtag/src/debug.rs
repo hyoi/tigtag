@@ -6,7 +6,7 @@ use super::*;
 pub fn spawn_2d_sprites
 (   mut cmds: Commands,
 )
-{   let color = Color::rgba( 0.1, 0.1, 0.1, 0.4 );
+{   let color = Color::srgba( 0.1, 0.1, 0.1, 0.4 );
     let custom_size = Some ( GRID_CUSTOM_SIZE * 0.9 );
 
     for x in GRIDS_X_RANGE

@@ -157,7 +157,7 @@ pub fn spawn_sprite
                     )
                 );
                 let index = chaser.sprite_sheet_offset( chaser.direction() ) as usize;
-                cmds.spawn( ( SpriteSheetBundle::default(), chaser ) )
+                cmds.spawn( ( SpriteBundle::default(), chaser ) )
                 .insert( Sprite { custom_size, ..default() } )
                 .insert( asset_svr.load( asset_file ) as Handle<Image> )
                 .insert( TextureAtlas { layout, index } )
