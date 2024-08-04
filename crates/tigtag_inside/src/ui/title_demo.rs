@@ -3,8 +3,8 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////
 
 //メッセージの設定
-const TITLE_COLOR1: Color = Color::rgba( 0.6, 1.0, 0.4, 0.75 );
-const TITLE_COLOR2: Color = Color::rgba( 0.0, 0.7, 0.5, 0.75 );
+const TITLE_COLOR1: Color = Color::srgba( 0.6, 1.0, 0.4, 0.75 );
+const TITLE_COLOR2: Color = Color::srgba( 0.0, 0.7, 0.5, 0.75 );
 
 const UI_TITLE: &[ MessageSect ] =
 &[  ( APP_TITLE, ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, TITLE_COLOR1 ),

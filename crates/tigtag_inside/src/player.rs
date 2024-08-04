@@ -14,9 +14,9 @@ pub struct Player
     pub px_start : Vec2,  //1フレーム時間に移動した微小区間の始点
     pub px_end   : Vec2,  //1フレーム時間に移動した微小区間の終点
     pub opt_fn_autodrive: Option<FnAutoDrive>, //デモ時に自キャラの移動方向を決める関数
-    pub anime_timer: Timer,                         //キャラアニメーションのタイマー
-    pub sprite_sheet_frame: usize,                  //キャラアニメーションのフレーム数
-    pub sprite_sheet_indexes: HashMap<News, usize>, //キャラアニメーションの先頭位置(offset値)
+    pub anime_timer: Timer,                       //キャラアニメーションのタイマー
+    pub sprite_sheet_frame: u32,                  //キャラアニメーションのフレーム数
+    pub sprite_sheet_indexes: HashMap<News, u32>, //キャラアニメーションの先頭位置(offset値)
 }
 
 impl Default for Player
@@ -60,10 +60,10 @@ impl CharacterAnimation for Player
 {   fn anime_timer_mut( &mut self ) -> &mut Timer
     {   &mut self.anime_timer
     }
-    fn sprite_sheet_frame( &self ) -> usize
+    fn sprite_sheet_frame( &self ) -> u32
     {   self.sprite_sheet_frame
     }
-    fn sprite_sheet_offset( &self, news: News ) -> usize
+    fn sprite_sheet_offset( &self, news: News ) -> u32
     {   *self.sprite_sheet_indexes.get( &news ).unwrap()
     }
     fn direction( &self ) -> News
@@ -80,10 +80,10 @@ const PLAYER_SPRITE_SCALING: f32 = 0.4; //primitive shape表示時の縮小係�
 const PLAYER_SPRITE_COLOR: Color = Color::YELLOW;
 
 //スプライトシートを使ったアニメーションの情報
-pub const  SPRITE_SHEET_SIZE_PLAYER: Vec2 = Vec2::new( 8.0, 8.0 );
-pub const  SPRITE_SHEET_COLS_PLAYER: usize = 4;
-pub const  SPRITE_SHEET_ROWS_PLAYER: usize = 4;
-pub static SPRITE_SHEET_IDXS_PLAYER: Lazy<HashMap<News,usize>> = Lazy::new
+pub const  SPRITE_SHEET_SIZE_PLAYER: UVec2 = UVec2::new( 8, 8 );
+pub const  SPRITE_SHEET_COLS_PLAYER: u32 = 4;
+pub const  SPRITE_SHEET_ROWS_PLAYER: u32 = 4;
+pub static SPRITE_SHEET_IDXS_PLAYER: Lazy<HashMap<News,u32>> = Lazy::new
 (   ||
     HashMap::from
     (   [   ( News::North,  0 ),
@@ -174,8 +174,8 @@ pub fn spawn_sprite
                 None, None
             )
         );
-        let index = player.sprite_sheet_offset( player.direction() );
-        cmds.spawn( ( SpriteSheetBundle::default(), player ) )
+        let index = player.sprite_sheet_offset( player.direction() ) as usize;
+        cmds.spawn( ( SpriteBundle::default(), player ) )
         .insert( Sprite { custom_size, ..default() } )
         .insert( asset_svr.load( ASSETS_SPRITE_SHEET_PLAYER ) as Handle<Image> )
         .insert( TextureAtlas { layout, index } )
@@ -297,9 +297,9 @@ pub fn move_sprite
             }
             else
             {   //スプライトシートのindexを変更する
-                let old_offset = player.sprite_sheet_offset( player.direction );
-                let new_offset = player.sprite_sheet_offset( new_side         );
-                sprite_sheet.index = sprite_sheet.index - old_offset + new_offset;
+                let old_offset = player.sprite_sheet_offset( player.direction ) as usize;
+                let new_offset = player.sprite_sheet_offset( new_side         ) as usize;
+                sprite_sheet.index = sprite_sheet.index + new_offset - old_offset;
             }
             player.direction = new_side;
         }

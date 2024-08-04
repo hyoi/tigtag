@@ -15,9 +15,9 @@ pub struct Chaser
     pub px_end   : Vec2,  //1フレーム時間に移動した微小区間の終点
     pub opt_fn_autochase: Option<FnAutoChase>, //敵キャラの移動方向を決める関数
     pub color    : Color, //敵キャラの表示色
-    pub anime_timer: Timer,                         //アニメーションのタイマー
-    pub sprite_sheet_frame: usize,                  //アニメーションのフレーム数
-    pub sprite_sheet_indexes: HashMap<News, usize>, //アニメーションの先頭位置(offset値)
+    pub anime_timer: Timer,                       //アニメーションのタイマー
+    pub sprite_sheet_frame: u32,                  //アニメーションのフレーム数
+    pub sprite_sheet_indexes: HashMap<News, u32>, //アニメーションの先頭位置(offset値)
 }
 
 impl Default for Chaser
@@ -48,10 +48,10 @@ impl CharacterAnimation for Chaser
 {   fn anime_timer_mut( &mut self ) -> &mut Timer
     {   &mut self.anime_timer
     }
-    fn sprite_sheet_frame( &self ) -> usize
+    fn sprite_sheet_frame( &self ) -> u32
     {   self.sprite_sheet_frame
     }
-    fn sprite_sheet_offset( &self, news: News ) -> usize
+    fn sprite_sheet_offset( &self, news: News ) -> u32
     {   *self.sprite_sheet_indexes.get( &news ).unwrap()
     }
     fn direction( &self ) -> News
@@ -76,10 +76,10 @@ const MAX_X: i32 = map::MAP_GRIDS_WIDTH  - 2;
 const MAX_Y: i32 = map::MAP_GRIDS_HEIGHT - 2;
 
 //スプライトシートを使ったアニメーションの情報
-const  SPRITE_SHEET_SIZE_CHASER: Vec2 = Vec2::new( 8.0, 8.0 );
-const  SPRITE_SHEET_COLS_CHASER: usize = 4;
-const  SPRITE_SHEET_ROWS_CHASER: usize = 4;
-static SPRITE_SHEET_IDXS_CHASER: Lazy<HashMap<News,usize>> = Lazy::new
+const  SPRITE_SHEET_SIZE_CHASER: UVec2 = UVec2::new( 8, 8 );
+const  SPRITE_SHEET_COLS_CHASER: u32 = 4;
+const  SPRITE_SHEET_ROWS_CHASER: u32 = 4;
+static SPRITE_SHEET_IDXS_CHASER: Lazy<HashMap<News,u32>> = Lazy::new
 (   ||
     HashMap::from
     (   [   ( News::North,  0 ),
@@ -156,8 +156,8 @@ pub fn spawn_sprite
                         None, None
                     )
                 );
-                let index = chaser.sprite_sheet_offset( chaser.direction() );
-                cmds.spawn( ( SpriteSheetBundle::default(), chaser ) )
+                let index = chaser.sprite_sheet_offset( chaser.direction() ) as usize;
+                cmds.spawn( ( SpriteBundle::default(), chaser ) )
                 .insert( Sprite { custom_size, ..default() } )
                 .insert( asset_svr.load( asset_file ) as Handle<Image> )
                 .insert( TextureAtlas { layout, index } )
@@ -253,9 +253,9 @@ pub fn move_sprite
 
             //進行方向が変わったらスプライトの見栄えを変える（スプライトシートのindexを変える）
             if ! SPRITE_SHEET_OFF() && chaser.direction != new_side
-            {   let old_offset = chaser.sprite_sheet_offset( chaser.direction );
-                let new_offset = chaser.sprite_sheet_offset( new_side         );
-                sprite_sheet.index = sprite_sheet.index - old_offset + new_offset;
+            {   let old_offset = chaser.sprite_sheet_offset( chaser.direction ) as usize;
+                let new_offset = chaser.sprite_sheet_offset( new_side         ) as usize;
+                sprite_sheet.index = sprite_sheet.index + new_offset - old_offset;
             }
             chaser.direction = new_side;
 
@@ -273,7 +273,7 @@ pub fn move_sprite
 
     //後続の処理にtimer finishedを伝達する
     if ! chaser_timer_finished.is_empty()
-    {   evt_timer.send( EventTimerChasers ( chaser_timer_finished ) );
+    {   evt_timer.send( EventTimerChasers );
     }
 
     //敵キャラは重なるとスピードアップする

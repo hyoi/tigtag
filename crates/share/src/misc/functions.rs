@@ -166,4 +166,21 @@ pub fn hide_component<T: Component>
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//bevy::window::close_on_escがv0.14.0で廃止になったため代替
+//  remove close_on_esc #12859
+//  https://github.com/bevyengine/bevy/pull/12859
+pub fn close_on_esc
+(   mut cmds: Commands,
+    windows: Query< ( Entity, &Window ) >,
+    inkey: Res< ButtonInput< KeyCode > >,
+)
+{   for ( id, window ) in windows.iter()
+    {   if window.focused && inkey.just_pressed( KeyCode::Escape )
+        {   cmds.entity( id ).despawn();
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //End of code.

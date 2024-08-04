@@ -42,9 +42,9 @@ impl Record
 //System間の通知用イベント
 #[derive( Event )] pub struct EventClear;
 #[derive( Event )] pub struct EventOver;
-#[derive( Event )] pub struct EventEatDot ( pub IVec2 );
+#[derive( Event )] pub struct EventEatDot;
 #[derive( Event )] pub struct EventTimerPlayer;
-#[derive( Event )] pub struct EventTimerChasers ( pub Vec<Color> );
+#[derive( Event )] pub struct EventTimerChasers;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -129,8 +129,8 @@ impl AddAssign<News> for IVec2
 //スプライトシートでアニメーションするためのトレイト
 pub trait CharacterAnimation
 {   fn anime_timer_mut( &mut self ) -> &mut Timer;
-    fn sprite_sheet_frame( &self ) -> usize;
-    fn sprite_sheet_offset( &self, news: News ) -> usize;
+    fn sprite_sheet_frame( &self ) -> u32;
+    fn sprite_sheet_offset( &self, news: News ) -> u32;
     fn direction( &self ) -> News;
 }
 

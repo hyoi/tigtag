@@ -157,7 +157,7 @@ impl AddOnTraitForText for Text
     }
     //Textのsectionsの透明度を一括で変更する
     fn set_alpha( &mut self, alpha: f32 )
-    {   self.sections.iter_mut().for_each( |x| { x.style.color.set_a( alpha ); } );
+    {   self.sections.iter_mut().for_each( |x| { x.style.color.set_alpha( alpha ); } );
     }
 }
 

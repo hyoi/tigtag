@@ -16,7 +16,7 @@ impl Plugin for Schedule
         .add_systems
         (   Update,
             (   //PAUSEメニュー表示／非表示のトグル処理（close_on_escより前に実行する）
-                show_and_hide_pause_menu.before( bevy::window::close_on_esc ),
+                show_and_hide_pause_menu.before( misc::close_on_esc ),
             )
         )
         .add_systems
@@ -150,7 +150,7 @@ fn spawn_ui_text
             grid_row       : GridPlacement::start_end( 2, 3 ), //２行目
             ..default()
         },
-        background_color: Color::rgba( 0.2, 0.2, 0.2, 0.9).into(),
+        background_color: Color::srgba( 0.2, 0.2, 0.2, 0.9).into(),
         visibility: Visibility::Hidden, //初期非表示
         ..default()
     };

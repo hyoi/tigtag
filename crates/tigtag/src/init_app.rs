@@ -96,7 +96,7 @@ const FOOTER_RIGHT: &[ MessageSect ] =
 const GRID_X_KANI: i32 = SCREEN_GRIDS_WIDTH  - 4;
 const GRID_Y_KANI: i32 = SCREEN_GRIDS_HEIGHT - 1;
 const MAGNIFY_SPRITE_KANI: f32 = 0.9;
-const COLOR_SPRITE_KANI: Color = Color::rgba( 1.0, 1.0, 1.0, 0.6 );
+const COLOR_SPRITE_KANI: Color = Color::srgba( 1.0, 1.0, 1.0, 0.6 );
 
 ////////////////////////////////////////////////////////////////////////////////
 
