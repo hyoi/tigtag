@@ -29,7 +29,7 @@ pub fn scoring_and_stage_clear
     //ドットの削除
     cmds.entity( dot ).despawn();
     *map.opt_entity_mut( player.grid ) = None;
-    evt_eatdot.send( EventEatDot ( player.grid ) ); //後続の処理にドット削除を伝達する
+    evt_eatdot.send( EventEatDot ); //後続の処理にドット削除を伝達する
 
     //スコア更新
     *record.score_mut() += 1;

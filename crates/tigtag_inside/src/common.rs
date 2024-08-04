@@ -42,9 +42,9 @@ impl Record
 //System間の通知用イベント
 #[derive( Event )] pub struct EventClear;
 #[derive( Event )] pub struct EventOver;
-#[derive( Event )] pub struct EventEatDot ( pub IVec2 );
+#[derive( Event )] pub struct EventEatDot;
 #[derive( Event )] pub struct EventTimerPlayer;
-#[derive( Event )] pub struct EventTimerChasers ( pub Vec<Color> );
+#[derive( Event )] pub struct EventTimerChasers;
 
 ////////////////////////////////////////////////////////////////////////////////
 
