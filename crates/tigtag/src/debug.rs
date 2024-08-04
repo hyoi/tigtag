@@ -268,7 +268,7 @@ pub fn catch_input_mouse
     //ホイールで極座標を更新する
     for mouse_wheel in evt_mouse_wheel.read()
     {   orbit.r += mouse_wheel.y * 0.2; //感度良すぎるので
-        orbit.r = orbit.r.min( CAMERA_ORBIT_MAX_R ).max( CAMERA_ORBIT_MIN_R );
+        orbit.r = orbit.r.clamp( CAMERA_ORBIT_MIN_R, CAMERA_ORBIT_MAX_R );
     }
 
     //右ボタンが押されていないなら
@@ -278,7 +278,7 @@ pub fn catch_input_mouse
     for mouse_motion in evt_mouse_motion.read()
     {   //上下
         orbit.theta += mouse_motion.delta.y * 0.01; //感度良すぎるので
-        orbit.theta = orbit.theta.min( CAMERA_ORBIT_MAX_THETA ).max( CAMERA_ORBIT_MIN_THETA );
+        orbit.theta = orbit.theta.clamp( CAMERA_ORBIT_MIN_THETA, CAMERA_ORBIT_MAX_THETA );
 
         //左右
         orbit.phi -= mouse_motion.delta.x * 0.01; //感度良すぎるので
@@ -328,7 +328,7 @@ pub fn catch_input_gamepad
     if let Some ( value ) = axis_stick.get( stick_y )
     {   if value != 0.0
         {   orbit.theta += value * time_delta;
-            orbit.theta = orbit.theta.min( CAMERA_ORBIT_MAX_THETA ).max( CAMERA_ORBIT_MIN_THETA );
+            orbit.theta = orbit.theta.clamp( CAMERA_ORBIT_MIN_THETA, CAMERA_ORBIT_MAX_THETA );
             flag = true;
         }
     }
