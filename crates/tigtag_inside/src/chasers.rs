@@ -273,7 +273,7 @@ pub fn move_sprite
 
     //後続の処理にtimer finishedを伝達する
     if ! chaser_timer_finished.is_empty()
-    {   evt_timer.send( EventTimerChasers );
+    {   evt_timer.send( EventTimerChasers ( chaser_timer_finished ) ); //tigtag3d用の追加フィールド
     }
 
     //敵キャラは重なるとスピードアップする

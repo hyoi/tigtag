@@ -42,9 +42,11 @@ impl Record
 //System間の通知用イベント
 #[derive( Event )] pub struct EventClear;
 #[derive( Event )] pub struct EventOver;
-#[derive( Event )] pub struct EventEatDot;
+#[allow( dead_code )]
+#[derive( Event )] pub struct EventEatDot ( pub IVec2 ); //tigtag3d用の追加フィールド
 #[derive( Event )] pub struct EventTimerPlayer;
-#[derive( Event )] pub struct EventTimerChasers;
+#[allow( dead_code )]
+#[derive( Event )] pub struct EventTimerChasers ( pub Vec<Color> ); //tigtag3d用の追加フィールド
 
 ////////////////////////////////////////////////////////////////////////////////
 
