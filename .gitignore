@@ -1,4 +1,6 @@
 /.cargo/*
 /target
 /backup
-/Cargo.lock
+
+Cargo.lock
+*.bak

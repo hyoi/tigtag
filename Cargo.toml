@@ -3,25 +3,24 @@ resolver = "2"
 members = [ "crates/tigtag" ]
 
 [workspace.package]
-version = "0.14.0"
+version = "0.14.1"
 edition = "2021"
 
 [workspace.dependencies]
-#bevy = { git = "https://github.com/bevyengine/bevy", branch = "release-0.14.0" }
-#bevy = { git = "https://github.com/bevyengine/bevy" } #Master branch
 bevy = "0.14"
-once_cell = "1"
 rand = "0.8"
 chrono = "0.4"
 
-syn = "2"
-quote = "1"
-proc-macro2 = "1"
-
-tigtag_inside = { path = "crates/tigtag_inside" }
-share         = { path = "crates/share"         }
+template      = { path = "crates/template"      }
 macros        = { path = "crates/macros"        }
 macros_inside = { path = "crates/macros_inside" }
+
+syn = "2.0"
+quote = "1.0"
+proc-macro2 = "1.0"
+
+#bevy = { git = "https://github.com/bevyengine/bevy" } #Master branch
+#bevy = { git = "https://github.com/bevyengine/bevy", branch = "release-0.14.0" }
 
 # WASMの場合にどれか指定する必要がある？？
 # rand = { version = "0.8.4", features = [ "wasm-bindgen" ] }
