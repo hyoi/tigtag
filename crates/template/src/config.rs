@@ -104,7 +104,7 @@ pub const DEPTH_SPRITE_BRICK_WALL : f32 = 400.0; //ゲームの壁スプライ�
 
 //assetsのパスのつじつま合わせ
 macro_rules! ASSETS_PATH
-{   ( $e:expr ) =>
+{   ( $e: expr ) =>
     (   if ( cfg!( target_arch = "wasm32" ) ) { $e } else { concat!( "../../../assets/", $e ) }
     )
 }

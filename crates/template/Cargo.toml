@@ -11,6 +11,3 @@ rand.workspace = true
 chrono.workspace = true
 
 macros.workspace = true
-
-[features]
-sprite_sheet_off = [] # cargo run --features sprite_sheet_off

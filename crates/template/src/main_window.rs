@@ -44,7 +44,7 @@ impl Plugin for Schedule
         .add_systems
         (   Update,
             (   //特殊な操作
-                (   misc::close_on_esc,       //[ESC]で終了
+                (   misc::close_on_esc, //[ESC]で終了
                     misc::toggle_window_mode, //フルスクリーン切換
                 )
                 .run_if( not( WASM ) ),

@@ -46,8 +46,10 @@ pub enum MyState
     Pause,
 }
 
+//ゲームの状態の判定
 impl MyState
 {   pub fn is_demoplay( &self ) -> bool { self.is_titledemo() || self.is_demoloop() }
+    pub fn is_playing( &self ) -> bool { self.is_stagestart() || self.is_mainloop() || self.is_stageclear() }
 }
 
 //InitAppの後の遷移先を登録するResource
