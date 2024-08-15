@@ -242,13 +242,24 @@ pub fn spawn_sprite
             //壁のスプライト
             if map.is_wall( grid )
             {   let id = cmds.spawn( ( SpriteBundle::default(), SpriteWall ) )
-                .insert( Sprite { custom_size, ..default() } )
-                .insert( asset_svr.load( ASSETS_SPRITE_BRICK_WALL ) as Handle<Image> )
                 .insert( Transform::from_translation( vec2.extend( DEPTH_SPRITE_BRICK_WALL ) ) )
-                .id()
-                ;
+                .id();
 
-                //debug用
+                if ! SPRITE_OFF()
+                {   //画像表示
+                    cmds.entity( id )
+                    .insert( Sprite { custom_size, ..default() } )
+                    .insert( asset_svr.load( ASSETS_SPRITE_BRICK_WALL ) as Handle<Image> );
+                }
+                else
+                {   //単色表示
+                    let color = Color::MAROON;
+                    let custom_size = Some ( GRID_CUSTOM_SIZE * 0.9 );
+                    cmds.entity( id )
+                    .insert( Sprite { color, custom_size, ..default() } );
+                }
+
+                //debug用のText
                 if DEBUG()
                 {   let value = format!( "{:02}\n{:02}", x, y ).to_string();
                     let style = TextStyle
@@ -262,9 +273,8 @@ pub fn spawn_sprite
                     let child = cmds.spawn( Text2dBundle::default() )
                     .insert( Text { sections, justify, ..default() } )
                     .insert( Transform::from_translation( Vec3::Z ) )
-                    .id()
-                    ;
-                    cmds.entity( id ).add_child( child );
+                    .id();
+                    cmds.entity( id ).add_child( child ); //Textをスプライトの子にする
                 }
             }
 
