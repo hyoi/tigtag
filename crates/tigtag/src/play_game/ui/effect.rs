@@ -28,7 +28,8 @@ pub const HAK_IGNORE_KEYS: &[ KeyCode ] =
     KeyCode::ShiftLeft  , KeyCode::ShiftRight,
     KeyCode::ArrowUp    , KeyCode::ArrowDown,
     KeyCode::ArrowRight , KeyCode::ArrowLeft,
-    KeyCode::Fn         , pause::ESC_KEY,
+    KeyCode::CapsLock   , pause::ESC_KEY,
+    KeyCode::Fn,
     KeyCode::Unidentified ( NativeKeyCode::Windows ( 57443 ) ), //ThinkPad [Fn]
 ];
 pub const HAK_IGNORE_BUTTONS: &[ GamepadButtonType ] =
