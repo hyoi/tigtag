@@ -2,25 +2,6 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//external crates
-// use bevy::
-// {   prelude::*,
-//     input::keyboard::NativeKeyCode,
-//     sprite::MaterialMesh2dBundle,
-//     utils::{ HashMap, HashSet },
-//     audio::Volume,
-// };
-// use rand::prelude::*;
-
-//standard library
-// use std::
-// {   ops::Range,
-//     f32::consts::{ PI, TAU },
-//     ops::{ Add, AddAssign },
-//     cmp::Ordering,
-//     collections::VecDeque,
-// };
-
 //ゲームロジック
 mod schedule;
 pub use schedule::Schedule;

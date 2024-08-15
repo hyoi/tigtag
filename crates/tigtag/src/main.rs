@@ -22,33 +22,7 @@ use std::
 use template::*;
 
 //ゲームロジック
-mod play_game;
-
-// mod schedule;
-// pub use schedule::Schedule;
-
-// //play_game内共通
-// mod common;
-// use common::*;
-
-// //UIの処理
-// mod header;
-// mod ui;
-// use ui::*;
-
-// //pause処理
-// mod pause;
-
-// //マップ、自機、追手の処理
-// mod map;
-// use map::GridToPixelOnMap;
-
-// mod player;
-// mod chasers;
-// mod detection;
-
-// //デモ
-// mod demo;
+mod tigtag_inside;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -59,8 +33,8 @@ fn main()
 
     //メイン処理
     app
-    .add_plugins( template::Schedule  ) //アプリの雛型
-    .add_plugins( play_game::Schedule ) //ゲームロジック
+    .add_plugins( template::Schedule      ) //アプリの雛型
+    .add_plugins( tigtag_inside::Schedule ) //ゲームロジック
     ;
 
     //アプリの実行
