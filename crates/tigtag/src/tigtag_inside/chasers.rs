@@ -136,7 +136,7 @@ pub fn spawn_sprite
                 ..default()
             };
 
-            if SPRITE_SHEET_OFF()
+            if SPRITE_OFF()
             {   //正方形のメッシュ
                 let custom_size = Some ( GRID_CUSTOM_SIZE * CHASER_SPRITE_SCALING );
                 cmds.spawn( ( SpriteBundle::default(), chaser ) )
@@ -252,7 +252,7 @@ pub fn move_sprite
             };
 
             //進行方向が変わったらスプライトの見栄えを変える（スプライトシートのindexを変える）
-            if ! SPRITE_SHEET_OFF() && chaser.direction != new_side
+            if ! SPRITE_OFF() && chaser.direction != new_side
             {   let old_offset = chaser.sprite_sheet_offset( chaser.direction ) as usize;
                 let new_offset = chaser.sprite_sheet_offset( new_side         ) as usize;
                 sprite_sheet.index = sprite_sheet.index + new_offset - old_offset;

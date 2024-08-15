@@ -140,7 +140,7 @@ pub fn spawn_sprite
         ..default()
     };
 
-    if SPRITE_SHEET_OFF()
+    if SPRITE_OFF()
     {   //三角形のメッシュを作る
         let radius = PIXELS_PER_GRID * PLAYER_SPRITE_SCALING;
         let shape = RegularPolygon::new( radius, 3 ).mesh();
@@ -289,7 +289,7 @@ pub fn move_sprite
 
         //進行方向が変わったらスプライトの見栄えを変える
         if player.direction != new_side
-        {   if SPRITE_SHEET_OFF()
+        {   if SPRITE_OFF()
             {   //三角形を回転させる
                 if let Ok ( mut transform ) = pst_transform.p1().get_single_mut()
                 {   rotate_player_sprite( &player, &mut transform, new_side );

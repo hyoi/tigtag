@@ -35,7 +35,7 @@ impl Plugin for Schedule
                 animating_sprites::<chasers::Chaser>,
 
                 //チェイサーの回転(スプライトシートがOFFの場合)
-                chasers::rotate_chaser_shape.run_if( SPRITE_SHEET_OFF ),
+                chasers::rotate_chaser_shape.run_if( SPRITE_OFF ),
             )
         )
 

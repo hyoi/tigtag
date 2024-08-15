@@ -12,4 +12,4 @@ rand.workspace = true
 template.workspace = true
 
 [features]
-sprite_sheet_off = [] # cargo run --features sprite_sheet_off
+sprite_off = [] # cargo run --features sprite_off
