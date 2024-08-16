@@ -6,7 +6,7 @@ use super::*;
 mod schedule;
 pub use schedule::Schedule;
 
-//play_game内共通
+//共有
 mod common;
 use common::*;
 
