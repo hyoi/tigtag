@@ -102,34 +102,27 @@ pub const DEPTH_SPRITE_BRICK_WALL : f32 = 400.0; //ゲームの壁スプライ�
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//assetsのパスのつじつま合わせ
-macro_rules! ASSETS_PATH
-{   ( $e: expr ) =>
-    (   if ( cfg!( target_arch = "wasm32" ) ) { $e } else { concat!( "../../../assets/", $e ) }
-    )
-}
-
 //assets（スプライト）
-pub const ASSETS_SPRITE_KANI_DOTOWN: &str = ASSETS_PATH!( "image/sprite/kani_DOTOWN.png" );
-pub const ASSETS_SPRITE_BRICK_WALL : &str = ASSETS_PATH!( "image/sprite/brick_wall.png"  );
+pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "image/sprite/kani_DOTOWN.png";
+pub const ASSETS_SPRITE_BRICK_WALL : &str = "image/sprite/brick_wall.png";
 
 //==============================================================================
 //assets（スプライトシート）
-pub const ASSETS_SPRITE_SHEET_PLAYER      : &str = ASSETS_PATH!( "image/sprite_sheet/player.png"       );
-pub const ASSETS_SPRITE_SHEET_CHASER_RED  : &str = ASSETS_PATH!( "image/sprite_sheet/chaser_red.png"   );
-pub const ASSETS_SPRITE_SHEET_CHASER_GREEN: &str = ASSETS_PATH!( "image/sprite_sheet/chaser_green.png" );
-pub const ASSETS_SPRITE_SHEET_CHASER_BLUE : &str = ASSETS_PATH!( "image/sprite_sheet/chaser_blue.png"  );
-pub const ASSETS_SPRITE_SHEET_CHASER_PINK : &str = ASSETS_PATH!( "image/sprite_sheet/chaser_pink.png"  );
+pub const ASSETS_SPRITE_SHEET_PLAYER      : &str = "image/sprite_sheet/player.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_RED  : &str = "image/sprite_sheet/chaser_red.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_GREEN: &str = "image/sprite_sheet/chaser_green.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_BLUE : &str = "image/sprite_sheet/chaser_blue.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_PINK : &str = "image/sprite_sheet/chaser_pink.png";
 //==============================================================================
 
 //assets（フォント）
-pub const ASSETS_FONT_ORBITRON_BLACK      : &str = ASSETS_PATH!( "font/Orbitron-Black.ttf"       );
-pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = ASSETS_PATH!( "font/PressStart2P-Regular.ttf" );
+pub const ASSETS_FONT_ORBITRON_BLACK      : &str = "font/Orbitron-Black.ttf";
+pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "font/PressStart2P-Regular.ttf";
 //==============================================================================
-pub const ASSETS_FONT_REGGAEONE_REGULAR   : &str = ASSETS_PATH!( "font/ReggaeOne-Regular.ttf"    );
+pub const ASSETS_FONT_REGGAEONE_REGULAR   : &str = "font/ReggaeOne-Regular.ttf";
 
 //assets（サウンド）
-pub const ASSETS_SOUND_BEEP: &str = ASSETS_PATH!( "audio/sound/beep.ogg" );
+pub const ASSETS_SOUND_BEEP: &str = "audio/sound/beep.ogg";
 //==============================================================================
 
 //事前ロード対象
