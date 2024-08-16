@@ -82,7 +82,7 @@ const FOOTER_LEFT: &[ MessageSect ] =
 ];
 
 const FOOTER_CENTER: &[ MessageSect ] =
-&[  ( "hyoi 2021 - 2024", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
+&[  ( COPYRIGHT, ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.6, Color::TEAL ),
 ];
 
 const FOOTER_RIGHT: &[ MessageSect ] =

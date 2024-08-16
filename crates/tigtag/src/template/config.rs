@@ -2,19 +2,10 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//アプリの情報
-pub const APP_TITLE : &str = "TigTag";       //アプリタイトル
-pub const APP_VER   : &str = CARGO_TOML_VER; //アプリのバージョン
-const CARGO_TOML_VER: &str = env!( "CARGO_PKG_VERSION" );
-
 //単位Gridの縦横(Pixel)
 const BASE_PIXELS : i32 = 8;
 const BASE_SCALING: f32 = 4.0;
 pub const PIXELS_PER_GRID: f32 = BASE_PIXELS as f32 * BASE_SCALING;
-
-//ウィンドウ縦横(Grid)
-pub const SCREEN_GRIDS_WIDTH : i32 = 25; //memo: 25 best 43
-pub const SCREEN_GRIDS_HEIGHT: i32 = 19; //memo: 19 best 24
 
 //ウィンドウ縦横(Pixel)
 pub const SCREEN_PIXELS_WIDTH : f32 = PIXELS_PER_GRID * SCREEN_GRIDS_WIDTH  as f32;
