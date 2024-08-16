@@ -1,7 +1,8 @@
+use super::*;
+
 //external crates
 use bevy::
-{   prelude::*,
-    log::LogPlugin,
+{   log::LogPlugin,
     color::palettes::css,
     window::WindowMode,
     input::mouse::{ MouseMotion, MouseWheel },
@@ -10,7 +11,6 @@ use bevy::
     diagnostic::{ FrameTimeDiagnosticsPlugin, DiagnosticsStore },
     utils::Duration,
 };
-use rand::prelude::*;
 use chrono::prelude::Local as time_local; //「Local」がbevyとバッティングするのでaliasを使う
 
 //standard library

@@ -47,6 +47,7 @@ pub enum MyState
 }
 
 //ゲームの状態の判定
+#[allow( dead_code )]
 impl MyState
 {   pub fn is_demoplay( &self ) -> bool { self.is_titledemo() || self.is_demoloop() }
     pub fn is_playing( &self ) -> bool { self.is_stagestart() || self.is_mainloop() || self.is_stageclear() }

@@ -18,7 +18,8 @@ use std::
     collections::VecDeque,
 };
 
-//other crates in this package
+//internal submodules
+mod template;
 use template::*;
 
 //ゲームロジック
