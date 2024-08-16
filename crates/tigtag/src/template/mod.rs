@@ -1,31 +1,10 @@
 use super::*;
 
-//external crates
-use bevy::
-{   log::LogPlugin,
-    color::palettes::css,
-    window::WindowMode,
-    input::mouse::{ MouseMotion, MouseWheel },
-    ecs::query::QueryFilter,
-    asset::{ LoadState, LoadedUntypedAsset },
-    diagnostic::{ FrameTimeDiagnosticsPlugin, DiagnosticsStore },
-    utils::Duration,
-};
-use chrono::prelude::Local as time_local; //「Local」がbevyとバッティングするのでaliasを使う
-
-//standard library
-use std::
-{   sync::LazyLock,
-    f32::consts::{ PI, TAU },
-    ops::Range,
-};
+////////////////////////////////////////////////////////////////////////////////
 
 //アプリの設定
 mod config;
 pub use config::*; //名前を公開
-
-//proc-macro crates
-use macros::MyState;
 
 //型定義
 mod types;
@@ -37,8 +16,6 @@ pub use misc::constants::*; //名前を公開
 
 //debug用
 mod debug;
-
-////////////////////////////////////////////////////////////////////////////////
 
 //Plugins
 mod main_window;

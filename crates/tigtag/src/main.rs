@@ -1,22 +1,34 @@
 //external crates
 use bevy::
 {   prelude::*,
+    log::LogPlugin,
+    color::palettes::css,
+    window::WindowMode,
+    input::mouse::{ MouseMotion, MouseWheel },
+    ecs::query::QueryFilter,
+    asset::{ LoadState, LoadedUntypedAsset },
+    diagnostic::{ FrameTimeDiagnosticsPlugin, DiagnosticsStore },
+    utils::Duration,
     input::keyboard::NativeKeyCode,
     sprite::MaterialMesh2dBundle,
     utils::{ HashMap, HashSet },
     audio::Volume,
 };
 use rand::prelude::*;
+use chrono::prelude::Local as time_local; //「Local」がbevyとバッティングするのでaliasを使う
 
 //standard library
 use std::
 {   sync::LazyLock,
-    ops::Range,
     f32::consts::{ PI, TAU },
+    ops::Range,
     ops::{ Add, AddAssign },
     cmp::Ordering,
     collections::VecDeque,
 };
+
+//proc-macro crates
+use macros::MyState;
 
 //internal submodules
 mod template;
