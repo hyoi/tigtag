@@ -17,6 +17,7 @@ impl Plugin for Schedule
             .set( ImagePlugin::default_nearest() ) //ピクセルパーフェクト
             .set( LogPlugin { filter, ..default() } ) //ロギング
         )
+        .add_plugins( ui_debug_overlay::DebugUiPlugin ) //UI Node Outline Gizmos
         .add_systems
         (   Startup,
             (   //カメラとライトを作る
@@ -64,6 +65,7 @@ impl Plugin for Schedule
 
                     //テスト用：Gizmo表示
                     debug::update_gizmo,
+                    debug::toggle_ui_node_gizmo, //UI Node Outline Gizmos
                 )
                 .run_if( DEBUG )
                 .run_if( not( state_exists::<MyState> ) )

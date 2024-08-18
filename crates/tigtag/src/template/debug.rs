@@ -99,13 +99,13 @@ pub fn spawn_grid_layout_ui
         height: Val::Percent( 100.0 ),
         display: Display::Grid,
         grid_template_columns: RepeatedGridTrack::fr( 3, 1.0 ),
-        border: UiRect::all( Val::Px( 1.0 ) ), //ボーダーライン表示用
+        // border: UiRect::all( Val::Px( 1.0 ) ), //ボーダーライン表示用
         ..default()
     };
     let hidden_node = NodeBundle
     {   style,
         background_color: Color::NONE.into(),
-        border_color    : Color::RED.into(), //ボーダーラインの色
+        // border_color    : Color::RED.into(), //ボーダーラインの色
         ..default()
     };
 
@@ -368,19 +368,35 @@ pub fn move_orbit_camera
 ////////////////////////////////////////////////////////////////////////////////
 
 //Gizomを描画する
-//※対象の三辺が1.0と決め打ちしているので、ライン長が足りなくなるかも
+//※立方体の三辺が1.0と決め打ちしているので、ライン長が足りなくなるかも
+//※地面のgridを立方体に紐づけて描画するのは悪手に思える
 pub fn update_gizmo
 (   qry_target: Query<&Transform, With<TargetGizumo>>,
     mut gizmos: Gizmos,
 )
 {   qry_target.iter().for_each
     (   | transform |
-        {   let origin = transform.translation;
-            gizmos.linestrip( [ origin + Vec3::NEG_X, origin + Vec3::X, origin + Vec3::X * 0.8 + ( Vec3::ONE - Vec3::X ) * 0.05 ], Color::RED   );
-            gizmos.linestrip( [ origin + Vec3::NEG_Y, origin + Vec3::Y, origin + Vec3::Y * 0.8 + ( Vec3::ONE - Vec3::Y ) * 0.05 ], Color::GREEN );
-            gizmos.linestrip( [ origin + Vec3::NEG_Z, origin + Vec3::Z, origin + Vec3::Z * 0.8 + ( Vec3::ONE - Vec3::Z ) * 0.05 ], Color::BLUE  );
+        {   gizmos.axes( *transform, 1.0 );
+            gizmos.grid
+            (   Vec3::Z * 0.5,
+                Quat::from_rotation_x( PI * 0.5 ),
+                UVec2::new( 5, 5 ),
+                Vec2::splat( 1.0 ),
+                Color::GREEN,
+            )
+            .outer_edges();
         }
     );
+}
+
+//UI Node Outline Gizmos
+pub fn toggle_ui_node_gizmo
+(   input: Res<ButtonInput<KeyCode>>,
+    opt_ui_debug_options: Option<ResMut<ui_debug_overlay::UiDebugOptions>>,
+)
+{   if let Some ( mut options ) = opt_ui_debug_options
+    {   if input.just_pressed( KeyCode::Space ) { options.toggle(); }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

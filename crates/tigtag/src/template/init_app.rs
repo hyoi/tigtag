@@ -51,6 +51,7 @@ impl Plugin for Schedule
 
                     //テスト用：Gizmo表示
                     debug::update_gizmo,
+                    // debug::toggle_ui_node_gizmo, //期待通りに動作しない(v0.14.1)
                 )
                 .run_if( DEBUG )
                 .run_if( not( resource_exists::<AfterInitApp> ) )
