@@ -109,6 +109,18 @@ impl TargetGamepad
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//UIを描画するCameraのEntity IDを保存するResource
+#[derive( Resource )]
+pub struct UiRenderCamera ( pub Entity );
+
+#[allow( dead_code )]
+impl UiRenderCamera
+{   pub fn id    ( &    self ) ->      Entity {      self.0 }
+    pub fn id_mut( &mut self ) -> &mut Entity { &mut self.0 }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //極座標カメラのResource
 #[derive( Resource, Clone, Copy )]
 pub struct OrbitCamera

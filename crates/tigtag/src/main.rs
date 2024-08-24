@@ -9,12 +9,12 @@ use bevy::
     asset::{ LoadState, LoadedUntypedAsset },
     diagnostic::{ FrameTimeDiagnosticsPlugin, DiagnosticsStore },
     utils::Duration,
+    dev_tools::ui_debug_overlay,
     input::keyboard::NativeKeyCode,
     sprite::MaterialMesh2dBundle,
     utils::{ HashMap, HashSet },
     audio::Volume,
 };
-use bevy_dev_tools::ui_debug_overlay; //UI Node Outline Gizmos
 
 use rand::prelude::*;
 use chrono::prelude::Local as time_local; //「Local」がbevyとバッティングするのでaliasを使う
@@ -56,7 +56,7 @@ pub const SPRITE_OFF: fn() -> bool = || cfg!( feature = "sprite_off" );
 ////////////////////////////////////////////////////////////////////////////////
 
 //メイン関数
-fn main()
+fn main() -> AppExit
 {   //アプリの生成
     let mut app = App::new();
 
@@ -67,7 +67,7 @@ fn main()
     ;
 
     //アプリの実行
-    app.run();
+    app.run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -18,6 +18,7 @@ impl Plugin for Schedule
             .set( LogPlugin { filter, ..default() } ) //ロギング
         )
         .add_plugins( ui_debug_overlay::DebugUiPlugin ) //UI Node Outline Gizmos
+
         .add_systems
         (   Startup,
             (   //カメラとライトを作る
@@ -26,10 +27,14 @@ impl Plugin for Schedule
                     misc::spawn_3d_light,
                 ),
 
+                //spawnしたカメラのうちUIの描画に使うカメラのEntity IDをResourceに保存する
+                misc::insert_res_ui_render_camera_id,
+
                 //テスト用：オブジェクト表示
                 (   debug::spawn_2d_sprites,     //2D表示テスト
                     debug::spawn_3d_objects,     //3D表示テスト
                     debug::spawn_grid_layout_ui, //UI表示テスト ※
+                    debug::show_light_gizmo,     //Light Gizmo
                 )
                 .run_if( DEBUG )
                 .run_if( not( state_exists::<MyState> ) )
@@ -41,6 +46,7 @@ impl Plugin for Schedule
             // https://bevyengine.org/news/bevy-0-13/#camera-driven-ui
             // https://docs.rs/bevy/0.13.0/bevy/ui/struct.TargetCamera.html
         )
+
         .init_resource::<TargetGamepad>() //操作を受付けるゲームパッドのID
         .add_systems
         (   Update,

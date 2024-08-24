@@ -63,6 +63,22 @@ pub fn spawn_camera_3d( mut cmds: Commands )
     ;
 }
 
+//UIを描画するCameraのEntity IDをResourceに保存する
+pub fn insert_res_ui_render_camera_id
+(   camera2d_entity: Query<Entity, With<misc::CameraDefault2d>>,
+    camera3d_entity: Query<Entity, With<misc::CameraDefault3d>>,
+    mut cmds: Commands,
+)
+{   //カメラのEntity IDを決定する(優先:Camera2dDefault)
+    #[allow(clippy::suspicious_else_formatting)]
+    let ui_camera_id =
+        if let Ok ( id ) = camera2d_entity.get_single() { id } else
+        if let Ok ( id ) = camera3d_entity.get_single() { id } else { return };
+
+    //Resourceを登録する
+    cmds.insert_resource( UiRenderCamera ( ui_camera_id ) );
+}
+
 //3D lightをspawnする
 pub fn spawn_3d_light( mut cmds: Commands )
 {   let illuminance = LIGHT_3D_BRIGHTNESS;

@@ -51,7 +51,7 @@ pub const CAMERA_BGCOLOR_3D: ClearColorConfig = CAMERA_BG_COLOR;
 
 //3Dライトの設定
 pub const LIGHT_3D_BRIGHTNESS : f32  = 3000.0; //明るさ
-pub const LIGHT_3D_TRANSLATION: Vec3 = Vec3::new( 30.0, 100.0, 40.0 ); //位置
+pub const LIGHT_3D_TRANSLATION: Vec3 = Vec3::new( 1.0, 3.0, 2.0 ); //位置
 
 //デフォルト2Dカメラの位置
 //第四象限。左上隅が(0,0)で、X軸はプラス方向へ、Y軸はマイナス方向へ伸びる

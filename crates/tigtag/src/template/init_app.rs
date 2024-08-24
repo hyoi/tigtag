@@ -29,6 +29,7 @@ impl Plugin for Schedule
                 //テスト用
                 (   debug::spawn_2d_sprites, //debug用グリッド表示
                     debug::spawn_3d_objects, //3D表示テスト
+                    debug::show_light_gizmo, //Light Gizmo
                 )
                 .run_if( DEBUG )
                 .run_if( not( resource_exists::<AfterInitApp> ) )
@@ -51,7 +52,7 @@ impl Plugin for Schedule
 
                     //テスト用：Gizmo表示
                     debug::update_gizmo,
-                    // debug::toggle_ui_node_gizmo, //期待通りに動作しない(v0.14.1)
+                    debug::toggle_ui_node_gizmo,
                 )
                 .run_if( DEBUG )
                 .run_if( not( resource_exists::<AfterInitApp> ) )
@@ -103,7 +104,8 @@ const COLOR_SPRITE_KANI: Color = Color::srgba( 1.0, 1.0, 1.0, 0.6 );
 
 //ヘッダー／フッターをspawnする
 fn spawn_header_footer
-(   mut cmds: Commands,
+(   opt_ui_camera: Option<Res<UiRenderCamera>>,
+    mut cmds: Commands,
     asset_svr: Res<AssetServer>,
 )
 {   //ウィンドウ全体の隠しノードを作成する(グリッドレイアウト３列)
@@ -115,17 +117,17 @@ fn spawn_header_footer
         grid_template_rows   : RepeatedGridTrack::fr( 3, 1.0 ), //３行指定
         ..default()
     };
-    let mut hidden_node = NodeBundle
+    let hidden_node = NodeBundle
     {   style,
         background_color: Color::NONE.into(),
         ..default()
     };
 
     //debug時のボーダーライン表示
-    if DEBUG()
-    {   hidden_node.style.border = UiRect::all( Val::Px( 1.0 ) );
-        hidden_node.border_color = Color::RED.into()
-    }
+    // if DEBUG()
+    // {   hidden_node.style.border = UiRect::all( Val::Px( 1.0 ) );
+    //     hidden_node.border_color = Color::RED.into()
+    // }
 
     //ヘッダー／フッターの準備
     let mut header_left   = misc::text_ui( HEADER_LEFT  , &asset_svr );
@@ -169,7 +171,8 @@ fn spawn_header_footer
     footer_right.style.justify_self  = JustifySelf::End;          //セル内の右寄せ
 
     //隠しノードの中に子要素を作成する
-    cmds.spawn( ( hidden_node, HiddenNode ) ).with_children
+    let id = cmds.spawn( ( hidden_node, HiddenNode ) )
+    .with_children
     (   | cmds |
         {   cmds.spawn( ( header_left  , UiHeaderLeft   ) );
             cmds.spawn( ( header_center, UiHeaderCenter ) );
@@ -178,7 +181,13 @@ fn spawn_header_footer
             cmds.spawn( ( footer_center, UiFooterCenter ) );
             cmds.spawn( ( footer_right , UiFooterRight  ) );
         }
-    );
+    )
+    .id();
+
+    //隠しノードにUIを描画するカメラのEntity IDを登録する
+    if let Some ( ui_camera ) = opt_ui_camera
+    {   cmds.entity( id ).insert( TargetCamera ( ui_camera.id() ) );
+    }
 
     //おまけ(蟹)
     let custom_size = Some ( GRID_CUSTOM_SIZE * MAGNIFY_SPRITE_KANI );

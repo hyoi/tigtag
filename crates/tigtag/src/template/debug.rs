@@ -89,8 +89,7 @@ pub fn spawn_3d_objects
 
 //テキストUIを表示する
 pub fn spawn_grid_layout_ui
-(   camera2d_id: Query<Entity, With<misc::CameraDefault2d>>,
-    camera3d_id: Query<Entity, With<misc::CameraDefault3d>>,
+(   opt_ui_camera: Option<Res<UiRenderCamera>>,
     mut cmds: Commands,
 )
 {   //ウィンドウ全体の隠しノードを作成する(グリッドレイアウト３列×３行)
@@ -109,15 +108,8 @@ pub fn spawn_grid_layout_ui
         ..default()
     };
 
-    //UIを描画するカメラを指定する(優先:Camera2dDefault)
-    #[allow(clippy::suspicious_else_formatting)]
-    let ui_camera_id =
-        if let Ok ( id ) = camera2d_id.get_single() { id } else
-        if let Ok ( id ) = camera3d_id.get_single() { id } else { return };
-
     //隠しノードの中に子ノードをspawnする
-    cmds.spawn( hidden_node )
-    .insert( TargetCamera ( ui_camera_id ) )
+    let id = cmds.spawn( hidden_node )
     .with_children
     (   |cmds|
         {   cmds.spawn( text_ui( "TOP/LEFT"    , AlignSelf::Start , JustifySelf::Start  ) );
@@ -132,7 +124,13 @@ pub fn spawn_grid_layout_ui
             cmds.spawn( text_ui( "BOTTOM"      , AlignSelf::End   , JustifySelf::Center ) );
             cmds.spawn( text_ui( "BOTTOM/RIGHT", AlignSelf::End   , JustifySelf::End    ) );
         }
-    );
+    )
+    .id();
+
+    //隠しノードにUIを描画するカメラのEntity IDを登録する
+    if let Some ( ui_camera ) = opt_ui_camera
+    {   cmds.entity( id ).insert( TargetCamera ( ui_camera.id() ) );
+    }
 }
 
 //TextBundleを作る
@@ -374,19 +372,32 @@ pub fn update_gizmo
 (   qry_target: Query<&Transform, With<TargetGizumo>>,
     mut gizmos: Gizmos,
 )
-{   qry_target.iter().for_each
-    (   | transform |
-        {   gizmos.axes( *transform, 1.0 );
-            gizmos.grid
-            (   Vec3::Z * 0.5,
-                Quat::from_rotation_x( PI * 0.5 ),
-                UVec2::new( 5, 5 ),
-                Vec2::splat( 1.0 ),
-                Color::GREEN,
-            )
-            .outer_edges();
-        }
-    );
+{   //立体にaxes gizmoを表示する
+    qry_target.iter().for_each( | transform | gizmos.axes( *transform, 1.0 ) );
+
+    //地面にgrid gizmoを表示する
+    gizmos.grid
+    (   Vec3::Z * 0.5,
+        Quat::from_rotation_x( PI * 0.5 ),
+        UVec2::new( 5, 5 ),
+        Vec2::splat( 1.0 ),
+        Color::GREEN,
+    )
+    .outer_edges();
+
+    //2D grid表示する
+    // let center_position = CAMERA_POSITION_DEFAULT_2D.xy();
+    // let rotation = 0.0;
+    // let cell_count = UVec2::new( SCREEN_GRIDS_WIDTH as u32, SCREEN_GRIDS_HEIGHT as u32 );
+    // let cell_size = GRID_CUSTOM_SIZE;
+    // gizmos.grid_2d
+    // (   center_position,
+    //     rotation,
+    //     cell_count,
+    //     cell_size,
+    //     Color::GRAY,
+    // )
+    // .outer_edges();
 }
 
 //UI Node Outline Gizmos
@@ -397,6 +408,15 @@ pub fn toggle_ui_node_gizmo
 {   if let Some ( mut options ) = opt_ui_debug_options
     {   if input.just_pressed( KeyCode::Space ) { options.toggle(); }
     }
+}
+
+//Light Gizmo
+pub fn show_light_gizmo
+(   mut gizmo_config_store: ResMut<GizmoConfigStore>,
+)
+{   let ( _, config ) = gizmo_config_store.config_mut::<LightGizmoConfigGroup>();
+    config.draw_all = true;
+    config.color = LightGizmoColor::MatchLightColor;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

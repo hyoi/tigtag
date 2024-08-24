@@ -7,7 +7,6 @@ edition.workspace = true
 
 [dependencies]
 bevy.workspace = true
-bevy_dev_tools.workspace = true
 
 rand.workspace = true
 chrono.workspace = true
@@ -31,8 +30,7 @@ version = "0.14.1"
 edition = "2021"
 
 [workspace.dependencies]
-bevy = "0.14"
-bevy_dev_tools = "0.14"
+bevy = { version = "0.14", features = [ "bevy_dev_tools" ] }
 
 rand = "0.8"
 chrono = "0.4"
