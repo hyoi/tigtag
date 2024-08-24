@@ -27,7 +27,7 @@ pub fn spawn_camera_2d( mut cmds: Commands )
     .insert( Camera
     {   order: CAMERA_ORDER_DEFAULT_2D,
         clear_color: CAMERA_BGCOLOR_2D,
-        viewport,
+        // viewport,
         ..default()
     } )
     .insert( Transform::from_translation( CAMERA_POSITION_DEFAULT_2D ) )
@@ -56,7 +56,7 @@ pub fn spawn_camera_3d( mut cmds: Commands )
     .insert( Camera
     {   order: CAMERA_ORDER_DEFAULT_3D,
         clear_color: CAMERA_BGCOLOR_3D,
-        viewport,
+        // viewport,
         ..default()
     } )
     .insert( Transform::from_translation( vec3 ).looking_at( Vec3::ZERO, Vec3::Y ) )
