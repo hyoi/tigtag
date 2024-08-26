@@ -20,13 +20,23 @@ path = "crates/tigtag/src/main.rs"
 [features]
 sprite_off = [] # cargo run --features sprite_off
 
+[profile.release-wasm]
+inherits = "release"
+opt-level = "s"
+debug = "none"
+#split-debuginfo = "packed" #platform-specific
+strip = "symbols"
+#lto = true #モバイルブラウザで表示されない不具合の対策
+codegen-units = 1
+panic = "abort"
+
 ################################################################################
 
 [workspace]
 resolver = "2"
 
 [workspace.package]
-version = "0.14.1"
+version = "0.14.2"
 edition = "2021"
 
 [workspace.dependencies]

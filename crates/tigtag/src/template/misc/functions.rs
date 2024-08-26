@@ -13,15 +13,15 @@ pub fn spawn_camera_2d( mut cmds: Commands )
 {   //タイトルバーWクリックや最大化ボタンによるウィンドウ最大化、および
     //WASMでCanvasへのfit(最大化)を設定した場合に表示が著しく崩れることがある。
     //それを緩和するためカメラにviewportを設定しておく
-    let zero = UVec2::new( 0, 0 );
-    let size = Vec2::new( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT );
-    let viewport = Some
-    (   bevy::render::camera::Viewport
-        {   physical_position: zero,
-            physical_size    : size.as_uvec2(),
-            ..default()
-        }
-    );
+    // let zero = UVec2::new( 0, 0 );
+    // let size = Vec2::new( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT );
+    // let viewport = Some
+    // (   bevy::render::camera::Viewport
+    //     {   physical_position: zero,
+    //         physical_size    : size.as_uvec2(),
+    //         ..default()
+    //     }
+    // );
 
     cmds.spawn( ( Camera2dBundle::default(), CameraDefault2d ) )
     .insert( Camera
@@ -39,15 +39,15 @@ pub fn spawn_camera_3d( mut cmds: Commands )
 {   //タイトルバーWクリックや最大化ボタンによるウィンドウ最大化、および
     //WASMでCanvasへのfit(最大化)を設定した場合に表示が著しく崩れることがある。
     //それを緩和するためカメラにviewportを設定しておく
-    let zero = UVec2::new( 0, 0 );
-    let size = Vec2::new( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT );
-    let viewport = Some
-    (   bevy::render::camera::Viewport
-        {   physical_position: zero,
-            physical_size    : size.as_uvec2(),
-            ..default()
-        }
-    );
+    // let zero = UVec2::new( 0, 0 );
+    // let size = Vec2::new( SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT );
+    // let viewport = Some
+    // (   bevy::render::camera::Viewport
+    //     {   physical_position: zero,
+    //         physical_size    : size.as_uvec2(),
+    //         ..default()
+    //     }
+    // );
 
     //3Dカメラの座標を初期化する（オービットカメラ）
     let vec3 = Orbit::default().to_vec3();
