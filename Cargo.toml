@@ -26,7 +26,7 @@ opt-level = "s"
 debug = "none"
 #split-debuginfo = "packed" #platform-specific
 strip = "symbols"
-lto = true
+#lto = true #モバイルブラウザで表示されない不具合の対策
 codegen-units = 1
 panic = "abort"
 
