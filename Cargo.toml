@@ -20,6 +20,16 @@ path = "crates/tigtag/src/main.rs"
 [features]
 sprite_off = [] # cargo run --features sprite_off
 
+[profile.release-wasm]
+inherits = "release"
+opt-level = "s"
+debug = "none"
+#split-debuginfo = "packed" #platform-specific
+strip = "symbols"
+lto = true
+codegen-units = 1
+panic = "abort"
+
 ################################################################################
 
 [workspace]
