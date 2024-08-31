@@ -4,6 +4,7 @@ use bevy::
     log::LogPlugin,
     color::palettes::css,
     window::WindowMode,
+    render::camera::Viewport,
     input::mouse::{ MouseMotion, MouseWheel },
     ecs::query::QueryFilter,
     asset::{ LoadState, LoadedUntypedAsset },
@@ -51,7 +52,8 @@ pub const SCREEN_GRIDS_WIDTH : i32 = 25; //memo: 25 best 43
 pub const SCREEN_GRIDS_HEIGHT: i32 = 19; //memo: 19 best 24
 
 //コンパイル オプションの定数
-pub const SPRITE_OFF: fn() -> bool = || cfg!( feature = "sprite_off" );
+pub const SPRITE_OFF     : fn() -> bool = || cfg!( feature = "sprite_off"      );
+pub const ATTACH_VIEWPORT: fn() -> bool = || cfg!( feature = "attach_viewport" );
 
 ////////////////////////////////////////////////////////////////////////////////
 

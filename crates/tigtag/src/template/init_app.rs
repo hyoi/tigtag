@@ -110,8 +110,12 @@ fn spawn_header_footer
 )
 {   //ウィンドウ全体の隠しノードを作成する(グリッドレイアウト３列)
     let style = Style
-    {   width : Val::Percent( 100.0 ),
-        height: Val::Percent( 100.0 ),
+    {   width : Val::Px ( SCREEN_PIXELS_WIDTH  ),
+        height: Val::Px ( SCREEN_PIXELS_HEIGHT ),
+        align_self  : AlignSelf::Center,
+        justify_self: JustifySelf::Center,
+        // width : Val::Percent( 100.0 ),
+        // height: Val::Percent( 100.0 ),
         display: Display::Grid,
         grid_template_columns: RepeatedGridTrack::fr( 3, 1.0 ), //３列指定
         grid_template_rows   : RepeatedGridTrack::fr( 3, 1.0 ), //３行指定

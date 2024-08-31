@@ -94,8 +94,12 @@ pub fn spawn_grid_layout_ui
 )
 {   //ウィンドウ全体の隠しノードを作成する(グリッドレイアウト３列×３行)
     let style = Style
-    {   width : Val::Percent( 100.0 ),
-        height: Val::Percent( 100.0 ),
+    {   width : Val::Px ( SCREEN_PIXELS_WIDTH  ),
+        height: Val::Px ( SCREEN_PIXELS_HEIGHT ),
+        align_self  : AlignSelf::Center,
+        justify_self: JustifySelf::Center,
+        // width : Val::Percent( 100.0 ),
+        // height: Val::Percent( 100.0 ),
         display: Display::Grid,
         grid_template_columns: RepeatedGridTrack::fr( 3, 1.0 ),
         // border: UiRect::all( Val::Px( 1.0 ) ), //ボーダーライン表示用

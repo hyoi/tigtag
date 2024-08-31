@@ -18,10 +18,21 @@ name = "tigtag"
 path = "crates/tigtag/src/main.rs"
 
 [features]
-sprite_off = [] # cargo run --features sprite_off
+sprite_off = [] #スプライト画像の代わりにプリミティブシェイプを表示する
+attach_viewport = [] #viewportをcameraに設定する
 
 [profile.release-wasm]
 inherits = "release"
+opt-level = "s"
+debug = "none"
+#split-debuginfo = "packed" #platform-specific
+strip = "symbols"
+#lto = true #モバイルブラウザで表示されない不具合の対策
+codegen-units = 1
+panic = "abort"
+
+[profile.dev-wasm]
+inherits = "dev"
 opt-level = "s"
 debug = "none"
 #split-debuginfo = "packed" #platform-specific
