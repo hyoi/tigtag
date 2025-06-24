@@ -1,77 +1,62 @@
-//external crates
-use bevy::
-{   prelude::*,
-    log::LogPlugin,
-    color::palettes::css,
-    window::WindowMode,
-    render::camera::Viewport,
-    input::mouse::{ MouseMotion, MouseWheel },
-    ecs::query::QueryFilter,
-    asset::{ LoadState, LoadedUntypedAsset },
-    diagnostic::{ FrameTimeDiagnosticsPlugin, DiagnosticsStore },
-    utils::Duration,
-    dev_tools::ui_debug_overlay,
-    input::keyboard::NativeKeyCode,
-    sprite::MaterialMesh2dBundle,
-    utils::{ HashMap, HashSet },
-    audio::Volume,
+// external crates
+use bevy::{
+    prelude::*,
+    // ecs::error::{GLOBAL_ERROR_HANDLER, warn},
+    // window::{EnabledButtons, WindowMode, Monitor},
+    // log::LogPlugin,
+    // color::palettes::*,
+    // asset::{LoadedUntypedAsset, LoadState},
+    // render::camera::Viewport,
+    // input::{
+    //     gamepad::{
+    //         GamepadInput, GamepadButton::*, GamepadAxis::*, GamepadAxisChangedEvent,
+    //     },
+    //     mouse::{MouseButtonInput, MouseMotion, MouseWheel},
+    // },
+    // diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
+    // ecs::query::QueryFilter,
 };
-
-use rand::prelude::*;
-use chrono::prelude::Local as time_local; //「Local」がbevyとバッティングするのでaliasを使う
+// use rand::prelude::*;
+// use rustc_hash::FxHashMap;
+// use chrono::prelude::Local as time_local; //「Local」がbevyとバッティングするのでaliasを使う
 
 //standard library
-use std::
-{   sync::LazyLock,
-    f32::consts::{ PI, TAU },
-    ops::Range,
-    ops::{ Add, AddAssign },
-    cmp::Ordering,
-    collections::VecDeque,
-};
+// use std::{
+//     sync::LazyLock,
+//     ops::Range,
+//     f32::consts::{PI, TAU},
+//     ops::{Deref, DerefMut},
+//     time::Duration,
+// };
 
-//proc-macro crates
-use macros::MyState;
+// proc-macro
+// use macros::MyState;
 
-//internal submodules
-mod template;
-use template::*;
+// internal submodules
+// mod config; // アプリの設定
+// use config::*;
 
-//ゲームロジック
-mod tigtag_inside;
+// mod bevy_app; // アプリ本体
 
-////////////////////////////////////////////////////////////////////////////////
-
-//アプリの情報
-pub const APP_TITLE: &str = "TigTag"; //env!( "CARGO_PKG_NAME" );
-pub const APP_VER  : &str = env!( "CARGO_PKG_VERSION" );
-pub const COPYRIGHT: &str = "hyoi 2021 - 2024";
-
-//ウィンドウ縦横(Grid)
-pub const SCREEN_GRIDS_WIDTH : i32 = 25; //memo: 25 best 43
-pub const SCREEN_GRIDS_HEIGHT: i32 = 19; //memo: 19 best 24
-
-//コンパイル オプションの定数
-pub const SPRITE_OFF     : fn() -> bool = || cfg!( feature = "sprite_off"      );
-pub const ATTACH_VIEWPORT: fn() -> bool = || cfg!( feature = "attach_viewport" );
+// mod template; // 共通
+// use template::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//メイン関数
+// メイン関数
 fn main() -> AppExit
-{   //アプリの生成
-    let mut app = App::new();
+{
+    // エラーハンドラ変更（Note: App生成前に設定すること）
+    // GLOBAL_ERROR_HANDLER.set(warn).expect(
+    //     "Error handler should be set only once in main() before app-initialization.",
+    // );
 
-    //メイン処理
-    app
-    .add_plugins( template::Schedule      ) //アプリの雛型
-    .add_plugins( tigtag_inside::Schedule ) //ゲームロジック
-    ;
-
-    //アプリの実行
-    app.run()
+    // アプリを実行
+    App::new()
+        // .add_plugins(bevy_app::Schedule)
+        .run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//End of code.
+// End of code.

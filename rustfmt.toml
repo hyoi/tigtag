@@ -1,0 +1,26 @@
+use_field_init_shorthand = true
+newline_style = "Unix"
+style_edition = "2021"
+
+# The following lines may be uncommented on nightly Rust.
+# Once these features have stabilized, they should be added to the always-enabled options above.
+unstable_features = true
+imports_granularity = "Crate"
+normalize_comments = true
+
+# these options seem poorly implemented and cause churn, so, try to avoid them
+# wrap_comments = true
+# comment_width = 100
+
+################################################################################
+
+#Settings I added (stable)
+reorder_modules = false
+reorder_imports = false
+match_arm_blocks = false
+max_width = 85
+
+#Settings I added (unstable) [cargo +nightly fmt]
+fn_single_line = true
+brace_style = "AlwaysNextLine"
+control_brace_style = "AlwaysNextLine"

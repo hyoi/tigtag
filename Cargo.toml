@@ -3,24 +3,68 @@ name = "tigtag"
 version.workspace = true
 edition.workspace = true
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-bevy.workspace = true
-
-rand.workspace = true
-chrono.workspace = true
-
-macros.workspace = true
+[workspace.package]
+version = "0.16.0"
+edition = "2024"
 
 [[bin]]
 name = "tigtag"
 path = "crates/tigtag/src/main.rs"
 
 [features]
-sprite_off = [] #スプライト画像の代わりにプリミティブシェイプを表示する
-attach_viewport = [] #viewportをcameraに設定する
+sprite_off = [] #スプライト画像の代わりにプリミティブシェイプを表示するコンパイルスイッチ
+attach_viewport = [] #cameraにviewportをセットするコンパイルスイッチ
 
+################################################################################
+
+[dependencies]
+bevy.workspace = true
+rand.workspace = true
+getrandom.workspace = true
+chrono.workspace = true
+rustc-hash.workspace = true
+macros.workspace = true
+
+[workspace.dependencies]
+#Bevyのバージョン／ブランチ等の指定
+#bevy = { version = "0.16.0-rc.5", features = [
+#bevy = { git = "https://github.com/bevyengine/bevy", features = [  # Master branch
+#bevy = { git = "https://github.com/bevyengine/bevy", tag = "v0.15.0-rc.3", features = [
+#bevy = { git = "https://github.com/bevyengine/bevy", branch = "release-0.14.0", features = [
+
+bevy = { version = "0.16", features = [
+    "configurable_error_handler",
+    "bevy_ui_debug"
+] }
+
+#依存するその他のcrate
+rand = "0.9"
+getrandom = { version = "0.3", features = [ "wasm_js" ] } #wasmコンパイル時のエラー対策
+chrono = "0.4"
+rustc-hash = "2"
+
+#マクロ関係の依存
+macros        = { path = "crates/macros"        }
+macros_inside = { path = "crates/macros_inside" }
+syn = "2.0"
+quote = "1.0"
+proc-macro2 = "1.0"
+
+################################################################################
+
+#releaseプロファイル
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1
+incremental = false
+debug = false
+
+#developプロファイル
+[profile.dev.package."*"]
+opt-level = 3
+
+#wasm releaseプロファイル
 [profile.release-wasm]
 inherits = "release"
 opt-level = "s"
@@ -31,6 +75,7 @@ strip = "symbols"
 codegen-units = 1
 panic = "abort"
 
+#wasm developプロファイル
 [profile.dev-wasm]
 inherits = "dev"
 opt-level = "s"
@@ -40,33 +85,3 @@ strip = "symbols"
 #lto = true #モバイルブラウザで表示されない不具合の対策
 codegen-units = 1
 panic = "abort"
-
-################################################################################
-
-[workspace]
-resolver = "2"
-
-[workspace.package]
-version = "0.14.2"
-edition = "2021"
-
-[workspace.dependencies]
-bevy = { version = "0.14", features = [ "bevy_dev_tools" ] }
-
-rand = "0.8"
-chrono = "0.4"
-
-macros        = { path = "crates/macros"        }
-macros_inside = { path = "crates/macros_inside" }
-
-syn = "2.0"
-quote = "1.0"
-proc-macro2 = "1.0"
-
-#bevy = { git = "https://github.com/bevyengine/bevy" } #Master branch
-#bevy = { git = "https://github.com/bevyengine/bevy", branch = "release-0.14.0" }
-
-# WASMの場合にどれか指定する必要がある？？
-# rand = { version = "0.8.4", features = [ "wasm-bindgen" ] }
-# getrandom = { version = "0.2.4", features = [ "js" ] }
-# getrandom = { version = "0.2.4", features = [ "wasm-bindgen" ] }
