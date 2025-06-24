@@ -1,11 +1,11 @@
 // external crates
 use bevy::{
     prelude::*,
-    // ecs::error::{GLOBAL_ERROR_HANDLER, warn},
-    // window::{EnabledButtons, WindowMode, Monitor},
-    // log::LogPlugin,
-    // color::palettes::*,
-    // asset::{LoadedUntypedAsset, LoadState},
+    ecs::error::{GLOBAL_ERROR_HANDLER, warn},
+    log::LogPlugin,
+    window::{EnabledButtons, WindowMode /* Monitor */},
+    color::palettes::*,
+    asset::{LoadedUntypedAsset, LoadState},
     // render::camera::Viewport,
     // input::{
     //     gamepad::{
@@ -16,30 +16,30 @@ use bevy::{
     // diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
     // ecs::query::QueryFilter,
 };
-// use rand::prelude::*;
+use rand::prelude::*;
 // use rustc_hash::FxHashMap;
 // use chrono::prelude::Local as time_local; //「Local」がbevyとバッティングするのでaliasを使う
 
-//standard library
-// use std::{
-//     sync::LazyLock,
-//     ops::Range,
-//     f32::consts::{PI, TAU},
-//     ops::{Deref, DerefMut},
-//     time::Duration,
-// };
+// standard library
+use std::{
+    sync::LazyLock,
+    ops::Range,
+    // f32::consts::{PI, TAU},
+    // ops::{Deref, DerefMut},
+    // time::Duration,
+};
 
 // proc-macro
-// use macros::MyState;
+use macros::MyState;
 
 // internal submodules
-// mod config; // アプリの設定
-// use config::*;
+mod config; // アプリの設定
+use config::*;
 
-// mod bevy_app; // アプリ本体
+mod bevy_app; // アプリ本体
 
-// mod template; // 共通
-// use template::*;
+mod template; // 共通
+use template::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -47,14 +47,12 @@ use bevy::{
 fn main() -> AppExit
 {
     // エラーハンドラ変更（Note: App生成前に設定すること）
-    // GLOBAL_ERROR_HANDLER.set(warn).expect(
-    //     "Error handler should be set only once in main() before app-initialization.",
-    // );
+    GLOBAL_ERROR_HANDLER.set(warn).expect(
+        "Error handler should be set only once in main() before app-initialization.",
+    );
 
     // アプリを実行
-    App::new()
-        // .add_plugins(bevy_app::Schedule)
-        .run()
+    App::new().add_plugins(bevy_app::Schedule).run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////

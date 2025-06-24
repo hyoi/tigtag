@@ -1,0 +1,176 @@
+// #![allow( dead_code )]
+use super::*;
+
+////////////////////////////////////////////////////////////////////////////////
+
+// キー入力でアプリ終了
+pub fn app_close_on_key(
+    qry_window: Query<(Entity, &Window)>,
+    input_keycode: Res<ButtonInput<KeyCode>>,
+    mut cmds: Commands,
+)
+{
+    qry_window.iter().for_each(|(id, window)| {
+        if window.focused && input_keycode.just_pressed(EXIT_APP_KEY)
+        {
+            cmds.entity(id).despawn();
+        }
+    });
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// ウィンドウとフルスクリーンの切換(トグル動作)
+pub fn toggle_window_mode(
+    mut qry_window: Query<&mut Window>,
+    input_keycode: Res<ButtonInput<KeyCode>>,
+    // qry_gamepads: Query<(Entity, &Gamepad)>,
+    // opt_target_gamepad: Option<ResMut<TargetGamepad>>,
+) -> Result
+{
+    // windowがない？
+    let mut window = qry_window.single_mut()?;
+
+    // キーの押下状態
+    let is_pressed = input_keycode.just_pressed(FULL_SCREEN_KEY)
+        && input_keycode.any_pressed(FULL_SCREEN_MODIFIER_KEY.iter().copied());
+
+    // ゲームパッドのボタン押下状態
+    // if ! is_pressed
+    // {   let Some ( target ) = opt_target_gamepad else { return }; //Resource未登録
+    //     let Some ( target ) = target.entity() else { return };    //ゲームパッド未接続
+    //     for ( entity, gamepad ) in qry_gamepads.iter()
+    //     {   if entity != target { continue }
+    //         is_pressed = gamepad.pressed( FULL_SCREEN_BUTTON );
+    //     }
+    // }
+
+    // 切換(トグル動作)
+    if is_pressed
+    {
+        window.mode = match window.mode
+        {
+            WindowMode::Windowed => WindowMode::Fullscreen(
+                MonitorSelection::Primary,
+                VideoModeSelection::Current,
+            ),
+            _ => WindowMode::Windowed,
+        };
+    }
+
+    Ok(())
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// QueryしたEnityを再帰的に削除する
+pub fn despawn_component<T: Component>(
+    qry_entity: Query<Entity, With<T>>,
+    mut cmds: Commands,
+)
+{
+    qry_entity.iter().for_each(|id| cmds.entity(id).despawn());
+}
+
+// pub fn despawn_by_filter<T: QueryFilter>
+// (   qry_entity: Query<Entity, T>,
+//     mut cmds: Commands,
+// )
+// {   qry_entity.iter().for_each( | id | cmds.entity( id ).despawn() );
+// }
+
+////////////////////////////////////////////////////////////////////////////////
+
+// 最大公約数を求める関数 (u32)
+// pub fn gcd_u32(a: u32, b: u32) -> u32
+// {
+//     if b == 0
+//     {
+//         a
+//     }
+//     else
+//     {
+//         gcd_u32(b, a % b)
+//     }
+// }
+
+////////////////////////////////////////////////////////////////////////////////
+
+// 操作を受付けるgamepadのEntityを保存するResource
+// #[derive(Resource, Default)]
+// pub struct TargetGamepad(Option<Entity>);
+// impl TargetGamepad
+// {
+//     pub fn entity(&self) -> Option<Entity> { self.0 }
+//     pub fn entity_mut(&mut self) -> &mut Option<Entity> { &mut self.0 }
+// }
+
+// 操作を受付けるgamepadを切り替える
+// ※副作用：ResMut<TargetGamepad>が見つからない場合、登録する
+// pub fn detect_gamepad_connection(
+//     mut qry_gamepads: Query<(Entity, &Name), With<Gamepad>>,
+//     opt_gamepad: Option<ResMut<TargetGamepad>>,
+//     mut cmds: Commands,
+// )
+// {
+//     // gamepadの接続状態を調べてResourceを更新するクロージャ
+//     let mut update_gamepad_connection = |gamepad: &mut TargetGamepad| {
+//         // gamepadの接続が保存されているなら
+//         if let Some(entity) = gamepad.entity()
+//         {
+//             // その接続が切断されたか？
+//             if !qry_gamepads.contains(entity)
+//             {
+//                 // 新たに接続を保存しようとする（結果はNoneかもしれない）
+//                 let (opt_a, _opt_b) = qry_gamepads.iter_mut().next().unzip();
+//                 *gamepad.entity_mut() = opt_a;
+
+//                 #[cfg(debug_assertions)]
+//                 dbg!(&_opt_b, gamepad.entity()); // Some⇒Some、Some⇒None
+//             }
+//         }
+//         else if !qry_gamepads.is_empty()
+//         {
+//             // 新たに接続を保存する
+//             let (opt_a, _opt_b) = qry_gamepads.iter_mut().next().unzip();
+//             *gamepad.entity_mut() = opt_a;
+
+//             #[cfg(debug_assertions)]
+//             dbg!(&_opt_b, gamepad.entity()); // None⇒Some
+//         }
+//     };
+
+//     // Resourceが登録済みか？
+//     if let Some(mut gamepad) = opt_gamepad
+//     {
+//         // 既存のResourceを使用する
+//         update_gamepad_connection(&mut gamepad);
+//     }
+//     else
+//     {
+//         // Resourceがない(関数実行一回目)ならResourceを登録する
+//         let mut gamepad = TargetGamepad::default();
+//         update_gamepad_connection(&mut gamepad);
+//         cmds.insert_resource(gamepad);
+//     }
+// }
+
+////////////////////////////////////////////////////////////////////////////////
+
+// //QueryしたComponentを可視化する
+// pub fn show_component<T: Component>
+// (   mut qry: Query<&mut Visibility, With<T>>,
+// )
+// {   qry.iter_mut().for_each( | mut v | *v = Visibility::Visible );
+// }
+
+// //QueryしたComponentを不可視にする
+// pub fn hide_component<T: Component>
+// (   mut qry: Query<&mut Visibility, With<T>>,
+// )
+// {   qry.iter_mut().for_each( | mut v | *v = Visibility::Hidden );
+// }
+
+////////////////////////////////////////////////////////////////////////////////
+
+// End of code.
