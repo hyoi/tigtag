@@ -98,39 +98,39 @@ pub const PRELOAD_ASSETS: &[&str] = &[
 ////////////////////////////////////////////////////////////////////////////////
 
 // カメラのマーカーComponent
-// #[derive(Component, Clone)]
-// pub struct SimpleCamera2d;
+#[derive(Component, Clone)]
+pub struct SimpleCamera2d;
 // #[derive(Component, Clone)]
 // pub struct SimpleCamera3dOrbit;
 
-// pub static CAMERA_SETTINGS: LazyLock<Vec<simple_camera::Setting>> =
-//     LazyLock::new(|| {
-//         vec![
-//             simple_camera::Setting::from((
-//                 1,              // カメラのレンダリング優先度（0が最後）
-//                 Color::NONE,    // レンダリング時の背景色（NONEは透明）
-//                 SimpleCamera2d, // マーカーComponent
-//                 Camera2d,       // カメラ種類Component
-//                 Transform::from_translation(CAMERA2D_POSITION), // カメラの位置
-//             )),
-//             simple_camera::Setting::from((
-//                 0,
-//                 Color::BLACK,
-//                 SimpleCamera3dOrbit,
-//                 Camera3d::default(),
-//                 Transform::from_translation(CAMERA3D_POSITION_ORBIT.vec3())
-//                     .looking_at(Vec3::ZERO, Vec3::Y),
-//             )),
-//         ]
-//     });
+pub static CAMERA_SETTINGS: LazyLock<Vec<simple_camera::Setting>> =
+    LazyLock::new(|| {
+        vec![
+            simple_camera::Setting::from((
+                1,              // カメラのレンダリング優先度（0が最後）
+                Color::BLACK,    // レンダリング時の背景色（NONEは透明）
+                SimpleCamera2d, // マーカーComponent
+                Camera2d,       // カメラ種類Component
+                Transform::from_translation(CAMERA2D_POSITION), // カメラの位置
+            )),
+            // simple_camera::Setting::from((
+            //     0,
+            //     Color::BLACK,
+            //     SimpleCamera3dOrbit,
+            //     Camera3d::default(),
+            //     Transform::from_translation(CAMERA3D_POSITION_ORBIT.vec3())
+            //         .looking_at(Vec3::ZERO, Vec3::Y),
+            // )),
+        ]
+    });
 
 // 2Dカメラの位置
 // ※第四象限を利用する。左上隅が(0,0)で、X軸はプラス方向へ、Y軸はマイナス方向へ伸びる
-// pub const CAMERA2D_POSITION: Vec3 = Vec3::new(
-//     SCREEN_PIXELS_WIDTH * 0.5,
-//     SCREEN_PIXELS_HEIGHT * -0.5,
-//     999.0, /* 0.0だとスプライトの子のText2dがZ軸1.0(Vec3::Z)で表示されない不具合が発生(v0.14) */
-// );
+pub const CAMERA2D_POSITION: Vec3 = Vec3::new(
+    SCREEN_PIXELS_WIDTH * 0.5,
+    SCREEN_PIXELS_HEIGHT * -0.5,
+    999.0, /* 0.0だとスプライトの子のText2dがZ軸1.0(Vec3::Z)で表示されない不具合が発生(v0.14) */
+);
 
 // 3Dカメラの位置（極座標）
 // pub const CAMERA3D_POSITION_ORBIT: Orbit = Orbit {

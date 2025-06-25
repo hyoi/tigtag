@@ -31,11 +31,11 @@ impl Plugin for Schedule
         // appl.add_systems(Startup, show_monitor_info.run_if(DEBUG));
 
         // カメラ（Camera2dとCamera3d）をspawnする
-        // appl.insert_resource(simple_camera::Settings(CAMERA_SETTINGS.clone()))
-        //     .add_systems(
-        //         OnEnter(MyState::InitGame),
-        //         simple_camera::spawn::<simple_camera::Settings>,
-        //     );
+        appl.insert_resource(simple_camera::Settings(CAMERA_SETTINGS.clone()))
+            .add_systems(
+                OnEnter(MyState::InitGame),
+                simple_camera::spawn::<simple_camera::Settings>,
+            );
 
         // 2D表示簡易テスト
         // appl.add_systems(

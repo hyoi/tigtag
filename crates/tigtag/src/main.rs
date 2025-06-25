@@ -6,7 +6,7 @@ use bevy::{
     window::{EnabledButtons, WindowMode /* Monitor */},
     color::palettes::*,
     asset::{LoadedUntypedAsset, LoadState},
-    // render::camera::Viewport,
+    render::camera::Viewport,
     // input::{
     //     gamepad::{
     //         GamepadInput, GamepadButton::*, GamepadAxis::*, GamepadAxisChangedEvent,
@@ -24,8 +24,8 @@ use rand::prelude::*;
 use std::{
     sync::LazyLock,
     ops::Range,
+    ops::{Deref, DerefMut},
     // f32::consts::{PI, TAU},
-    // ops::{Deref, DerefMut},
     // time::Duration,
 };
 

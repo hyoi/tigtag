@@ -9,7 +9,7 @@ pub use consts_and_types::*; // 識別子をモジュール名不要にして外
 
 pub mod misc; // 共通関数
 
-// mod utilities; // ユーティリティ
-// pub use utilities::*; // 識別子をモジュール名不要にして外へ公開
+mod utilities; // ユーティリティ
+pub use utilities::*; // 識別子をモジュール名不要にして外へ公開
 
 // End of code.
