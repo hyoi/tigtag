@@ -7,13 +7,13 @@ use bevy::{
     color::palettes::*,
     asset::{LoadedUntypedAsset, LoadState},
     render::camera::Viewport,
+    diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
     // input::{
     //     gamepad::{
     //         GamepadInput, GamepadButton::*, GamepadAxis::*, GamepadAxisChangedEvent,
     //     },
     //     mouse::{MouseButtonInput, MouseMotion, MouseWheel},
     // },
-    // diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
     // ecs::query::QueryFilter,
 };
 use rand::prelude::*;

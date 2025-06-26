@@ -48,6 +48,12 @@ pub const LOG_LV_REL: &str = "error"; // リリース
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// コンパイル オプションの定数
+pub const SPRITE_OFF: fn() -> bool = || cfg!(feature = "sprite_off");
+pub const ATTACH_VIEWPORT: fn() -> bool = || cfg!(feature = "attach_viewport");
+
+////////////////////////////////////////////////////////////////////////////////
+
 // アプリ終了キー
 pub const EXIT_APP_KEY: KeyCode = KeyCode::Escape;
 
@@ -81,18 +87,18 @@ pub enum MyState
 
 // 事前ロード対象
 pub const PRELOAD_ASSETS: &[&str] = &[
-    // ASSETS_FONT_PRESSSTART2P_REGULAR,
-    // ASSETS_FONT_ORBITRON_BLACK,
-    // ASSETS_SPRITE_KANI_DOTOWN,
+    ASSETS_FONT_PRESSSTART2P_REGULAR,
+    ASSETS_FONT_ORBITRON_BLACK,
+    ASSETS_SPRITE_KANI_DOTOWN,
     // ASSETS_SPRITE_BRICK_WALL,
 ];
 
 // assets（フォント）
-// pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "font/PressStart2P-Regular.ttf";
-// pub const ASSETS_FONT_ORBITRON_BLACK: &str = "font/Orbitron-Black.ttf";
+pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "font/PressStart2P-Regular.ttf";
+pub const ASSETS_FONT_ORBITRON_BLACK: &str = "font/Orbitron-Black.ttf";
 
 // assets（スプライト）
-// pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "image/sprite/kani_DOTOWN.png";
+pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "image/sprite/kani_DOTOWN.png";
 // pub const ASSETS_SPRITE_BRICK_WALL: &str = "image/sprite/brick_wall.png";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -100,28 +106,16 @@ pub const PRELOAD_ASSETS: &[&str] = &[
 // カメラのマーカーComponent
 #[derive(Component, Clone)]
 pub struct SimpleCamera2d;
-// #[derive(Component, Clone)]
-// pub struct SimpleCamera3dOrbit;
 
 pub static CAMERA_SETTINGS: LazyLock<Vec<simple_camera::Setting>> =
     LazyLock::new(|| {
-        vec![
-            simple_camera::Setting::from((
-                1,              // カメラのレンダリング優先度（0が最後）
-                Color::BLACK,    // レンダリング時の背景色（NONEは透明）
-                SimpleCamera2d, // マーカーComponent
-                Camera2d,       // カメラ種類Component
-                Transform::from_translation(CAMERA2D_POSITION), // カメラの位置
-            )),
-            // simple_camera::Setting::from((
-            //     0,
-            //     Color::BLACK,
-            //     SimpleCamera3dOrbit,
-            //     Camera3d::default(),
-            //     Transform::from_translation(CAMERA3D_POSITION_ORBIT.vec3())
-            //         .looking_at(Vec3::ZERO, Vec3::Y),
-            // )),
-        ]
+        vec![simple_camera::Setting::from((
+            1,              // カメラのレンダリング優先度（0が最後）
+            Color::BLACK,   // レンダリング時の背景色（NONEは透明）
+            SimpleCamera2d, // マーカーComponent
+            Camera2d,       // カメラ種類Component
+            Transform::from_translation(CAMERA2D_POSITION), // カメラの位置
+        ))]
     });
 
 // 2Dカメラの位置
@@ -132,30 +126,115 @@ pub const CAMERA2D_POSITION: Vec3 = Vec3::new(
     999.0, /* 0.0だとスプライトの子のText2dがZ軸1.0(Vec3::Z)で表示されない不具合が発生(v0.14) */
 );
 
-// 3Dカメラの位置（極座標）
-// pub const CAMERA3D_POSITION_ORBIT: Orbit = Orbit {
-//     r: 8.0,
-//     theta: PI * 0.6, // 1.0:天頂、0.5:真横、0.0:真下
-//     phi: TAU * 0.9,  // 時計の6時方向が0.0で反時計回り
-// };
+////////////////////////////////////////////////////////////////////////////////
+
+// シンプル ヘッダー／フッター用の情報
+pub const HEADER_FOOTER: &[header_footer::TextBlock] = &[
+    HEADER_STAGE,      // ステージ数
+    HEADER_SCORE,      // スコア
+    HEADER_HI_SCORE,   // ハイスコア
+    FOOTER_FPS,        // FPS表示
+    FOOTER_AUTHER,     // auther
+    FOOTER_POWERED_BY, // Powered by
+];
+
+pub const NA2: &str = "##";
+pub const NA5: &str = "#####";
+pub const NA2_5: &str = "##-#####";
+pub const NA3_2: &str = "###.##";
+
+const HEADER_LABEL_SIZE: f32 = PIXELS_PER_GRID * 0.58;
+const HEADER_VALUE_SIZE: f32 = PIXELS_PER_GRID * 0.7;
+const FOOTER_FONT_SIZE: f32 = PIXELS_PER_GRID * 0.48;
+
+pub const HEADER_STAGE: header_footer::TextBlock = header_footer::TextBlock {
+    position: header_footer::Position::TopLeft,
+    align_self: AlignSelf::Start,     // セル内の上寄せ
+    justify_self: JustifySelf::Start, // セル内の左寄せ
+    bg_color: Srgba::NONE,
+    #[rustfmt::skip]
+    spans: &[
+        ( " STAGE ", ASSETS_FONT_ORBITRON_BLACK      , HEADER_LABEL_SIZE, css::GOLD  ),
+        ( NA2      , ASSETS_FONT_PRESSSTART2P_REGULAR, HEADER_VALUE_SIZE, css::WHITE ),
+    ],
+};
+
+pub const HEADER_SCORE: header_footer::TextBlock = header_footer::TextBlock {
+    position: header_footer::Position::TopCenter,
+    align_self: AlignSelf::Start,      // セル内の上寄せ
+    justify_self: JustifySelf::Center, // セル内の中央寄せ
+    bg_color: Srgba::NONE,
+    #[rustfmt::skip]
+    spans: &[
+        ( " SCORE ", ASSETS_FONT_ORBITRON_BLACK      , HEADER_LABEL_SIZE, css::GOLD  ),
+        ( NA5      , ASSETS_FONT_PRESSSTART2P_REGULAR, HEADER_VALUE_SIZE, css::WHITE ),
+    ],
+};
+
+pub const HEADER_HI_SCORE: header_footer::TextBlock = header_footer::TextBlock {
+    position: header_footer::Position::TopRight,
+    align_self: AlignSelf::Start,   // セル内の上寄せ
+    justify_self: JustifySelf::End, // セル内の右寄せ
+    bg_color: Srgba::NONE,
+    #[rustfmt::skip]
+    spans: &[
+        ( " Hi-SCORE ", ASSETS_FONT_ORBITRON_BLACK      , HEADER_LABEL_SIZE, css::GOLD  ),
+        ( NA5         , ASSETS_FONT_PRESSSTART2P_REGULAR, HEADER_VALUE_SIZE, css::WHITE ),
+    ],
+};
+
+pub const FOOTER_FPS: header_footer::TextBlock = header_footer::TextBlock {
+    position: header_footer::Position::BottomLeft,
+    align_self: AlignSelf::End,       // セル内の下寄せ
+    justify_self: JustifySelf::Start, // セル内の左寄せ
+    bg_color: Srgba::NONE,
+    #[rustfmt::skip]
+    spans: &[
+        ( "  FPS ", ASSETS_FONT_ORBITRON_BLACK      , FOOTER_FONT_SIZE      , css::TEAL   ),
+        ( NA3_2   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4 , css::SILVER ),
+        ( " demo ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.35, css::TEAL   ),
+        ( NA2_5   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.26, css::SILVER ),
+    ],
+};
+
+pub const FOOTER_AUTHER: header_footer::TextBlock = header_footer::TextBlock {
+    position: header_footer::Position::BottomCenter,
+    align_self: AlignSelf::End,        // セル内の下寄せ
+    justify_self: JustifySelf::Center, // セル内の中央寄せ
+    bg_color: Srgba::NONE,
+    #[rustfmt::skip]
+    spans: &[
+        ( COPYRIGHT, ASSETS_FONT_ORBITRON_BLACK, FOOTER_FONT_SIZE, css::TEAL ),
+    ],
+};
+
+pub const FOOTER_POWERED_BY: header_footer::TextBlock = header_footer::TextBlock {
+    position: header_footer::Position::BottomRight,
+    align_self: AlignSelf::End,     // セル内の下寄せ
+    justify_self: JustifySelf::End, // セル内の右寄せ
+    bg_color: Srgba::NONE,
+    #[rustfmt::skip]
+    spans: &[
+        ( "Powered by ", ASSETS_FONT_ORBITRON_BLACK, FOOTER_FONT_SIZE, css::TEAL   ),
+        ( "RUST"       , ASSETS_FONT_ORBITRON_BLACK, FOOTER_FONT_SIZE, css::SILVER ),
+        ( " & "        , ASSETS_FONT_ORBITRON_BLACK, FOOTER_FONT_SIZE, css::TEAL   ),
+        ( "BEVY  "     , ASSETS_FONT_ORBITRON_BLACK, FOOTER_FONT_SIZE, css::SILVER ),
+    ],
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// コンパイル オプションの定数
-pub const SPRITE_OFF: fn() -> bool = || cfg!(feature = "sprite_off");
-pub const ATTACH_VIEWPORT: fn() -> bool = || cfg!(feature = "attach_viewport");
-
-////////////////////////////////////////////////////////////////////////////////
-
-// 3Dライトの設定
-// pub const SIMPLE_LIGHT3D_BRIGHTNESS: f32 = 3000.0; // 明るさ
-// pub const SIMPLE_LIGHT3D_POSITION: Vec3 = Vec3::new(1.0, 3.0, 2.0); // 位置
+// おまけ(蟹)
+pub const GRID_X_KANI: i32 = SCREEN_GRIDS_WIDTH - 4;
+pub const GRID_Y_KANI: i32 = SCREEN_GRIDS_HEIGHT - 1;
+pub const MAGNIFY_SPRITE_KANI: f32 = 0.9;
+pub const COLOR_SPRITE_KANI: Color = Color::srgba(1.0, 1.0, 1.0, 0.6);
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // スプライト重なり
 // pub const DEPTH_SPRITE_DEBUG_GRID: f32 = 999.0; // 重なりの最大値
-// pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0; // フッターの蟹アイコン
+pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0; // フッターの蟹アイコン
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -213,132 +292,6 @@ pub const ATTACH_VIEWPORT: fn() -> bool = || cfg!(feature = "attach_viewport");
 //     (GamepadInput::Axis(LeftStickX), orbit_camera::axis_x_reverse),
 //     (GamepadInput::Axis(LeftStickY), orbit_camera::axis_y_normal),
 // ];
-
-////////////////////////////////////////////////////////////////////////////////
-
-// シンプル ヘッダー／フッター用情報
-// pub const HEADER_FOOTER: &[header_footer::TextBlock] = &[
-//     HEADER_DAY_TIME,     // 日時表示
-//     HEADER_TITLE,        // タイトル
-//     HEADER_ELAPSED_TIME, // 経過時間表示
-//     FOOTER_FPS,          // FPS表示
-//     FOOTER_AUTHER,       // auther
-//     FOOTER_POWERED_BY,   // Powered by
-// ];
-
-// pub const HEADER_DAY_TIME: header_footer::TextBlock = header_footer::TextBlock {
-//     position: header_footer::Position::TopLeft,
-//     align_self: AlignSelf::Start,     // セル内の上寄せ
-//     justify_self: JustifySelf::Start, // セル内の左寄せ
-//     bg_color: css::BLUE,
-//     spans: &[(
-//         "",
-//         ASSETS_FONT_PRESSSTART2P_REGULAR,
-//         PIXELS_PER_GRID * 0.4,
-//         css::SILVER,
-//     )],
-// };
-
-// pub const HEADER_TITLE: header_footer::TextBlock = header_footer::TextBlock {
-//     position: header_footer::Position::TopCenter,
-//     align_self: AlignSelf::Start,      // セル内の上寄せ
-//     justify_self: JustifySelf::Center, // セル内の中央寄せ
-//     bg_color: css::BLUE,
-//     spans: &[(
-//         APP_TITLE,
-//         ASSETS_FONT_ORBITRON_BLACK,
-//         PIXELS_PER_GRID * 0.5,
-//         css::TEAL,
-//     )],
-// };
-
-// pub const HEADER_ELAPSED_TIME: header_footer::TextBlock = header_footer::TextBlock {
-//     position: header_footer::Position::TopRight,
-//     align_self: AlignSelf::Start,   // セル内の上寄せ
-//     justify_self: JustifySelf::End, // セル内の右寄せ
-//     bg_color: css::BLUE,
-//     spans: &[(
-//         "",
-//         ASSETS_FONT_PRESSSTART2P_REGULAR,
-//         PIXELS_PER_GRID * 0.4,
-//         css::SILVER,
-//     )],
-// };
-
-// pub const FOOTER_FPS: header_footer::TextBlock = header_footer::TextBlock {
-//     position: header_footer::Position::BottomLeft,
-//     align_self: AlignSelf::End,       // セル内の下寄せ
-//     justify_self: JustifySelf::Start, // セル内の左寄せ
-//     bg_color: Srgba::NONE,
-//     spans: &[
-//         (
-//             " FPS ",
-//             ASSETS_FONT_ORBITRON_BLACK,
-//             PIXELS_PER_GRID * 0.5,
-//             css::TEAL,
-//         ),
-//         (
-//             "",
-//             ASSETS_FONT_PRESSSTART2P_REGULAR,
-//             PIXELS_PER_GRID * 0.4,
-//             css::SILVER,
-//         ),
-//     ],
-// };
-
-// pub const FOOTER_AUTHER: header_footer::TextBlock = header_footer::TextBlock {
-//     position: header_footer::Position::BottomCenter,
-//     align_self: AlignSelf::End,        // セル内の下寄せ
-//     justify_self: JustifySelf::Center, // セル内の中央寄せ
-//     bg_color: Srgba::NONE,
-//     spans: &[(
-//         COPYRIGHT,
-//         ASSETS_FONT_ORBITRON_BLACK,
-//         PIXELS_PER_GRID * 0.5,
-//         css::TEAL,
-//     )],
-// };
-
-// pub const FOOTER_POWERED_BY: header_footer::TextBlock = header_footer::TextBlock {
-//     position: header_footer::Position::BottomRight,
-//     align_self: AlignSelf::End,     // セル内の下寄せ
-//     justify_self: JustifySelf::End, // セル内の右寄せ
-//     bg_color: Srgba::NONE,
-//     spans: &[
-//         (
-//             "Powered by ",
-//             ASSETS_FONT_ORBITRON_BLACK,
-//             PIXELS_PER_GRID * 0.5,
-//             css::TEAL,
-//         ),
-//         (
-//             "RUST",
-//             ASSETS_FONT_ORBITRON_BLACK,
-//             PIXELS_PER_GRID * 0.5,
-//             css::SILVER,
-//         ),
-//         (
-//             " & ",
-//             ASSETS_FONT_ORBITRON_BLACK,
-//             PIXELS_PER_GRID * 0.5,
-//             css::TEAL,
-//         ),
-//         (
-//             "BEVY ",
-//             ASSETS_FONT_ORBITRON_BLACK,
-//             PIXELS_PER_GRID * 0.5,
-//             css::SILVER,
-//         ),
-//     ],
-// };
-
-////////////////////////////////////////////////////////////////////////////////
-
-// おまけ(蟹)
-// pub const GRID_X_KANI: i32 = SCREEN_GRIDS_WIDTH - 4;
-// pub const GRID_Y_KANI: i32 = SCREEN_GRIDS_HEIGHT - 1;
-// pub const MAGNIFY_SPRITE_KANI: f32 = 0.9;
-// pub const COLOR_SPRITE_KANI: Color = Color::srgba(1.0, 1.0, 1.0, 0.6);
 
 ////////////////////////////////////////////////////////////////////////////////
 
