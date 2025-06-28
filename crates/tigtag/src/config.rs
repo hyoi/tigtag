@@ -90,7 +90,9 @@ pub const PRELOAD_ASSETS: &[&str] = &[
     ASSETS_FONT_PRESSSTART2P_REGULAR,
     ASSETS_FONT_ORBITRON_BLACK,
     ASSETS_SPRITE_KANI_DOTOWN,
-    // ASSETS_SPRITE_BRICK_WALL,
+    //============================
+    ASSETS_SPRITE_BRICK_WALL,
+    //============================
 ];
 
 // assets（フォント）
@@ -99,7 +101,9 @@ pub const ASSETS_FONT_ORBITRON_BLACK: &str = "font/Orbitron-Black.ttf";
 
 // assets（スプライト）
 pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "image/sprite/kani_DOTOWN.png";
-// pub const ASSETS_SPRITE_BRICK_WALL: &str = "image/sprite/brick_wall.png";
+//==============================================================================
+pub const ASSETS_SPRITE_BRICK_WALL: &str = "image/sprite/brick_wall.png";
+//==============================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -224,17 +228,34 @@ pub const FOOTER_POWERED_BY: header_footer::TextBlock = header_footer::TextBlock
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// おまけ(蟹)
-pub const GRID_X_KANI: i32 = SCREEN_GRIDS_WIDTH - 4;
-pub const GRID_Y_KANI: i32 = SCREEN_GRIDS_HEIGHT - 1;
-pub const MAGNIFY_SPRITE_KANI: f32 = 0.9;
-pub const COLOR_SPRITE_KANI: Color = Color::srgba(1.0, 1.0, 1.0, 0.6);
-
-////////////////////////////////////////////////////////////////////////////////
-
 // スプライト重なり
 // pub const DEPTH_SPRITE_DEBUG_GRID: f32 = 999.0; // 重なりの最大値
 pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0; // フッターの蟹アイコン
+
+//==============================================================================
+
+// pub const DEPTH_SPRITE_CHASER     : f32 = 700.0; //ゲームの敵機スプライト
+// pub const DEPTH_SPRITE_PLAYER     : f32 = 600.0; //ゲームの自機スプライト
+pub const DEPTH_SPRITE_DOT: f32 = 500.0; // ゲームのドットスプライト
+pub const DEPTH_SPRITE_BRICK_WALL: f32 = 400.0; // ゲームの壁スプライト
+
+//==============================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+
+// おまけ(蟹)
+pub const SPRITE_KANI_GRID_X: i32 = SCREEN_GRIDS_WIDTH - 4;
+pub const SPRITE_KANI_GRID_Y: i32 = SCREEN_GRIDS_HEIGHT - 1;
+pub const SPRITE_KANI_MAGNIFY: f32 = 0.9;
+pub const SPRITE_KANI_COLOR: Color = Color::srgba(1.0, 1.0, 1.0, 0.6);
+
+//==============================================================================
+
+// ドットのスプライトの情報
+pub const SPRITE_DOT_RADIUS: f32 = PIXELS_PER_GRID * 0.08;
+pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
+
+//==============================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
 

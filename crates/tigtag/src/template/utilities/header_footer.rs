@@ -80,9 +80,9 @@ pub fn spawn_header_footer(
     });
 
     // おまけ(蟹)
-    let custom_size = Some(GRID_CUSTOM_SIZE * MAGNIFY_SPRITE_KANI);
-    let color = COLOR_SPRITE_KANI;
-    let vec2 = (GRID_X_KANI, GRID_Y_KANI).to_vec2_of_screen();
+    let custom_size = Some(GRID_CUSTOM_SIZE * SPRITE_KANI_MAGNIFY);
+    let color = SPRITE_KANI_COLOR;
+    let vec2 = (SPRITE_KANI_GRID_X, SPRITE_KANI_GRID_Y).to_vec2_of_screen();
     let image = asset_svr.load(ASSETS_SPRITE_KANI_DOTOWN);
     cmds.spawn((
         Sprite {

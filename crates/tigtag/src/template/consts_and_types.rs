@@ -15,7 +15,7 @@ pub const GRIDS_Y_RANGE: Range<i32> = 0..SCREEN_GRIDS_HEIGHT;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//(i32,i32)型にメソッドを追加し、グリッド座標からピクセル座標への変換を容易にする
+// グリッド座標からピクセル座標へ変換するメソッドの追加
 pub trait GridToVec2
 {
     fn to_vec2_of_screen(&self) -> Vec2;
@@ -28,6 +28,13 @@ impl GridToVec2 for (i32, i32)
     fn to_vec2_of_screen(&self) -> Vec2
     {
         Vec2::new(self.0 as f32 + 0.5, -self.1 as f32 - 0.5) * PIXELS_PER_GRID
+    }
+}
+impl GridToVec2 for IVec2
+{
+    fn to_vec2_of_screen(&self) -> Vec2
+    {
+        Vec2::new(self.x as f32 + 0.5, -self.y as f32 - 0.5) * PIXELS_PER_GRID
     }
 }
 

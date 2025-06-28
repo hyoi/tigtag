@@ -8,7 +8,7 @@ impl Plugin for Schedule
 {
     fn build(&self, appl: &mut App)
     {
-        // 主ウィンドウの準備
+        // アプリの準備
         let window_plugin = WindowPlugin {
             primary_window: MAIN_WINDOW.clone(),
             ..default()
@@ -24,15 +24,18 @@ impl Plugin for Schedule
                 .set(ImagePlugin::default_nearest()), // ピクセルパーフェクト
         );
 
+        // Stateの初期化（DefaultPluginsの後に記述すること）
+        appl.init_state::<MyState>();
+
+        //----------------------------------------------------------------------
+        // Update
+        //----------------------------------------------------------------------
+
         // キー入力でアプリ終了
         appl.add_systems(Update, misc::app_close_on_key.run_if(not(WASM)));
 
         // フルスクリーン切換
         appl.add_systems(Update, misc::toggle_window_mode.run_if(not(WASM)));
-
-        // Stateの初期化
-        // ※前提条件：1) DefaultPluginsの後に記述すること。2) enumのDefaltを設定すること
-        appl.init_state::<MyState>();
     }
 }
 

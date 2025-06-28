@@ -18,6 +18,10 @@ impl Plugin for Schedule
 {
     fn build(&self, appl: &mut App)
     {
+        //----------------------------------------------------------------------
+        // MyState::LoadAssets
+        //----------------------------------------------------------------------
+
         // ロード中のアニメーション
         appl.add_systems(
             OnEnter(MyState::LoadAssets),
