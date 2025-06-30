@@ -78,19 +78,18 @@ pub fn spawn_sprite(
     };
 
     if SPRITE_OFF()
-    {   //三角形のメッシュを作る
+    {
+        // 三角形のメッシュを作る
         let radius = PIXELS_PER_GRID * PLAYER_SPRITE_SCALING;
-        let shape = RegularPolygon::new( radius, 3 ).mesh();
-        let quat = Quat::from_rotation_z( PI ); //News::South
-        cmds.spawn
-        (   (
-                Mesh2d( meshes.add( shape ) ),
-                MeshMaterial2d( materials.add( PLAYER_SPRITE_COLOR ) ),
-                Transform::from_translation( translation ).with_rotation( quat ),
-                PlayerTriangle, //マーカー
-                player, //データ
-            )
-        );
+        let shape = RegularPolygon::new(radius, 3).mesh();
+        let quat = Quat::from_rotation_z(PI); // News::South
+        cmds.spawn((
+            Mesh2d(meshes.add(shape)),
+            MeshMaterial2d(materials.add(PLAYER_SPRITE_COLOR)),
+            Transform::from_translation(translation).with_rotation(quat),
+            PlayerTriangle, // マーカー
+            player,         // データ
+        ));
     }
     else
     {
@@ -112,7 +111,7 @@ pub fn spawn_sprite(
         cmds.spawn((
             sprite,
             Transform::from_translation(translation),
-            player, //データ
+            player, // データ
         ));
     }
 
