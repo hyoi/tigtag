@@ -59,12 +59,9 @@ pub fn make_new_stage_data(
                 box_fill(IVec2::new(short_side, short_side), true);
             }
         }
-        else
+        else if MAP_GRIDS_WIDTH % 2 != 0
         {
-            if MAP_GRIDS_WIDTH % 2 != 0
-            {
-                box_fill(IVec2::new(short_side, short_side), true);
-            }
+            box_fill(IVec2::new(short_side, short_side), true);
         }
     }
 
@@ -101,10 +98,8 @@ pub fn spawn_sprite(
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) -> Result
 {
-    // 必須のResource
-    let mut map = opt_map.ok_or("Resource <Map> not found.")?;
-
     // 準備
+    let mut map = opt_map.ok_or("Resource <Map> not found.")?; // 必須のResource
     qry_entity.iter().for_each(|id| cmds.entity(id).despawn()); // 既存スプライトがあれば削除する
     map.remaining_dots = 0; // カウンターのゼロクリア
 

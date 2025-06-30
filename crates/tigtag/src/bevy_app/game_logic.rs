@@ -50,16 +50,17 @@ impl Plugin for Schedule
             .add_systems(Update, update_fps::<DisplayInfoFps>); // FPS表示の更新
 
         // アニメーション（ゲーム中もPAUSE中も）
-        // appl.add_systems
-        //     (   Update,
-        //         (   //スプライトシートアニメーション
-        //             animating_sprites::<player::Player>,
-        //             animating_sprites::<chasers::Chaser>,
+        appl.add_systems(
+            Update,
+            (
+                // スプライトシートアニメーション
+                animating_sprites::<Player>,
+                // animating_sprites::<chasers::Chaser>,
 
-        //             //チェイサーの回転(スプライトシートがOFFの場合)
-        //             chasers::rotate_chaser_shape.run_if( SPRITE_OFF ),
-        //         )
-        //     );
+                // チェイサーの回転(スプライトシートがOFFの場合)
+                // chasers::rotate_chaser_shape.run_if( SPRITE_OFF ),
+            ),
+        );
 
         // アプリ終了キーをフックして処理を挿入
         // appl.add_systems(
@@ -120,8 +121,8 @@ impl Plugin for Schedule
 
                     //スプライトのspawn
                     (   map::spawn_sprite,
-        //                 player::spawn_sprite,
-        //                 chasers::spawn_sprite,
+                        player::spawn_sprite,
+                        // chasers::spawn_sprite,
                     ),
                 )
                 .chain(), //実行順の固定
@@ -322,19 +323,33 @@ impl Plugin for Schedule
 ////////////////////////////////////////////////////////////////////////////////
 
 // キャラクターをアニメーションさせる
-// fn animating_sprites<T: Component + CharacterAnimation>
-// (   mut qry_target: Query<( &mut TextureAtlas, &mut T )>,
-//     time: Res<Time>,
-// )
-// {   for ( mut sprite, mut character ) in &mut qry_target
-//     {   if character.anime_timer_mut().tick( time.delta() ).just_finished()
-//         {   sprite.index += 1;
-//             let offset = character.sprite_sheet_offset( character.direction() );
-//             let frame  = character.sprite_sheet_frame();
-//             if sprite.index as u32 >= offset + frame { sprite.index = offset as usize }
-//         }
-//     }
-// }
+fn animating_sprites<T: Component<Mutability = Mutable> + CharacterAnimation>(
+    mut qry_sprite: Query<(&mut Sprite, &mut T)>,
+    time: Res<Time>,
+)
+{
+    for (mut sprite, mut character) in &mut qry_sprite
+    {
+        if character
+            .anime_timer_mut()
+            .tick(time.delta())
+            .just_finished()
+        {
+            if let Some(texture_atlas) = &mut sprite.texture_atlas
+            {
+                let index = &mut texture_atlas.index;
+                *index += 1;
+                let offset =
+                    character.sprite_sheet_offset(character.direction()) as usize;
+                let frame = character.sprite_sheet_frame() as usize;
+                if *index >= offset + frame
+                {
+                    *index = offset
+                }
+            }
+        }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

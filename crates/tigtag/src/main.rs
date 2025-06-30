@@ -1,7 +1,10 @@
 // external crates
 use bevy::{
     prelude::*,
-    ecs::error::{GLOBAL_ERROR_HANDLER, warn},
+    ecs::{
+        error::{GLOBAL_ERROR_HANDLER, warn},
+        component::Mutable,
+    },
     log::LogPlugin,
     window::{EnabledButtons, WindowMode /* Monitor */},
     color::palettes::*,
@@ -17,7 +20,7 @@ use bevy::{
     // },
 };
 use rand::prelude::*;
-// use rustc_hash::FxHashMap;
+use rustc_hash::FxHashMap;
 // use chrono::prelude::Local as time_local; //「Local」がbevyとバッティングするのでaliasを使う
 
 // standard library
@@ -26,7 +29,7 @@ use std::{
     ops::Range,
     ops::{Deref, DerefMut},
     ops::{Add /* AddAssign */},
-    // f32::consts::{PI, TAU},
+    f32::consts::{PI, /*TAU*/},
     // time::Duration,
 };
 

@@ -293,4 +293,158 @@ const ADJUST_MAP_ON_SCREEN: IVec2 = IVec2::new(0, 1);
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// 自キャラのComponent
+#[derive(Component)]
+pub struct Player
+{
+    pub grid: IVec2,      // 移動中は移動元の座標、停止中はその場の座標
+    pub next_grid: IVec2, // 移動中は移動先の座標、停止中はその場の座標
+    pub direction: News,  // 移動の向き
+    pub timer: Timer,     // 移動のタイマー
+    pub is_stop: bool,    // 移動停止フラグ
+    pub speedup: f32,     // スピードアップ係数
+    pub px_start: Vec2,   // 1フレーム時間に移動した微小区間の始点
+    pub px_end: Vec2,     // 1フレーム時間に移動した微小区間の終点
+    pub opt_fn_autodrive: Option<FnAutoDrive>, /* デモ時に自キャラの移動方向を決める関数 */
+    pub anime_timer: Timer,                    // キャラアニメーションのタイマー
+    pub sprite_sheet_frame: u32,               // キャラアニメーションのフレーム数
+    pub sprite_sheet_indexes: FxHashMap<News, u32>, /* キャラアニメーションの先頭位置(offset値) */
+}
+
+// 関数ポインタ型(デモ時の自走自キャラの移動方向を決める関数)
+type FnAutoDrive =
+    fn(&Player, Query<&Chaser>, Res<Map>, Res<DemoMapParams>, &[News]) -> News;
+
+impl Default for Player
+{
+    fn default() -> Self
+    {
+        Self {
+            grid: IVec2::default(),
+            next_grid: IVec2::default(),
+            direction: News::South,
+            timer: Timer::from_seconds(PLAYER_TIME_PER_GRID, TimerMode::Once),
+            is_stop: true,
+            speedup: 1.0,
+            px_start: Vec2::default(),
+            px_end: Vec2::default(),
+            opt_fn_autodrive: None,
+            anime_timer: Timer::from_seconds(
+                ANIME_TIMER_PLAYER,
+                TimerMode::Repeating,
+            ),
+            sprite_sheet_frame: SPRITE_SHEET_COLS_PLAYER,
+            sprite_sheet_indexes: (*SPRITE_SHEET_IDXS_PLAYER).clone(),
+        }
+    }
+}
+
+// 自キャラの設定値
+pub const PLAYER_TIME_PER_GRID: f32 = 0.15; // 0.09; //１グリッド進むために必要な時間
+const PLAYER_SPEED: f32 = PIXELS_PER_GRID / PLAYER_TIME_PER_GRID; // 速度
+pub const PLAYER_SPRITE_SCALING: f32 = 0.4; // primitive shape表示時の縮小係数
+pub const PLAYER_SPRITE_COLOR: Color = Color::Srgba(css::YELLOW);
+
+// スプライトシートを使ったアニメーションの情報
+pub const SPRITE_SHEET_SIZE_PLAYER: UVec2 = UVec2::new(8, 8);
+pub const SPRITE_SHEET_COLS_PLAYER: u32 = 4;
+pub const SPRITE_SHEET_ROWS_PLAYER: u32 = 4;
+pub static SPRITE_SHEET_IDXS_PLAYER: LazyLock<FxHashMap<News, u32>> =
+    LazyLock::new(|| {
+        FxHashMap::from_iter([
+            (News::North, 0),
+            (News::East, 4),
+            (News::West, 8),
+            (News::South, 12),
+        ])
+    });
+pub const ANIME_TIMER_PLAYER: f32 = 0.15;
+
+////////////////////////////////////////////////////////////////////////////////
+
+// 敵キャラのComponent
+#[derive(Component)]
+pub struct Chaser
+{
+    pub grid: IVec2,      // 移動中は移動元の座標、停止中はその場の座標
+    pub next_grid: IVec2, // 移動中は移動先の座標、停止中はその場の座標
+    pub direction: News,  // 移動の向き
+    pub timer: Timer,     // 移動のタイマー
+    pub is_stop: bool,    // 移動停止フラグ
+    pub speedup: f32, // スピードアップ係数(1.0未満なら減速、1.0より大きいと増速)
+    pub px_start: Vec2, // 1フレーム時間に移動した微小区間の始点
+    pub px_end: Vec2, // 1フレーム時間に移動した微小区間の終点
+    pub opt_fn_autochase: Option<FnAutoChase>, // 敵キャラの移動方向を決める関数
+    pub color: Color, // 敵キャラの表示色
+    pub anime_timer: Timer, // アニメーションのタイマー
+    pub sprite_sheet_frame: u32, // アニメーションのフレーム数
+    pub sprite_sheet_indexes: FxHashMap<News, u32>, /* アニメーションの先頭位置(offset値) */
+}
+
+// 関数ポインタ型(敵キャラの移動方向を決める関数)
+type FnAutoChase = fn(&mut Chaser, &Player, &[News]) -> News;
+
+// impl Default for Chaser
+// {   fn default() -> Self
+//     {   Self
+//         {   grid     : IVec2::default(),
+//             next_grid: IVec2::default(),
+//             direction: News::South,
+//             timer    : Timer::from_seconds( CHASER_TIME_PER_GRID, TimerMode::Once ),
+//             is_stop  : true,
+//             speedup  : 1.0,
+//             px_start : Vec2::default(),
+//             px_end   : Vec2::default(),
+//             opt_fn_autochase: None,
+//             color    : Color::NONE,
+//             anime_timer: Timer::from_seconds( ANIME_TIMER_CHASER, TimerMode::Repeating ),
+//             sprite_sheet_frame: SPRITE_SHEET_COLS_CHASER,
+//             sprite_sheet_indexes: ( *SPRITE_SHEET_IDXS_CHASER ).clone(),
+//         }
+//     }
+// }
+
+////////////////////////////////////////////////////////////////////////////////
+
+// demo用のマップ情報Resource
+#[derive(Resource, Default)]
+pub struct DemoMapParams
+{
+    dots_rect: IVec2Rect, // dotsを内包する最小の矩形
+    dots_sum_x: [i32; MAP_GRIDS_WIDTH as usize], // 列に残っているdotsを数えた配列
+    dots_sum_y: [i32; MAP_GRIDS_HEIGHT as usize], // 行に残っているdotsを数えた配列
+}
+
+#[derive(Default)]
+struct IVec2Rect
+{
+    min: IVec2,
+    max: IVec2,
+}
+
+// impl DemoMapParams
+// {   pub fn dots_sum_x    ( &    self, x: i32 ) ->      i32 {      self.dots_sum_x[ x as usize ] }
+//     pub fn dots_sum_x_mut( &mut self, x: i32 ) -> &mut i32 { &mut self.dots_sum_x[ x as usize ] }
+//     pub fn dots_sum_y    ( &    self, y: i32 ) ->      i32 {      self.dots_sum_y[ y as usize ] }
+//     pub fn dots_sum_y_mut( &mut self, y: i32 ) -> &mut i32 { &mut self.dots_sum_y[ y as usize ] }
+
+//     pub fn dots_rect_min    ( &    self ) ->       IVec2 {      self.dots_rect.min }
+//     pub fn dots_rect_min_mut( &mut self ) ->  &mut IVec2 { &mut self.dots_rect.min }
+//     pub fn dots_rect_max    ( &    self ) ->       IVec2 {      self.dots_rect.max }
+//     pub fn dots_rect_max_mut( &mut self ) ->  &mut IVec2 { &mut self.dots_rect.max }
+// }
+
+////////////////////////////////////////////////////////////////////////////////
+
+// スプライトシートでアニメーションするためのトレイト
+pub trait CharacterAnimation
+{
+    fn anime_timer_mut(&mut self) -> &mut Timer;
+    fn sprite_sheet_frame(&self) -> u32;
+    fn sprite_sheet_offset(&self, news: News) -> u32;
+    fn direction(&self) -> News;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // End of code.
