@@ -139,18 +139,21 @@ pub const CHOICE_WAY_PINK: Option<FnAutoChase> = None; // Some( choice_way_pink 
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 敵キャラ（正方形の場合）のスプライトを回転させる
-// pub fn rotate_chaser_shape
-// (   mut qry_chaser: Query<&mut Transform, With<Chaser>>,
-//     time: Res<Time>,
-// )
-// {   let time_delta = time.delta().as_secs_f32();
-//     let radian = TAU * time_delta;
-//     let quat = Quat::from_rotation_z( radian );
+// チェイサーのスプライトを回転させる（SPRITE OFFの場合）
+pub fn rotate_chaser_shape(
+    mut qry_chaser: Query<&mut Transform, With<Chaser>>,
+    time: Res<Time>,
+)
+{
+    let time_delta = time.delta().as_secs_f32();
+    let radian = TAU * time_delta;
+    let quat = Quat::from_rotation_z(radian);
 
-//     //回転させる
-//     qry_chaser.iter_mut().for_each( | mut transform | transform.rotate( quat ) );
-// }
+    // 回転させる
+    qry_chaser
+        .iter_mut()
+        .for_each(|mut transform| transform.rotate(quat));
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

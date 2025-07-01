@@ -10,7 +10,7 @@ pub use player::*;
 mod chasers; // チェイサー
 pub use chasers::*;
 
-mod common; //共通
+mod common; // 共通
 pub use common::*;
 
 // End of code.

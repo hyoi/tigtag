@@ -49,15 +49,14 @@ impl Plugin for Schedule
             .insert_resource(DisplayInfoFps(bottomleft, index)) // 表示位置の指定（Resource）
             .add_systems(Update, update_fps::<DisplayInfoFps>); // FPS表示の更新
 
-        // アニメーション（ゲーム中もPAUSE中も）
+        // スプライトシートアニメーション（ゲーム中もPAUSE中も）
         appl.add_systems(
             Update,
             (
-                // スプライトシートアニメーション
-                animating_sprites::<Player>,
-                animating_sprites::<Chaser>,
-                // チェイサーの回転(スプライトシートがOFFの場合)
-                // chasers::rotate_chaser_shape.run_if( SPRITE_OFF ),
+                animating_sprites::<Player>, // プレイヤー
+                animating_sprites::<Chaser>, // チェイサー
+                chasers::rotate_chaser_shape // チェイサーの回転
+                    .run_if(SPRITE_OFF), // スプライトシートがOFFの場合
             ),
         );
 
