@@ -1,131 +1,141 @@
-// use super::*;
+use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // スプライトシートでアニメーションするためのトレイト実装
-// impl CharacterAnimation for Chaser
-// {   fn anime_timer_mut( &mut self ) -> &mut Timer
-//     {   &mut self.anime_timer
-//     }
-//     fn sprite_sheet_frame( &self ) -> u32
-//     {   self.sprite_sheet_frame
-//     }
-//     fn sprite_sheet_offset( &self, news: News ) -> u32
-//     {   *self.sprite_sheet_indexes.get( &news ).unwrap()
-//     }
-//     fn direction( &self ) -> News
-//     {   self.direction
-//     }
-// }
+impl CharacterAnimation for Chaser
+{
+    fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime_timer }
+    fn sprite_sheet_frame(&self) -> u32 { self.sprite_sheet_frame }
+    fn sprite_sheet_offset(&self, news: News) -> u32
+    {
+        *self.sprite_sheet_indexes.get(&news).unwrap()
+    }
+    fn direction(&self) -> News { self.direction }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 敵キャラの設定値
-// pub const CHASER_TIME_PER_GRID: f32 = 0.20;//0.13; //１グリッド進むために必要な時間
-// const CHASER_SPEED: f32 = PIXELS_PER_GRID / CHASER_TIME_PER_GRID; //速度
-// const CHASER_SPRITE_SCALING: f32 = 0.5; //primitive shape表示時の縮小係数
-// const CHASER_ACCEL: f32 = 0.4; //スピードアップの割増
-// const CHASER_START_POSITION: &[ IVec2 ] = //スタート座標
-// &[  IVec2::new( 1    , 1     ),
-//     IVec2::new( 1    , MAX_Y ),
-//     IVec2::new( MAX_X, 1     ),
-//     IVec2::new( MAX_X, MAX_Y ),
-// ];
-// const MAX_X: i32 = map::MAP_GRIDS_WIDTH  - 2;
-// const MAX_Y: i32 = map::MAP_GRIDS_HEIGHT - 2;
+// チェイサーをspawnする
+pub fn spawn_sprite(
+    opt_record: Option<Res<Record>>,
+    qry_entity: Query<Entity, With<Chaser>>,
+    mut cmds: Commands,
+    asset_svr: Res<AssetServer>,
+    mut texture_atlases_layout: ResMut<Assets<TextureAtlasLayout>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) -> Result
+{
+    // 準備
+    let record = opt_record.ok_or("Resource <Record> not found.")?; // 必須のResource
+    qry_entity.iter().for_each(|id| cmds.entity(id).despawn()); // 既存スプライトがあれば削除する
 
-// スプライトシートを使ったアニメーションの情報
-// const  SPRITE_SHEET_SIZE_CHASER: UVec2 = UVec2::new( 8, 8 );
-// const  SPRITE_SHEET_COLS_CHASER: u32 = 4;
-// const  SPRITE_SHEET_ROWS_CHASER: u32 = 4;
-// static SPRITE_SHEET_IDXS_CHASER: LazyLock<HashMap<News,u32>> = LazyLock::new
-// (   ||
-//     HashMap::from
-//     (   [   ( News::North,  0 ),
-//             ( News::East ,  4 ),
-//             ( News::West ,  8 ),
-//             ( News::South, 12 ),
-//         ]
-//     )
-// );
-// const ANIME_TIMER_CHASER: f32 = 0.15;
+    // 敵キャラをマップの四隅に配置する
+    (0..)
+        .zip(CHASER_START_POSITION)
+        .for_each(|(i, start_grid)| {
+            // ステージ数を4で割ったあまりをindex（0,1,2,3）にする
+            let index = ((record.stage() - 1 + i) % 4) as usize;
+            let (color, opt_fn_autochase, asset_file) = CHASERS_SPRITE_INFO[index];
 
-// 各色ごとの情報（色と移動方向の決定関数とassetファイル名）
-// const CHASERS_SPRITE_INFO: &[ ( Color, Option<FnAutoChase>, &str ) ] =
-// &[  ( Color::RED,   Some ( choice_way_red   ), ASSETS_SPRITE_SHEET_CHASER_RED   ),
-//     ( Color::GREEN, Some ( choice_way_green ), ASSETS_SPRITE_SHEET_CHASER_GREEN ),
-//     ( Color::PINK,  Some ( choice_way_pink  ), ASSETS_SPRITE_SHEET_CHASER_PINK  ),
-//     ( Color::BLUE,  Some ( choice_way_blue  ), ASSETS_SPRITE_SHEET_CHASER_BLUE  ),
-// ];
+            // 初期位置
+            let vec2 = start_grid.to_vec2_on_game_map();
+            let translation = vec2.extend(DEPTH_SPRITE_CHASER);
+
+            // Componentを初期化する
+            let chaser = Chaser {
+                grid: *start_grid,
+                next_grid: *start_grid,
+                px_start: vec2,
+                px_end: vec2,
+                color,
+                opt_fn_autochase,
+                ..default()
+            };
+
+            if SPRITE_OFF()
+            {
+                // 正方形のメッシュ
+                let radius = PIXELS_PER_GRID * CHASER_SPRITE_SCALING;
+                let shape = RegularPolygon::new(radius, 4).mesh();
+                cmds.spawn((
+                    Mesh2d(meshes.add(shape)),
+                    MeshMaterial2d(materials.add(color)),
+                    Transform::from_translation(translation),
+                    chaser, // データ
+                ));
+            }
+            else
+            {
+                // アニメーションするスプライトをspawnする
+                let custom_size = Some(GRID_CUSTOM_SIZE);
+                let layout =
+                    texture_atlases_layout.add(TextureAtlasLayout::from_grid(
+                        SPRITE_SHEET_SIZE_CHASER,
+                        SPRITE_SHEET_COLS_CHASER,
+                        SPRITE_SHEET_ROWS_CHASER,
+                        None,
+                        None,
+                    ));
+                let index = chaser.sprite_sheet_offset(chaser.direction()) as usize;
+                let mut sprite = Sprite::from_atlas_image(
+                    asset_svr.load(asset_file),
+                    TextureAtlas { layout, index },
+                );
+                sprite.custom_size = custom_size;
+                cmds.spawn((
+                    sprite,
+                    Transform::from_translation(translation),
+                    chaser, // データ
+                ));
+            }
+        });
+
+    Ok(())
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 敵キャラをspawnする
-// pub fn spawn_sprite
-// (   qry_chaser: Query<Entity, With<Chaser>>,
-//     opt_record: Option<Res<Record>>,
-//     mut cmds: Commands,
-//     asset_svr: Res<AssetServer>,
-//     mut texture_atlases_layout: ResMut<Assets<TextureAtlasLayout>>,
-// )
-// {   let Some ( record ) = opt_record else { return };
+// 進む方向を決める(赤)
+pub const CHOICE_WAY_RED: Option<FnAutoChase> = None; // Some( choice_way_red );
+                                                      // fn choice_way_red( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
+                                                      // {   if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
+                                                      //     if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
+                                                      //     if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
+                                                      //     if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
+                                                      //     sides[ rand::rng().random_range( 0..sides.len() ) ]
+                                                      // }
 
-//     //スプライトがあれば削除する
-//     qry_chaser.iter().for_each( | id | cmds.entity( id ).despawn_recursive() );
+// 進む方向を決める(青)
+pub const CHOICE_WAY_BLUE: Option<FnAutoChase> = None; // Some( choice_way_blue );
+                                                       // fn choice_way_blue( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
+                                                       // {   if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
+                                                       //     if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
+                                                       //     if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
+                                                       //     if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
+                                                       //     sides[ rand::rng().random_range( 0..sides.len() ) ]
+                                                       // }
 
-//     //敵キャラをマップの四隅に配置する
-//     ( 0.. ).zip( CHASER_START_POSITION ).for_each
-//     (   | ( i, start_grid ) |
-//         {   //ステージ数を4で割ったあまりをindex（0,1,2,3）にする
-//             let index = ( ( record.stage() - 1 + i ) % 4 ) as usize;
-//             let ( color, opt_fn_autochase, asset_file ) = CHASERS_SPRITE_INFO[ index ];
+// 進む方向を決める(緑)
+pub const CHOICE_WAY_GREEN: Option<FnAutoChase> = None; // Some( choice_way_green );
+                                                        // fn choice_way_green( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
+                                                        // {   if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
+                                                        //     if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
+                                                        //     if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
+                                                        //     if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
+                                                        //     sides[ rand::rng().random_range( 0..sides.len() ) ]
+                                                        // }
 
-//             //初期位置
-//             let vec2 = start_grid.to_vec2_on_game_map();
-//             let translation = vec2.extend( DEPTH_SPRITE_CHASER );
-
-//             //Componentを初期化する
-//             let chaser = Chaser
-//             {   grid     : *start_grid,
-//                 next_grid: *start_grid,
-//                 px_start : vec2,
-//                 px_end   : vec2,
-//                 color,
-//                 opt_fn_autochase,
-//                 ..default()
-//             };
-
-//             if SPRITE_OFF()
-//             {   //正方形のメッシュ
-//                 let custom_size = Some ( GRID_CUSTOM_SIZE * CHASER_SPRITE_SCALING );
-//                 cmds.spawn( ( SpriteBundle::default(), chaser ) )
-//                 .insert( Sprite { color, custom_size, ..default() } )
-//                 .insert( Transform::from_translation( translation ) )
-//                 .insert( TextureAtlas::default() ) //move_sprite()のqry_chaserの検索条件を満たすためのdummy
-//                 ;
-//             }
-//             else
-//             {   //アニメーションするスプライトをspawnする
-//                 let custom_size = Some( GRID_CUSTOM_SIZE );
-//                 let layout = texture_atlases_layout.add
-//                 (   TextureAtlasLayout::from_grid
-//                     (   SPRITE_SHEET_SIZE_CHASER,
-//                         SPRITE_SHEET_COLS_CHASER,
-//                         SPRITE_SHEET_ROWS_CHASER,
-//                         None, None
-//                     )
-//                 );
-//                 let index = chaser.sprite_sheet_offset( chaser.direction() ) as usize;
-//                 cmds.spawn( ( SpriteBundle::default(), chaser ) )
-//                 .insert( Sprite { custom_size, ..default() } )
-//                 .insert( asset_svr.load( asset_file ) as Handle<Image> )
-//                 .insert( TextureAtlas { layout, index } )
-//                 .insert( Transform::from_translation( translation ) )
-//                 ;
-//             }
-//         }
-//     );
-// }
+// 進む方向を決める(ピンク)
+pub const CHOICE_WAY_PINK: Option<FnAutoChase> = None; // Some( choice_way_pink );
+                                                       // fn choice_way_pink( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
+                                                       // {   if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
+                                                       //     if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
+                                                       //     if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
+                                                       //     if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
+                                                       //     sides[ rand::rng().random_range( 0..sides.len() ) ]
+                                                       // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -247,44 +257,6 @@
 //             chaser.speedup += CHASER_ACCEL;
 //         }
 //     }
-// }
-
-////////////////////////////////////////////////////////////////////////////////
-
-// 進む方向を決める(赤)
-// fn choice_way_red( chaser: &mut Chaser, player: &player::Player, sides: &[ News ] ) -> News
-// {   if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
-//     if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
-//     if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
-//     if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
-//     sides[ rand::thread_rng().gen_range( 0..sides.len() ) ]
-// }
-
-// 進む方向を決める(青)
-// fn choice_way_blue( chaser: &mut Chaser, player: &player::Player, sides: &[ News ] ) -> News
-// {   if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
-//     if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
-//     if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
-//     if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
-//     sides[ rand::thread_rng().gen_range( 0..sides.len() ) ]
-// }
-
-// 進む方向を決める(緑)
-// fn choice_way_green( chaser: &mut Chaser, player: &player::Player, sides: &[ News ] ) -> News
-// {   if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
-//     if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
-//     if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
-//     if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
-//     sides[ rand::thread_rng().gen_range( 0..sides.len() ) ]
-// }
-
-// 進む方向を決める(ピンク)
-// fn choice_way_pink( chaser: &mut Chaser, player: &player::Player, sides: &[ News ] ) -> News
-// {   if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
-//     if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
-//     if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
-//     if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
-//     sides[ rand::thread_rng().gen_range( 0..sides.len() ) ]
 // }
 
 ////////////////////////////////////////////////////////////////////////////////

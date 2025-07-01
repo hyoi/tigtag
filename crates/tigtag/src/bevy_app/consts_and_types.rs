@@ -293,7 +293,7 @@ const ADJUST_MAP_ON_SCREEN: IVec2 = IVec2::new(0, 1);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 自キャラのComponent
+// プレイヤーのComponent
 #[derive(Component)]
 pub struct Player
 {
@@ -311,7 +311,7 @@ pub struct Player
     pub sprite_sheet_indexes: FxHashMap<News, u32>, /* キャラアニメーションの先頭位置(offset値) */
 }
 
-// 関数ポインタ型(デモ時の自走自キャラの移動方向を決める関数)
+// 関数ポインタ型(デモ時の自走プレイヤーの移動方向を決める関数)
 type FnAutoDrive =
     fn(&Player, Query<&Chaser>, Res<Map>, Res<DemoMapParams>, &[News]) -> News;
 
@@ -339,9 +339,9 @@ impl Default for Player
     }
 }
 
-// 自キャラの設定値
+// プレイヤーの設定値
 pub const PLAYER_TIME_PER_GRID: f32 = 0.15; // 0.09; //１グリッド進むために必要な時間
-const PLAYER_SPEED: f32 = PIXELS_PER_GRID / PLAYER_TIME_PER_GRID; // 速度
+                                            // const PLAYER_SPEED: f32 = PIXELS_PER_GRID / PLAYER_TIME_PER_GRID; // 速度
 pub const PLAYER_SPRITE_SCALING: f32 = 0.4; // primitive shape表示時の縮小係数
 pub const PLAYER_SPRITE_COLOR: Color = Color::Srgba(css::YELLOW);
 
@@ -362,7 +362,7 @@ pub const ANIME_TIMER_PLAYER: f32 = 0.15;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 敵キャラのComponent
+// チェイサーのComponent
 #[derive(Component)]
 pub struct Chaser
 {
@@ -382,27 +382,87 @@ pub struct Chaser
 }
 
 // 関数ポインタ型(敵キャラの移動方向を決める関数)
-type FnAutoChase = fn(&mut Chaser, &Player, &[News]) -> News;
+pub type FnAutoChase = fn(&mut Chaser, &Player, &[News]) -> News;
 
-// impl Default for Chaser
-// {   fn default() -> Self
-//     {   Self
-//         {   grid     : IVec2::default(),
-//             next_grid: IVec2::default(),
-//             direction: News::South,
-//             timer    : Timer::from_seconds( CHASER_TIME_PER_GRID, TimerMode::Once ),
-//             is_stop  : true,
-//             speedup  : 1.0,
-//             px_start : Vec2::default(),
-//             px_end   : Vec2::default(),
-//             opt_fn_autochase: None,
-//             color    : Color::NONE,
-//             anime_timer: Timer::from_seconds( ANIME_TIMER_CHASER, TimerMode::Repeating ),
-//             sprite_sheet_frame: SPRITE_SHEET_COLS_CHASER,
-//             sprite_sheet_indexes: ( *SPRITE_SHEET_IDXS_CHASER ).clone(),
-//         }
-//     }
-// }
+impl Default for Chaser
+{
+    fn default() -> Self
+    {
+        Self {
+            grid: IVec2::default(),
+            next_grid: IVec2::default(),
+            direction: News::South,
+            timer: Timer::from_seconds(CHASER_TIME_PER_GRID, TimerMode::Once),
+            is_stop: true,
+            speedup: 1.0,
+            px_start: Vec2::default(),
+            px_end: Vec2::default(),
+            opt_fn_autochase: None,
+            color: Color::NONE,
+            anime_timer: Timer::from_seconds(
+                ANIME_TIMER_CHASER,
+                TimerMode::Repeating,
+            ),
+            sprite_sheet_frame: SPRITE_SHEET_COLS_CHASER,
+            sprite_sheet_indexes: (*SPRITE_SHEET_IDXS_CHASER).clone(),
+        }
+    }
+}
+
+// 敵キャラの設定値
+pub const CHASER_START_POSITION: &[IVec2] = // スタート座標
+    &[
+        IVec2::new(1, 1),
+        IVec2::new(1, MAX_Y),
+        IVec2::new(MAX_X, 1),
+        IVec2::new(MAX_X, MAX_Y),
+    ];
+const MAX_X: i32 = MAP_GRIDS_WIDTH - 2;
+const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
+
+// 各色ごとの情報（色と移動方向の決定関数とassetファイル名）
+pub const CHASERS_SPRITE_INFO: &[(Color, Option<FnAutoChase>, &str)] = &[
+    (
+        Color::Srgba(css::RED),
+        chasers::CHOICE_WAY_RED,
+        ASSETS_SPRITE_SHEET_CHASER_RED,
+    ),
+    (
+        Color::Srgba(css::GREEN),
+        chasers::CHOICE_WAY_GREEN,
+        ASSETS_SPRITE_SHEET_CHASER_GREEN,
+    ),
+    (
+        Color::Srgba(css::PINK),
+        chasers::CHOICE_WAY_PINK,
+        ASSETS_SPRITE_SHEET_CHASER_PINK,
+    ),
+    (
+        Color::Srgba(css::BLUE),
+        chasers::CHOICE_WAY_BLUE,
+        ASSETS_SPRITE_SHEET_CHASER_BLUE,
+    ),
+];
+
+pub const CHASER_TIME_PER_GRID: f32 = 0.20; // 0.13; //１グリッド進むために必要な時間
+                                            // const CHASER_SPEED: f32 = PIXELS_PER_GRID / CHASER_TIME_PER_GRID; //速度
+pub const CHASER_SPRITE_SCALING: f32 = 0.35; // primitive shape表示時の縮小係数
+                                             // const CHASER_ACCEL: f32 = 0.4; //スピードアップの割増
+
+// スプライトシートを使ったアニメーションの情報
+pub const SPRITE_SHEET_SIZE_CHASER: UVec2 = UVec2::new(8, 8);
+pub const SPRITE_SHEET_COLS_CHASER: u32 = 4;
+pub const SPRITE_SHEET_ROWS_CHASER: u32 = 4;
+static SPRITE_SHEET_IDXS_CHASER: LazyLock<FxHashMap<News, u32>> =
+    LazyLock::new(|| {
+        FxHashMap::from_iter([
+            (News::North, 0),
+            (News::East, 4),
+            (News::West, 8),
+            (News::South, 12),
+        ])
+    });
+const ANIME_TIMER_CHASER: f32 = 0.15;
 
 ////////////////////////////////////////////////////////////////////////////////
 

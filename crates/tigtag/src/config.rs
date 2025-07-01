@@ -93,10 +93,10 @@ pub const PRELOAD_ASSETS: &[&str] = &[
     //============================
     ASSETS_SPRITE_BRICK_WALL,
     ASSETS_SPRITE_SHEET_PLAYER,
-    // ASSETS_SPRITE_SHEET_CHASER_RED,
-    // ASSETS_SPRITE_SHEET_CHASER_GREEN,
-    // ASSETS_SPRITE_SHEET_CHASER_BLUE,
-    // ASSETS_SPRITE_SHEET_CHASER_PINK,
+    ASSETS_SPRITE_SHEET_CHASER_RED,
+    ASSETS_SPRITE_SHEET_CHASER_GREEN,
+    ASSETS_SPRITE_SHEET_CHASER_BLUE,
+    ASSETS_SPRITE_SHEET_CHASER_PINK,
     // ASSETS_FONT_REGGAEONE_REGULAR,
     // ASSETS_SOUND_BEEP,
     //============================
@@ -116,10 +116,13 @@ pub const ASSETS_SPRITE_BRICK_WALL: &str = "image/sprite/brick_wall.png";
 
 // assets（スプライトシート）
 pub const ASSETS_SPRITE_SHEET_PLAYER: &str = "image/sprite_sheet/player.png";
-// pub const ASSETS_SPRITE_SHEET_CHASER_RED  : &str = "image/sprite_sheet/chaser_red.png";
-// pub const ASSETS_SPRITE_SHEET_CHASER_GREEN: &str = "image/sprite_sheet/chaser_green.png";
-// pub const ASSETS_SPRITE_SHEET_CHASER_BLUE : &str = "image/sprite_sheet/chaser_blue.png";
-// pub const ASSETS_SPRITE_SHEET_CHASER_PINK : &str = "image/sprite_sheet/chaser_pink.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_RED: &str = "image/sprite_sheet/chaser_red.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_GREEN: &str =
+    "image/sprite_sheet/chaser_green.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_BLUE: &str =
+    "image/sprite_sheet/chaser_blue.png";
+pub const ASSETS_SPRITE_SHEET_CHASER_PINK: &str =
+    "image/sprite_sheet/chaser_pink.png";
 
 // assets（サウンド）
 // pub const ASSETS_SOUND_BEEP: &str = "audio/sound/beep.ogg";
@@ -254,10 +257,10 @@ pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0; // フッターの蟹アイコ�
 
 //==============================================================================
 
-// pub const DEPTH_SPRITE_CHASER     : f32 = 700.0; //ゲームの敵機スプライト
-pub const DEPTH_SPRITE_PLAYER: f32 = 600.0; // ゲームのプレイヤーのスプライト
-pub const DEPTH_SPRITE_DOT: f32 = 500.0; // ゲームのドットスプライト
-pub const DEPTH_SPRITE_BRICK_WALL: f32 = 400.0; // ゲームの壁スプライト
+pub const DEPTH_SPRITE_CHASER: f32 = 700.0; // チェイサーのスプライト
+pub const DEPTH_SPRITE_PLAYER: f32 = 600.0; // プレイヤーのスプライト
+pub const DEPTH_SPRITE_DOT: f32 = 500.0; // ドットスプライト
+pub const DEPTH_SPRITE_BRICK_WALL: f32 = 400.0; // 壁スプライト
 
 //==============================================================================
 

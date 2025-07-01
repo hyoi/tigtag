@@ -55,8 +55,7 @@ impl Plugin for Schedule
             (
                 // スプライトシートアニメーション
                 animating_sprites::<Player>,
-                // animating_sprites::<chasers::Chaser>,
-
+                animating_sprites::<Chaser>,
                 // チェイサーの回転(スプライトシートがOFFの場合)
                 // chasers::rotate_chaser_shape.run_if( SPRITE_OFF ),
             ),
@@ -122,7 +121,7 @@ impl Plugin for Schedule
                     //スプライトのspawn
                     (   map::spawn_sprite,
                         player::spawn_sprite,
-                        // chasers::spawn_sprite,
+                        chasers::spawn_sprite,
                     ),
                 )
                 .chain(), //実行順の固定
