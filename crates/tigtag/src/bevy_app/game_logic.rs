@@ -18,17 +18,20 @@ impl Plugin for Schedule
         //----------------------------------------------------------------------
 
         // Resource
-        appl.init_resource::<Record>() //ゲームの成績
-            .init_resource::<Map>()    //ステージのマップ
-        //     .init_resource::<player::InputDirection>(); //プレイヤーの入力(十字方向)
-        ;
+        appl.init_resource::<Record>() // ゲームの成績
+            .init_resource::<Map>() // ステージのマップ
+            .init_resource::<player::InputDirection>() // プレイヤーの入力(十字方向)
+            .insert_resource(player::KeyMap(FxHashMap::from_iter(KEY_MAP)))
+            .insert_resource(player::PadMap(FxHashMap::from_iter(PAD_MAP)));
 
         // Event
-        // appl.add_event::<EventClear>()  //ステージクリアの伝達
-        //     .add_event::<EventOver>()   //ゲームオーバーの伝達
-        //     .add_event::<EventEatDot>() //スコアリングの伝達
-        //     .add_event::<EventTimerPlayer>()  //自キャラ移動タイマーのfinishedの伝達
-        //     .add_event::<EventTimerChasers>(); //敵キャラ移動タイマーのfinishedの伝達
+        appl
+            .add_event::<EventTimerPlayer>()  //プレイヤー移動タイマーのfinishedの伝達
+            // .add_event::<EventClear>()  //ステージクリアの伝達
+            // .add_event::<EventOver>()   //ゲームオーバーの伝達
+            // .add_event::<EventEatDot>() //スコアリングの伝達
+            // .add_event::<EventTimerChasers>() //敵キャラ移動タイマーのfinishedの伝達
+            ;
 
         // plugin
         // appl.add_plugins( header::Schedule ) //ヘッダー更新(Stage、Score、HiScore)
@@ -122,6 +125,8 @@ impl Plugin for Schedule
                         player::spawn_sprite,
                         chasers::spawn_sprite,
                     ),
+                    //for DEBUG
+                    change_state_to::<MainLoop>, //DEBUG後に削除すること
                 )
                 .chain(), //実行順の固定
 /*
@@ -154,29 +159,36 @@ impl Plugin for Schedule
         //----------------------------------------------------------------------
 
         // メインループ
-        // appl.add_systems
-        // (   Update,
-        //     (   //ループ脱出条件
+        appl.add_systems(
+            Update,
+            (
+                // ループ脱出条件
         //         detection::scoring_and_stage_clear, //スコアリング＆クリア判定
         //         change_state_to::<StageClear>.run_if( on_event::<EventClear>() ),
 
         //         detection::collisions_and_gameover, //衝突判定
         //         change_state_to::<GameOver>.run_if( on_event::<EventOver>() ),
 
-        //         //スプライトの移動
-        //         (   //自キャラ
-        //             (   player::catch_input_direction,
-        //                 player::move_sprite,
-        //             )
-        //             .chain(), //実行順の固定
+                //スプライトの移動
+                (
+                    // 自キャラ
+                    //             (   player::catch_input_direction,
+                    (
+        //                 // Resourceに保存した極座標値を更新する
+                        player::input_from_keyboard, // キー
+        //                 orbit_camera::input_from_gamepad,  // ゲームパッド
+                        //             ),
+                        player::move_sprite,
+                    )
+                        .chain(), /* 実行順の固定 */
 
-        //             //敵キャラ
-        //             chasers::move_sprite,
-        //         )
-        //     )
-        //     .chain() //実行順の固定
-        //     .run_if( in_state( MyState::MainLoop ) )
-        // );
+                                  /*             //敵キャラ
+                                   *             chasers::move_sprite, */
+                )
+            )
+                .chain() // 実行順の固定
+                .run_if(in_state(MyState::MainLoop)),
+        );
 
         //----------------------------------------------------------------------
         // MyState::StageClear

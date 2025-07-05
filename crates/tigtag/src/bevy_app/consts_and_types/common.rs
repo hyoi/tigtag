@@ -65,24 +65,44 @@ impl Add<News> for IVec2
     {
         match news
         {
-            News::North =>
-            {
-                self.y -= 1;
-            }
-            News::East =>
-            {
-                self.x += 1;
-            }
-            News::West =>
-            {
-                self.x -= 1;
-            }
-            News::South =>
-            {
-                self.y += 1;
-            }
+            News::North => self.y -= 1,
+            News::East => self.x += 1,
+            News::West => self.x -= 1,
+            News::South => self.y += 1,
         }
         self
+    }
+}
+
+// IVec2 = IVec2 + &News
+impl Add<&News> for IVec2
+{
+    type Output = IVec2;
+    fn add(mut self, news: &News) -> IVec2
+    {
+        match news
+        {
+            News::North => self.y -= 1,
+            News::South => self.y += 1,
+            News::East => self.x += 1,
+            News::West => self.x -= 1,
+        }
+        self
+    }
+}
+
+// IVec2 += News
+impl AddAssign<News> for IVec2
+{
+    fn add_assign(&mut self, news: News)
+    {
+        match news
+        {
+            News::North => self.y -= 1,
+            News::East => self.x += 1,
+            News::West => self.x -= 1,
+            News::South => self.y += 1,
+        }
     }
 }
 
@@ -148,6 +168,19 @@ pub trait CharacterAnimation
     fn sprite_sheet_offset(&self, news: News) -> u32;
     fn direction(&self) -> News;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+// System間の通知用イベント
+#[derive(Event)]
+pub struct EventTimerPlayer;
+// #[derive( Event )] pub struct EventClear;
+// #[derive( Event )] pub struct EventOver;
+// #[allow( dead_code )]
+// #[derive( Event )] pub struct EventEatDot ( pub IVec2 ); //tigtag3d用の追加フィールド
+// #[derive( Event )] pub struct EventTimerPlayer;
+// #[allow( dead_code )]
+// #[derive( Event )] pub struct EventTimerChasers ( pub Vec<Color> ); //tigtag3d用の追加フィールド
 
 ////////////////////////////////////////////////////////////////////////////////
 

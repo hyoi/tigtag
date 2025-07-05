@@ -11,13 +11,13 @@ use bevy::{
     asset::{LoadedUntypedAsset, LoadState},
     render::camera::Viewport,
     diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
+    input::{
+        gamepad::{
+            GamepadInput, GamepadButton::*, GamepadAxis::*, GamepadAxisChangedEvent,
+        },
+        //     mouse::{MouseButtonInput, MouseMotion, MouseWheel},
+    },
     // ecs::query::QueryFilter,
-    // input::{
-    //     gamepad::{
-    //         GamepadInput, GamepadButton::*, GamepadAxis::*, GamepadAxisChangedEvent,
-    //     },
-    //     mouse::{MouseButtonInput, MouseMotion, MouseWheel},
-    // },
 };
 use rand::prelude::*;
 use rustc_hash::FxHashMap;
@@ -26,10 +26,9 @@ use rustc_hash::FxHashMap;
 // standard library
 use std::{
     sync::LazyLock,
-    ops::Range,
-    ops::{Deref, DerefMut},
-    ops::{Add /* AddAssign */},
+    ops::{Range, Deref, DerefMut, Add, AddAssign},
     f32::consts::{PI, TAU},
+    cmp::Ordering,
     // time::Duration,
 };
 
@@ -37,12 +36,13 @@ use std::{
 use macros::MyState;
 
 // internal submodules
-mod config; // アプリの設定
+mod config; // 設定
 use config::*;
 
 mod bevy_app; // アプリ本体
+use bevy_app::*;
 
-mod template; // 共通
+mod template; // 共通ライブラリ
 use template::*;
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -6,16 +6,6 @@ use super::*;
 #[derive(Component)]
 pub struct PlayerTriangle;
 
-// 自キャラの入力を保存するResource
-// #[derive( Resource )]
-// pub struct InputDirection ( Vec<News> );
-
-// impl Default for InputDirection
-// {   fn default() -> Self
-//     {   Self ( Vec::with_capacity( 4 ) ) //十字方向
-//     }
-// }
-
 // スプライトシートでアニメーションするためのトレイト実装
 impl CharacterAnimation for Player
 {
@@ -120,132 +110,318 @@ pub fn spawn_sprite(
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// 極座標の型
+// #[derive(Default, Clone)]
+// pub struct Orbit
+// {
+//     pub r: f32,     // 極座標のr（中心点から飛翔体までの距離）
+//     pub theta: f32, // 極座標のΘ（中心点から見た飛翔体の仰角）
+//     pub phi: f32,   // 極座標のφ（中心点から見た飛翔体の平面の回転角）
+// }
+
+// 極座標カメラのResource
+// #[derive(Resource, Default, Clone)]
+// pub struct OrbitCamera
+// {
+//     pub position: Orbit,         // 極座標上のカメラの位置
+//     pub lock: LockFlag,          // スピードバグ防止フラグ
+// }
+
+// 自キャラの入力を保存するResource
+#[derive(Resource)]
+pub struct InputDirection(Vec<News>, LockFlag);
+
+impl Default for InputDirection
+{
+    fn default() -> Self
+    {
+        Self(Vec::with_capacity(4), LockFlag::default()) // 十字方向
+    }
+}
+
+// スピードバグ防止フラグ
+#[derive(Default, Clone)]
+pub struct LockFlag
+{
+    up: bool,
+    down: bool,
+    left: bool,
+    right: bool,
+}
+
+// コールバック関数の型
+pub type CallBack = fn(&mut InputDirection, f32);
+
+// コールバック関数
+pub use callback::*;
+
+#[allow( dead_code )]
+#[rustfmt::skip]
+pub mod callback
+{   use super::*;
+
+    pub fn move_up( orbit: &mut InputDirection, value: f32 )
+    {
+        if orbit.1.up || value == 0.0 { return; }
+        // orbit.position.theta += value;
+        orbit.0.push( News::North );
+        orbit.1.up = true;
+    }
+    pub fn move_down( orbit: &mut InputDirection, value: f32 )
+    {
+        if orbit.1.down || value == 0.0 { return; }
+        // orbit.position.theta -= value;
+        orbit.0.push( News::South );
+        orbit.1.down = true;
+    }
+    pub fn move_right( orbit: &mut InputDirection, value: f32 )
+    {
+        if orbit.1.right || value == 0.0 { return; }
+        // orbit.position.phi += value;
+        orbit.0.push( News::East );
+        orbit.1.right = true;
+    }
+    pub fn move_left( orbit: &mut InputDirection, value: f32 )
+    {
+        if orbit.1.left || value == 0.0 { return; }
+        // orbit.position.phi -= value;
+        orbit.0.push( News::West );
+        orbit.1.left = true;
+    }
+
+    pub fn axis_x_normal( orbit: &mut InputDirection, value: f32 )
+    {
+        if ( value == 0.0 )
+            || ( value > 0.0 && orbit.1.right )
+            || ( value < 0.0 && orbit.1.left  ) { return; }
+        // orbit.position.phi += value;
+        if value > 0.0
+        {
+            orbit.0.push( News::East );
+            orbit.1.right = true;
+        } else
+        {
+            orbit.0.push( News::West );
+            orbit.1.left = true;
+        }
+    }
+    pub fn axis_x_reverse( orbit: &mut InputDirection, value: f32 )
+    {
+        if ( value == 0.0 )
+            || ( value > 0.0 && orbit.1.left  )
+            || ( value < 0.0 && orbit.1.right ) { return; }
+        // orbit.position.phi += - value;
+        if value >= 0.0
+        {
+            orbit.0.push( News::West );
+            orbit.1.left = true;
+        } else
+        {
+            orbit.0.push( News::East );
+            orbit.1.right = true;
+        }
+    }
+    pub fn axis_y_normal( orbit: &mut InputDirection, value: f32 )
+    {
+        if ( value == 0.0 )
+            || ( value > 0.0 && orbit.1.up   )
+            || ( value < 0.0 && orbit.1.down ) { return; }
+        // orbit.position.theta += value;
+        if value >= 0.0
+        {
+            orbit.0.push( News::North );
+            orbit.1.up = true;
+        } else
+        {
+            orbit.0.push( News::South );
+            orbit.1.down = true;
+        }
+    }
+    pub fn axis_y_reverse( orbit: &mut InputDirection, value: f32 )
+    {
+        if ( value == 0.0 )
+            || ( value > 0.0 && orbit.1.down )
+            || ( value < 0.0 && orbit.1.up   ) { return; }
+        // orbit.position.theta += - value;
+        if value >= 0.0
+        {
+            orbit.0.push( News::South );
+            orbit.1.down = true;
+        } else
+        {
+            orbit.0.push( News::North );
+            orbit.1.up = true;
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // 自キャラを移動させる
 // #[allow(clippy::too_many_arguments)]
 // #[allow(clippy::type_complexity)]
-// pub fn move_sprite
-// (   mut qry_player: Query<( &mut Player, &mut TextureAtlas )>,
-//     mut pst_transform: ParamSet
-//     <(  Query<&mut Transform, With<Player>>,
-//         Query<&mut Transform, With<PlayerTriangle>>,
-//     )>,
-//     opt_map: Option<Res<Map>>,
-//     opt_input_direction: Option<Res<InputDirection>>,
-//     opt_demo: Option<Res<demo::schedule::DemoMapParams>>,
-//     qry_chasers: Query<&chasers::Chaser>,
-//     state: ResMut<State<MyState>>,
-//     mut evt_timer: EventWriter<EventTimerPlayer>,
-//     time: Res<Time>,
-// )
-// {   let Ok ( ( mut player, mut sprite_sheet ) ) = qry_player.get_single_mut() else { return };
-//     let mut qry_transform = pst_transform.p0();
-//     let Ok ( mut transform ) = qry_transform.get_single_mut() else { return };
-//     let Some ( map ) = opt_map else { return };
-//     let Some ( input_direction ) = opt_input_direction else { return };
+pub fn move_sprite(
+    mut qry_player: Query<(&mut Sprite, &mut Transform, &mut Player)>,
+    opt_input_direction: Option<ResMut<InputDirection>>,
+    opt_map: Option<Res<Map>>,
+    //     mut qry_player: Query<( &mut Player, &mut TextureAtlas )>,
+    //     mut pst_transform: ParamSet
+    //     <(  Query<&mut Transform, With<Player>>,
+    //         Query<&mut Transform, With<PlayerTriangle>>,
+    //     )>,
+    opt_demo: Option<Res<DemoMapParams>>,
+    qry_chasers: Query<&Chaser>,
+    state: ResMut<State<MyState>>,
+    mut evt_timer: EventWriter<EventTimerPlayer>,
+    time: Res<Time>,
+) -> Result
+{
+    let (mut sprite, mut transform, mut player) = qry_player.single_mut()?;
+    let mut input_direction =
+        opt_input_direction.ok_or("Resource InputDirection not found.")?;
+    let map = opt_map.ok_or("Resource Map not found.")?;
+    //     let Ok ( ( mut player, mut sprite_sheet ) ) = qry_player.get_single_mut() else { return };
+    //     let mut qry_transform = pst_transform.p0();
+    //     let Ok ( mut transform ) = qry_transform.get_single_mut() else { return };
 
-//     //前回からの経過時間にスピードアップ係数をかける
-//     let time_delta = time.delta().mul_f32( player.speedup );
+    // 前回からの経過時間にスピードアップ係数をかける
+    let time_delta = time.delta().mul_f32(player.speedup);
 
-//     //グリッドのマス間を移動中か？
-//     if ! player.timer.tick( time_delta ).finished()
-//     {   if ! player.is_stop
-//         {   //移動中の中割座標
-//             let delta = PLAYER_SPEED * time_delta.as_secs_f32();
-//             match player.direction
-//             {   News::North => transform.translation.y += delta,
-//                 News::South => transform.translation.y -= delta,
-//                 News::East  => transform.translation.x += delta,
-//                 News::West  => transform.translation.x -= delta,
-//             }
-//             player.px_start = player.px_end;
-//             player.px_end   = transform.translation.truncate();
-//         }
-//     }
-//     else
-//     {   evt_timer.send( EventTimerPlayer ); //後続の処理にtimer finishedを伝達する
+    // グリッドのマス間を移動中か？
+    if !player.timer.tick(time_delta).finished()
+    {
+        if !player.is_stop
+        {
+            // 移動中の中割座標
+            let delta = PLAYER_SPEED * time_delta.as_secs_f32();
+            match player.direction
+            {
+                News::North => transform.translation.y += delta,
+                News::South => transform.translation.y -= delta,
+                News::East => transform.translation.x += delta,
+                News::West => transform.translation.x -= delta,
+            }
+            player.px_start = player.px_end;
+            player.px_end = transform.translation.truncate();
+        }
+    }
+    else
+    {
+        evt_timer.write(EventTimerPlayer); // 後続の処理にtimer finishedを伝達する
 
-//         //スプライトをグリッドに配置する
-//         if player.px_start != player.px_end
-//         {   player.px_start = player.px_end;
-//             player.px_end   = player.next_grid.to_vec2_on_game_map();
-//             transform.translation = player.px_end.extend( DEPTH_SPRITE_PLAYER );
-//         }
+        // スプライトをグリッドに配置する
+        if player.px_start != player.px_end
+        {
+            player.px_start = player.px_end;
+            player.px_end = player.next_grid.to_vec2_on_game_map();
+            transform.translation = player.px_end.extend(DEPTH_SPRITE_PLAYER);
+        }
 
-//         //自キャラが次に進む方向を決める
-//         let mut new_side = player.direction;
-//         player.is_stop = true; //停止フラグを立てておく
+        // 自キャラが次に進む方向を決める
+        let mut new_side = player.direction;
+        player.is_stop = true; // 停止フラグを立てておく
 
-//         if ! state.get().is_demoplay()
-//         {   //入力に対応する
-//             for side in input_direction.0.iter() //input_direction.0は優先順に並んでいる前提
-//             {   //壁でない場合
-//                 if map.is_space( player.next_grid + side )
-//                 {   new_side = *side;
-//                     player.is_stop = false;
-//                     break;
-//                 }
+        if !state.get().is_demoplay()
+        {
+            // 入力に対応する
+            for side in input_direction.0.iter()
+            // input_direction.0は優先順に並んでいる前提
+            {
+                // 壁でない場合
+                if map.is_space(player.next_grid + side)
+                {
+                    new_side = *side;
+                    player.is_stop = false;
+                    break;
+                }
 
-//                 //ループの先頭要素では、向きを必ず変える
-//                 if *side == ( input_direction.0 )[ 0 ] //データの性質上 値が重複する要素はない
-//                 {   new_side = *side;
-//                 }
-//             }
-//         }
-//         else
-//         {   //demoの場合 入力相当のデータをアルゴリズムで作る
-//             player.is_stop = false; //demoでは自機は停止しない
+                // ループの先頭要素では、向きを必ず変える
+                if *side == (input_direction.0)[0]
+                // データの性質上 値が重複する要素はない
+                {
+                    new_side = *side;
+                }
+            }
+        }
+        else
+        {
+            // demoの場合 入力相当のデータをアルゴリズムで作る
+            player.is_stop = false; // demoでは自機は停止しない
 
-//             let mut sides = map.get_side_spaces_list( player.next_grid ); //脇道のリスト
-//             sides.retain( | side | player.next_grid + side != player.grid ); //戻り路を取り除く
+            let mut sides = map.get_side_spaces_list(player.next_grid); // 脇道のリスト
+            sides.retain(|side| player.next_grid + side != player.grid); // 戻り路を取り除く
 
-//             new_side = match sides.len().cmp( &1 )
-//             {   Ordering::Equal => //一本道 ⇒ 道なりに進む
-//                     sides[ 0 ],
-//                 Ordering::Greater => //三叉路または十字路
-//                     if let ( Some ( autodrive ), Some ( demo ) ) = ( player.opt_fn_autodrive, opt_demo )
-//                     {   //外部関数で進行方向を決める
-//                         autodrive( &player, qry_chasers, map, demo, &sides )
-//                     }
-//                     else
-//                     {   //外部関数を使えないなら乱数で決める
-//                         let mut rng = rand::thread_rng();
-//                         sides[ rng.gen_range( 0..sides.len() ) ]
-//                     },
-//                 Ordering::Less => //行き止まり ⇒ 逆走 (このゲームに行き止まりはないけど)
-//                     match player.direction
-//                     {   News::North => News::South,
-//                         News::South => News::North,
-//                         News::East  => News::West ,
-//                         News::West  => News::East ,
-//                     },
-//             };
-//         }
+            new_side = match sides.len().cmp(&1)
+            {
+                Ordering::Equal =>
+                // 一本道 ⇒ 道なりに進む
+                    sides[0],
+                Ordering::Greater =>
+                // 三叉路または十字路
+                    if let (Some(autodrive), Some(demo)) =
+                        (player.opt_fn_autodrive, opt_demo)
+                    {
+                        // 外部関数で進行方向を決める
+                        autodrive(&player, qry_chasers, map, demo, &sides)
+                    }
+                    else
+                    {
+                        // 外部関数を使えないなら乱数で決める
+                        let mut rng = rand::rng();
+                        sides[rng.random_range(0..sides.len())]
+                    },
+                Ordering::Less =>
+                // 行き止まり ⇒ 逆走 (このゲームに行き止まりはないけど)
+                    match player.direction
+                    {
+                        News::North => News::South,
+                        News::South => News::North,
+                        News::East => News::West,
+                        News::West => News::East,
+                    },
+            };
+        }
 
-//         //進行方向が変わったらスプライトの見栄えを変える
-//         if player.direction != new_side
-//         {   if SPRITE_OFF()
-//             {   //三角形を回転させる
-//                 if let Ok ( mut transform ) = pst_transform.p1().get_single_mut()
-//                 {   rotate_player_sprite( &player, &mut transform, new_side );
-//                 }
-//             }
-//             else
-//             {   //スプライトシートのindexを変更する
-//                 let old_offset = player.sprite_sheet_offset( player.direction ) as usize;
-//                 let new_offset = player.sprite_sheet_offset( new_side         ) as usize;
-//                 sprite_sheet.index = sprite_sheet.index + new_offset - old_offset;
-//             }
-//             player.direction = new_side;
-//         }
+        // 進行方向が変わったらスプライトの見栄えを変える
+        if player.direction != new_side
+        {
+            // if SPRITE_OFF()
+            // {   //三角形を回転させる
+            //     if let Ok ( mut transform ) = pst_transform.p1().get_single_mut()
+            //     {   rotate_player_sprite( &player, &mut transform, new_side );
+            //     }
+            // }
+            // else
+            {
+                // スプライトシートのindexを変更する
+                let old_offset =
+                    player.sprite_sheet_offset(player.direction) as usize;
+                let new_offset = player.sprite_sheet_offset(new_side) as usize;
+                let sprite_sheet = &mut sprite
+                    .texture_atlas
+                    .as_mut()
+                    .ok_or("Sprite TextureAtlas not setting.")?;
+                let index = &mut sprite_sheet.index;
+                *index = *index + new_offset - old_offset;
+            }
+            player.direction = new_side;
+        }
 
-//         //現在の位置と次の位置を更新する
-//         player.grid = player.next_grid;
-//         if ! player.is_stop { player.next_grid += new_side; }
+        // 現在の位置と次の位置を更新する
+        player.grid = player.next_grid;
+        if !player.is_stop
+        {
+            player.next_grid += new_side;
+        }
 
-//         //タイマーをリセットする
-//         player.timer.reset();
-//     }
-// }
+        // タイマーをリセットする
+        player.timer.reset();
+    }
+
+    *input_direction = InputDirection::default();
+
+    Ok(())
+}
 
 // 自機の向きと入力から角度の差分を求めてスプライトを回転させる
 // fn rotate_player_sprite
@@ -282,6 +458,45 @@ pub fn spawn_sprite(
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// キーマップ登録用Resource
+#[derive(Resource, Deref)]
+pub struct KeyMap(pub FxHashMap<KeyCode, player::CallBack>);
+
+// ゲームパッドボタンマップ登録用Resource
+#[derive(Resource, Deref)]
+pub struct PadMap(pub FxHashMap<GamepadInput, player::CallBack>);
+
+////////////////////////////////////////////////////////////////////////////////
+
+// 極座標カメラの位置をキー入力で操作
+pub fn input_from_keyboard(
+    // opt_orbit_camera: Option<ResMut<OrbitCamera>>,
+    opt_input_direction: Option<ResMut<InputDirection>>,
+    opt_keymap: Option<Res<KeyMap>>,
+    time: Res<Time>,
+    input_keycode: Res<ButtonInput<KeyCode>>,
+) -> Result
+{
+    // 準備
+    let mut camera =
+        opt_input_direction.ok_or("Resource InputDirection not found.")?;
+    let keymap = opt_keymap.ok_or("opt_keymap is None.")?;
+
+    // 前回の実行からの経過時間（感度調整の係数あり）
+    let time_delta = time.delta_secs() /* * COEF_KEY_TIME_DELTA */;
+
+    // キー入力とキーマップを使って極座標を更新する
+    input_keycode.get_pressed().for_each(|keycode| {
+        if let Some(callback) = keymap.get(keycode)
+        {
+            callback(&mut camera, time_delta);
+        }
+    });
+
+    Ok(())
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // 自キャラの入力を捕まえる
 // pub fn catch_input_direction
 // (   qry_player: Query<&player::Player>,

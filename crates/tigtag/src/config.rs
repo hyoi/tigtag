@@ -83,6 +83,17 @@ pub enum MyState
     Pause,
 }
 
+// ゲームの状態の判定
+#[allow(dead_code)]
+impl MyState
+{
+    pub fn is_demoplay(&self) -> bool { self.is_titledemo() || self.is_demoloop() }
+    pub fn is_playing(&self) -> bool
+    {
+        self.is_stagestart() || self.is_mainloop() || self.is_stageclear()
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // 事前ロード対象
@@ -282,11 +293,39 @@ pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// キーコードとコールバック関数の対応
+pub const KEY_MAP: [(KeyCode, player::CallBack); 8] = [
+    // WASD
+    (KeyCode::KeyW, player::move_up),
+    (KeyCode::KeyS, player::move_down),
+    (KeyCode::KeyA, player::move_left),
+    (KeyCode::KeyD, player::move_right),
+    // カーソルキー
+    (KeyCode::ArrowUp, player::move_up),
+    (KeyCode::ArrowDown, player::move_down),
+    (KeyCode::ArrowLeft, player::move_left),
+    (KeyCode::ArrowRight, player::move_right),
+];
+
+// ゲームパッドのボタン／スティックとコールバック関数の対応
+pub const PAD_MAP: [(GamepadInput, player::CallBack); 6] = [
+    // 十字ボタン
+    (GamepadInput::Button(DPadUp), player::move_up),
+    (GamepadInput::Button(DPadDown), player::move_down),
+    (GamepadInput::Button(DPadLeft), player::move_right),
+    (GamepadInput::Button(DPadRight), player::move_left),
+    // 左スティック
+    (GamepadInput::Axis(LeftStickX), player::axis_x_reverse),
+    (GamepadInput::Axis(LeftStickY), player::axis_y_normal),
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
 // 極座標カメラを移動する場合の初期位置
 // ※positionとlook_atがspawn済みCamera3dと同じ状態になる初期値を与えること
-// pub static ORBIT_CAMERA_DEFAULT: LazyLock<orbit_camera::OrbitCamera> =
+// pub static PLAYER_DEFAULT: LazyLock<player::OrbitCamera> =
 //     LazyLock::new(|| {
-//         orbit_camera::OrbitCamera {
+//         player::OrbitCamera {
 //             position: CAMERA3D_POSITION_ORBIT, // 極座標上のカメラの位置
 //             look_at: (Vec3::ZERO, Vec3::Y),    // 注視点と視線を軸にしたロール
 //             is_active: true,                   // カメラが有効か
@@ -299,43 +338,6 @@ pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
 // 極座標カメラを移動する場合の制限
 // pub const ORBIT_R_MIN_MAX: (f32, f32) = (1.0, 30.0); // min, max
 // pub const ORBIT_THETA_MIN_MAX: (f32, f32) = (PI * 0.51, PI * 0.99); // min, max
-
-////////////////////////////////////////////////////////////////////////////////
-
-// キーコードとコールバック関数の対応
-// pub const KEY_MAP: [(KeyCode, orbit_camera::CallBack); 12] = [
-//     // WASD
-//     (KeyCode::KeyW, orbit_camera::move_up),
-//     (KeyCode::KeyS, orbit_camera::move_down),
-//     (KeyCode::KeyA, orbit_camera::move_right),
-//     (KeyCode::KeyD, orbit_camera::move_left),
-//     (KeyCode::KeyQ, orbit_camera::zoom_in),
-//     (KeyCode::KeyE, orbit_camera::zoom_out),
-//     // カーソルキー
-//     (KeyCode::ArrowUp, orbit_camera::move_up),
-//     (KeyCode::ArrowDown, orbit_camera::move_down),
-//     (KeyCode::ArrowLeft, orbit_camera::move_right),
-//     (KeyCode::ArrowRight, orbit_camera::move_left),
-//     (KeyCode::PageUp, orbit_camera::zoom_in),
-//     (KeyCode::PageDown, orbit_camera::zoom_out),
-// ];
-
-// ゲームパッドのボタン／スティックとコールバック関数の対応
-// pub const PAD_MAP: [(GamepadInput, orbit_camera::CallBack); 10] = [
-//     // 十字ボタン
-//     (GamepadInput::Button(DPadUp), orbit_camera::move_up),
-//     (GamepadInput::Button(DPadDown), orbit_camera::move_down),
-//     (GamepadInput::Button(DPadLeft), orbit_camera::move_right),
-//     (GamepadInput::Button(DPadRight), orbit_camera::move_left),
-//     // トリガー
-//     (GamepadInput::Button(LeftTrigger), orbit_camera::zoom_in),
-//     (GamepadInput::Button(RightTrigger), orbit_camera::zoom_out),
-//     (GamepadInput::Button(LeftTrigger2), orbit_camera::zoom_in),
-//     (GamepadInput::Button(RightTrigger2), orbit_camera::zoom_out),
-//     // 左スティック
-//     (GamepadInput::Axis(LeftStickX), orbit_camera::axis_x_reverse),
-//     (GamepadInput::Axis(LeftStickY), orbit_camera::axis_y_normal),
-// ];
 
 ////////////////////////////////////////////////////////////////////////////////
 

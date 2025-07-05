@@ -50,7 +50,7 @@ impl Default for Player
 
 // プレイヤーの設定値
 pub const PLAYER_TIME_PER_GRID: f32 = 0.15; // 0.09; //１グリッド進むために必要な時間
-                                            // const PLAYER_SPEED: f32 = PIXELS_PER_GRID / PLAYER_TIME_PER_GRID; // 速度
+pub const PLAYER_SPEED: f32 = PIXELS_PER_GRID / PLAYER_TIME_PER_GRID; // 速度
 pub const PLAYER_SPRITE_SCALING: f32 = 0.4; // primitive shape表示時の縮小係数
 pub const PLAYER_SPRITE_COLOR: Color = Color::Srgba(css::YELLOW);
 
