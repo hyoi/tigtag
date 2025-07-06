@@ -115,20 +115,22 @@ impl Plugin for Schedule
         //----------------------------------------------------------------------
 
         // ステージ初期化
-        appl.add_systems
-        (   OnEnter ( MyState::StageStart ),
-            (   (   //マップデータ生成
+        appl.add_systems(
+            OnEnter(MyState::StageStart),
+            (
+                (
+                    //マップデータ生成
                     map::make_new_stage_data,
-
                     //スプライトのspawn
-                    (   map::spawn_sprite,
+                    (
+                        map::spawn_sprite,
                         player::spawn_sprite,
                         chasers::spawn_sprite,
                     ),
                     //for DEBUG
                     change_state_to::<MainLoop>, //DEBUG後に削除すること
                 )
-                .chain(), //実行順の固定
+                    .chain(), //実行順の固定
 /*
         //         //TextUIの可視化
         //         (   effect::init_count::<stage_start::CountDown>, //カウント初期化
@@ -136,7 +138,7 @@ impl Plugin for Schedule
         //         )
         //         .chain(), //実行順の固定
 */
-            )
+            ),
 /*
         // )
         // .add_systems
@@ -181,9 +183,9 @@ impl Plugin for Schedule
                         ),
                         player::move_sprite, // スプライトを移動
                     )
-                        .chain(), /* 実行順の固定
-                                   * チェイサー
-                                   * chasers::move_sprite, // スプライトを移動 */
+                        .chain(), // 実行順の固定
+                        // チェイサー
+                        // chasers::move_sprite, // スプライトを移動
                 )
             )
                 .chain() // 実行順の固定
