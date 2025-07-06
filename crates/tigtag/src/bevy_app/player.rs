@@ -497,6 +497,70 @@ pub fn input_from_keyboard(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+// 極座標カメラの位置をゲームパッドで操作
+pub fn input_from_gamepad(
+    // opt_orbit_camera: Option<ResMut<OrbitCamera>>,
+    opt_input_direction: Option<ResMut<InputDirection>>,
+    opt_padmap: Option<Res<PadMap>>,
+    opt_target_gamepad: Option<ResMut<misc::TargetGamepad>>,
+    time: Res<Time>,
+    qry_gamepads: Query<&Gamepad>,
+    mut axis_events: EventReader<GamepadAxisChangedEvent>,
+    mut axis_values: Local<FxHashMap<GamepadAxis, f32>>, // スティックの角度の変化量
+) -> Result
+{
+    // 準備
+    // let mut camera = opt_orbit_camera.ok_or("opt_orbit_camera is None.")?;
+    let mut camera =
+        opt_input_direction.ok_or("Resource InputDirection not found.")?;
+    let padmap = opt_padmap.ok_or("opt_padmap is None.")?;
+    let target_gamepad = opt_target_gamepad.ok_or("opt_target_gamepad is None.")?;
+
+    // ゲームパッドが接続されていれば
+    if let Some(entity) = target_gamepad.entity()
+    {
+        if let Ok(gamepad) = qry_gamepads.get(entity)
+        {
+            // 前回の実行からの経過時間（感度調整の係数あり）
+            let time_delta = time.delta_secs() /* * COEF_PAD_TIME_DELTA */;
+
+            // 押されているボタンを調べてコールバック関数を実行する
+            // ToDo： eventの利用を検討する（GamepadButtonChangedEvent）
+            gamepad.get_pressed().for_each(|&button| {
+                let device = GamepadInput::Button(button);
+                if let Some(callback) = padmap.get(&device)
+                {
+                    // ボタンはアナログの可能性があるので変化量を考慮する
+                    let value = gamepad.get(button).unwrap_or(1.0);
+                    callback(&mut camera, value * time_delta);
+                }
+            });
+
+            // 変化があった時だけ発火するイベントのスティック角度を保存する
+            axis_events.read().for_each(|change_axis| {
+                if change_axis.entity == entity
+                {
+                    axis_values.insert(change_axis.axis, change_axis.value);
+                }
+            });
+
+            // 保存した角度の情報を使いスティックのコールバック関数を実行する
+            axis_values.iter().for_each(|(axis, value)| {
+                let device = GamepadInput::Axis(*axis);
+                if let Some(callback) = padmap.get(&device)
+                {
+                    callback(&mut camera, value * time_delta);
+                }
+            });
+        }
+    }
+
+    Ok(())
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // 自キャラの入力を捕まえる
 // pub fn catch_input_direction
 // (   qry_player: Query<&player::Player>,

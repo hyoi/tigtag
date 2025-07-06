@@ -163,27 +163,27 @@ impl Plugin for Schedule
             Update,
             (
                 // ループ脱出条件
-        //         detection::scoring_and_stage_clear, //スコアリング＆クリア判定
-        //         change_state_to::<StageClear>.run_if( on_event::<EventClear>() ),
+                //         detection::scoring_and_stage_clear, //スコアリング＆クリア判定
+                //         change_state_to::<StageClear>.run_if( on_event::<EventClear>() ),
 
-        //         detection::collisions_and_gameover, //衝突判定
-        //         change_state_to::<GameOver>.run_if( on_event::<EventOver>() ),
+                //         detection::collisions_and_gameover, //衝突判定
+                //         change_state_to::<GameOver>.run_if( on_event::<EventOver>() ),
 
-                //スプライトの移動
+                // スプライトの移動
                 (
-                    // 自キャラ
-                    //             (   player::catch_input_direction,
+                    // プレイヤー
                     (
-        //                 // Resourceに保存した極座標値を更新する
-                        player::input_from_keyboard, // キー
-        //                 orbit_camera::input_from_gamepad,  // ゲームパッド
-                        //             ),
-                        player::move_sprite,
+                        // player::catch_input_direction,
+                        (
+                            // Resourceを更新する
+                            player::input_from_keyboard, // キー
+                            player::input_from_gamepad,  // ゲームパッド
+                        ),
+                        player::move_sprite, // スプライトを移動
                     )
-                        .chain(), /* 実行順の固定 */
-
-                                  /*             //敵キャラ
-                                   *             chasers::move_sprite, */
+                        .chain(), /* 実行順の固定
+                                   * チェイサー
+                                   * chasers::move_sprite, // スプライトを移動 */
                 )
             )
                 .chain() // 実行順の固定
