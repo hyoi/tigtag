@@ -22,7 +22,7 @@ pub struct Chaser
 }
 
 // 関数ポインタ型(敵キャラの移動方向を決める関数)
-pub type FnAutoChase = fn(&mut Chaser, &Player, &[News]) -> News;
+pub type FnAutoChase = fn(&mut Chaser, &player::Player, &[News]) -> News;
 
 impl Default for Chaser
 {

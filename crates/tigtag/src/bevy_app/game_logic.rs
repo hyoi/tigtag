@@ -56,8 +56,8 @@ impl Plugin for Schedule
         appl.add_systems(
             Update,
             (
-                animating_sprites::<Player>, // プレイヤー
-                animating_sprites::<Chaser>, // チェイサー
+                animating_sprites::<player::Player>, // プレイヤー
+                animating_sprites::<Chaser>,         // チェイサー
                 chasers::rotate_chaser_shape // チェイサーの回転
                     .run_if(SPRITE_OFF), // スプライトシートがOFFの場合
             ),
