@@ -2,23 +2,6 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 極座標の型
-// #[derive(Default, Clone)]
-// pub struct Orbit
-// {
-//     pub r: f32,     // 極座標のr（中心点から飛翔体までの距離）
-//     pub theta: f32, // 極座標のΘ（中心点から見た飛翔体の仰角）
-//     pub phi: f32,   // 極座標のφ（中心点から見た飛翔体の平面の回転角）
-// }
-
-// 極座標カメラのResource
-// #[derive(Resource, Default, Clone)]
-// pub struct OrbitCamera
-// {
-//     pub position: Orbit,         // 極座標上のカメラの位置
-//     pub lock: LockFlag,          // スピードバグ防止フラグ
-// }
-
 // プレイヤーの入力を保存するResource
 #[derive(Resource)]
 pub struct InputDirection(pub Vec<News>, pub LockFlag);

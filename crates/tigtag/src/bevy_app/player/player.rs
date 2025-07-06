@@ -2,24 +2,6 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// プレイヤーの三角スプライトのComponent
-#[derive(Component)]
-pub struct PlayerTriangle;
-
-// スプライトシートでアニメーションするためのトレイト実装
-impl CharacterAnimation for Player
-{
-    fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime_timer }
-    fn sprite_sheet_frame(&self) -> u32 { self.sprite_sheet_frame }
-    fn sprite_sheet_offset(&self, news: News) -> u32
-    {
-        *self.sprite_sheet_indexes.get(&news).unwrap()
-    }
-    fn direction(&self) -> News { self.direction }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // プレイヤーをspawnする
 pub fn spawn_sprite(
     opt_map: Option<ResMut<Map>>,
@@ -77,8 +59,7 @@ pub fn spawn_sprite(
             Mesh2d(meshes.add(shape)),
             MeshMaterial2d(materials.add(PLAYER_SPRITE_COLOR)),
             Transform::from_translation(translation).with_rotation(quat),
-            PlayerTriangle, // マーカー
-            player,         // データ
+            player, // データ
         ));
     }
     else
@@ -114,14 +95,10 @@ pub fn spawn_sprite(
 // #[allow(clippy::too_many_arguments)]
 // #[allow(clippy::type_complexity)]
 pub fn move_sprite(
-    mut qry_player: Query<(&mut Sprite, &mut Transform, &mut Player)>,
+    mut qry_player: Query<(&mut Transform, &mut Player)>,
+    mut qry_sprite: Query<&mut Sprite, With<Player>>,
     opt_input_direction: Option<ResMut<InputDirection>>,
     opt_map: Option<Res<Map>>,
-    //     mut qry_player: Query<( &mut Player, &mut TextureAtlas )>,
-    //     mut pst_transform: ParamSet
-    //     <(  Query<&mut Transform, With<Player>>,
-    //         Query<&mut Transform, With<PlayerTriangle>>,
-    //     )>,
     opt_demo: Option<Res<DemoMapParams>>,
     qry_chasers: Query<&Chaser>,
     state: ResMut<State<MyState>>,
@@ -129,13 +106,10 @@ pub fn move_sprite(
     time: Res<Time>,
 ) -> Result
 {
-    let (mut sprite, mut transform, mut player) = qry_player.single_mut()?;
+    let (mut transform, mut player) = qry_player.single_mut()?;
     let mut input_direction =
         opt_input_direction.ok_or("Resource InputDirection not found.")?;
     let map = opt_map.ok_or("Resource Map not found.")?;
-    //     let Ok ( ( mut player, mut sprite_sheet ) ) = qry_player.get_single_mut() else { return };
-    //     let mut qry_transform = pst_transform.p0();
-    //     let Ok ( mut transform ) = qry_transform.get_single_mut() else { return };
 
     // 前回からの経過時間にスピードアップ係数をかける
     let time_delta = time.delta().mul_f32(player.speedup);
@@ -212,7 +186,7 @@ pub fn move_sprite(
                 Ordering::Greater =>
                 // 三叉路または十字路
                     if let (Some(autodrive), Some(demo)) =
-                        (player.opt_fn_autodrive, opt_demo)
+                        (player.fn_autodrive, opt_demo)
                     {
                         // 外部関数で進行方向を決める
                         autodrive(&player, qry_chasers, map, demo, &sides)
@@ -238,24 +212,26 @@ pub fn move_sprite(
         // 進行方向が変わったらスプライトの見栄えを変える
         if player.direction != new_side
         {
-            // if SPRITE_OFF()
-            // {   //三角形を回転させる
-            //     if let Ok ( mut transform ) = pst_transform.p1().get_single_mut()
-            //     {   rotate_player_sprite( &player, &mut transform, new_side );
-            //     }
-            // }
-            // else
+            if SPRITE_OFF()
+            {
+                //三角形を回転させる
+                rotate_player_sprite(&player, &mut transform, new_side);
+            }
+            else
             {
                 // スプライトシートのindexを変更する
-                let old_offset =
-                    player.sprite_sheet_offset(player.direction) as usize;
-                let new_offset = player.sprite_sheet_offset(new_side) as usize;
-                let sprite_sheet = &mut sprite
-                    .texture_atlas
-                    .as_mut()
-                    .ok_or("Sprite TextureAtlas not setting.")?;
-                let index = &mut sprite_sheet.index;
-                *index = *index + new_offset - old_offset;
+                if let Ok(mut sprite) = qry_sprite.single_mut()
+                {
+                    let old_offset =
+                        player.sprite_sheet_offset(player.direction) as usize;
+                    let new_offset = player.sprite_sheet_offset(new_side) as usize;
+                    let sprite_sheet = &mut sprite
+                        .texture_atlas
+                        .as_mut()
+                        .ok_or("Sprite TextureAtlas not setting.")?;
+                    let index = &mut sprite_sheet.index;
+                    *index = *index + new_offset - old_offset;
+                }
             }
             player.direction = new_side;
         }
@@ -277,37 +253,39 @@ pub fn move_sprite(
 }
 
 // 自機の向きと入力から角度の差分を求めてスプライトを回転させる
-// fn rotate_player_sprite
-// (   player: &Player,
-//     transform: &mut Mut<Transform>,
-//     input: News
-// )
-// {   let angle: f32 = match player.direction
-//     {   News::North => match input
-//         {   News::West => PI /  2.0,
-//             News::East => PI / -2.0,
-//             _ => PI,
-//         }
-//         News::South => match input
-//         {   News::East => PI /  2.0,
-//             News::West => PI / -2.0,
-//             _  => PI,
-//         }
-//         News::East => match input
-//         {   News::North => PI /  2.0,
-//             News::South => PI / -2.0,
-//             _ => PI,
-//         }
-//         News::West => match input
-//         {   News::South => PI /  2.0,
-//             News::North => PI / -2.0,
-//             _ => PI,
-//         }
-//     };
+fn rotate_player_sprite(player: &Player, transform: &mut Mut<Transform>, input: News)
+{
+    let angle: f32 = match player.direction
+    {
+        News::North => match input
+        {
+            News::West => PI / 2.0,
+            News::East => PI / -2.0,
+            _ => PI,
+        },
+        News::South => match input
+        {
+            News::East => PI / 2.0,
+            News::West => PI / -2.0,
+            _ => PI,
+        },
+        News::East => match input
+        {
+            News::North => PI / 2.0,
+            News::South => PI / -2.0,
+            _ => PI,
+        },
+        News::West => match input
+        {
+            News::South => PI / 2.0,
+            News::North => PI / -2.0,
+            _ => PI,
+        },
+    };
 
-//     let quat = Quat::from_rotation_z( angle );
-//     transform.rotate( quat );
-// }
+    let quat = Quat::from_rotation_z(angle);
+    transform.rotate(quat);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
