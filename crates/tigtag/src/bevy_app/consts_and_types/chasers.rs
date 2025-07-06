@@ -11,11 +11,11 @@ pub struct Chaser
     pub direction: News,  // 移動の向き
     pub timer: Timer,     // 移動のタイマー
     pub is_stop: bool,    // 移動停止フラグ
-    pub speedup: f32, // スピードアップ係数(1.0未満なら減速、1.0より大きいと増速)
-    pub px_start: Vec2, // 1フレーム時間に移動した微小区間の始点
-    pub px_end: Vec2, // 1フレーム時間に移動した微小区間の終点
+    pub speedup: f32,     // スピードアップ係数(1.0未満なら減速、1.0より大きいと増速)
+    pub px_start: Vec2,   // 1フレーム時間に移動した微小区間の始点
+    pub px_end: Vec2,     // 1フレーム時間に移動した微小区間の終点
     pub opt_fn_autochase: Option<FnAutoChase>, // 敵キャラの移動方向を決める関数
-    pub color: Color, // 敵キャラの表示色
+    pub color: Color,     // 敵キャラの表示色
     pub anime_timer: Timer, // アニメーションのタイマー
     pub sprite_sheet_frame: u32, // アニメーションのフレーム数
     pub sprite_sheet_indexes: FxHashMap<News, u32>, /* アニメーションの先頭位置(offset値) */
