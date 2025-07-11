@@ -61,7 +61,8 @@ pub fn spawn_header_footer(
 ) -> Result
 {
     // 準備
-    let textblock_list = opt_textblock_list.ok_or("opt_textblock_list is None.")?;
+    let textblock_list =
+        opt_textblock_list.ok_or("Res<Settings<'static>> not found.")?;
 
     // 親ノードをGRIDレイアウト（３Ｘ３）でspawnする
     let mut layout_node = cmds.spawn((Node {

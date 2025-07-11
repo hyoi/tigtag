@@ -153,8 +153,8 @@ pub fn input_from_keyboard(
 {
     // 準備
     let mut camera =
-        opt_input_direction.ok_or("Resource InputDirection not found.")?;
-    let keymap = opt_keymap.ok_or("opt_keymap is None.")?;
+        opt_input_direction.ok_or("ResMut<InputDirection> not found.")?;
+    let keymap = opt_keymap.ok_or("Res<KeyMap> not found.")?;
 
     // 前回の実行からの経過時間（感度調整の係数あり）
     let time_delta = time.delta_secs() /* * COEF_KEY_TIME_DELTA */;
@@ -187,9 +187,10 @@ pub fn input_from_gamepad(
     // 準備
     // let mut camera = opt_orbit_camera.ok_or("opt_orbit_camera is None.")?;
     let mut camera =
-        opt_input_direction.ok_or("Resource InputDirection not found.")?;
-    let padmap = opt_padmap.ok_or("opt_padmap is None.")?;
-    let target_gamepad = opt_target_gamepad.ok_or("opt_target_gamepad is None.")?;
+        opt_input_direction.ok_or("ResMut<InputDirection> not found.")?;
+    let padmap = opt_padmap.ok_or("Res<PadMap> not found.")?;
+    let target_gamepad =
+        opt_target_gamepad.ok_or("ResMut<misc::TargetGamepad> not found.")?;
 
     // ゲームパッドが接続されていれば
     if let Some(entity) = target_gamepad.entity()
