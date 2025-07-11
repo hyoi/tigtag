@@ -160,20 +160,9 @@ struct IVec2Rect
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// スプライトシートでアニメーションするためのトレイト
-pub trait CharacterAnimation
-{
-    fn anime_timer_mut(&mut self) -> &mut Timer;
-    fn sprite_sheet_frame(&self) -> u32;
-    fn sprite_sheet_offset(&self, news: News) -> u32;
-    fn direction(&self) -> News;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // System間の通知用イベント
-#[derive(Event)]
-pub struct EventTimerPlayer;
+// #[derive(Event)]
+// pub struct EventTimerPlayer;
 // #[derive( Event )] pub struct EventClear;
 // #[derive( Event )] pub struct EventOver;
 // #[allow( dead_code )]

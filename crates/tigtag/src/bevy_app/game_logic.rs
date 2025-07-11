@@ -25,13 +25,13 @@ impl Plugin for Schedule
             .insert_resource(player::PadMap(FxHashMap::from_iter(PAD_MAP)));
 
         // Event
-        appl
-            .add_event::<EventTimerPlayer>()  //プレイヤー移動タイマーのfinishedの伝達
-            // .add_event::<EventClear>()  //ステージクリアの伝達
-            // .add_event::<EventOver>()   //ゲームオーバーの伝達
-            // .add_event::<EventEatDot>() //スコアリングの伝達
-            // .add_event::<EventTimerChasers>() //敵キャラ移動タイマーのfinishedの伝達
-            ;
+        // appl
+        // .add_event::<EventTimerPlayer>()  //プレイヤー移動タイマーのfinishedの伝達
+        // .add_event::<EventClear>()  //ステージクリアの伝達
+        // .add_event::<EventOver>()   //ゲームオーバーの伝達
+        // .add_event::<EventEatDot>() //スコアリングの伝達
+        // .add_event::<EventTimerChasers>() //敵キャラ移動タイマーのfinishedの伝達
+        // ;
 
         // plugin
         // appl.add_plugins( header::Schedule ) //ヘッダー更新(Stage、Score、HiScore)
@@ -56,8 +56,8 @@ impl Plugin for Schedule
         appl.add_systems(
             Update,
             (
-                animating_sprites::<player::Player>, // プレイヤー
-                animating_sprites::<Chaser>,         // チェイサー
+                animate_sprites::<player::Player>, // プレイヤー
+                animate_sprites::<Chaser>,         // チェイサー
                 chasers::rotate_chaser_shape // チェイサーの回転
                     .run_if(SPRITE_OFF), // スプライトシートがOFFの場合
             ),
@@ -334,37 +334,6 @@ impl Plugin for Schedule
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// キャラクターをアニメーションさせる
-fn animating_sprites<T: Component<Mutability = Mutable> + CharacterAnimation>(
-    mut qry_sprite: Query<(&mut Sprite, &mut T)>,
-    time: Res<Time>,
-)
-{
-    for (mut sprite, mut character) in &mut qry_sprite
-    {
-        if character
-            .anime_timer_mut()
-            .tick(time.delta())
-            .just_finished()
-        {
-            if let Some(texture_atlas) = &mut sprite.texture_atlas
-            {
-                let index = &mut texture_atlas.index;
-                *index += 1;
-                let offset =
-                    character.sprite_sheet_offset(character.direction()) as usize;
-                let frame = character.sprite_sheet_frame() as usize;
-                if *index >= offset + frame
-                {
-                    *index = offset
-                }
-            }
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // ScoreとStageの初期化
 // pub fn initialize_record_except_hi_score
 // (   opt_record: Option<ResMut<Record>>,
@@ -443,7 +412,7 @@ fn update_fps<T: Resource + DisplayInfoFpsTrait>(
 ) -> Result
 {
     // 準備
-    let display_info = opt_display_info.ok_or("DisplayInfoFps not found.")?;
+    let display_info = opt_display_info.ok_or("Res<{T}> not found.")?;
     let root_entity = qry_text_block
         .iter()
         .filter(|(_, position)| **position == display_info.position())
@@ -456,7 +425,7 @@ fn update_fps<T: Resource + DisplayInfoFpsTrait>(
         let mut fps_text = text_writer
             .get_text(entity, display_info.index())
             .ok_or(format!(
-                "no entity with a matching index: {}",
+                "No entity with a matching index: {}",
                 display_info.index()
             ))?;
 

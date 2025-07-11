@@ -4,8 +4,8 @@ use super::*;
 mod consts_and_types; // プレイヤーの定数と型の宣言
 pub use consts_and_types::*;
 
-mod player; // プレイヤーのスプライト処理
-pub use player::*;
+mod player_sprite; // プレイヤーのスプライト処理
+pub use player_sprite::*;
 
 mod input; // キー・ゲームパッドの入力処理
 pub use input::*;

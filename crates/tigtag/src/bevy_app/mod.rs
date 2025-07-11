@@ -11,4 +11,7 @@ mod map; // 迷路生成
 pub mod player; // プレイヤー
 mod chasers; // チェイサー
 
+mod animate_sprites; //スプライトアニメーション
+use animate_sprites::*;
+
 // End of code.

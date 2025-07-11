@@ -2,20 +2,6 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// スプライトシートでアニメーションするためのトレイト実装
-impl CharacterAnimation for Chaser
-{
-    fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime_timer }
-    fn sprite_sheet_frame(&self) -> u32 { self.sprite_sheet_frame }
-    fn sprite_sheet_offset(&self, news: News) -> u32
-    {
-        *self.sprite_sheet_indexes.get(&news).unwrap()
-    }
-    fn direction(&self) -> News { self.direction }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // チェイサーをspawnする
 pub fn spawn_sprite(
     opt_record: Option<Res<Record>>,
@@ -28,7 +14,7 @@ pub fn spawn_sprite(
 ) -> Result
 {
     // 準備
-    let record = opt_record.ok_or("Resource <Record> not found.")?; // 必須のResource
+    let record = opt_record.ok_or("Res<Record> not found.")?; // 必須のResource
     qry_entity.iter().for_each(|id| cmds.entity(id).despawn()); // 既存スプライトがあれば削除する
 
     // 敵キャラをマップの四隅に配置する
