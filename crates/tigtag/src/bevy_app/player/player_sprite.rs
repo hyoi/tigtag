@@ -88,7 +88,7 @@ pub fn move_sprite(
     mut qry_player: Query<(&mut Transform, &mut Player)>,
     mut qry_sprite: Query<&mut Sprite, With<Player>>,
     opt_map: Option<Res<Map>>,
-    opt_input: Option<ResMut<InputDirection>>,
+    opt_input: Option<ResMut<PlayerInput>>,
     opt_demo: Option<Res<DemoMapParams>>,
     qry_chasers: Query<&Chaser>,
     state: ResMut<State<MyState>>,
@@ -110,10 +110,10 @@ pub fn move_sprite(
         // 後続の処理にtimer finishedを伝達する
         // evt_timer.write(EventTimerPlayer);
 
-        // スプライトがグリッド間の中途に位置したなら
+        // スプライトがグリッド間の中途に位置したら
         if player.px_start != player.px_end
         {
-            // スプライトをグリッドにフィットさせる
+            // グリッドにフィットさせる
             player.px_start = player.px_end;
             player.px_end = player.next_grid.to_vec2_on_game_map();
             transform.translation = player.px_end.extend(DEPTH_SPRITE_PLAYER);
@@ -122,26 +122,50 @@ pub fn move_sprite(
         // プレイヤーが次に進む方向を決める
         let mut new_side = player.direction;
         player.is_stop = true; // 停止フラグを立てておく
-
         if !state.get().is_demoplay()
         {
-            // 入力に対応する
-            for side in input.0.iter()
-            // input.0は優先順に並んでいる前提
+            //準備
+            let count = input.len();
+            let direction = &mut Vec::<News>::with_capacity(4);
+
+            if count == 1
             {
-                // 壁でない場合
-                if map.is_space(player.next_grid + side)
+                //入力が１なら
+                direction.push(*input.iter().next().unwrap());
+            }
+            else if count >= 2
+            {
+                //入力が２つ以上あれば、
+                //プレイヤーの正面（前方）、逆向き（後方）、それ以外（左右）として、
+                //後方、左右、前方の順に優先して並べ替えたVecを作る。
+                let opt_front = input.take(&player.direction);
+                let opt_back = input.take(&player.direction.back());
+                opt_back.iter().for_each(|&x| direction.push(x));
+
+                //frontとbackはtake済みなので残りは(あれば)右折か左折だけ
+                direction.extend(input.iter());
+
+                opt_front.iter().for_each(|&x| direction.push(x));
+            }
+
+            // 入力を処理する
+            for &input_news in direction.iter()
+            {
+                // 入力された向きのグリッドが壁でないなら
+                if map.is_space(player.next_grid + input_news)
                 {
-                    new_side = *side;
+                    new_side = input_news;
                     player.is_stop = false;
+
+                    // directionの要素は優先順に並んでいる前提なので即break
                     break;
                 }
 
-                // ループの先頭要素では、向きを必ず変える
-                if *side == (input.0)[0]
-                // データの性質上 値が重複する要素はない
+                // ループの先頭要素なら（入力された向きのグリッドが壁でも）
+                if input_news == direction[0]
                 {
-                    new_side = *side;
+                    //向きを変える
+                    new_side = input_news;
                 }
             }
         }
@@ -238,7 +262,7 @@ pub fn move_sprite(
     }
 
     //入力のクリア
-    *input = InputDirection::default();
+    input.clear();
 
     Ok(())
 }

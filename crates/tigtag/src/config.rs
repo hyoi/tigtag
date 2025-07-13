@@ -294,29 +294,31 @@ pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
 ////////////////////////////////////////////////////////////////////////////////
 
 // キーコードとコールバック関数の対応
+#[rustfmt::skip]
 pub const KEY_MAP: [(KeyCode, player::CallBack); 8] = [
     // WASD
-    (KeyCode::KeyW, player::move_up),
-    (KeyCode::KeyS, player::move_down),
-    (KeyCode::KeyA, player::move_left),
-    (KeyCode::KeyD, player::move_right),
+    ( KeyCode::KeyW, player::move_up    ),
+    ( KeyCode::KeyS, player::move_down  ),
+    ( KeyCode::KeyA, player::move_left  ),
+    ( KeyCode::KeyD, player::move_right ),
     // カーソルキー
-    (KeyCode::ArrowUp, player::move_up),
-    (KeyCode::ArrowDown, player::move_down),
-    (KeyCode::ArrowLeft, player::move_left),
-    (KeyCode::ArrowRight, player::move_right),
+    ( KeyCode::ArrowUp   , player::move_up    ),
+    ( KeyCode::ArrowDown , player::move_down  ),
+    ( KeyCode::ArrowLeft , player::move_left  ),
+    ( KeyCode::ArrowRight, player::move_right ),
 ];
 
 // ゲームパッドのボタン／スティックとコールバック関数の対応
+#[rustfmt::skip]
 pub const PAD_MAP: [(GamepadInput, player::CallBack); 6] = [
     // 十字ボタン
-    (GamepadInput::Button(DPadUp), player::move_up),
-    (GamepadInput::Button(DPadDown), player::move_down),
-    (GamepadInput::Button(DPadLeft), player::move_left),
-    (GamepadInput::Button(DPadRight), player::move_right),
+    ( GamepadInput::Button( DPadUp   ), player::move_up    ),
+    ( GamepadInput::Button( DPadDown ), player::move_down  ),
+    ( GamepadInput::Button( DPadLeft ), player::move_left  ),
+    ( GamepadInput::Button( DPadRight), player::move_right ),
     // 左スティック
-    (GamepadInput::Axis(LeftStickX), player::axis_x_normal),
-    (GamepadInput::Axis(LeftStickY), player::axis_y_normal),
+    ( GamepadInput::Axis( LeftStickX ), player::axis_x_normal ),
+    ( GamepadInput::Axis( LeftStickY ), player::axis_y_normal ),
 ];
 
 ////////////////////////////////////////////////////////////////////////////////

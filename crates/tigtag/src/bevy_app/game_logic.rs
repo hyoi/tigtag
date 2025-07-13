@@ -20,9 +20,10 @@ impl Plugin for Schedule
         // Resource
         appl.init_resource::<Record>() // ゲームの成績
             .init_resource::<Map>() // ステージのマップ
-            .init_resource::<player::InputDirection>() // プレイヤーの入力(十字方向)
-            .insert_resource(player::KeyMap(FxHashMap::from_iter(KEY_MAP)))
-            .insert_resource(player::PadMap(FxHashMap::from_iter(PAD_MAP)));
+            .init_resource::<player::PlayerInput>() // プレイヤーの入力
+            .insert_resource(player::KeyMap(FxHashMap::from_iter(KEY_MAP))) //マッピング（キー）
+            .insert_resource(player::PadMap(FxHashMap::from_iter(PAD_MAP))) //マッピング（ゲームパッド）
+            ;
 
         // Event
         // appl

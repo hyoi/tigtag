@@ -20,7 +20,7 @@ use bevy::{
     // ecs::query::QueryFilter,
 };
 use rand::prelude::*;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxHashMap, FxHashSet};
 // use chrono::prelude::Local as time_local; //「Local」がbevyとバッティングするのでaliasを使う
 
 // standard library

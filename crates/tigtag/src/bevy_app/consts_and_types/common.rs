@@ -57,6 +57,41 @@ pub enum News
     South,
 }
 
+impl News
+{
+    // //時計回りで方角を得る
+    // pub fn turn_right( &self ) -> Self
+    // {   match self
+    //     {   News::North => News::East,
+    //         News::East  => News::South,
+    //         News::West  => News::North,
+    //         News::South => News::West,
+    //     }
+    // }
+
+    // //反時計回りで方角を得る
+    // pub fn turn_left( &self ) -> Self
+    // {   match self
+    //     {   News::North => News::West,
+    //         News::East  => News::North,
+    //         News::West  => News::South,
+    //         News::South => News::East,
+    //     }
+    // }
+
+    //背面の方角を得る
+    pub fn back(&self) -> Self
+    {
+        match self
+        {
+            News::North => News::South,
+            News::East => News::West,
+            News::West => News::East,
+            News::South => News::North,
+        }
+    }
+}
+
 // IVec2 = IVec2 + News
 impl Add<News> for IVec2
 {
