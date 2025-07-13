@@ -46,11 +46,11 @@ impl Default for Player
 
 // 自走プレイヤー(デモ時)の移動方向を決める関数（関数ポインタ）
 type FnAutoDrive = fn(
-    &Player,            //プレイヤーのComponent
-    Query<&Chaser>,     //チェイサーのComponent
-    Res<Map>,           //マップ
-    Res<DemoMapParams>, //デモ用情報
-    &[News],            //
+    &Player,                //プレイヤーのComponent
+    Query<&chaser::Chaser>, //チェイサーのComponent
+    Res<Map>,               //マップ
+    Res<DemoMapParams>,     //デモ用情報
+    &[News],                //
 ) -> News;
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -58,8 +58,8 @@ impl Plugin for Schedule
             Update,
             (
                 animate_sprites::<player::Player>, // プレイヤー
-                animate_sprites::<Chaser>,         // チェイサー
-                chasers::rotate_chaser_shape // チェイサーの回転
+                animate_sprites::<chaser::Chaser>, // チェイサー
+                chaser::rotate_chaser_shape // チェイサーの回転
                     .run_if(SPRITE_OFF), // スプライトシートがOFFの場合
             ),
         );
@@ -126,35 +126,35 @@ impl Plugin for Schedule
                     (
                         map::spawn_sprite,
                         player::spawn_sprite,
-                        chasers::spawn_sprite,
+                        chaser::spawn_sprite,
                     ),
                     //for DEBUG
                     change_state_to::<MainLoop>, //DEBUG後に削除すること
                 )
                     .chain(), //実行順の固定
-/*
-        //         //TextUIの可視化
-        //         (   effect::init_count::<stage_start::CountDown>, //カウント初期化
-        //             misc::show_component::<stage_start::Message>,
-        //         )
-        //         .chain(), //実行順の固定
-*/
+                              /*
+                              //         //TextUIの可視化
+                              //         (   effect::init_count::<stage_start::CountDown>, //カウント初期化
+                              //             misc::show_component::<stage_start::Message>,
+                              //         )
+                              //         .chain(), //実行順の固定
+                              */
             ),
-/*
-        // )
-        // .add_systems
-        // (   Update,
-        //     (   //TextUIの演出
-        //         effect::count_down::<stage_start::CountDown>, //カウントダウン
-        //     )
-        //     .run_if( in_state( MyState::StageStart ) )
-        // )
-        // .add_systems
-        // (   OnExit ( MyState::StageStart ),
-        //     (   //TextUIの不可視化
-        //         misc::hide_component::<stage_start::Message>,
-        //     )
-*/
+            /*
+            // )
+            // .add_systems
+            // (   Update,
+            //     (   //TextUIの演出
+            //         effect::count_down::<stage_start::CountDown>, //カウントダウン
+            //     )
+            //     .run_if( in_state( MyState::StageStart ) )
+            // )
+            // .add_systems
+            // (   OnExit ( MyState::StageStart ),
+            //     (   //TextUIの不可視化
+            //         misc::hide_component::<stage_start::Message>,
+            //     )
+            */
         );
 
         //----------------------------------------------------------------------
@@ -185,8 +185,8 @@ impl Plugin for Schedule
                         player::move_sprite, // スプライトを移動
                     )
                         .chain(), // 実行順の固定
-                        // チェイサー
-                        // chasers::move_sprite, // スプライトを移動
+                                  // チェイサー
+                                  // chasers::move_sprite, // スプライトを移動
                 )
             )
                 .chain() // 実行順の固定

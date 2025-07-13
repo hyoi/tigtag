@@ -9,7 +9,7 @@ use consts_and_types::*; // 識別子をモジュール名不要にして外へ�
 
 mod map; // 迷路生成
 pub mod player; // プレイヤー
-mod chasers; // チェイサー
+pub mod chaser; // チェイサー
 
 mod animate_sprites; //スプライトアニメーション
 use animate_sprites::*;

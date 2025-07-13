@@ -61,26 +61,26 @@ const MAX_X: i32 = MAP_GRIDS_WIDTH - 2;
 const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
 
 // 各色ごとの情報（色と移動方向の決定関数とassetファイル名）
-use crate::bevy_app::chasers::*;
+use crate::bevy_app::chaser::*;
 pub const CHASERS_SPRITE_INFO: &[(Color, Option<FnAutoChase>, &str)] = &[
     (
         Color::Srgba(css::RED),
-        chasers::CHOICE_WAY_RED,
+        chaser::CHOICE_WAY_RED,
         ASSETS_SPRITE_SHEET_CHASER_RED,
     ),
     (
         Color::Srgba(css::GREEN),
-        chasers::CHOICE_WAY_GREEN,
+        chaser::CHOICE_WAY_GREEN,
         ASSETS_SPRITE_SHEET_CHASER_GREEN,
     ),
     (
         Color::Srgba(css::PINK),
-        chasers::CHOICE_WAY_PINK,
+        chaser::CHOICE_WAY_PINK,
         ASSETS_SPRITE_SHEET_CHASER_PINK,
     ),
     (
         Color::Srgba(css::BLUE),
-        chasers::CHOICE_WAY_BLUE,
+        chaser::CHOICE_WAY_BLUE,
         ASSETS_SPRITE_SHEET_CHASER_BLUE,
     ),
 ];

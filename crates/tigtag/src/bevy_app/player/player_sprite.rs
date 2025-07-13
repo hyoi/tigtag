@@ -90,7 +90,7 @@ pub fn move_sprite(
     opt_map: Option<Res<Map>>,
     opt_input: Option<ResMut<PlayerInput>>,
     opt_demo: Option<Res<DemoMapParams>>,
-    qry_chasers: Query<&Chaser>,
+    qry_chasers: Query<&chaser::Chaser>,
     state: ResMut<State<MyState>>,
     // mut evt_timer: EventWriter<EventTimerPlayer>,
     time: Res<Time>,
@@ -315,7 +315,7 @@ fn autodrive(
     player: &mut Player,
     map: Res<Map>,
     opt_demo: Option<Res<DemoMapParams>>,
-    qry_chasers: Query<&Chaser>,
+    qry_chasers: Query<&chaser::Chaser>,
 ) -> News
 {
     // demoでは停止しない

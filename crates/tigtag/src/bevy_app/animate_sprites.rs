@@ -58,7 +58,7 @@ impl SpriteAnimation for player::Player
 }
 
 // Chaserのトレイト実装
-impl SpriteAnimation for Chaser
+impl SpriteAnimation for chaser::Chaser
 {
     fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime_timer }
     fn num_patterns(&self) -> u32 { self.sprite_sheet_frame }
