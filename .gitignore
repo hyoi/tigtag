@@ -1,5 +1,6 @@
 /target
 /backup
+/.idea
 
 Cargo.lock
 *.bak
