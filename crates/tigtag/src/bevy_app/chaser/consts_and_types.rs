@@ -68,8 +68,8 @@ pub const CHASER_START_POSITION: &[IVec2] = &[
     IVec2::new(MAX_X, 1),
     IVec2::new(MAX_X, MAX_Y),
 ];
-const MAX_X: i32 = MAP_GRIDS_WIDTH - 2;
-const MAX_Y: i32 = MAP_GRIDS_HEIGHT - 2;
+const MAX_X: i32 = map::MAP_GRIDS_WIDTH - 2;
+const MAX_Y: i32 = map::MAP_GRIDS_HEIGHT - 2;
 
 // チェイサーの各色ごとの情報
 pub const CHASERS_SPRITE_INFO: &[(&str, Srgba, Option<FnAutoChase>)] = &[

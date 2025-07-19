@@ -54,7 +54,7 @@ const ANIME_TIMER_PLAYER: f32 = 0.15;
 type FnAutoDrive = fn(
     &Player,                // プレイヤーのComponent
     Query<&chaser::Chaser>, // チェイサーのComponent
-    Res<Map>,               // マップ
+    Res<map::Map>,          // マップ
     Res<DemoMapParams>,     // デモ用情報
     &[News],                //
 ) -> News;

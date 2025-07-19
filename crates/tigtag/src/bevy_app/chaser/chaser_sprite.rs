@@ -77,7 +77,7 @@ pub fn spawn_sprite(
 // チェイサーを移動させる
 pub fn move_sprite(
     mut qry_chaser: Query<(&mut Transform, &mut Sprite, &mut Chaser)>,
-    opt_map: Option<Res<Map>>,
+    opt_map: Option<Res<map::Map>>,
     qry_player: Query<&player::Player>,
     // mut evt_timer: EventWriter<EventTimerChasers>,
     time: Res<Time>,

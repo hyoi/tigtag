@@ -5,7 +5,7 @@ use super::*;
 // プレイヤーをspawnする
 pub fn spawn_sprite(
     qry_entity: Query<Entity, With<Player>>,
-    opt_map: Option<ResMut<Map>>,
+    opt_map: Option<ResMut<map::Map>>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
     mut texture_atlases_layout: ResMut<Assets<TextureAtlasLayout>>,
@@ -18,13 +18,13 @@ pub fn spawn_sprite(
     let mut map = opt_map.ok_or("ResMut<Map> not found.")?; // 必須のResource
 
     // 乱数で初期位置を決める(マップ中央付近の通路)
-    let half_w = MAP_GRIDS_WIDTH / 2;
-    let half_h = MAP_GRIDS_HEIGHT / 2;
+    let half_w = map::MAP_GRIDS_WIDTH / 2;
+    let half_h = map::MAP_GRIDS_HEIGHT / 2;
     let short_side = if half_w >= half_h { half_h } else { half_w };
     let x1 = short_side - 1;
     let y1 = short_side - 1;
-    let x2 = MAP_GRIDS_WIDTH - short_side;
-    let y2 = MAP_GRIDS_HEIGHT - short_side;
+    let x2 = map::MAP_GRIDS_WIDTH - short_side;
+    let y2 = map::MAP_GRIDS_HEIGHT - short_side;
 
     let player_grid = loop
     {
@@ -88,7 +88,7 @@ pub fn spawn_sprite(
 pub fn move_sprite(
     mut qry_player: Query<(&mut Transform, &mut Player)>,
     mut qry_sprite: Query<&mut Sprite, With<Player>>,
-    opt_map: Option<Res<Map>>,
+    opt_map: Option<Res<map::Map>>,
     opt_input: Option<ResMut<PlayerInput>>,
     opt_demo: Option<Res<DemoMapParams>>,
     qry_chasers: Query<&chaser::Chaser>,
@@ -314,7 +314,7 @@ fn rotate_player_triangle(
 // demo用に入力相当のデータを作る
 fn autodrive(
     player: &mut Player,
-    map: Res<Map>,
+    map: Res<map::Map>,
     opt_demo: Option<Res<DemoMapParams>>,
     qry_chasers: Query<&chaser::Chaser>,
 ) -> News

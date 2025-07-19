@@ -104,10 +104,14 @@ impl Map
         flags & Map::BIT_WALL == 0
     }
 
-    // pub fn opt_entity( &self, grid: IVec2 ) -> Option<Entity>
-    // {   if ! self.is_inside( grid ) { return None } //範囲外はOption::Noneを返す
-    //     self.dot_entities[ grid.x as usize ][ grid.y as usize ]
-    // }
+    pub fn opt_entity(&self, grid: IVec2) -> Option<Entity>
+    {
+        if !self.is_inside(grid)
+        {
+            return None;
+        } //範囲外はOption::Noneを返す
+        self.dot_entities[grid.x as usize][grid.y as usize]
+    }
     pub fn opt_entity_mut(&mut self, grid: IVec2) -> &mut Option<Entity>
     {
         if !self.is_inside(grid)

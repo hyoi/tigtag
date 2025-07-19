@@ -170,8 +170,8 @@ const ADJUST_MAP_ON_SCREEN: IVec2 = IVec2::new(0, 1);
 pub struct DemoMapParams
 {
     dots_rect: IVec2Rect, // dotsを内包する最小の矩形
-    dots_sum_x: [i32; MAP_GRIDS_WIDTH as usize], // 列に残っているdotsを数えた配列
-    dots_sum_y: [i32; MAP_GRIDS_HEIGHT as usize], // 行に残っているdotsを数えた配列
+    dots_sum_x: [i32; map::MAP_GRIDS_WIDTH as usize], // 列に残っているdotsを数えた配列
+    dots_sum_y: [i32; map::MAP_GRIDS_HEIGHT as usize], // 行に残っているdotsを数えた配列
 }
 
 #[derive(Default)]
