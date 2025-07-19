@@ -9,8 +9,6 @@ pub fn spawn_sprite(
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
     mut texture_atlases_layout: ResMut<Assets<TextureAtlasLayout>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
 ) -> Result
 {
     // 準備
@@ -44,14 +42,15 @@ pub fn spawn_sprite(
         if SPRITE_OFF()
         {
             // 正方形のメッシュを作る
-            let shape = RegularPolygon::new(CHASER_SPRITE_RADIUS, 4).mesh();
             cmds.spawn((
-                Mesh2d(meshes.add(shape)),
-                MeshMaterial2d(materials.add(Color::Srgba(color))),
+                Sprite {
+                    //imageを指定しないと正方形のメッシュを表示するのを利用する
+                    color: Color::Srgba(color),
+                    custom_size: Some(GRID_CUSTOM_SIZE * CHASER_SPRITE_SCALING),
+                    ..default()
+                },
                 transform,
                 chaser,
-                // move_sprite()の引数qry_chaserのQueryを満たす為に必要なダミーのSprite
-                Sprite::default(),
             ));
         }
         else
