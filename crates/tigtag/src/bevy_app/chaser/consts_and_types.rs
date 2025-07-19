@@ -76,22 +76,22 @@ pub const CHASERS_SPRITE_INFO: &[(&str, Srgba, Option<FnAutoChase>)] = &[
     (
         ASSETS_SPRITE_SHEET_CHASER_RED, // assetファイル名
         basic::RED,                     // 色
-        chaser::CHOICE_WAY_RED,         // 移動方向の決定関数
+        chaser::SELECT_PATH_RED,        // 移動方向の決定関数
     ),
     (
         ASSETS_SPRITE_SHEET_CHASER_GREEN,
         basic::GREEN,
-        chaser::CHOICE_WAY_GREEN,
+        chaser::SELECT_PATH_GREEN,
     ),
     (
         ASSETS_SPRITE_SHEET_CHASER_PINK,
         basic::FUCHSIA,
-        chaser::CHOICE_WAY_PINK,
+        chaser::SELECT_PATH_PINK,
     ),
     (
         ASSETS_SPRITE_SHEET_CHASER_BLUE,
         basic::BLUE,
-        chaser::CHOICE_WAY_BLUE,
+        chaser::SELECT_PATH_BLUE,
     ),
 ];
 

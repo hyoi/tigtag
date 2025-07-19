@@ -233,44 +233,112 @@ pub fn rotate_chaser_shape(
 ////////////////////////////////////////////////////////////////////////////////
 
 // 進む方向を決める(赤)
-pub const CHOICE_WAY_RED: Option<FnAutoChase> = None; // Some( choice_way_red );
-// fn choice_way_red( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
-// {   if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
-//     if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
-//     if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
-//     if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
-//     sides[ rand::rng().random_range( 0..sides.len() ) ]
-// }
+// pub const SELECT_PATH_RED: Option<FnAutoChase> = None;
+pub const SELECT_PATH_RED: Option<FnAutoChase> = Some(select_path_red);
+fn select_path_red(
+    chaser: &mut Chaser,
+    player: &player::Player,
+    sides: &[News],
+) -> News
+{
+    let priority = [
+        (News::West, player.next_grid.x < chaser.grid.x),
+        (News::East, player.next_grid.x > chaser.grid.x),
+        (News::North, player.next_grid.y < chaser.grid.y),
+        (News::South, player.next_grid.y > chaser.grid.y),
+    ];
+    for (direction, condition) in priority
+    {
+        if condition && sides.contains(&direction)
+        {
+            return direction;
+        }
+    }
+
+    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
+    *sides.choose(&mut rand::rng()).unwrap()
+}
 
 // 進む方向を決める(青)
-pub const CHOICE_WAY_BLUE: Option<FnAutoChase> = None; // Some( choice_way_blue );
-// fn choice_way_blue( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
-// {   if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
-//     if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
-//     if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
-//     if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
-//     sides[ rand::rng().random_range( 0..sides.len() ) ]
-// }
+// pub const SELECT_PATH_BLUE: Option<FnAutoChase> = None;
+pub const SELECT_PATH_BLUE: Option<FnAutoChase> = Some(select_path_blue);
+fn select_path_blue(
+    chaser: &mut Chaser,
+    player: &player::Player,
+    sides: &[News],
+) -> News
+{
+    let priority = [
+        (News::South, player.next_grid.y > chaser.grid.y),
+        (News::West, player.next_grid.x < chaser.grid.x),
+        (News::East, player.next_grid.x > chaser.grid.x),
+        (News::North, player.next_grid.y < chaser.grid.y),
+    ];
+    for (direction, condition) in priority
+    {
+        if condition && sides.contains(&direction)
+        {
+            return direction;
+        }
+    }
+
+    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
+    *sides.choose(&mut rand::rng()).unwrap()
+}
 
 // 進む方向を決める(緑)
-pub const CHOICE_WAY_GREEN: Option<FnAutoChase> = None; // Some( choice_way_green );
-// fn choice_way_green( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
-// {   if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
-//     if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
-//     if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
-//     if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
-//     sides[ rand::rng().random_range( 0..sides.len() ) ]
-// }
+// pub const SELECT_PATH_GREEN: Option<FnAutoChase> = None;
+pub const SELECT_PATH_GREEN: Option<FnAutoChase> = Some(select_path_green);
+fn select_path_green(
+    chaser: &mut Chaser,
+    player: &player::Player,
+    sides: &[News],
+) -> News
+{
+    let priority = [
+        (News::North, player.next_grid.y < chaser.grid.y),
+        (News::South, player.next_grid.y > chaser.grid.y),
+        (News::West, player.next_grid.x < chaser.grid.x),
+        (News::East, player.next_grid.x > chaser.grid.x),
+    ];
+    for (direction, condition) in priority
+    {
+        if condition && sides.contains(&direction)
+        {
+            return direction;
+        }
+    }
+
+    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
+    *sides.choose(&mut rand::rng()).unwrap()
+}
 
 // 進む方向を決める(ピンク)
-pub const CHOICE_WAY_PINK: Option<FnAutoChase> = None; // Some( choice_way_pink );
-// fn choice_way_pink( chaser: &mut Chaser, player: &Player, sides: &[ News ] ) -> News
-// {   if sides.contains( &News::East  ) && player.next_grid.x > chaser.grid.x { return News::East  }
-//     if sides.contains( &News::North ) && player.next_grid.y < chaser.grid.y { return News::North }
-//     if sides.contains( &News::South ) && player.next_grid.y > chaser.grid.y { return News::South }
-//     if sides.contains( &News::West  ) && player.next_grid.x < chaser.grid.x { return News::West  }
-//     sides[ rand::rng().random_range( 0..sides.len() ) ]
-                                                       // }
+// pub const SELECT_PATH_PINK: Option<FnAutoChase> = None;
+pub const SELECT_PATH_PINK: Option<FnAutoChase> = Some(select_path_pink);
+fn select_path_pink(
+    chaser: &mut Chaser,
+    player: &player::Player,
+    sides: &[News],
+) -> News
+{
+    let priority = [
+        (News::East, player.next_grid.x > chaser.grid.x),
+        (News::North, player.next_grid.y < chaser.grid.y),
+        (News::South, player.next_grid.y > chaser.grid.y),
+        (News::West, player.next_grid.x < chaser.grid.x),
+    ];
+    for (direction, condition) in priority
+    {
+        if condition && sides.contains(&direction)
+        {
+            return direction;
+        }
+    }
+
+    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
+    *sides.choose(&mut rand::rng()).unwrap()
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
