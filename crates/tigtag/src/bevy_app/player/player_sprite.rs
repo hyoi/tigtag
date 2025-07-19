@@ -4,8 +4,8 @@ use super::*;
 
 // プレイヤーをspawnする
 pub fn spawn_sprite(
-    opt_map: Option<ResMut<Map>>,
     qry_entity: Query<Entity, With<Player>>,
+    opt_map: Option<ResMut<Map>>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
     mut texture_atlases_layout: ResMut<Assets<TextureAtlasLayout>>,
@@ -14,8 +14,8 @@ pub fn spawn_sprite(
 ) -> Result
 {
     // 準備
-    let mut map = opt_map.ok_or("ResMut<Map> not found.")?; // 必須のResource
     qry_entity.iter().for_each(|id| cmds.entity(id).despawn()); // 既存スプライトがあれば削除する
+    let mut map = opt_map.ok_or("ResMut<Map> not found.")?; // 必須のResource
 
     // 乱数で初期位置を決める(マップ中央付近の通路)
     let half_w = MAP_GRIDS_WIDTH / 2;
@@ -38,9 +38,10 @@ pub fn spawn_sprite(
         }
     };
     let vec2 = player_grid.to_vec2_on_game_map();
-    let transform = Transform::from_translation(vec2.extend(DEPTH_SPRITE_PLAYER));
+    let vec3 = vec2.extend(DEPTH_SPRITE_PLAYER);
+    let transform = Transform::from_translation(vec3);
 
-    // プレイヤーデータを初期化する
+    // プレイヤーのデータを初期化する
     let player = Player {
         grid: player_grid,
         next_grid: player_grid,
@@ -54,7 +55,7 @@ pub fn spawn_sprite(
     {
         // 三角形のメッシュを作る
         let shape = RegularPolygon::new(PLAYER_SPRITE_RADIUS, 3).mesh();
-        let quat = Quat::from_rotation_z(PI); // News::South
+        let quat = Quat::from_rotation_z(PI); // 回転 News::South
         cmds.spawn((
             Mesh2d(meshes.add(shape)),
             MeshMaterial2d(materials.add(PLAYER_SPRITE_COLOR)),
@@ -65,7 +66,7 @@ pub fn spawn_sprite(
     else
     {
         // アニメーションするスプライトをspawnする
-        let layout = texture_atlases_layout.add(PLAYER_SPRITESHEET_LAYOUT.clone());
+        let layout = texture_atlases_layout.add(SPRITESHEET_LAYOUT.clone());
         let index = player.sprite_sheet_offset(player.direction()) as usize;
 
         let mut sprite = Sprite::from_atlas_image(
@@ -100,9 +101,7 @@ pub fn move_sprite(
     let (mut transform, mut player) = qry_player.single_mut()?;
     let map = opt_map.ok_or("Res<Map> not found.")?;
     let mut input = opt_input.ok_or("ResMut<InputDirection> not found.")?;
-
-    // 前回からの経過時間 × スピードアップ係数
-    let time_delta = time.delta().mul_f32(player.speedup);
+    let time_delta = time.delta(); //.mul_f32(player.speedup);
 
     // 移動タイマーがfinishしたなら
     if player.timer.tick(time_delta).finished()

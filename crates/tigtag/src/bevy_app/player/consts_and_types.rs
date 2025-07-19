@@ -37,62 +37,27 @@ impl Default for Player
             px_start: Vec2::default(),
             px_end: Vec2::default(),
             fn_autodrive: None,
-            anime: SpriteAnimationParams::default(),
+            anime: SpriteAnimationParams {
+                timer: Timer::from_seconds(ANIME_TIMER_PLAYER, TimerMode::Repeating),
+                ..default()
+            },
         }
     }
 }
+
+// スプライトアニメーションの切替間隔
+const ANIME_TIMER_PLAYER: f32 = 0.15;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // 自走プレイヤー(デモ時)の移動方向を決める関数（関数ポインタ）
 type FnAutoDrive = fn(
-    &Player,                //プレイヤーのComponent
-    Query<&chaser::Chaser>, //チェイサーのComponent
-    Res<Map>,               //マップ
-    Res<DemoMapParams>,     //デモ用情報
+    &Player,                // プレイヤーのComponent
+    Query<&chaser::Chaser>, // チェイサーのComponent
+    Res<Map>,               // マップ
+    Res<DemoMapParams>,     // デモ用情報
     &[News],                //
 ) -> News;
-
-////////////////////////////////////////////////////////////////////////////////
-
-//スプライトアニメーションの情報
-pub struct SpriteAnimationParams
-{
-    pub timer: Timer,                               // タイマー
-    pub num_patterns: u32,                          // フレーム数
-    pub sprite_sheet_offsets: FxHashMap<News, u32>, // 先頭位置(offset値)
-}
-
-// スプライトシートの情報１
-impl Default for SpriteAnimationParams
-{
-    fn default() -> Self
-    {
-        const NUM_PATTERNS: u32 = 4; // パターン数(TextureAtlasLayoutのcolumns)
-        Self {
-            timer: Timer::from_seconds(0.15, TimerMode::Repeating),
-            num_patterns: NUM_PATTERNS,
-            sprite_sheet_offsets: FxHashMap::from_iter([
-                (News::North, 0),
-                (News::East, NUM_PATTERNS),
-                (News::West, NUM_PATTERNS * 2),
-                (News::South, NUM_PATTERNS * 3),
-            ]),
-        }
-    }
-}
-
-// スプライトシートの情報２（TextureAtlasLayout）
-pub static PLAYER_SPRITESHEET_LAYOUT: LazyLock<TextureAtlasLayout> =
-    LazyLock::new(|| {
-        TextureAtlasLayout::from_grid(
-            UVec2::new(8, 8), // １セルの縦横px
-            4,                // columns（アニメのパターン数）
-            4,                // rows（上下左右の向きで４つ）
-            None,             // padding
-            None,             // offset
-        )
-    });
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -174,7 +174,6 @@ impl Plugin for Schedule
 
                 // スプライトの移動
                 (
-                    // プレイヤー
                     (
                         // player::catch_input_direction,
                         (
@@ -182,11 +181,10 @@ impl Plugin for Schedule
                             player::input_from_keyboard, // キー
                             player::input_from_gamepad,  // ゲームパッド
                         ),
-                        player::move_sprite, // スプライトを移動
+                        player::move_sprite, // プレイヤーを移動
                     )
                         .chain(), // 実行順の固定
-                                  // チェイサー
-                                  // chasers::move_sprite, // スプライトを移動
+                    chaser::move_sprite, // チェイサーを移動
                 )
             )
                 .chain() // 実行順の固定

@@ -2,6 +2,46 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//スプライトアニメーションの情報
+pub struct SpriteAnimationParams
+{
+    pub timer: Timer,                               // タイマー
+    pub num_patterns: u32,                          // フレーム数
+    pub sprite_sheet_offsets: FxHashMap<News, u32>, // 先頭位置(offset値)
+}
+
+// スプライトシートの情報１
+impl Default for SpriteAnimationParams
+{
+    fn default() -> Self
+    {
+        const NUM_PATTERNS: u32 = 4; // パターン数(TextureAtlasLayoutのcolumns)
+        Self {
+            timer: Timer::from_seconds(0.15, TimerMode::Repeating),
+            num_patterns: NUM_PATTERNS,
+            sprite_sheet_offsets: FxHashMap::from_iter([
+                (News::North, 0),
+                (News::East, NUM_PATTERNS),
+                (News::West, NUM_PATTERNS * 2),
+                (News::South, NUM_PATTERNS * 3),
+            ]),
+        }
+    }
+}
+
+// スプライトシートの情報２（TextureAtlasLayout）
+pub static SPRITESHEET_LAYOUT: LazyLock<TextureAtlasLayout> = LazyLock::new(|| {
+    TextureAtlasLayout::from_grid(
+        UVec2::new(8, 8), // １セルの縦横px
+        4,                // columns（アニメのパターン数）
+        4,                // rows（上下左右の向きで４つ）
+        None,             // padding
+        None,             // offset
+    )
+});
+
+////////////////////////////////////////////////////////////////////////////////
+
 // スプライトをアニメーションさせる
 pub fn animate_sprites<T>(
     mut qry_target: Query<(&mut Sprite, &mut T)>,
@@ -60,11 +100,11 @@ impl SpriteAnimation for player::Player
 // Chaserのトレイト実装
 impl SpriteAnimation for chaser::Chaser
 {
-    fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime_timer }
-    fn num_patterns(&self) -> u32 { self.sprite_sheet_frame }
+    fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime.timer }
+    fn num_patterns(&self) -> u32 { self.anime.num_patterns }
     fn sprite_sheet_offset(&self, news: News) -> u32
     {
-        *self.sprite_sheet_indexes.get(&news).unwrap()
+        *self.anime.sprite_sheet_offsets.get(&news).unwrap()
     }
     fn direction(&self) -> News { self.direction }
 }
