@@ -19,20 +19,20 @@ impl Plugin for Schedule
 
         // Resource
         appl.init_resource::<Record>() // ゲームの成績
-            .init_resource::<Map>() // ステージのマップ
+            .init_resource::<map::Map>() // ステージのマップ
             .init_resource::<player::PlayerInput>() // プレイヤーの入力
             .insert_resource(player::KeyMap(FxHashMap::from_iter(KEY_MAP))) //マッピング（キー）
             .insert_resource(player::PadMap(FxHashMap::from_iter(PAD_MAP))) //マッピング（ゲームパッド）
             ;
 
         // Event
-        // appl
+        appl
+            .add_event::<EventClear>()  //ステージクリアの伝達
         // .add_event::<EventTimerPlayer>()  //プレイヤー移動タイマーのfinishedの伝達
-        // .add_event::<EventClear>()  //ステージクリアの伝達
         // .add_event::<EventOver>()   //ゲームオーバーの伝達
         // .add_event::<EventEatDot>() //スコアリングの伝達
         // .add_event::<EventTimerChasers>() //敵キャラ移動タイマーのfinishedの伝達
-        // ;
+            ;
 
         // plugin
         // appl.add_plugins( header::Schedule ) //ヘッダー更新(Stage、Score、HiScore)
@@ -165,19 +165,18 @@ impl Plugin for Schedule
         appl.add_systems(
             Update,
             (
-                // ループ脱出条件
-                //         detection::scoring_and_stage_clear, //スコアリング＆クリア判定
-                //         change_state_to::<StageClear>.run_if( on_event::<EventClear>() ),
-
-                //         detection::collisions_and_gameover, //衝突判定
-                //         change_state_to::<GameOver>.run_if( on_event::<EventOver>() ),
+                // スコアリング＆クリア判定
+                scoring_and_stage_clear,
+                change_state_to::<StageClear>.run_if(on_event::<EventClear>),
+                // 衝突判定
+                // detection::collisions_and_gameover,
+                // change_state_to::<GameOver>.run_if( on_event::<EventOver> ),
 
                 // スプライトの移動
                 (
                     (
-                        // player::catch_input_direction,
                         (
-                            // Resourceを更新する
+                            // 入力に従ってResourceを更新する
                             player::input_from_keyboard, // キー
                             player::input_from_gamepad,  // ゲームパッド
                         ),
@@ -185,7 +184,7 @@ impl Plugin for Schedule
                     )
                         .chain(), // 実行順の固定
                     chaser::move_sprite, // チェイサーを移動
-                )
+                ),
             )
                 .chain() // 実行順の固定
                 .run_if(in_state(MyState::MainLoop)),

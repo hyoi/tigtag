@@ -14,4 +14,7 @@ pub mod chaser; // チェイサー
 mod animate_sprites; //スプライトアニメーション
 use animate_sprites::*;
 
+mod detecting_change; // ステージクリアとゲームオーバーの判定
+use detecting_change::*;
+
 // End of code.
