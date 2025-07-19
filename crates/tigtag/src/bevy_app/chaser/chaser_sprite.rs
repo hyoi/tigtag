@@ -93,7 +93,7 @@ pub fn move_sprite(
     for (mut transform, mut sprite, mut chaser) in qry_chaser.iter_mut()
     {
         // 前回からの経過時間 × スピードアップ係数
-        // let time_delta = time_delta.mul_f32( chaser.speedup ); //??? speedupが1.x？？
+        let time_delta = time_delta.mul_f32(chaser.speedup); //speedup > 1.0
 
         // 移動タイマーがfinishしたなら
         if chaser.timer.tick(time_delta).finished()
@@ -193,20 +193,22 @@ pub fn move_sprite(
 
     //敵キャラは重なるとスピードアップする
     let mut color_grid = Vec::with_capacity(qry_chaser.iter().len());
+
     for (_, _, mut chaser) in qry_chaser.iter_mut()
     {
         color_grid.push((chaser.color, chaser.next_grid));
         chaser.speedup = 1.0;
     }
+
     for (color, grid) in color_grid
     {
         for (_, _, mut chaser) in qry_chaser.iter_mut()
         {
-            if grid != chaser.next_grid || color == chaser.color
+            //グリッドが一致し、自分以外の色なら
+            if grid == chaser.next_grid && color != chaser.color
             {
-                continue;
+                chaser.speedup += CHASER_ACCEL;
             }
-            chaser.speedup += CHASER_ACCEL;
         }
     }
 

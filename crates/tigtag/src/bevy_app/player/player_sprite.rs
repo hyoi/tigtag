@@ -101,7 +101,9 @@ pub fn move_sprite(
     let (mut transform, mut player) = qry_player.single_mut()?;
     let map = opt_map.ok_or("Res<Map> not found.")?;
     let mut input = opt_input.ok_or("ResMut<InputDirection> not found.")?;
-    let time_delta = time.delta(); //.mul_f32(player.speedup);
+
+    // 前回からの経過時間 × スピードアップ係数（プレイヤーのスピードアップは未実装）
+    let time_delta = time.delta().mul_f32(player.speedup); //speedup > 1.0
 
     // 移動タイマーがfinishしたなら
     if player.timer.tick(time_delta).finished()
