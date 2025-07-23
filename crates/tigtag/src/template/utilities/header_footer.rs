@@ -27,6 +27,7 @@ pub enum Position
     BottomCenter,
     BottomRight,
 }
+pub use Position::*; //enum Positionのバリアントを剥き身で公開する
 impl Position
 {
     fn index_xy(&self) -> (i16, i16)

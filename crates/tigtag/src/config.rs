@@ -262,6 +262,15 @@ pub const FOOTER_POWERED_BY: header_footer::TextBlock = header_footer::TextBlock
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//ヘッダー情報を表示する位置と更新するtext spanのindexの指定
+pub const PLACE_HOLDER: &[header_info::PlaceHolder] = &[
+    header_info::Stage(header_footer::TopLeft, 1), //表示位置（Stage）
+    header_info::Score(header_footer::TopCenter, 1), //表示位置（Score）
+    header_info::HiScore(header_footer::TopRight, 1), //表示位置（HiScore）
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
 // スプライト重なり
 // pub const DEPTH_SPRITE_DEBUG_GRID: f32 = 999.0; // 重なりの最大値
 pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0; // フッターの蟹アイコン

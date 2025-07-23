@@ -35,9 +35,10 @@ impl Plugin for Schedule
             ;
 
         // plugin
-        // appl.add_plugins( header::Schedule ) //ヘッダー更新(Stage、Score、HiScore)
+        // appl
         //     .add_plugins( demo::Schedule   ) //タイトル画面のデモプレイ
         //     .add_plugins( pause::Schedule  ); //Pause処理
+        // ;
 
         //----------------------------------------------------------------------
         // Update
@@ -46,21 +47,27 @@ impl Plugin for Schedule
         // ゲームパッドの接続状態を検出する
         appl.add_systems(Update, misc::detect_gamepad_connection);
 
-        // FPS表示
-        let bottomleft = header_footer::Position::BottomLeft;
-        let index = 1;
-        appl.add_plugins(FrameTimeDiagnosticsPlugin::default()) // FPS Plugin
-            .insert_resource(DisplayInfoFps(bottomleft, index)) // 表示位置の指定（Resource）
-            .add_systems(Update, update_fps::<DisplayInfoFps>); // FPS表示の更新
+        //ヘッダー情報の更新
+        appl.insert_resource(UpdateHeaders(PLACE_HOLDER)) // 表示位置
+            .add_systems(Update, update_header::<UpdateHeaders>) // 表示の更新
+            ;
 
-        // スプライトシートアニメーション（ゲーム中もPAUSE中も）
+        //フッター情報の更新
+        appl.add_plugins(FrameTimeDiagnosticsPlugin::default()) // FPS Plugin
+            .insert_resource(DisplayInfoFps(header_footer::BottomLeft, 1)) // 表示位置
+            .add_systems(Update, update_fps::<DisplayInfoFps>) // 表示の更新
+            ;
+
+        // スプライトアニメーション（ゲーム中もPAUSE中も）
         appl.add_systems(
             Update,
             (
+                //スプライトアニメーション
                 animate_sprites::<player::Player>, // プレイヤー
                 animate_sprites::<chaser::Chaser>, // チェイサー
+                // スプライト表示がOFFの場合
                 chaser::rotate_chaser_shape // チェイサーの回転
-                    .run_if(SPRITE_OFF), // スプライトシートがOFFの場合
+                    .run_if(SPRITE_OFF),
             ),
         );
 
