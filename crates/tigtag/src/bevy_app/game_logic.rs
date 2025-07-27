@@ -79,41 +79,39 @@ impl Plugin for Schedule
         //======================================================================
         // MyState::InitGameスケジュール
 
-        // カメラ（Camera2dとCamera3d）をspawnする
+        // カメラをspawnする
         appl.insert_resource(simple_camera::Settings(CAMERA_SETTINGS.clone()))
             .add_systems(
                 OnEnter(MyState::InitGame),
-                simple_camera::spawn::<simple_camera::Settings>,
-            );
-
-        // ヘッダー／フッターの準備
-        appl.insert_resource(header_footer::Settings(HEADER_FOOTER)) // UIの情報（Resource）
-            .add_systems(
-                OnEnter(MyState::InitGame),
                 (
-                    misc::select_ui_camera // UIを描画するカメラを選ぶ
-                        .after( simple_camera::spawn::<simple_camera::Settings> ),
-                    header_footer::spawn_header_footer, // UIをspawnする
+                    simple_camera::spawn::<simple_camera::Settings>,
+                    misc::select_ui_camera, // UIを描画するカメラを選ぶ
                 )
-                    .chain(),
+                    .chain(), // 実行順の固定
             );
 
         // 無条件遷移
         appl.add_systems(OnEnter(MyState::InitGame), change_state_to::<StageStart>);
+        // appl.add_systems(OnEnter(MyState::InitGame), change_state_to::<TitleDemo>);
 
-        // ゲーム初期化
-        // appl.add_systems
-        //     (   OnEnter ( MyState::InitGame ),
-        //         (   //TextUIの準備
-        //             title_demo ::spawn_text,
-        //             stage_start::spawn_text,
-        //             stage_clear::spawn_text,
-        //             game_over  ::spawn_text,
+        // ヘッダー／フッターの準備
+        appl.insert_resource(header_footer::Settings(HEADER_FOOTER)) // UIの情報（Resource）
+            .add_systems(
+                OnExit(MyState::InitGame),
+                header_footer::spawn_header_footer, // UIをspawnする
+            );
 
-        //             //無条件遷移
-        //             change_state_to::<TitleDemo>,
-        //         )
-        //     );
+        // 各種タイトル／メニューのspawn
+        // appl.add_systems(
+        //     OnExit(MyState::InitGame),
+        //     (
+        //         //TextUIの準備
+        //         title_demo::spawn_text,
+        //         stage_start::spawn_text,
+        //         stage_clear::spawn_text,
+        //         game_over::spawn_text,
+        //     ),
+        // );
 
         //======================================================================
         // MyState::StageStartスケジュール
