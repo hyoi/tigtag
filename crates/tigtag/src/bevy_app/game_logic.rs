@@ -17,7 +17,7 @@ impl Plugin for Schedule
 
         //----------------------------------------------------------------------
 
-        // Resource
+        // Resource登録
         appl.init_resource::<Record>() // ゲームの成績
             .init_resource::<map::Map>() // ステージのマップ
             .init_resource::<player::PlayerInput>() // プレイヤーの入力
@@ -25,7 +25,7 @@ impl Plugin for Schedule
             .insert_resource(player::PadMap(FxHashMap::from_iter(PAD_MAP))) //マッピング（ゲームパッド）
             ;
 
-        // Event
+        // Event登録
         appl
             .add_event::<EventClear>()  //ステージクリアの伝達
         // .add_event::<EventTimerPlayer>()  //プレイヤー移動タイマーのfinishedの伝達
@@ -40,16 +40,15 @@ impl Plugin for Schedule
         //     .add_plugins( pause::Schedule  ); //Pause処理
         // ;
 
-        //----------------------------------------------------------------------
-        // Update
-        //----------------------------------------------------------------------
+        //======================================================================
+        // Updateスケジュール（without State）
 
         // ゲームパッドの接続状態を検出する
         appl.add_systems(Update, misc::detect_gamepad_connection);
 
         //ヘッダー情報の更新
-        appl.insert_resource(UpdateHeaders(PLACE_HOLDER)) // 表示位置
-            .add_systems(Update, update_header::<UpdateHeaders>) // 表示の更新
+        appl.insert_resource(HeaderInfo(PLACE_HOLDER)) // 表示位置
+            .add_systems(Update, update_header::<HeaderInfo>) // 表示の更新
             ;
 
         //フッター情報の更新
@@ -58,16 +57,15 @@ impl Plugin for Schedule
             .add_systems(Update, update_fps::<DisplayInfoFps>) // 表示の更新
             ;
 
-        // スプライトアニメーション（ゲーム中もPAUSE中も）
+        // スプライトアニメーション
         appl.add_systems(
             Update,
             (
                 //スプライトアニメーション
                 animate_sprites::<player::Player>, // プレイヤー
                 animate_sprites::<chaser::Chaser>, // チェイサー
-                // スプライト表示がOFFの場合
                 chaser::rotate_chaser_shape // チェイサーの回転
-                    .run_if(SPRITE_OFF),
+                    .run_if(SPRITE_OFF), // スプライト表示がOFFの場合
             ),
         );
 
@@ -78,9 +76,8 @@ impl Plugin for Schedule
         //         .before(misc::app_close_on_key),
         // );
 
-        //----------------------------------------------------------------------
-        // MyState::InitGame
-        //----------------------------------------------------------------------
+        //======================================================================
+        // MyState::InitGameスケジュール
 
         // カメラ（Camera2dとCamera3d）をspawnする
         appl.insert_resource(simple_camera::Settings(CAMERA_SETTINGS.clone()))
@@ -101,6 +98,9 @@ impl Plugin for Schedule
                     .chain(),
             );
 
+        // 無条件遷移
+        appl.add_systems(OnEnter(MyState::InitGame), change_state_to::<StageStart>);
+
         // ゲーム初期化
         // appl.add_systems
         //     (   OnEnter ( MyState::InitGame ),
@@ -115,12 +115,8 @@ impl Plugin for Schedule
         //         )
         //     );
 
-        // 無条件遷移
-        appl.add_systems(OnEnter(MyState::InitGame), change_state_to::<StageStart>);
-
-        //----------------------------------------------------------------------
-        // MyState::StageStart
-        //----------------------------------------------------------------------
+        //======================================================================
+        // MyState::StageStartスケジュール
 
         // ステージ初期化
         appl.add_systems(
@@ -135,8 +131,8 @@ impl Plugin for Schedule
                         player::spawn_sprite,
                         chaser::spawn_sprite,
                     ),
-                    //for DEBUG
-                    change_state_to::<MainLoop>, //DEBUG後に削除すること
+                    // 無条件遷移
+                    change_state_to::<MainLoop>, //★★★DEBUG後に削除すること★★★
                 )
                     .chain(), //実行順の固定
                               /*
@@ -145,7 +141,7 @@ impl Plugin for Schedule
                               //             misc::show_component::<stage_start::Message>,
                               //         )
                               //         .chain(), //実行順の固定
-                              */
+                               */
             ),
             /*
             // )
@@ -161,12 +157,11 @@ impl Plugin for Schedule
             //     (   //TextUIの不可視化
             //         misc::hide_component::<stage_start::Message>,
             //     )
-            */
+             */
         );
 
-        //----------------------------------------------------------------------
-        // MyState::MainLoop
-        //----------------------------------------------------------------------
+        //======================================================================
+        // MyState::MainLoopスケジュール
 
         // メインループ
         appl.add_systems(
@@ -179,29 +174,35 @@ impl Plugin for Schedule
                 // detection::collisions_and_gameover,
                 // change_state_to::<GameOver>.run_if( on_event::<EventOver> ),
 
-                // スプライトの移動
+                // スプライトの位置を更新する
                 (
+                    // プレイヤーの移動
                     (
+                        // 入力に従ってResourceを更新する
                         (
-                            // 入力に従ってResourceを更新する
                             player::input_from_keyboard, // キー
                             player::input_from_gamepad,  // ゲームパッド
                         ),
-                        player::move_sprite, // プレイヤーを移動
+                        player::move_sprite,
                     )
                         .chain(), // 実行順の固定
-                    chaser::move_sprite, // チェイサーを移動
+                    // チェイサーの移動
+                    chaser::move_sprite,
                 ),
             )
                 .chain() // 実行順の固定
                 .run_if(in_state(MyState::MainLoop)),
         );
 
-        //----------------------------------------------------------------------
-        // MyState::StageClear
-        //----------------------------------------------------------------------
+        //======================================================================
+        // MyState::StageClearスケジュール
 
         // ステージクリアの処理
+        appl.add_systems
+        (   OnEnter ( MyState::StageClear ),
+            // 無条件遷移
+            change_state_to::<StageStart>, //★★★DEBUG後に削除すること★★★
+        );
         // appl.add_systems
         // (   OnEnter ( MyState::StageClear ),
         //     (   //TextUIの可視化
@@ -224,9 +225,8 @@ impl Plugin for Schedule
         //     )
         // );
 
-        //----------------------------------------------------------------------
-        // MyState::GameOver
-        //----------------------------------------------------------------------
+        //======================================================================
+        // MyState::GameOverスケジュール
 
         // ゲームオーバーの処理
         // appl.add_systems
@@ -256,9 +256,8 @@ impl Plugin for Schedule
         //     )
         // );
 
-        //----------------------------------------------------------------------
-        // MyState::TitleDemo
-        //----------------------------------------------------------------------
+        //======================================================================
+        // MyState::TitleDemoスケジュール
 
         // タイトル画面
         // appl.add_systems

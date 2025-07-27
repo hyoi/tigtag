@@ -13,12 +13,12 @@ pub use PlaceHolder::*; //enum PlaceHolderのバリアントを剥き身で公�
 
 // 登録用Resource
 #[derive(Resource)]
-pub struct UpdateHeaders(pub &'static [PlaceHolder]);
-pub trait UpdateHeadersTrait
+pub struct HeaderInfo(pub &'static [PlaceHolder]);
+pub trait HeaderInfoTrait
 {
     fn list(&self) -> &'static [PlaceHolder];
 }
-impl UpdateHeadersTrait for UpdateHeaders
+impl HeaderInfoTrait for HeaderInfo
 {
     fn list(&self) -> &'static [PlaceHolder] { self.0 }
 }
@@ -33,7 +33,7 @@ pub fn update_header<T>(
     opt_record: Option<Res<Record>>,
 ) -> Result
 where
-    T: Resource + UpdateHeadersTrait,
+    T: Resource + HeaderInfoTrait,
 {
     // 準備
     let place_holder = opt_place_holder.ok_or("Res<{T}> not found.")?;
