@@ -9,11 +9,11 @@ pub struct Settings<'a>(pub &'a [TextBlock<'a>]);
 // TextUIのブロックの情報を格納する型
 pub struct TextBlock<'a>
 {
-    pub position: header_footer::Position, // Component
-    pub align_self: AlignSelf,             // textblock内の寄せ（上中下）
-    pub justify_self: JustifySelf,         // textblock内の寄せ（左中右）
-    pub bg_color: Srgba,                   // textblockの背景色
-    pub spans: &'a [MessageSpan],          // 表示文字列の情報
+    pub position: Position,        // Component
+    pub align_self: AlignSelf,     // textblock内の寄せ（上中下）
+    pub justify_self: JustifySelf, // textblock内の寄せ（左中右）
+    pub bg_color: Srgba,           // textblockの背景色
+    pub spans: &'a [MessageSpan],  // 表示文字列の情報
 }
 
 // シンプル ヘッダー／フッターのComponent
