@@ -176,15 +176,6 @@ pub const HEADER_FOOTER: &[header_footer::TextBlock] = &[
     FOOTER_POWERED_BY, // Powered by
 ];
 
-pub const NA2: &str = "##";
-pub const NA5: &str = "#####";
-pub const NA2_5: &str = "##-#####";
-pub const NA3_2: &str = "###.##";
-
-const HEADER_LABEL_SIZE: f32 = PIXELS_PER_GRID * 0.58;
-const HEADER_VALUE_SIZE: f32 = PIXELS_PER_GRID * 0.7;
-const FOOTER_FONT_SIZE: f32 = PIXELS_PER_GRID * 0.48;
-
 pub const HEADER_STAGE: header_footer::TextBlock = header_footer::TextBlock {
     position: header_footer::Position::TopLeft,
     align_self: AlignSelf::Start,     // セル内の上寄せ
@@ -259,6 +250,15 @@ pub const FOOTER_POWERED_BY: header_footer::TextBlock = header_footer::TextBlock
         ( "BEVY  "     , ASSETS_FONT_ORBITRON_BLACK, FOOTER_FONT_SIZE, css::SILVER ),
     ],
 };
+
+const HEADER_LABEL_SIZE: f32 = PIXELS_PER_GRID * 0.58;
+const HEADER_VALUE_SIZE: f32 = PIXELS_PER_GRID * 0.7;
+const FOOTER_FONT_SIZE: f32 = PIXELS_PER_GRID * 0.48;
+
+pub const NA2: &str = "##";
+pub const NA5: &str = "#####";
+pub const NA2_5: &str = "##-#####";
+pub const NA3_2: &str = "###.##";
 
 ////////////////////////////////////////////////////////////////////////////////
 
