@@ -27,9 +27,9 @@ impl Plugin for Schedule
 
         // Event登録
         appl
-            .add_event::<EventClear>()  //ステージクリアの伝達
+            .add_event::<EventStageClear>()  //ステージクリアの伝達
+            .add_event::<EventGameOver>()   //ゲームオーバーの伝達
         // .add_event::<EventTimerPlayer>()  //プレイヤー移動タイマーのfinishedの伝達
-        // .add_event::<EventOver>()   //ゲームオーバーの伝達
         // .add_event::<EventEatDot>() //スコアリングの伝達
         // .add_event::<EventTimerChasers>() //敵キャラ移動タイマーのfinishedの伝達
             ;
@@ -168,12 +168,13 @@ impl Plugin for Schedule
             Update,
             (
                 // スコアリング＆クリア判定
-                scoring_and_stage_clear,
-                change_state_to::<StageClear>.run_if(on_event::<EventClear>),
+                detecting_change::scoring_and_stage_clear,
                 // 衝突判定
-                // detection::collisions_and_gameover,
-                // change_state_to::<GameOver>.run_if( on_event::<EventOver> ),
-
+                detecting_change::collisions_and_gameover
+                    .run_if(not(on_event::<EventStageClear>)), // ステージクリアならチェックしない
+                // Stateの条件付き遷移
+                change_state_to::<StageClear>.run_if(on_event::<EventStageClear>),
+                change_state_to::<GameOver>.run_if(on_event::<EventGameOver>),
                 // スプライトの位置を更新する
                 (
                     // プレイヤーの移動
@@ -198,8 +199,8 @@ impl Plugin for Schedule
         // MyState::StageClearスケジュール
 
         // ステージクリアの処理
-        appl.add_systems
-        (   OnEnter ( MyState::StageClear ),
+        appl.add_systems(
+            OnEnter(MyState::StageClear),
             // 無条件遷移
             change_state_to::<StageStart>, //★★★DEBUG後に削除すること★★★
         );
@@ -229,6 +230,11 @@ impl Plugin for Schedule
         // MyState::GameOverスケジュール
 
         // ゲームオーバーの処理
+        appl.add_systems(
+            OnEnter(MyState::GameOver),
+            // 無条件遷移
+            change_state_to::<StageStart>, //★★★DEBUG後に削除すること★★★
+        );
         // appl.add_systems
         // (   OnEnter ( MyState::GameOver ),
         //     (   //TextUIの可視化
@@ -246,15 +252,14 @@ impl Plugin for Schedule
         //     )
         //     .run_if( in_state( MyState::GameOver ) )
         // )
-        // .add_systems
-        // (   OnExit ( MyState::GameOver ),
+
+        //scoreとstageをゼロクリアする
+        appl.add_systems(
+            OnExit(MyState::GameOver),
+            initialize_record_except_hi_score,
+        );
         //     (   //TextUIの不可視化
         //         misc::hide_component::<game_over::Message>,
-
-        //         //scoreとstageをゼロクリアする
-        //         initialize_record_except_hi_score
-        //     )
-        // );
 
         //======================================================================
         // MyState::TitleDemoスケジュール
@@ -339,21 +344,18 @@ impl Plugin for Schedule
 ////////////////////////////////////////////////////////////////////////////////
 
 // ScoreとStageの初期化
-// pub fn initialize_record_except_hi_score
-// (   opt_record: Option<ResMut<Record>>,
-// )
-// {   let Some ( mut record ) = opt_record else { return };
+pub fn initialize_record_except_hi_score(
+    opt_record: Option<ResMut<Record>>,
+) -> Result
+{
+    let mut record = opt_record.ok_or("ResMut<Record> not found.")?;
 
-//     //クリアフラグが立っていた場合
-//     if record.is_clear()
-//     {   *record.is_clear_mut() = false;
-//         return;
-//     }
+    //scoreとstageをゼロクリア
+    *record.score_mut() = 0;
+    *record.stage_mut() = 0;
 
-//     //scoreとstageをゼロクリア
-//     *record.score_mut() = 0;
-//     *record.stage_mut() = 0;
-// }
+    Ok(())
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

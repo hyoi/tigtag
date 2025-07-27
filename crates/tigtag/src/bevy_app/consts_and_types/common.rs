@@ -10,9 +10,7 @@ pub struct Record
     hi_score: i32,    // ハイスコア
     stage: i32,       // ステージ数
     demo: DemoRecord, // demo用の記録
-    is_clear: bool,   // ステージクリア時にtrue(※)
 }
-//※スコアとステージ数を誤って初期化しないよう制御用フラグを設けた
 
 // demo用
 #[derive(Default)]
@@ -39,9 +37,6 @@ impl Record
 
     pub fn demo_stage(&self) -> i32 { self.demo.stage }
     pub fn demo_stage_mut(&mut self) -> &mut i32 { &mut self.demo.stage }
-
-    pub fn is_clear(&self) -> bool { self.is_clear }
-    pub fn is_clear_mut(&mut self) -> &mut bool { &mut self.is_clear }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,10 +192,11 @@ struct IVec2Rect
 
 // System間の通知用イベント
 #[derive(Event)]
-pub struct EventClear;
+pub struct EventStageClear;
+#[derive(Event)]
+pub struct EventGameOver;
 // #[derive(Event)]
 // pub struct EventTimerPlayer;
-// #[derive( Event )] pub struct EventOver;
 // #[allow( dead_code )]
 // #[derive( Event )] pub struct EventEatDot ( pub IVec2 ); //tigtag3d用の追加フィールド
 // #[derive( Event )] pub struct EventTimerPlayer;

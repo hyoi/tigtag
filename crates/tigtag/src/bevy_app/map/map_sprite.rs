@@ -74,7 +74,7 @@ pub fn make_new_stage_data(
     });
 
     // 付随する情報の初期化
-    *record.stage_mut() += 1; // 新マップを作ったらステージ数を＋１する
+    *record.stage_mut() += 1;
     map.init_path_bits(); // 全グリッドに対し、四方の壁・通の状態をセットする
 
     Ok(())

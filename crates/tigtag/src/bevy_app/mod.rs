@@ -15,7 +15,6 @@ mod animate_sprites; //スプライトアニメーション
 use animate_sprites::*;
 
 mod detecting_change; // ステージクリアとゲームオーバーの判定
-use detecting_change::*;
 
 pub mod header_info; //ヘッダー情報
 use header_info::*;
