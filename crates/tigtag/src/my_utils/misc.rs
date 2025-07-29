@@ -102,6 +102,21 @@ pub fn select_ui_camera(
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// UI Nodeのアウトラインを表示
+pub fn toggle_ui_outline_gizmo(
+    input: Res<ButtonInput<KeyCode>>,
+    opt_ui_debug_options: Option<ResMut<UiDebugOptions>>,
+)
+{
+    if let Some(mut options) = opt_ui_debug_options
+        && input.just_pressed(SHOW_HIDE_GIZMO_TOGGLE_KEY)
+    {
+        options.toggle();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // 操作を受付けるgamepadのEntityを保存するResource
 #[derive(Resource, Default)]
 pub struct TargetGamepad(Option<Entity>);

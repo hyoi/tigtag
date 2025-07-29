@@ -64,8 +64,8 @@ impl Plugin for Schedule
                 //スプライトアニメーション
                 animate_sprites::<player::Player>, // プレイヤー
                 animate_sprites::<chaser::Chaser>, // チェイサー
-                chaser::rotate_chaser_shape // チェイサーの回転
-                    .run_if(SPRITE_OFF), // スプライト表示がOFFの場合
+                // スプライト表示OFFの場合
+                chaser::rotate_chaser_shape.run_if(SPRITE_OFF), // チェイサー回転
             ),
         );
 
@@ -75,6 +75,9 @@ impl Plugin for Schedule
         //     hook_exit_app_key // Pause等の雛型
         //         .before(misc::app_close_on_key),
         // );
+
+        // UI Nodeのアウトラインの表示／非表示を切替える
+        appl.add_systems(Update, misc::toggle_ui_outline_gizmo.run_if(DEBUG));
 
         //======================================================================
         // MyState::InitGameスケジュール
@@ -286,56 +289,6 @@ impl Plugin for Schedule
         //         initialize_record_except_hi_score,
         //     )
         // );
-
-        // 2D表示簡易テスト
-        // appl.add_systems(
-        //     OnEnter(MyState::InitGame),
-        //     test_2d::spawn_sprites, // 格子状にスプライトをspawnする
-        // )
-        // .add_systems(
-        //     Update,
-        //     test_2d::draw_gizmos_2d // gizmoを描画
-        //         .run_if(in_state(MyState::InitGame)),
-        // );
-
-        // UI簡易テスト
-        // appl.add_systems(
-        //     OnEnter(MyState::InitGame),
-        //     (
-        //         test_ui::select_ui_camera,   // UIを描画するカメラを選ぶ
-        //         test_ui::spawn_grid_text_ui, // UIをspawnする
-        //     )
-        //         .chain() // 実行順固定
-        //         .after(simple_camera::spawn::<simple_camera::Settings>) // カメラのspawn
-        //         .run_if(any_with_component::<Camera>), // カメラが存在すれば実行する
-        // )
-        // .add_systems(
-        //     Update,
-        //     test_ui::toggle_ui_outline_gizmo // TextUIのアウトライン表示
-        //         .run_if(in_state(MyState::InitGame)),
-        // );
-
-        // 入力（キー、マウス、ゲームパッド）の簡易テスト（極座標カメラの操作）
-        // appl.insert_resource(ORBIT_CAMERA_DEFAULT.clone())
-        //     .insert_resource(orbit_camera::KeyMap(FxHashMap::from_iter(KEY_MAP)))
-        //     .insert_resource(orbit_camera::PadMap(FxHashMap::from_iter(PAD_MAP)))
-        //     .add_systems(
-        //         Update,
-        //         (
-        //             // ゲームパッドの接続状態を検出する
-        //             misc::detect_gamepad_connection,
-        //             (
-        //                 // Resourceに保存した極座標値を更新する
-        //                 orbit_camera::input_from_keyboard, // キー
-        //                 orbit_camera::input_from_gamepad,  // ゲームパッド
-        //                 orbit_camera::input_from_mouse,    // マウス
-        //             ),
-        //             // カメラの座標を変更する
-        //             orbit_camera::move_orbit_camera::<SimpleCamera3dOrbit>,
-        //         )
-        //             .chain() // 実行順固定
-        //             .run_if(in_state(MyState::InitGame)),
-        //     );
     }
 }
 

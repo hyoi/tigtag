@@ -332,23 +332,8 @@ pub const PAD_MAP: [(GamepadInput, player::CallBack); 6] = [
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 極座標カメラを移動する場合の初期位置
-// ※positionとlook_atがspawn済みCamera3dと同じ状態になる初期値を与えること
-// pub static PLAYER_DEFAULT: LazyLock<player::OrbitCamera> =
-//     LazyLock::new(|| {
-//         player::OrbitCamera {
-//             position: CAMERA3D_POSITION_ORBIT, // 極座標上のカメラの位置
-//             look_at: (Vec3::ZERO, Vec3::Y),    // 注視点と視線を軸にしたロール
-//             is_active: true,                   // カメラが有効か
-//             clamp_r: ORBIT_R_MIN_MAX,          // 極座標のRのminとmax
-//             clamp_theta: ORBIT_THETA_MIN_MAX,  // 極座標のθのminとmax
-//             ..default()
-//         }
-//     });
-
-// 極座標カメラを移動する場合の制限
-// pub const ORBIT_R_MIN_MAX: (f32, f32) = (1.0, 30.0); // min, max
-// pub const ORBIT_THETA_MIN_MAX: (f32, f32) = (PI * 0.51, PI * 0.99); // min, max
+// GIZMOの表示／非表示を切替えるキー
+pub const SHOW_HIDE_GIZMO_TOGGLE_KEY: KeyCode = KeyCode::Tab;
 
 ////////////////////////////////////////////////////////////////////////////////
 
