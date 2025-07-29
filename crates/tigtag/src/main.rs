@@ -42,8 +42,8 @@ use config::*;
 mod bevy_app; // アプリ本体
 use bevy_app::*;
 
-mod template; // 共通ライブラリ
-use template::*;
+mod my_utils; // 共通ライブラリ
+use my_utils::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
