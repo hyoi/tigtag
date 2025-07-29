@@ -38,7 +38,7 @@ pub fn input_from_keyboard(
 pub fn input_from_gamepad(
     opt_input_direction: Option<ResMut<PlayerInput>>,
     opt_padmap: Option<Res<PadMap>>,
-    opt_target_gamepad: Option<ResMut<misc::TargetGamepad>>,
+    opt_target_gamepad: Option<ResMut<my_utils::misc::TargetGamepad>>,
     qry_gamepads: Query<&Gamepad>,
     mut axis_events: EventReader<GamepadAxisChangedEvent>,
     mut axis_values: Local<FxHashMap<GamepadAxis, f32>>, // スティックの角度の変化量
