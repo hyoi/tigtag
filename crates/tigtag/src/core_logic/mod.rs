@@ -14,7 +14,6 @@ pub use animate_sprites::*;
 pub mod detecting_change; // ステージクリアとゲームオーバーの判定
 
 pub mod header_info; //ヘッダー情報
-pub use header_info::*;
 
 mod misc; // その他
 pub use misc::*;

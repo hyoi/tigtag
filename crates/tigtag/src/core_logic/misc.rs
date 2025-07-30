@@ -55,21 +55,21 @@ pub fn initialize_record_except_hi_score(
 
 // 更新対象の位置を指定するためのResource
 #[derive(Resource)]
-pub struct DisplayInfoFps(pub header_footer::Position, pub usize);
+pub struct PlaceHolderFps(pub header_footer::Position, pub usize);
 
-pub trait DisplayInfoFpsTrait
+pub trait PlaceHolderFpsTrait
 {
     fn position(&self) -> header_footer::Position;
     fn index(&self) -> usize;
 }
-impl DisplayInfoFpsTrait for DisplayInfoFps
+impl PlaceHolderFpsTrait for PlaceHolderFps
 {
     fn position(&self) -> header_footer::Position { self.0 }
     fn index(&self) -> usize { self.1 }
 }
 
 // FPSの表示を更新する
-pub fn update_fps<T: Resource + DisplayInfoFpsTrait>(
+pub fn update_fps<T: Resource + PlaceHolderFpsTrait>(
     opt_display_info: Option<Res<T>>,
     qry_text_block: Query<(Entity, &header_footer::Position)>,
     mut text_writer: TextUiWriter,

@@ -28,6 +28,8 @@ use std::{
     f32::consts::{PI, TAU},
 };
 
+//------------------------------------------------------------------------------
+
 // proc-macro
 use macros::MyState;
 
@@ -35,11 +37,11 @@ use macros::MyState;
 mod config; // 設定
 use config::*;
 
-mod core_logic; // アプリの中核
-use core_logic::*;
-
 mod my_utils; // 共通ライブラリ
 use my_utils::*;
+
+mod core_logic; // ゲームアプリの中核
+use core_logic::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -54,54 +56,42 @@ fn main() -> AppExit
     // アプリを生成
     let mut appl = App::new();
 
-    // アプリの初期化
-    appl.add_plugins(init_app::Schedule);
-
-    // assetsの事前ロード
-    appl.insert_resource(load_assets::NextState(MyState::InitGame)) // 完了後のState遷移先
-        .add_plugins(load_assets::Schedule);
-
-    //----------------------------------------------------------------------
-
-    // Resource登録
-    appl.init_resource::<Record>() // ゲームの成績
+    // Resourceを登録
+    appl.init_resource::<Record>()   // ゲームの成績
         .init_resource::<map::Map>() // ステージのマップ
         .init_resource::<player::PlayerInput>() // プレイヤーの入力
         .insert_resource(player::KeyMap(FxHashMap::from_iter(KEY_MAP))) //マッピング（キー）
         .insert_resource(player::PadMap(FxHashMap::from_iter(PAD_MAP))) //マッピング（ゲームパッド）
         ;
 
-    // Event登録
-    appl
-        .add_event::<EventStageClear>()  //ステージクリアの伝達
-        .add_event::<EventGameOver>()   //ゲームオーバーの伝達
+    // Eventを登録
+    appl.add_event::<EventStageClear>()  //ステージクリアの伝達
+        .add_event::<EventGameOver>()    //ゲームオーバーの伝達
     // .add_event::<EventTimerPlayer>()  //プレイヤー移動タイマーのfinishedの伝達
     // .add_event::<EventEatDot>() //スコアリングの伝達
     // .add_event::<EventTimerChasers>() //敵キャラ移動タイマーのfinishedの伝達
         ;
 
-    // plugin
-    // appl
-    //     .add_plugins( demo::Schedule   ) //タイトル画面のデモプレイ
-    //     .add_plugins( pause::Schedule  ); //Pause処理
-    // ;
+    // アプリを初期化しassetsをロードする
+    appl.add_plugins(init_app::Schedule)
+        .add_plugins(load_assets::Schedule)
+        .insert_resource(load_assets::NextState(MyState::InitGame)); // 完了後の遷移先
 
-    //======================================================================
+    //----------------------------------------------------------------------
     // Updateスケジュール（without State）
+    //----------------------------------------------------------------------
 
     // ゲームパッドの接続状態を検出する
     appl.add_systems(Update, misc::detect_gamepad_connection);
 
-    //ヘッダー情報の更新
-    appl.insert_resource(HeaderInfo(PLACE_HOLDER)) // 表示位置
-        .add_systems(Update, update_header::<HeaderInfo>) // 表示の更新
-        ;
+    //ヘッダーの表示を更新する
+    appl.insert_resource(header_info::PlaceHolder(PLACE_HOLDER)) // 表示位置
+        .add_systems(Update, header_info::update::<header_info::PlaceHolder>); // 表示の更新
 
-    //フッター情報の更新
-    appl.add_plugins(FrameTimeDiagnosticsPlugin::default()) // FPS Plugin
-        .insert_resource(DisplayInfoFps(header_footer::BottomLeft, 1)) // 表示位置
-        .add_systems(Update, update_fps::<DisplayInfoFps>) // 表示の更新
-        ;
+    //フッターの表示を更新する
+    appl.insert_resource(PlaceHolderFps(header_footer::BottomLeft, 1)) // 表示位置
+        .add_systems(Update, update_fps::<PlaceHolderFps>) // 表示の更新
+        .add_plugins(FrameTimeDiagnosticsPlugin::default()); // FPS Plugin
 
     // スプライトアニメーション
     appl.add_systems(
@@ -125,8 +115,9 @@ fn main() -> AppExit
     // UI Nodeのアウトラインの表示／非表示を切替える
     appl.add_systems(Update, misc::toggle_ui_outline_gizmo.run_if(DEBUG));
 
-    //======================================================================
+    //----------------------------------------------------------------------
     // MyState::InitGameスケジュール
+    //----------------------------------------------------------------------
 
     // カメラをspawnする
     appl.insert_resource(simple_camera::Settings(CAMERA_SETTINGS.clone()))
@@ -162,8 +153,9 @@ fn main() -> AppExit
     //     ),
     // );
 
-    //======================================================================
+    //----------------------------------------------------------------------
     // MyState::StageStartスケジュール
+    //----------------------------------------------------------------------
 
     // ステージ初期化
     appl.add_systems(
@@ -207,8 +199,9 @@ fn main() -> AppExit
          */
     );
 
-    //======================================================================
+    //----------------------------------------------------------------------
     // MyState::MainLoopスケジュール
+    //----------------------------------------------------------------------
 
     // メインループ
     appl.add_systems(
@@ -242,8 +235,9 @@ fn main() -> AppExit
             .run_if(in_state(MyState::MainLoop)),
     );
 
-    //======================================================================
+    //----------------------------------------------------------------------
     // MyState::StageClearスケジュール
+    //----------------------------------------------------------------------
 
     // ステージクリアの処理
     appl.add_systems(
@@ -273,8 +267,9 @@ fn main() -> AppExit
     //     )
     // );
 
-    //======================================================================
+    //----------------------------------------------------------------------
     // MyState::GameOverスケジュール
+    //----------------------------------------------------------------------
 
     // ゲームオーバーの処理
     appl.add_systems(
@@ -305,8 +300,9 @@ fn main() -> AppExit
     //     (   //TextUIの不可視化
     //         misc::hide_component::<game_over::Message>,
 
-    //======================================================================
+    //----------------------------------------------------------------------
     // MyState::TitleDemoスケジュール
+    //----------------------------------------------------------------------
 
     // タイトル画面
     // appl.add_systems
@@ -332,6 +328,8 @@ fn main() -> AppExit
     //         initialize_record_except_hi_score,
     //     )
     // );
+
+    //----------------------------------------------------------------------
 
     // アプリを実行
     appl.run()
