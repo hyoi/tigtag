@@ -108,7 +108,7 @@ pub const PRELOAD_ASSETS: &[&str] = &[
     ASSETS_SPRITE_SHEET_CHASER_GREEN,
     ASSETS_SPRITE_SHEET_CHASER_BLUE,
     ASSETS_SPRITE_SHEET_CHASER_PINK,
-    // ASSETS_FONT_REGGAEONE_REGULAR,
+    ASSETS_FONT_REGGAEONE_REGULAR,
     // ASSETS_SOUND_BEEP,
     //============================
 ];
@@ -117,7 +117,7 @@ pub const PRELOAD_ASSETS: &[&str] = &[
 pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "font/PressStart2P-Regular.ttf";
 pub const ASSETS_FONT_ORBITRON_BLACK: &str = "font/Orbitron-Black.ttf";
 //==============================================================================
-// pub const ASSETS_FONT_REGGAEONE_REGULAR   : &str = "font/ReggaeOne-Regular.ttf";
+pub const ASSETS_FONT_REGGAEONE_REGULAR   : &str = "font/ReggaeOne-Regular.ttf";
 //==============================================================================
 
 // assets（スプライト）
@@ -334,6 +334,62 @@ pub const PAD_MAP: [(GamepadInput, player::CallBack); 6] = [
 
 // GIZMOの表示／非表示を切替えるキー
 pub const SHOW_HIDE_GIZMO_TOGGLE_KEY: KeyCode = KeyCode::Tab;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//色の表記短縮
+const COLOR_CYAN: Color = Color::Srgba( css::AQUA );
+const COLOR_GOLD: Color = Color::Srgba( css::GOLD );
+const COLOR_RED : Color = Color::Srgba( css::RED  );
+const COLOR_NONE: Color = Color::NONE;
+
+pub static POPUP_MESSAGE_SETTINGS: LazyLock<Vec<popup_messages::TextBlock>> =
+    LazyLock::new(||
+    {   vec![
+            popup_messages::TextBlock
+            (   Box::new( popup_messages::StageSatrt),
+                Vec::from( POPUP_MESSAGE_STAGE_START ),
+            ),
+            popup_messages::TextBlock
+            (   Box::new( popup_messages::StageClear),
+                Vec::from( POPUP_MESSAGE_STAGE_CLEAR ),
+            ),
+            popup_messages::TextBlock
+            (   Box::new( popup_messages::GameOver),
+                Vec::from( POPUP_MESSAGE_GAME_OVER ),
+            ),
+        ]
+    });
+
+const POPUP_MESSAGE_STAGE_START: &[ popup_messages::TextUiSpanSettings ] =
+&[
+        ( "Start\n"   , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, COLOR_CYAN ),
+        ( "\n"        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, COLOR_NONE ),
+        ( "Ready...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.5, COLOR_CYAN ),
+        ( "\n"        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, COLOR_NONE ),
+        ( "#"         , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, COLOR_GOLD ),
+];
+
+const POPUP_MESSAGE_STAGE_CLEAR: &[ popup_messages::TextUiSpanSettings ] =
+&[
+    ( "C L E A R !!\n" , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, COLOR_CYAN ),
+    ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, COLOR_NONE ),
+    ( "Next stage...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.5, COLOR_CYAN ),
+    ( "\n"             , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.5, COLOR_NONE ),
+    ( "#"              , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, COLOR_GOLD ),
+];
+
+const POPUP_MESSAGE_GAME_OVER: &[ popup_messages::TextUiSpanSettings ] =
+&[
+    ( "Game Over\n"   , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 5.5, COLOR_RED  ),
+    ( " \n \n"        , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.6, COLOR_NONE ),
+    ( "REPLAY?"       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, COLOR_GOLD ),
+    ( "\n"            , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, COLOR_NONE ),
+    ( "Hit ANY key!\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN ),
+    ( "or\n"          , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, COLOR_CYAN ),
+    ( "ANY button!\n" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN ),
+    ( "#"             , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 4.0, COLOR_GOLD ),
+];
 
 ////////////////////////////////////////////////////////////////////////////////
 

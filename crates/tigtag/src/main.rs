@@ -43,6 +43,8 @@ use my_utils::*;
 mod core_logic; // ゲームアプリの中核
 use core_logic::*;
 
+mod popup_messages; //ポップアップメッセージ関連
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // メイン関数
@@ -140,6 +142,14 @@ fn main() -> AppExit
             OnExit(MyState::InitGame),
             header_footer::spawn_header_footer, // UIをspawnする
         );
+
+    // ポップアップメッセージの準備
+    appl.insert_resource( popup_messages::PopupMessages ( POPUP_MESSAGE_SETTINGS.clone() ) )
+        // .add_systems(
+        //     OnExit(MyState::InitGame),
+        //     popup_messages::spawn_popup_messages,
+        // )
+        ;
 
     // 各種タイトル／メニューのspawn
     // appl.add_systems(
