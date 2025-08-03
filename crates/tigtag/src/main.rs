@@ -145,23 +145,10 @@ fn main() -> AppExit
 
     // ポップアップメッセージの準備
     appl.insert_resource( popup_messages::PopupMessages ( POPUP_MESSAGE_SETTINGS.clone() ) )
-        // .add_systems(
-        //     OnExit(MyState::InitGame),
-        //     popup_messages::spawn_popup_messages,
-        // )
-        ;
-
-    // 各種タイトル／メニューのspawn
-    // appl.add_systems(
-    //     OnExit(MyState::InitGame),
-    //     (
-    //         //TextUIの準備
-    //         title_demo::spawn_text,
-    //         stage_start::spawn_text,
-    //         stage_clear::spawn_text,
-    //         game_over::spawn_text,
-    //     ),
-    // );
+        .add_systems(
+            OnExit(MyState::InitGame),
+            popup_messages::spawn::<popup_messages::PopupMessages>,
+        );
 
     //----------------------------------------------------------------------
     // MyState::StageStartスケジュール
@@ -184,13 +171,13 @@ fn main() -> AppExit
                 change_state_to::<mystate::MainLoop>, //★★★DEBUG後に削除すること★★★
             )
                 .chain(), //実行順の固定
-                          /*
-                          //         //TextUIの可視化
-                          //         (   effect::init_count::<stage_start::CountDown>, //カウント初期化
-                          //             misc::show_component::<stage_start::Message>,
-                          //         )
-                          //         .chain(), //実行順の固定
-                           */
+
+            //TextUIの可視化
+            (
+                // effect::init_count::<stage_start::CountDown>, //カウント初期化
+                misc::show_component::<popup_messages::StageSatrt>,
+            )
+            .chain(), //実行順の固定
         ),
         /*
         // )
