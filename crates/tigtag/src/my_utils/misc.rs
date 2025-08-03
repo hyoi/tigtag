@@ -193,19 +193,19 @@ pub fn detect_gamepad_connection(
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// //QueryしたComponentを可視化する
-// pub fn show_component<T: Component>
-// (   mut qry: Query<&mut Visibility, With<T>>,
-// )
-// {   qry.iter_mut().for_each( | mut v | *v = Visibility::Visible );
-// }
+//QueryしたComponentを可視化する
+pub fn show_component<T: Component>
+(   mut qry: Query<&mut Visibility, With<T>>,
+)
+{   qry.iter_mut().for_each( | mut v | *v = Visibility::Visible );
+}
 
-// //QueryしたComponentを不可視にする
-// pub fn hide_component<T: Component>
-// (   mut qry: Query<&mut Visibility, With<T>>,
-// )
-// {   qry.iter_mut().for_each( | mut v | *v = Visibility::Hidden );
-// }
+//QueryしたComponentを不可視にする
+pub fn hide_component<T: Component>
+(   mut qry: Query<&mut Visibility, With<T>>,
+)
+{   qry.iter_mut().for_each( | mut v | *v = Visibility::Hidden );
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
