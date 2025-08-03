@@ -131,8 +131,8 @@ fn main() -> AppExit
         );
 
     // 無条件遷移
-    appl.add_systems(OnEnter(MyState::InitGame), change_state_to::<StageStart>);
-    // appl.add_systems(OnEnter(MyState::InitGame), change_state_to::<TitleDemo>);
+    appl.add_systems(OnEnter(MyState::InitGame), change_state_to::<mystate::StageStart>);
+    // appl.add_systems(OnEnter(MyState::InitGame), change_state_to::<mystate::TitleDemo>);
 
     // ヘッダー／フッターの準備
     appl.insert_resource(header_footer::Settings(HEADER_FOOTER)) // UIの情報（Resource）
@@ -171,7 +171,7 @@ fn main() -> AppExit
                     chaser::spawn_sprite,
                 ),
                 // 無条件遷移
-                change_state_to::<MainLoop>, //★★★DEBUG後に削除すること★★★
+                change_state_to::<mystate::MainLoop>, //★★★DEBUG後に削除すること★★★
             )
                 .chain(), //実行順の固定
                           /*
@@ -213,8 +213,8 @@ fn main() -> AppExit
             detecting_change::collisions_and_gameover
                 .run_if(not(on_event::<EventStageClear>)), // ステージクリアならチェックしない
             // Stateの条件付き遷移
-            change_state_to::<StageClear>.run_if(on_event::<EventStageClear>),
-            change_state_to::<GameOver>.run_if(on_event::<EventGameOver>),
+            change_state_to::<mystate::StageClear>.run_if(on_event::<EventStageClear>),
+            change_state_to::<mystate::GameOver>.run_if(on_event::<EventGameOver>),
             // スプライトの位置を更新する
             (
                 // プレイヤーの移動
@@ -243,7 +243,7 @@ fn main() -> AppExit
     appl.add_systems(
         OnEnter(MyState::StageClear),
         // 無条件遷移
-        change_state_to::<StageStart>, //★★★DEBUG後に削除すること★★★
+        change_state_to::<mystate::StageStart>, //★★★DEBUG後に削除すること★★★
     );
     // appl.add_systems
     // (   OnEnter ( MyState::StageClear ),
@@ -275,7 +275,7 @@ fn main() -> AppExit
     appl.add_systems(
         OnEnter(MyState::GameOver),
         // 無条件遷移
-        change_state_to::<StageStart>, //★★★DEBUG後に削除すること★★★
+        change_state_to::<mystate::StageStart>, //★★★DEBUG後に削除すること★★★
     );
     // appl.add_systems
     // (   OnEnter ( MyState::GameOver ),
