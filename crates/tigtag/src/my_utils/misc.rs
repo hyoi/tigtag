@@ -178,33 +178,16 @@ pub fn detect_gamepad_connection(
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 最大公約数を求める関数 (u32)
-// pub fn gcd_u32(a: u32, b: u32) -> u32
-// {
-//     if b == 0
-//     {
-//         a
-//     }
-//     else
-//     {
-//         gcd_u32(b, a % b)
-//     }
-// }
-
-////////////////////////////////////////////////////////////////////////////////
-
 //QueryしたComponentを可視化する
-pub fn show_component<T: Component>
-(   mut qry: Query<&mut Visibility, With<T>>,
-)
-{   qry.iter_mut().for_each( | mut v | *v = Visibility::Visible );
+pub fn show_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
+{
+    query.iter_mut().for_each(|mut v| *v = Visibility::Visible);
 }
 
 //QueryしたComponentを不可視にする
-pub fn hide_component<T: Component>
-(   mut qry: Query<&mut Visibility, With<T>>,
-)
-{   qry.iter_mut().for_each( | mut v | *v = Visibility::Hidden );
+pub fn hide_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
+{
+    query.iter_mut().for_each(|mut v| *v = Visibility::Hidden);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
