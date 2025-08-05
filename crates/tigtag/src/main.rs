@@ -133,8 +133,8 @@ fn main() -> AppExit
         );
 
     // 無条件遷移
-    appl.add_systems(OnEnter(MyState::InitGame), change_state_to::<mystate::StageStart>);
-    // appl.add_systems(OnEnter(MyState::InitGame), change_state_to::<mystate::TitleDemo>);
+    appl.add_systems(OnEnter(MyState::InitGame), jump_to::<mystate::StageStart>);
+    // appl.add_systems(OnEnter(MyState::InitGame), jump_to::<mystate::TitleDemo>);
 
     // ヘッダー／フッターの準備
     appl.insert_resource(header_footer::Settings(HEADER_FOOTER)) // UIの情報（Resource）
@@ -144,10 +144,10 @@ fn main() -> AppExit
         );
 
     // ポップアップメッセージの準備
-    appl.insert_resource( popup_messages::PopupMessages ( POPUP_MESSAGE_SETTINGS.clone() ) )
+    appl.insert_resource(popup_messages::Settings(POPUP_MESSAGES.clone()))
         .add_systems(
             OnExit(MyState::InitGame),
-            popup_messages::spawn::<popup_messages::PopupMessages>,
+            popup_messages::spawn::<popup_messages::Settings>,
         );
 
     //----------------------------------------------------------------------
@@ -168,16 +168,15 @@ fn main() -> AppExit
                     chaser::spawn_sprite,
                 ),
                 // 無条件遷移
-                change_state_to::<mystate::MainLoop>, //★★★DEBUG後に削除すること★★★
+                jump_to::<mystate::MainLoop>, //★★★DEBUG後に削除すること★★★
             )
                 .chain(), //実行順の固定
-
             //TextUIの可視化
             (
                 // effect::init_count::<stage_start::CountDown>, //カウント初期化
                 misc::show_component::<popup_messages::StageSatrt>,
             )
-            .chain(), //実行順の固定
+                .chain(), //実行順の固定
         ),
         /*
         // )
@@ -210,8 +209,8 @@ fn main() -> AppExit
             detecting_change::collisions_and_gameover
                 .run_if(not(on_event::<EventStageClear>)), // ステージクリアならチェックしない
             // Stateの条件付き遷移
-            change_state_to::<mystate::StageClear>.run_if(on_event::<EventStageClear>),
-            change_state_to::<mystate::GameOver>.run_if(on_event::<EventGameOver>),
+            jump_to::<mystate::StageClear>.run_if(on_event::<EventStageClear>),
+            jump_to::<mystate::GameOver>.run_if(on_event::<EventGameOver>),
             // スプライトの位置を更新する
             (
                 // プレイヤーの移動
@@ -240,7 +239,7 @@ fn main() -> AppExit
     appl.add_systems(
         OnEnter(MyState::StageClear),
         // 無条件遷移
-        change_state_to::<mystate::StageStart>, //★★★DEBUG後に削除すること★★★
+        jump_to::<mystate::StageStart>, //★★★DEBUG後に削除すること★★★
     );
     // appl.add_systems
     // (   OnEnter ( MyState::StageClear ),
@@ -272,7 +271,7 @@ fn main() -> AppExit
     appl.add_systems(
         OnEnter(MyState::GameOver),
         // 無条件遷移
-        change_state_to::<mystate::StageStart>, //★★★DEBUG後に削除すること★★★
+        jump_to::<mystate::StageStart>, //★★★DEBUG後に削除すること★★★
     );
     // appl.add_systems
     // (   OnEnter ( MyState::GameOver ),

@@ -4,31 +4,31 @@ use super::*;
 
 // ポップアップメッセージをspawnするために必要な情報のリスト（Resource）
 #[derive(Resource, Deref, DerefMut)]
-pub struct PopupMessages ( pub Vec<TextBlock> );
+pub struct Settings(pub Vec<TextBlock>);
 
 // ポップアップメッセージをspawnするために必要な情報
-pub struct TextBlock (
-    pub Box<dyn PopupMessage>,  // マーカーComponent
-    pub Vec<TextUiSpanSettings> // TextUiのspans
+pub struct TextBlock(
+    pub Box<dyn PopupMessage>,   // マーカーComponent
+    pub Vec<TextUiSpanSettings>, // TextUiのspans
 );
 
 // TextUiのspanをspawnする為に必要な情報
-pub type TextUiSpanSettings = (&'static str,&'static str,f32,Color);
+pub type TextUiSpanSettings = (&'static str, &'static str, f32, Color);
 
 // TextBlockのCloneトレイトの実装
-impl Clone for TextBlock {
-    fn clone(&self) -> Self {
-        Self ( self.0.clone_boxed(), self.1.clone() )
-    }
+impl Clone for TextBlock
+{
+    fn clone(&self) -> Self { Self(self.0.clone_boxed(), self.1.clone()) }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //マーカーComponentをBoxで束ねるためのトレイト境界
 pub trait PopupMessage: Send + Sync + 'static
-{   fn clone_boxed(&self) -> Box<dyn PopupMessage>;
-    fn spawn_textui
-    (   self: Box<Self>,
+{
+    fn clone_boxed(&self) -> Box<dyn PopupMessage>;
+    fn spawn_textui(
+        self: Box<Self>,
         cmds: &mut Commands,
         asset_svr: &Res<AssetServer>,
         vec_text_spans: Vec<TextUiSpanSettings>,
@@ -36,15 +36,19 @@ pub trait PopupMessage: Send + Sync + 'static
 }
 
 //マーカーComponent
-#[derive(Component, Clone)] pub struct StageSatrt;
-#[derive(Component, Clone)] pub struct StageClear;
-#[derive(Component, Clone)] pub struct GameOver;
+#[derive(Component, Clone)]
+pub struct StageSatrt;
+#[derive(Component, Clone)]
+pub struct StageClear;
+#[derive(Component, Clone)]
+pub struct GameOver;
 
 //トレイト境界をジェネリクス(T: Component)対象に実装する
 impl<T: Component + Clone + 'static> PopupMessage for T
-{   fn clone_boxed(&self) -> Box<dyn PopupMessage> { Box::new(self.clone()) }
-    fn spawn_textui
-    (   self: Box<Self>,
+{
+    fn clone_boxed(&self) -> Box<dyn PopupMessage> { Box::new(self.clone()) }
+    fn spawn_textui(
+        self: Box<Self>,
         cmds: &mut Commands,
         asset_svr: &Res<AssetServer>,
         vec_text_spans: Vec<TextUiSpanSettings>,
@@ -53,8 +57,7 @@ impl<T: Component + Clone + 'static> PopupMessage for T
         cmds.spawn((
             *self, // マーカーComponent
             Visibility::Hidden,
-            Node
-            {
+            Node {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
                 display: Display::Flex, // CSSフレックスレイアウト
@@ -63,8 +66,7 @@ impl<T: Component + Clone + 'static> PopupMessage for T
                 ..default()
             },
         ))
-        .add_popup_message(vec_text_spans, asset_svr)
-        ;
+        .add_popup_message(vec_text_spans, asset_svr);
     }
 }
 
@@ -77,11 +79,11 @@ pub fn spawn<T: Resource + Deref<Target = Vec<TextBlock>> + DerefMut>(
     asset_svr: Res<AssetServer>,
 )
 {
-    settings.drain(..).for_each(
-        |TextBlock ( boxed_trait, vec_text_spans )| {
-            boxed_trait.spawn_textui( &mut cmds, &asset_svr, vec_text_spans )
-        },
-    );
+    settings
+        .drain(..)
+        .for_each(|TextBlock(boxed_trait, vec_text_spans)| {
+            boxed_trait.spawn_textui(&mut cmds, &asset_svr, vec_text_spans)
+        });
 }
 
 ////////////////////////////////////////////////////////////////////////////////

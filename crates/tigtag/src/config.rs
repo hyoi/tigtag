@@ -117,7 +117,7 @@ pub const PRELOAD_ASSETS: &[&str] = &[
 pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "font/PressStart2P-Regular.ttf";
 pub const ASSETS_FONT_ORBITRON_BLACK: &str = "font/Orbitron-Black.ttf";
 //==============================================================================
-pub const ASSETS_FONT_REGGAEONE_REGULAR   : &str = "font/ReggaeOne-Regular.ttf";
+pub const ASSETS_FONT_REGGAEONE_REGULAR: &str = "font/ReggaeOne-Regular.ttf";
 //==============================================================================
 
 // assets（スプライト）
@@ -338,45 +338,45 @@ pub const SHOW_HIDE_GIZMO_TOGGLE_KEY: KeyCode = KeyCode::Tab;
 ////////////////////////////////////////////////////////////////////////////////
 
 //色の表記短縮
-const COLOR_CYAN: Color = Color::Srgba( css::AQUA );
-const COLOR_GOLD: Color = Color::Srgba( css::GOLD );
-const COLOR_RED : Color = Color::Srgba( css::RED  );
+const COLOR_CYAN: Color = Color::Srgba(css::AQUA);
+const COLOR_GOLD: Color = Color::Srgba(css::GOLD);
+const COLOR_RED: Color = Color::Srgba(css::RED);
 const COLOR_NONE: Color = Color::NONE;
 
-pub static POPUP_MESSAGE_SETTINGS: LazyLock<Vec<popup_messages::TextBlock>> =
-    LazyLock::new(||
-    {   vec![
-            popup_messages::TextBlock
-            (   Box::new( popup_messages::StageSatrt),
-                Vec::from( POPUP_MESSAGE_STAGE_START ),
+pub static POPUP_MESSAGES: LazyLock<Vec<popup_messages::TextBlock>> =
+    LazyLock::new(|| {
+        vec![
+            popup_messages::TextBlock(
+                Box::new(popup_messages::StageSatrt),
+                Vec::from(POPUP_STAGE_START),
             ),
-            popup_messages::TextBlock
-            (   Box::new( popup_messages::StageClear),
-                Vec::from( POPUP_MESSAGE_STAGE_CLEAR ),
+            popup_messages::TextBlock(
+                Box::new(popup_messages::StageClear),
+                Vec::from(POPUP_STAGE_CLEAR),
             ),
-            popup_messages::TextBlock
-            (   Box::new( popup_messages::GameOver),
-                Vec::from( POPUP_MESSAGE_GAME_OVER ),
+            popup_messages::TextBlock(
+                Box::new(popup_messages::GameOver),
+                Vec::from(POPUP_GAME_OVER),
             ),
         ]
     });
 
-const POPUP_MESSAGE_STAGE_START: &[ popup_messages::TextUiSpanSettings ] =
-&[
+#[rustfmt::skip]
+const POPUP_STAGE_START: &[ popup_messages::TextUiSpanSettings ] = &[
     ( "START\n"   , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, COLOR_CYAN ),
     ( "ready...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.0, COLOR_CYAN ),
     ( "#"         , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
 ];
 
-const POPUP_MESSAGE_STAGE_CLEAR: &[ popup_messages::TextUiSpanSettings ] =
-&[
+#[rustfmt::skip]
+const POPUP_STAGE_CLEAR: &[ popup_messages::TextUiSpanSettings ] = &[
     ( "C L E A R !!!\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.7, COLOR_CYAN ),
     ( "next stage...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.0, COLOR_CYAN ),
     ( "#"              , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
 ];
 
-const POPUP_MESSAGE_GAME_OVER: &[ popup_messages::TextUiSpanSettings ] =
-&[
+#[rustfmt::skip]
+const POPUP_GAME_OVER: &[ popup_messages::TextUiSpanSettings ] = &[
     ( "Game Over\n"   , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 4.0, COLOR_RED  ),
     ( " \n"           , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.6, COLOR_NONE ),
     ( "REPLAY?"       , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 2.0, COLOR_GOLD ),
