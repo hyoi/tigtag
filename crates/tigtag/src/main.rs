@@ -144,11 +144,8 @@ fn main() -> AppExit
         );
 
     // ポップアップメッセージの準備
-    appl.insert_resource(popup_messages::Settings(POPUP_MESSAGES.clone()))
-        .add_systems(
-            OnExit(MyState::InitGame),
-            popup_messages::spawn::<popup_messages::Settings>,
-        );
+    appl.init_resource::<PopupMessages>()
+        .add_systems(OnExit(MyState::InitGame), popup_messages::spawn::<PopupMessages>);
 
     //----------------------------------------------------------------------
     // MyState::StageStartスケジュール
@@ -174,7 +171,7 @@ fn main() -> AppExit
             //TextUIの可視化
             (
                 // effect::init_count::<stage_start::CountDown>, //カウント初期化
-                misc::show_component::<popup_messages::StageSatrt>,
+                misc::show_component::<popup::StageSatrt>,
             )
                 .chain(), //実行順の固定
         ),

@@ -343,23 +343,32 @@ const COLOR_GOLD: Color = Color::Srgba(css::GOLD);
 const COLOR_RED: Color = Color::Srgba(css::RED);
 const COLOR_NONE: Color = Color::NONE;
 
-pub static POPUP_MESSAGES: LazyLock<Vec<popup_messages::TextBlock>> =
-    LazyLock::new(|| {
-        vec![
-            popup_messages::TextBlock(
-                Box::new(popup_messages::StageSatrt),
-                Vec::from(POPUP_STAGE_START),
-            ),
-            popup_messages::TextBlock(
-                Box::new(popup_messages::StageClear),
-                Vec::from(POPUP_STAGE_CLEAR),
-            ),
-            popup_messages::TextBlock(
-                Box::new(popup_messages::GameOver),
-                Vec::from(POPUP_GAME_OVER),
-            ),
-        ]
-    });
+////////////////////////////////////////////////////////////////////////////////
+
+// ポップアップメッセージをspawnするために必要な情報のリスト（Resource）
+#[derive(Resource, Deref, DerefMut)]
+pub struct PopupMessages(pub Vec<popup_messages::TextBlock>);
+
+impl Default for PopupMessages
+{
+    fn default() -> Self
+    {
+        PopupMessages(vec![
+            (Box::new(popup::StageSatrt), Vec::from(POPUP_STAGE_START)),
+            (Box::new(popup::StageClear), Vec::from(POPUP_STAGE_CLEAR)),
+            (Box::new(popup::GameOver), Vec::from(POPUP_GAME_OVER)),
+        ])
+    }
+}
+
+//マーカーComponent
+#[rustfmt::skip]
+pub mod popup
+{   use super::*;
+    #[derive(Component, Clone)] pub struct StageSatrt;
+    #[derive(Component, Clone)] pub struct StageClear;
+    #[derive(Component, Clone)] pub struct GameOver;
+}
 
 #[rustfmt::skip]
 const POPUP_STAGE_START: &[ popup_messages::TextUiSpanSettings ] = &[
