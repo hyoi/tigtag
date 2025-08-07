@@ -133,8 +133,8 @@ fn main() -> AppExit
         );
 
     // 無条件遷移
-    appl.add_systems(OnEnter(MyState::InitGame), jump_to::<mystate::StageStart>);
-    // appl.add_systems(OnEnter(MyState::InitGame), jump_to::<mystate::TitleDemo>);
+    appl.add_systems(OnEnter(MyState::InitGame), set_next_state::<StageStart>);
+    // appl.add_systems(OnEnter(MyState::InitGame), set_next_state::<TitleDemo>);
 
     // ヘッダー／フッターの準備
     appl.insert_resource(header_footer::Settings(HEADER_FOOTER)) // UIの情報（Resource）
@@ -165,7 +165,7 @@ fn main() -> AppExit
                     chaser::spawn_sprite,
                 ),
                 // 無条件遷移
-                jump_to::<mystate::MainLoop>, //★★★DEBUG後に削除すること★★★
+                set_next_state::<MainLoop>, //★★★DEBUG後に削除すること★★★
             )
                 .chain(), //実行順の固定
             //TextUIの可視化
@@ -206,8 +206,8 @@ fn main() -> AppExit
             detecting_change::collisions_and_gameover
                 .run_if(not(on_event::<EventStageClear>)), // ステージクリアならチェックしない
             // Stateの条件付き遷移
-            jump_to::<mystate::StageClear>.run_if(on_event::<EventStageClear>),
-            jump_to::<mystate::GameOver>.run_if(on_event::<EventGameOver>),
+            set_next_state::<StageClear>.run_if(on_event::<EventStageClear>),
+            set_next_state::<GameOver>.run_if(on_event::<EventGameOver>),
             // スプライトの位置を更新する
             (
                 // プレイヤーの移動
@@ -236,7 +236,7 @@ fn main() -> AppExit
     appl.add_systems(
         OnEnter(MyState::StageClear),
         // 無条件遷移
-        jump_to::<mystate::StageStart>, //★★★DEBUG後に削除すること★★★
+        set_next_state::<StageStart>, //★★★DEBUG後に削除すること★★★
     );
     // appl.add_systems
     // (   OnEnter ( MyState::StageClear ),
@@ -268,7 +268,7 @@ fn main() -> AppExit
     appl.add_systems(
         OnEnter(MyState::GameOver),
         // 無条件遷移
-        jump_to::<mystate::StageStart>, //★★★DEBUG後に削除すること★★★
+        set_next_state::<StageStart>, //★★★DEBUG後に削除すること★★★
     );
     // appl.add_systems
     // (   OnEnter ( MyState::GameOver ),

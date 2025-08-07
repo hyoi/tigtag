@@ -38,18 +38,15 @@ pub fn derive_mystate(input: TokenStream) -> TokenStream
         }
 
         //バリアントと同名のstructからバリアントを取得させるための仕込み
-        pub mod mystate
-        {   use super::*;
-            #(  #[derive( Default )]
-                pub struct #enum_variant;
-                impl ChangeMyState for #enum_variant
-                {   fn state( &self ) -> #enum_type { #enum_type::#enum_variant }
-                }
-            )*
-        }
+        #(  #[derive( Default )]
+            pub struct #enum_variant;
+            impl ChangeMyState for #enum_variant
+            {   fn state( &self ) -> #enum_type { #enum_type::#enum_variant }
+            }
+        )*
 
         //同名structによって指定されたMyStateへ遷移するSystem
-        pub fn jump_to<T: Send + Sync + Default + ChangeMyState>
+        pub fn set_next_state<T: Send + Sync + Default + ChangeMyState>
         (   next: Local<T>,
             mut next_state: ResMut<NextState<#enum_type>>
         )
