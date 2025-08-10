@@ -345,6 +345,53 @@ const COLOR_NONE: Color = Color::NONE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+//マーカーComponent
+#[rustfmt::skip]
+pub mod popup
+{   use super::*;
+    #[derive(Component, Clone)] pub struct StageSatrt ( pub i32, pub Timer, pub i32 );
+    #[derive(Component, Clone)] pub struct StageClear ( pub i32, pub Timer, pub i32 );
+    #[derive(Component, Clone)] pub struct GameOver   ( pub i32, pub Timer, pub i32 );
+
+    impl Default for StageSatrt {
+        fn default() -> Self {
+            Self ( 5, Timer::from_seconds( 1.0, TimerMode::Once ), 0 )
+        }
+    }
+    impl Default for StageClear {
+        fn default() -> Self {
+            Self ( 5, Timer::from_seconds( 1.0, TimerMode::Once ), 0 )
+        }
+    }
+    impl Default for GameOver {
+        fn default() -> Self {
+            Self ( 5, Timer::from_seconds( 1.0, TimerMode::Once ), 0 )
+        }
+    }
+
+    impl popup_messages::effect::CountDown for StageSatrt {
+        fn init( &mut self ) { *self = Self::default(); }
+        fn placeholder( &self ) -> Option<usize> { POPUP_STAGE_START.iter().position( |x| x.0 == _CDPH_ ) }
+        fn timer( &mut self ) -> &mut Timer { &mut self.1 }
+        fn counter( &mut self ) -> &mut i32 { &mut self.2 }
+        fn start_value( &self ) -> i32 { self.0 }
+    }
+    impl popup_messages::effect::CountDown for StageClear {
+        fn init( &mut self ) { *self = Self::default(); }
+        fn placeholder( &self ) -> Option<usize> { POPUP_STAGE_CLEAR.iter().position( |x| x.0 == _CDPH_ ) }
+        fn timer( &mut self ) -> &mut Timer { &mut self.1 }
+        fn counter( &mut self ) -> &mut i32 { &mut self.2 }
+        fn start_value( &self ) -> i32 { self.0 }
+    }
+    impl popup_messages::effect::CountDown for GameOver   {
+        fn init( &mut self ) { *self = Self::default(); }
+        fn placeholder( &self ) -> Option<usize> { POPUP_GAME_OVER.iter().position( |x| x.0 == _CDPH_ ) }
+        fn timer( &mut self ) -> &mut Timer { &mut self.1 }
+        fn counter( &mut self ) -> &mut i32 { &mut self.2 }
+        fn start_value( &self ) -> i32 { self.0 }
+    }
+}
+
 // ポップアップメッセージをspawnするために必要な情報のリスト（Resource）
 #[derive(Resource, Deref, DerefMut)]
 pub struct PopupMessages(pub Vec<popup_messages::TextBlock>);
@@ -354,34 +401,36 @@ impl Default for PopupMessages
     fn default() -> Self
     {
         PopupMessages(vec![
-            (Box::new(popup::StageSatrt), Vec::from(POPUP_STAGE_START)),
-            (Box::new(popup::StageClear), Vec::from(POPUP_STAGE_CLEAR)),
-            (Box::new(popup::GameOver), Vec::from(POPUP_GAME_OVER)),
+            (
+                Box::new(popup::StageSatrt::default()),
+                Vec::from(POPUP_STAGE_START),
+            ),
+            (
+                Box::new(popup::StageClear::default()),
+                Vec::from(POPUP_STAGE_CLEAR),
+            ),
+            (
+                Box::new(popup::GameOver::default()),
+                Vec::from(POPUP_GAME_OVER),
+            ),
         ])
     }
 }
 
-//マーカーComponent
-#[rustfmt::skip]
-pub mod popup
-{   use super::*;
-    #[derive(Component, Clone)] pub struct StageSatrt;
-    #[derive(Component, Clone)] pub struct StageClear;
-    #[derive(Component, Clone)] pub struct GameOver;
-}
+pub const _CDPH_: &str = "__countdown_placeholder__";
 
 #[rustfmt::skip]
 const POPUP_STAGE_START: &[ popup_messages::TextUiSpanSettings ] = &[
     ( "START\n"   , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, COLOR_CYAN ),
     ( "ready...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.0, COLOR_CYAN ),
-    ( "#"         , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
+    ( _CDPH_      , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
 ];
 
 #[rustfmt::skip]
 const POPUP_STAGE_CLEAR: &[ popup_messages::TextUiSpanSettings ] = &[
     ( "C L E A R !!!\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.7, COLOR_CYAN ),
     ( "next stage...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.0, COLOR_CYAN ),
-    ( "#"              , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
+    ( _CDPH_           , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
 ];
 
 #[rustfmt::skip]
@@ -393,7 +442,7 @@ const POPUP_GAME_OVER: &[ popup_messages::TextUiSpanSettings ] = &[
     ( "Hit ANY key!\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN ),
     ( "or\n"          , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, COLOR_CYAN ),
     ( "ANY button!\n" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN ),
-    ( "#"             , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
+    ( _CDPH_          , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
 ];
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -67,8 +67,9 @@ fn main() -> AppExit
         .insert_resource(player::KeyMap(FxHashMap::from_iter(KEY_MAP))) //マッピング（キー）
         .insert_resource(player::PadMap(FxHashMap::from_iter(PAD_MAP))) //マッピング（ゲームパッド）
         // Eventを登録
-        .add_event::<EventStageClear>() //ステージクリアの伝達
-        .add_event::<EventGameOver>() //ゲームオーバーの伝達
+        .add_event::<EventStageClear>() // ステージクリアの伝達
+        .add_event::<EventGameOver>()   // ゲームオーバーの伝達
+        .add_event::<EventCountDown>()  // カウントダウンの終了
         // .add_event::<EventTimerPlayer>()  //プレイヤー移動タイマーのfinishedの伝達
         // .add_event::<EventEatDot>() //スコアリングの伝達
         // .add_event::<EventTimerChasers>() //敵キャラ移動タイマーのfinishedの伝達
@@ -134,48 +135,47 @@ fn main() -> AppExit
         );
 
     // MyState::StageStartスケジュール
-    // ステージ開始の処理
+    // ゲーム開始の処理
     application
         .add_systems(
             OnEnter(MyState::StageStart),
             (
+                //ステージ初期化
                 (
-                    //マップデータ生成
-                    map::make_new_stage_data,
-                    //スプライトのspawn
+                    map::make_new_stage_data, //マップデータ
                     (
-                        map::spawn_sprite,
-                        player::spawn_sprite,
-                        chaser::spawn_sprite,
-                    )
-                        .after(map::make_new_stage_data),
-                    // 無条件遷移
-                    set_next_state::<MainLoop>, //★★★DEBUG後に削除すること★★★
-                ),
-                //TextUIの可視化
+                        map::spawn_sprite,    //マップスプライト
+                        player::spawn_sprite, //プレーヤースプライト
+                        chaser::spawn_sprite, //チェイサースプライト
+                    ),
+                )
+                    .chain(),
+                //ポップアップメッセージ表示
                 (
-                    // effect::init_count::<stage_start::CountDown>, //カウント初期化
-                    misc::show_component::<popup::StageSatrt>,
+                    popup_messages::effect::init_count::<popup::StageSatrt>, //カウント初期化
+                    misc::show_component::<popup::StageSatrt>,               //可視化
                 )
                     .chain(), //実行順の固定
             ),
         )
-        // .add_systems(
-        //     Update,
-        //     (
-        //         //TextUIの演出
-        //         effect::count_down::<stage_start::CountDown>, //カウントダウン
-        //     )
-        //         .run_if(in_state(MyState::StageStart)),
-        // )
-        // .add_systems(
-        //     OnExit(MyState::StageStart),
-        //     (
-        //         //TextUIの不可視化
-        //         misc::hide_component::<stage_start::Message>,
-        //     ),
-        // )
-        ;
+        .add_systems(
+            Update,
+            (
+                //カウントダウン
+                popup_messages::effect::count_down::<popup::StageSatrt>,
+                // Stateの条件付き遷移
+                set_next_state::<MainLoop>.run_if(on_event::<EventCountDown>),
+            )
+                .chain() //実行順の固定
+                .run_if(in_state(MyState::StageStart)),
+        )
+        .add_systems(
+            OnExit(MyState::StageStart),
+            (
+                //ポップアップメッセージ非表示
+                misc::hide_component::<popup::StageSatrt>, //不可視化
+            ),
+        );
 
     // MyState::MainLoopスケジュール
     // メインループ
