@@ -348,7 +348,9 @@ const COLOR_NONE: Color = Color::NONE;
 //マーカーComponent
 #[rustfmt::skip]
 pub mod popup
-{   use super::*;
+{
+    use super::*;
+
     #[derive(Component, Clone)] pub struct StageSatrt ( pub i32, pub Timer, pub i32 );
     #[derive(Component, Clone)] pub struct StageClear ( pub i32, pub Timer, pub i32 );
     #[derive(Component, Clone)] pub struct GameOver   ( pub i32, pub Timer, pub i32 );
@@ -360,12 +362,12 @@ pub mod popup
     }
     impl Default for StageClear {
         fn default() -> Self {
-            Self ( 5, Timer::from_seconds( 1.0, TimerMode::Once ), 0 )
+            Self ( 10, Timer::from_seconds( 1.0, TimerMode::Once ), 0 )
         }
     }
     impl Default for GameOver {
         fn default() -> Self {
-            Self ( 5, Timer::from_seconds( 1.0, TimerMode::Once ), 0 )
+            Self ( 10, Timer::from_seconds( 1.0, TimerMode::Once ), 0 )
         }
     }
 

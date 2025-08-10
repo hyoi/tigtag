@@ -69,7 +69,7 @@ fn main() -> AppExit
         // Eventを登録
         .add_event::<EventStageClear>() // ステージクリアの伝達
         .add_event::<EventGameOver>()   // ゲームオーバーの伝達
-        .add_event::<EventCountDown>()  // カウントダウンの終了
+        .add_event::<EventCountDown>()  // カウントダウンの終了を伝達
         // .add_event::<EventTimerPlayer>()  //プレイヤー移動タイマーのfinishedの伝達
         // .add_event::<EventEatDot>() //スコアリングの伝達
         // .add_event::<EventTimerChasers>() //敵キャラ移動タイマーのfinishedの伝達
@@ -140,8 +140,8 @@ fn main() -> AppExit
         .add_systems(
             OnEnter(MyState::StageStart),
             (
-                //ステージ初期化
                 (
+                    //ステージ初期化
                     map::make_new_stage_data, //マップデータ
                     (
                         map::spawn_sprite,    //マップスプライト
@@ -150,30 +150,30 @@ fn main() -> AppExit
                     ),
                 )
                     .chain(),
-                //ポップアップメッセージ表示
                 (
-                    popup_messages::effect::init_count::<popup::StageSatrt>, //カウント初期化
-                    misc::show_component::<popup::StageSatrt>,               //可視化
+                    // ポップアップメッセージ表示
+                    popup_messages::effect::init_count::<popup::StageSatrt>,
+                    misc::show_component::<popup::StageSatrt>,
                 )
-                    .chain(), //実行順の固定
+                    .chain(),
             ),
         )
         .add_systems(
             Update,
             (
-                //カウントダウン
+                // カウントダウン
                 popup_messages::effect::count_down::<popup::StageSatrt>,
                 // Stateの条件付き遷移
                 set_next_state::<MainLoop>.run_if(on_event::<EventCountDown>),
             )
-                .chain() //実行順の固定
+                .chain()
                 .run_if(in_state(MyState::StageStart)),
         )
         .add_systems(
             OnExit(MyState::StageStart),
             (
-                //ポップアップメッセージ非表示
-                misc::hide_component::<popup::StageSatrt>, //不可視化
+                // ポップアップメッセージ非表示
+                misc::hide_component::<popup::StageSatrt>,
             ),
         );
 
@@ -192,21 +192,21 @@ fn main() -> AppExit
             set_next_state::<GameOver>.run_if(on_event::<EventGameOver>),
             // スプライトの位置を更新する
             (
-                // プレイヤーの移動
                 (
-                    // 入力に従ってResourceを更新する
+                    // プレイヤーの移動
                     (
+                        // 入力に従ってResourceを更新する
                         player::input_from_keyboard, // キー
                         player::input_from_gamepad,  // ゲームパッド
                     ),
                     player::move_sprite,
                 )
-                    .chain(), // 実行順の固定
+                    .chain(),
                 // チェイサーの移動
                 chaser::move_sprite,
             ),
         )
-            .chain() // 実行順の固定
+            .chain()
             .run_if(in_state(MyState::MainLoop)),
     );
 
@@ -215,62 +215,69 @@ fn main() -> AppExit
     application
         .add_systems(
             OnEnter(MyState::StageClear),
-            // 無条件遷移
-            set_next_state::<StageStart>, //★★★DEBUG後に削除すること★★★
+            (
+                // ポップアップメッセージ表示
+                popup_messages::effect::init_count::<popup::StageClear>,
+                misc::show_component::<popup::StageClear>,
+            )
+                .chain(),
         )
-        // appl.add_systems
-        // (   OnEnter ( MyState::StageClear ),
-        //     (   //TextUIの可視化
-        //         effect::init_count::<stage_clear::CountDown>, //カウント初期化
-        //         misc::show_component::<stage_clear::Message>,
-        //     )
-        //     .chain(), //実行順の固定
-        // )
-        // .add_systems
-        // (   Update,
-        //     (   //TextUIの演出
-        //         effect::count_down::<stage_clear::CountDown>, //カウントダウン
-        //     )
-        //     .run_if( in_state( MyState::StageClear ) )
-        // )
-        // .add_systems
-        // (   OnExit ( MyState::StageClear ),
-        //     (   //TextUIの不可視化
-        //         misc::hide_component::<stage_clear::Message>,
-        //     )
-        // )
-        ;
+        .add_systems(
+            Update,
+            (
+                // カウントダウン
+                popup_messages::effect::count_down::<popup::StageClear>,
+                // Stateの条件付き遷移
+                set_next_state::<StageStart>.run_if(on_event::<EventCountDown>),
+            )
+                .chain()
+                .run_if(in_state(MyState::StageClear)),
+        )
+        .add_systems(
+            OnExit(MyState::StageClear),
+            (
+                // ポップアップメッセージ非表示
+                misc::hide_component::<popup::StageClear>,
+            ),
+        );
 
     // MyState::GameOverスケジュール
     // ゲームオーバーの処理
     application
         .add_systems(
             OnEnter(MyState::GameOver),
-            // 無条件遷移
-            set_next_state::<StageStart>, //★★★DEBUG後に削除すること★★★
+            (
+                //ポップアップメッセージ表示
+                popup_messages::effect::init_count::<popup::GameOver>,
+                misc::show_component::<popup::GameOver>,
+            )
+                .chain(),
         )
-        // appl.add_systems
-        // (   OnEnter ( MyState::GameOver ),
-        //     (   //TextUIの可視化
-        //         effect::init_count::<game_over::CountDown>,//カウント初期化
-        //         misc::show_component::<game_over::Message>,
-        //     )
-        //     .chain() //実行順の固定
-        // )
-        // .add_systems
-        // (   Update,
-        //     (   //TextUIの演出＆入力待ち
-        //         effect::count_down::<game_over::CountDown>, //カウントダウン
-        //         effect::blinking_text::<game_over::TextREPLAY>, //Replay? の明滅
-        //         effect::hit_any_key::<StageStart>, //Hit ANY Key
-        //     )
-        //     .run_if( in_state( MyState::GameOver ) )
-        // )
-        //scoreとstageをゼロクリアする
-        .add_systems(OnExit(MyState::GameOver), initialize_record_except_hi_score)
-        //     (   //TextUIの不可視化
-        //         misc::hide_component::<game_over::Message>,
-        ;
+        .add_systems(
+            Update,
+            (
+                //ポップアップメッセージの表示効果
+                (
+                    //カウントダウン
+                    popup_messages::effect::count_down::<popup::GameOver>,
+                    // effect::blinking_text::<game_over::TextREPLAY>, //Replay? の明滅
+                    // effect::hit_any_key::<StageStart>, //Hit ANY Key
+                ),
+                // Stateの条件付き遷移
+                set_next_state::<StageStart>.run_if(on_event::<EventCountDown>),
+            )
+                .chain()
+                .run_if(in_state(MyState::GameOver)),
+        )
+        .add_systems(
+            OnExit(MyState::GameOver),
+            (
+                //scoreとstageをゼロクリアする
+                initialize_record_except_hi_score,
+                //ポップアップメッセージ非表示
+                misc::hide_component::<popup::GameOver>,
+            ),
+        );
 
     // MyState::TitleDemoスケジュール
     // タイトル画面の処理
