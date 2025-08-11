@@ -197,6 +197,8 @@ pub struct EventStageClear;
 pub struct EventGameOver;
 #[derive(Event)]
 pub struct EventCountDown;
+#[derive(Event)]
+pub struct EventHitAnyKey;
 // #[derive(Event)]
 // pub struct EventTimerPlayer;
 // #[allow( dead_code )]

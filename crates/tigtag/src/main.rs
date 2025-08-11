@@ -11,8 +11,11 @@ use bevy::{
     asset::{LoadedUntypedAsset, LoadState},
     render::camera::Viewport,
     diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
-    input::gamepad::{
-        GamepadInput, GamepadButton::*, GamepadAxis::*, GamepadAxisChangedEvent,
+    input::{
+        gamepad::{
+            GamepadInput, GamepadButton::*, GamepadAxis::*, GamepadAxisChangedEvent,
+        },
+        keyboard::NativeKeyCode,
     },
     // ecs::query::QueryFilter,
 };
@@ -70,6 +73,7 @@ fn main() -> AppExit
         .add_event::<EventStageClear>() // ステージクリアの伝達
         .add_event::<EventGameOver>()   // ゲームオーバーの伝達
         .add_event::<EventCountDown>()  // カウントダウンの終了を伝達
+        .add_event::<EventHitAnyKey>()  // Hit Any Keyの入力を伝達
         // .add_event::<EventTimerPlayer>()  //プレイヤー移動タイマーのfinishedの伝達
         // .add_event::<EventEatDot>() //スコアリングの伝達
         // .add_event::<EventTimerChasers>() //敵キャラ移動タイマーのfinishedの伝達
@@ -254,15 +258,15 @@ fn main() -> AppExit
         .add_systems(
             Update,
             (
-                //ポップアップメッセージの表示効果
                 (
-                    //カウントダウン
-                    popup_messages::effect::count_down::<popup::GameOver>,
+                    //ポップアップメッセージの表示効果
+                    popup_messages::effect::count_down::<popup::GameOver>, //カウントダウン
                     popup_messages::effect::blinking_text::<popup::GameOver>, //Replay? の明滅
-                    // effect::hit_any_key::<StageStart>, //Hit ANY Key
+                    popup_messages::effect::hit_any_key::<popup::GameOver>, //Hit ANY Key
                 ),
                 // Stateの条件付き遷移
                 set_next_state::<StageStart>.run_if(on_event::<EventCountDown>),
+                set_next_state::<StageStart>.run_if(on_event::<EventHitAnyKey>),
             )
                 .chain()
                 .run_if(in_state(MyState::GameOver)),

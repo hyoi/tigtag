@@ -19,6 +19,9 @@ pub trait Blinking
     fn blink_index(&self) -> usize;
 }
 
+//効果「Hit Any Key」のトレイト
+pub trait HitAnyKey {}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //カウントダウンのパラメータを初期化する
@@ -104,6 +107,74 @@ where
         .ok_or(format!("No entity with a matching index: {index}"))?;
 
     text_color.set_alpha(alpha);
+
+    Ok(())
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//Hit ANY Keyの処理で無視するキーとボタン
+#[rustfmt::skip]
+const IGNORE_KEYS: &[KeyCode] = &[
+    KeyCode::AltLeft    , KeyCode::AltRight,
+    KeyCode::ControlLeft, KeyCode::ControlRight,
+    KeyCode::ShiftLeft  , KeyCode::ShiftRight,
+    KeyCode::SuperLeft  , KeyCode::SuperRight,
+    KeyCode::ArrowUp    , KeyCode::ArrowDown,
+    KeyCode::ArrowRight , KeyCode::ArrowLeft,
+    KeyCode::CapsLock   , KeyCode::Fn,
+    KeyCode::Unidentified(NativeKeyCode::Windows(57443)), //ThinkPad [Fn]
+];
+// const IGNORE_BUTTONS: &[ GamepadButtonType ] =
+// &[
+//     GamepadButtonType::DPadUp,    GamepadButtonType::DPadDown,
+//     GamepadButtonType::DPadRight, GamepadButtonType::DPadLeft,
+// ];
+
+//入力があればStateを変更する
+pub fn hit_any_key<T>(
+    input_keycode: Res<ButtonInput<KeyCode>>,
+    opt_target_gamepad: Option<ResMut<my_utils::misc::TargetGamepad>>,
+    qry_gamepads: Query<&Gamepad>,
+    mut event: EventWriter<EventHitAnyKey>,
+) -> Result
+where
+    T: Component<Mutability = Mutable> + HitAnyKey,
+{
+    //無視キー以外のキー入力はあるか
+    if input_keycode.any_pressed(IGNORE_KEYS.iter().copied())
+    {
+        return Ok(());
+    }
+    if input_keycode.any_just_pressed(IGNORE_KEYS.iter().copied())
+    {
+        return Ok(());
+    } //[Fn]対策
+    let mut is_pressed = input_keycode.get_just_pressed().len();
+
+    #[cfg(debug_assertions)]
+    if is_pressed != 0
+    {
+        input_keycode.get_just_pressed().for_each(|key| {
+            dbg!(key);
+        });
+    }
+
+    // //無視ボタン以外のボタン入力はあるか
+    // if is_pressed == 0
+    // {   let Some ( gamepad ) = opt_gamepad else { return };
+    //     let Some ( id ) = gamepad.id() else { return };
+    //     for buton in HAK_IGNORE_BUTTONS
+    //     {   if inbtn.pressed( GamepadButton::new( id, *buton ) ) { return }
+    //     }
+    //     is_pressed = inbtn.get_just_pressed().filter( |x| x.gamepad == id ).count();
+    // }
+
+    //Stateを遷移させる
+    if is_pressed > 0
+    {
+        event.write(EventHitAnyKey);
+    }
 
     Ok(())
 }

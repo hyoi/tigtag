@@ -404,6 +404,8 @@ pub mod popup
         }
         fn blink_index( &self ) -> usize { self.4 }
     }
+
+    impl popup_messages::effect::HitAnyKey for GameOver {}
 }
 
 // ポップアップメッセージをspawnするために必要な情報のリスト（Resource）
