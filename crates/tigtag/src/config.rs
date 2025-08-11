@@ -353,7 +353,7 @@ pub mod popup
 
     #[derive(Component, Clone)] pub struct StageSatrt ( pub i32, pub Timer, pub i32 );
     #[derive(Component, Clone)] pub struct StageClear ( pub i32, pub Timer, pub i32 );
-    #[derive(Component, Clone)] pub struct GameOver   ( pub i32, pub Timer, pub i32 );
+    #[derive(Component, Clone)] pub struct GameOver   ( pub i32, pub Timer, pub i32, pub f32, pub usize );
 
     impl Default for StageSatrt {
         fn default() -> Self {
@@ -367,7 +367,7 @@ pub mod popup
     }
     impl Default for GameOver {
         fn default() -> Self {
-            Self ( 10, Timer::from_seconds( 1.0, TimerMode::Once ), 0 )
+            Self ( 10, Timer::from_seconds( 1.0, TimerMode::Once ), 0, 0.0, 2 )
         }
     }
 
@@ -391,6 +391,18 @@ pub mod popup
         fn timer( &mut self ) -> &mut Timer { &mut self.1 }
         fn counter( &mut self ) -> &mut i32 { &mut self.2 }
         fn start_value( &self ) -> i32 { self.0 }
+    }
+
+    impl popup_messages::effect::Blinking for GameOver
+    {
+        fn alpha( &mut self, time_delta: f32 ) -> f32
+        {   let radian = &mut self.3;
+            *radian += TAU * time_delta;
+            *radian -= if *radian > TAU { TAU } else { 0.0 };
+
+            ( *radian ).sin() * 0.5 + 0.5 //0.0 ～ 1.0
+        }
+        fn blink_index( &self ) -> usize { self.4 }
     }
 }
 

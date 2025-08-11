@@ -258,7 +258,7 @@ fn main() -> AppExit
                 (
                     //カウントダウン
                     popup_messages::effect::count_down::<popup::GameOver>,
-                    // effect::blinking_text::<game_over::TextREPLAY>, //Replay? の明滅
+                    popup_messages::effect::blinking_text::<popup::GameOver>, //Replay? の明滅
                     // effect::hit_any_key::<StageStart>, //Hit ANY Key
                 ),
                 // Stateの条件付き遷移

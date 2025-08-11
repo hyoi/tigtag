@@ -12,6 +12,15 @@ pub trait CountDown
     fn start_value(&self) -> i32;
 }
 
+//効果「テキスト明滅」のトレイト
+pub trait Blinking
+{
+    fn alpha(&mut self, time_delta: f32) -> f32;
+    fn blink_index(&self) -> usize;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //カウントダウンのパラメータを初期化する
 pub fn init_count<T>(
     mut qrt_count_params: Query<&mut T>,
@@ -30,7 +39,7 @@ where
     Ok(())
 }
 
-//カウントダウンを表示しゼロになったらStateを変更する
+//カウントダウンを表示しゼロになったらEventをセットする
 pub fn count_down<T>(
     mut query: Query<(&Children, &mut T)>,
     mut text_writer: TextUiWriter,
@@ -40,6 +49,7 @@ pub fn count_down<T>(
 where
     T: Component<Mutability = Mutable> + CountDown,
 {
+    //準備
     let (children, mut count_params) = query.single_mut()?;
     let entity = children.iter().next().ok_or("Child Entity not found.")?;
     let index = count_params.placeholder().ok_or("err")?;
@@ -67,6 +77,33 @@ where
         //そうでないならカウントダウン終了のイベントを発行
         event.write(EventCountDown);
     }
+
+    Ok(())
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//テキストを明滅させる
+pub fn blinking_text<T>(
+    mut query: Query<(&Children, &mut T)>,
+    mut text_writer: TextUiWriter,
+    time: Res<Time>,
+) -> Result
+where
+    T: Component<Mutability = Mutable> + Blinking,
+{
+    //準備
+    let (children, mut count_params) = query.single_mut()?;
+    let entity = children.iter().next().ok_or("Child Entity not found.")?;
+    let index = count_params.blink_index();
+
+    //透明度を変化させる
+    let alpha = count_params.alpha(time.delta().as_secs_f32());
+    let mut text_color = text_writer
+        .get_color(entity, index)
+        .ok_or(format!("No entity with a matching index: {index}"))?;
+
+    text_color.set_alpha(alpha);
 
     Ok(())
 }
