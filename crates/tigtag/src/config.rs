@@ -371,21 +371,21 @@ pub mod popup
         }
     }
 
-    impl popup_messages::effect::CountDown for StageSatrt {
+    impl popup_text_ui::effect::CountDown for StageSatrt {
         fn init( &mut self ) { *self = Self::default(); }
         fn placeholder( &self ) -> Option<usize> { POPUP_STAGE_START.iter().position( |x| x.0 == _CDPH_ ) }
         fn timer( &mut self ) -> &mut Timer { &mut self.1 }
         fn counter( &mut self ) -> &mut i32 { &mut self.2 }
         fn start_value( &self ) -> i32 { self.0 }
     }
-    impl popup_messages::effect::CountDown for StageClear {
+    impl popup_text_ui::effect::CountDown for StageClear {
         fn init( &mut self ) { *self = Self::default(); }
         fn placeholder( &self ) -> Option<usize> { POPUP_STAGE_CLEAR.iter().position( |x| x.0 == _CDPH_ ) }
         fn timer( &mut self ) -> &mut Timer { &mut self.1 }
         fn counter( &mut self ) -> &mut i32 { &mut self.2 }
         fn start_value( &self ) -> i32 { self.0 }
     }
-    impl popup_messages::effect::CountDown for GameOver   {
+    impl popup_text_ui::effect::CountDown for GameOver   {
         fn init( &mut self ) { *self = Self::default(); }
         fn placeholder( &self ) -> Option<usize> { POPUP_GAME_OVER.iter().position( |x| x.0 == _CDPH_ ) }
         fn timer( &mut self ) -> &mut Timer { &mut self.1 }
@@ -393,7 +393,7 @@ pub mod popup
         fn start_value( &self ) -> i32 { self.0 }
     }
 
-    impl popup_messages::effect::Blinking for GameOver
+    impl popup_text_ui::effect::Blinking for GameOver
     {
         fn alpha( &mut self, time_delta: f32 ) -> f32
         {   let radian = &mut self.3;
@@ -405,12 +405,12 @@ pub mod popup
         fn blink_index( &self ) -> usize { self.4 }
     }
 
-    impl popup_messages::effect::HitAnyKey for GameOver {}
+    impl popup_text_ui::effect::HitAnyKey for GameOver {}
 }
 
 // ポップアップメッセージをspawnするために必要な情報のリスト（Resource）
 #[derive(Resource, Deref, DerefMut)]
-pub struct PopupMessages(pub Vec<popup_messages::TextBlock>);
+pub struct PopupMessages(pub Vec<popup_text_ui::TextBlock>);
 
 impl Default for PopupMessages
 {
@@ -436,21 +436,21 @@ impl Default for PopupMessages
 pub const _CDPH_: &str = "__countdown_placeholder__";
 
 #[rustfmt::skip]
-const POPUP_STAGE_START: &[ popup_messages::TextUiSpanSettings ] = &[
+const POPUP_STAGE_START: &[ popup_text_ui::TextUiSpanSettings ] = &[
     ( "START\n"   , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, COLOR_CYAN ),
     ( "ready...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.0, COLOR_CYAN ),
     ( _CDPH_      , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
 ];
 
 #[rustfmt::skip]
-const POPUP_STAGE_CLEAR: &[ popup_messages::TextUiSpanSettings ] = &[
+const POPUP_STAGE_CLEAR: &[ popup_text_ui::TextUiSpanSettings ] = &[
     ( "C L E A R !!!\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.7, COLOR_CYAN ),
     ( "next stage...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.0, COLOR_CYAN ),
     ( _CDPH_           , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
 ];
 
 #[rustfmt::skip]
-const POPUP_GAME_OVER: &[ popup_messages::TextUiSpanSettings ] = &[
+const POPUP_GAME_OVER: &[ popup_text_ui::TextUiSpanSettings ] = &[
     ( "Game Over\n"   , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 4.0, COLOR_RED  ),
     ( " \n"           , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.6, COLOR_NONE ),
     ( "REPLAY?"       , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 2.0, COLOR_GOLD ),

@@ -42,7 +42,7 @@ use my_utils::*;
 mod core_logic; // ゲームアプリの中核
 use core_logic::*;
 
-mod popup_messages; //ポップアップメッセージ関連
+mod popup_text_ui; //ポップアップメッセージ関連
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -134,7 +134,7 @@ fn main() -> AppExit
                 // ヘッダー／フッターの準備
                 header_footer::spawn_header_footer,
                 // ポップアップメッセージの準備
-                popup_messages::spawn::<PopupMessages>,
+                popup_text_ui::spawn::<PopupMessages>,
             ),
         );
 
@@ -156,7 +156,7 @@ fn main() -> AppExit
                     .chain(),
                 (
                     // ポップアップメッセージ表示
-                    popup_messages::effect::init_count::<popup::StageSatrt>,
+                    popup_text_ui::effect::init_count::<popup::StageSatrt>,
                     misc::show_component::<popup::StageSatrt>,
                 )
                     .chain(),
@@ -166,7 +166,7 @@ fn main() -> AppExit
             Update,
             (
                 // カウントダウン後にStateを遷移
-                popup_messages::effect::count_down::<popup::StageSatrt>,
+                popup_text_ui::effect::count_down::<popup::StageSatrt>,
                 set_next_state::<MainLoop>.run_if(on_event::<EventCountDown>),
             )
                 .chain()
@@ -220,7 +220,7 @@ fn main() -> AppExit
             OnEnter(MyState::StageClear),
             (
                 // ポップアップメッセージ表示
-                popup_messages::effect::init_count::<popup::StageClear>,
+                popup_text_ui::effect::init_count::<popup::StageClear>,
                 misc::show_component::<popup::StageClear>,
             )
                 .chain(),
@@ -229,7 +229,7 @@ fn main() -> AppExit
             Update,
             (
                 // カウントダウン後にStateを遷移
-                popup_messages::effect::count_down::<popup::StageClear>,
+                popup_text_ui::effect::count_down::<popup::StageClear>,
                 set_next_state::<StageStart>.run_if(on_event::<EventCountDown>),
             )
                 .chain()
@@ -250,7 +250,7 @@ fn main() -> AppExit
             OnEnter(MyState::GameOver),
             (
                 //ポップアップメッセージ表示
-                popup_messages::effect::init_count::<popup::GameOver>,
+                popup_text_ui::effect::init_count::<popup::GameOver>,
                 misc::show_component::<popup::GameOver>,
             )
                 .chain(),
@@ -260,9 +260,9 @@ fn main() -> AppExit
             (
                 (
                     //ポップアップメッセージの表示効果
-                    popup_messages::effect::count_down::<popup::GameOver>, //カウントダウン
-                    popup_messages::effect::blinking_text::<popup::GameOver>, //Replay? の明滅
-                    popup_messages::effect::hit_any_key::<popup::GameOver>, //Hit ANY Key
+                    popup_text_ui::effect::count_down::<popup::GameOver>, //カウントダウン
+                    popup_text_ui::effect::blinking_text::<popup::GameOver>, //Replay? の明滅
+                    popup_text_ui::effect::hit_any_key::<popup::GameOver>, //Hit ANY Key
                 ),
                 // Stateの条件付き遷移
                 set_next_state::<StageStart>.run_if(on_event::<EventCountDown>),
