@@ -13,7 +13,10 @@ pub trait CountDown
 }
 
 //カウントダウンのパラメータを初期化する
-pub fn init_count<T>(mut qrt_count_params: Query<&mut T>) -> Result
+pub fn init_count<T>(
+    mut qrt_count_params: Query<&mut T>,
+    mut event: ResMut<Events<EventCountDown>>,
+) -> Result
 where
     T: Component<Mutability = Mutable> + CountDown,
 {
@@ -22,6 +25,7 @@ where
 
     //初期化
     count_params.init();
+    event.clear(); //[対策]StageClear等のCountDownイベントが生きているので（v0.16.1）
 
     Ok(())
 }
@@ -36,7 +40,7 @@ pub fn count_down<T>(
 where
     T: Component<Mutability = Mutable> + CountDown,
 {
-    let (mut children, mut count_params) = query.single_mut()?;
+    let (children, mut count_params) = query.single_mut()?;
     let entity = children.iter().next().ok_or("Child Entity not found.")?;
     let index = count_params.placeholder().ok_or("err")?;
 

@@ -161,9 +161,8 @@ fn main() -> AppExit
         .add_systems(
             Update,
             (
-                // カウントダウン
+                // カウントダウン後にStateを遷移
                 popup_messages::effect::count_down::<popup::StageSatrt>,
-                // Stateの条件付き遷移
                 set_next_state::<MainLoop>.run_if(on_event::<EventCountDown>),
             )
                 .chain()
@@ -225,9 +224,8 @@ fn main() -> AppExit
         .add_systems(
             Update,
             (
-                // カウントダウン
+                // カウントダウン後にStateを遷移
                 popup_messages::effect::count_down::<popup::StageClear>,
-                // Stateの条件付き遷移
                 set_next_state::<StageStart>.run_if(on_event::<EventCountDown>),
             )
                 .chain()
