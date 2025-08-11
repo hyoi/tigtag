@@ -42,7 +42,7 @@ use my_utils::*;
 mod core_logic; // ゲームアプリの中核
 use core_logic::*;
 
-mod popup_text_ui; //ポップアップメッセージ関連
+mod popup_text_ui; //ポップアップTextUI関連
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -123,17 +123,17 @@ fn main() -> AppExit
                     .before(misc::select_ui_camera),
                 misc::select_ui_camera, // UIを描画するカメラを選ぶ
                 // 無条件遷移
-                set_next_state::<StageStart>,
+                set_next_state::<TitleDemo>,
             ),
         )
         .insert_resource(header_footer::Settings(HEADER_FOOTER)) // UIの情報
-        .init_resource::<PopupMessages>() // ポップアップメッセージの情報
+        .init_resource::<PopupMessages>() // ポップアップTextUIの情報
         .add_systems(
             OnExit(MyState::InitGame),
             (
                 // ヘッダー／フッターの準備
                 header_footer::spawn_header_footer,
-                // ポップアップメッセージの準備
+                // ポップアップTextUIの準備
                 popup_text_ui::spawn::<PopupMessages>,
             ),
         );
@@ -155,7 +155,7 @@ fn main() -> AppExit
                 )
                     .chain(),
                 (
-                    // ポップアップメッセージ表示
+                    // ポップアップTextUI表示
                     popup_text_ui::effect::init_count::<popup::StageSatrt>,
                     misc::show_component::<popup::StageSatrt>,
                 )
@@ -175,7 +175,7 @@ fn main() -> AppExit
         .add_systems(
             OnExit(MyState::StageStart),
             (
-                // ポップアップメッセージ非表示
+                // ポップアップTextUI非表示
                 misc::hide_component::<popup::StageSatrt>,
             ),
         );
@@ -219,7 +219,7 @@ fn main() -> AppExit
         .add_systems(
             OnEnter(MyState::StageClear),
             (
-                // ポップアップメッセージ表示
+                // ポップアップTextUI表示
                 popup_text_ui::effect::init_count::<popup::StageClear>,
                 misc::show_component::<popup::StageClear>,
             )
@@ -238,7 +238,7 @@ fn main() -> AppExit
         .add_systems(
             OnExit(MyState::StageClear),
             (
-                // ポップアップメッセージ非表示
+                // ポップアップTextUI非表示
                 misc::hide_component::<popup::StageClear>,
             ),
         );
@@ -249,7 +249,7 @@ fn main() -> AppExit
         .add_systems(
             OnEnter(MyState::GameOver),
             (
-                //ポップアップメッセージ表示
+                //ポップアップTextUI表示
                 popup_text_ui::effect::init_count::<popup::GameOver>,
                 misc::show_component::<popup::GameOver>,
             )
@@ -259,7 +259,7 @@ fn main() -> AppExit
             Update,
             (
                 (
-                    //ポップアップメッセージの表示効果
+                    //ポップアップTextUIの表示効果
                     popup_text_ui::effect::count_down::<popup::GameOver>, //カウントダウン
                     popup_text_ui::effect::blinking_text::<popup::GameOver>, //Replay? の明滅
                     popup_text_ui::effect::hit_any_key::<popup::GameOver>, //Hit ANY Key
@@ -276,36 +276,43 @@ fn main() -> AppExit
             (
                 //scoreとstageをゼロクリアする
                 initialize_record_except_hi_score,
-                //ポップアップメッセージ非表示
+                //ポップアップTextUI非表示
                 misc::hide_component::<popup::GameOver>,
             ),
         );
 
     // MyState::TitleDemoスケジュール
     // タイトル画面の処理
-    // application
-    // .add_systems
-    // (   OnEnter ( MyState::TitleDemo ),
-    //     (   //TextUIの可視化
-    //         misc::show_component::<title_demo::Message>,
-    //     )
-    // )
-    // .add_systems
-    // (   Update,
-    //     (   //TextUIの演出＆入力待ち
-    //         effect::blinking_text::<title_demo::TextDEMO>, //Demo の明滅
-    //         effect::hit_any_key::<StageStart>, //Hit ANY Key
-    //     )
-    //     .run_if( in_state( MyState::TitleDemo ) )
-    // )
-    // .add_systems
-    // (   OnExit ( MyState::TitleDemo ),
-    //     (   //TextUIの不可視化
-    //         misc::hide_component::<title_demo::Message>,
-    //         //scoreとstageをゼロクリアする(DEMOでステージクリアの時はしない)
-    //         initialize_record_except_hi_score,
-    //     )
-    // );
+    application
+        .add_systems(
+            OnEnter(MyState::TitleDemo),
+            //ポップアップTextUI表示
+            misc::show_component::<popup::TitleDemo>,
+        )
+        .add_systems(
+            Update,
+            (
+                (
+                    //ポップアップTextUIの表示効果
+                    popup_text_ui::effect::blinking_text::<popup::TitleDemo>, //DEMO の明滅
+                    popup_text_ui::effect::hit_any_key::<popup::TitleDemo>, //Hit ANY Key
+                ),
+                // Stateの条件付き遷移
+                set_next_state::<StageStart>.run_if(on_event::<EventHitAnyKey>),
+            )
+                .chain()
+                .run_if(in_state(MyState::TitleDemo)),
+        )
+        .add_systems(
+            OnExit(MyState::TitleDemo),
+            (
+                //ポップアップTextUI非表示
+                misc::hide_component::<popup::TitleDemo>,
+                //scoreとstageをゼロクリアする(DEMOでステージクリアの時はしない)
+                initialize_record_except_hi_score,
+            ),
+        )
+    ;
 
     // アプリを実行
     application.run()

@@ -337,7 +337,7 @@ pub const SHOW_HIDE_GIZMO_TOGGLE_KEY: KeyCode = KeyCode::Tab;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//色の表記短縮
+//色の短縮表記
 const COLOR_CYAN: Color = Color::Srgba(css::AQUA);
 const COLOR_GOLD: Color = Color::Srgba(css::GOLD);
 const COLOR_RED: Color = Color::Srgba(css::RED);
@@ -354,6 +354,7 @@ pub mod popup
     #[derive(Component, Clone)] pub struct StageSatrt ( pub i32, pub Timer, pub i32 );
     #[derive(Component, Clone)] pub struct StageClear ( pub i32, pub Timer, pub i32 );
     #[derive(Component, Clone)] pub struct GameOver   ( pub i32, pub Timer, pub i32, pub f32, pub usize );
+    #[derive(Component, Clone)] pub struct TitleDemo  ( pub f32, pub usize );
 
     impl Default for StageSatrt {
         fn default() -> Self {
@@ -368,6 +369,11 @@ pub mod popup
     impl Default for GameOver {
         fn default() -> Self {
             Self ( 10, Timer::from_seconds( 1.0, TimerMode::Once ), 0, 0.0, 2 )
+        }
+    }
+    impl Default for TitleDemo {
+        fn default() -> Self {
+            Self ( 0.0, 5 )
         }
     }
 
@@ -404,8 +410,20 @@ pub mod popup
         }
         fn blink_index( &self ) -> usize { self.4 }
     }
+    impl popup_text_ui::effect::Blinking for TitleDemo
+    {
+        fn alpha( &mut self, time_delta: f32 ) -> f32
+        {   let radian = &mut self.0;
+            *radian += TAU * time_delta;
+            *radian -= if *radian > TAU { TAU } else { 0.0 };
+
+            ( *radian ).sin() * 0.5 + 0.5 //0.0 ～ 1.0
+        }
+        fn blink_index( &self ) -> usize { self.1 }
+    }
 
     impl popup_text_ui::effect::HitAnyKey for GameOver {}
+    impl popup_text_ui::effect::HitAnyKey for TitleDemo {}
 }
 
 // ポップアップメッセージをspawnするために必要な情報のリスト（Resource）
@@ -428,6 +446,10 @@ impl Default for PopupMessages
             (
                 Box::new(popup::GameOver::default()),
                 Vec::from(POPUP_GAME_OVER),
+            ),
+            (
+                Box::new(popup::TitleDemo::default()),
+                Vec::from(POPUP_TITLE_DEMO),
             ),
         ])
     }
@@ -459,6 +481,23 @@ const POPUP_GAME_OVER: &[ popup_text_ui::TextUiSpanSettings ] = &[
     ( "or\n"          , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, COLOR_CYAN ),
     ( "ANY button!\n" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN ),
     ( _CDPH_          , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
+];
+
+const TITLE_COLOR1: Color = Color::srgba( 0.6, 1.0, 0.4, 0.75 );
+const TITLE_COLOR2: Color = Color::srgba( 0.0, 0.7, 0.5, 0.75 );
+
+#[rustfmt::skip]
+const POPUP_TITLE_DEMO: &[ popup_text_ui::TextUiSpanSettings ] = &[
+    ( APP_TITLE       , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 3.5, TITLE_COLOR1 ),
+    ( "\nv"           , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, TITLE_COLOR2 ),
+    ( APP_VER         , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, TITLE_COLOR2 ),
+    ( "\n"            , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.6, COLOR_NONE   ),
+    ( " \n"           , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 1.0, COLOR_NONE   ),
+    ( "D E M O\n"     , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, COLOR_GOLD   ),
+    ( " \n"           , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.0, COLOR_NONE   ),
+    ( "Hit ANY key!\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN   ),
+    ( "or\n"          , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, COLOR_CYAN   ),
+    ( "ANY button!"   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN   ),
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
