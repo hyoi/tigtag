@@ -45,7 +45,7 @@ impl Position
 }
 
 // TextUIの文字列の情報を格納する型
-type MessageSpan = (
+pub type MessageSpan = (
     &'static str, // 表示文字列
     &'static str, // フォントのAssets
     f32,          // フォントのサイズ

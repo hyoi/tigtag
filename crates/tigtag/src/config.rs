@@ -221,8 +221,6 @@ pub const FOOTER_FPS: header_footer::TextBlock = header_footer::TextBlock {
     spans: &[
         ( "  FPS ", ASSETS_FONT_ORBITRON_BLACK      , FOOTER_FONT_SIZE      , css::TEAL   ),
         ( NA3_2   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.4 , css::SILVER ),
-        ( " demo ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.35, css::TEAL   ),
-        ( NA2_5   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.26, css::SILVER ),
     ],
 };
 
@@ -257,7 +255,6 @@ const FOOTER_FONT_SIZE: f32 = PIXELS_PER_GRID * 0.48;
 
 pub const NA2: &str = "##";
 pub const NA5: &str = "#####";
-pub const NA2_5: &str = "##-#####";
 pub const NA3_2: &str = "###.##";
 
 ////////////////////////////////////////////////////////////////////////////////

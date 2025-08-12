@@ -1,5 +1,3 @@
-use crate::core_logic::map::{MAP_GRIDS_HEIGHT, MAP_GRIDS_WIDTH};
-
 use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -14,7 +12,7 @@ impl Plugin for Schedule
             //Resource
             .init_resource::<DemoMapParams>() //デモ用マップ情報
             //plugin
-            // .add_plugins( footer::Schedule ) //フッター(demo record)
+            .add_plugins( footer::Schedule ) //フッター(demo record)
             ;
 
         // MyState::TitleDemoスケジュール
@@ -69,31 +67,6 @@ impl Plugin for Schedule
         );
     }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-
-//demo用のマップ情報Resource
-// #[derive( Resource, Default )]
-// pub struct DemoMapParams
-// {   dots_rect : IVec2Rect,                               //dotsを内包する最小の矩形
-//     dots_sum_x: [ i32; map::MAP_GRIDS_WIDTH  as usize ], //列に残っているdotsを数えた配列
-//     dots_sum_y: [ i32; map::MAP_GRIDS_HEIGHT as usize ], //行に残っているdotsを数えた配列
-// }
-
-// #[derive( Default )]
-// struct IVec2Rect { min: IVec2, max: IVec2 }
-
-// impl DemoMapParams
-// {   pub fn dots_sum_x    ( &    self, x: i32 ) ->      i32 {      self.dots_sum_x[ x as usize ] }
-//     pub fn dots_sum_x_mut( &mut self, x: i32 ) -> &mut i32 { &mut self.dots_sum_x[ x as usize ] }
-//     pub fn dots_sum_y    ( &    self, y: i32 ) ->      i32 {      self.dots_sum_y[ y as usize ] }
-//     pub fn dots_sum_y_mut( &mut self, y: i32 ) -> &mut i32 { &mut self.dots_sum_y[ y as usize ] }
-
-//     pub fn dots_rect_min    ( &    self ) ->       IVec2 {      self.dots_rect.min }
-//     pub fn dots_rect_min_mut( &mut self ) ->  &mut IVec2 { &mut self.dots_rect.min }
-//     pub fn dots_rect_max    ( &    self ) ->       IVec2 {      self.dots_rect.max }
-//     pub fn dots_rect_max_mut( &mut self ) ->  &mut IVec2 { &mut self.dots_rect.max }
-// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -163,67 +136,21 @@ fn update_data_for_demo(
     let y = map::MAP_GRIDS_Y_RANGE
         .position(|i| demo.dots_sum_y(i) != 0)
         .unwrap_or(map::MAP_GRIDS_HEIGHT as usize) as i32;
-    // let (mut x, mut y) = (0, 0);
-    // for _ in map::MAP_GRIDS_X_RANGE
-    // {
-    //     if demo.dots_sum_x(x) != 0
-    //     {
-    //         break;
-    //     }
-    //     else
-    //     {
-    //         x += 1;
-    //     }
-    // }
-    // for _ in map::MAP_GRIDS_Y_RANGE
-    // {
-    //     if demo.dots_sum_y(y) != 0
-    //     {
-    //         break;
-    //     }
-    //     else
-    //     {
-    //         y += 1;
-    //     }
-    // }
     *demo.dots_rect_min_mut() = IVec2::new(x, y);
 
     //dotsを内包する最小の矩形の右下座標（max）を更新する
-    let x = MAP_GRIDS_WIDTH
+    let x = map::MAP_GRIDS_WIDTH
         - 1
         - map::MAP_GRIDS_X_RANGE
             .rev()
             .position(|i| demo.dots_sum_x(i) != 0)
             .unwrap_or(0) as i32;
-    let y = MAP_GRIDS_HEIGHT
+    let y = map::MAP_GRIDS_HEIGHT
         - 1
         - map::MAP_GRIDS_Y_RANGE
             .rev()
             .position(|i| demo.dots_sum_y(i) != 0)
             .unwrap_or(0) as i32;
-    // (x, y) = (map::MAP_GRIDS_WIDTH - 1, map::MAP_GRIDS_HEIGHT - 1);
-    // for _ in map::MAP_GRIDS_X_RANGE
-    // {
-    //     if demo.dots_sum_x(x) != 0
-    //     {
-    //         break;
-    //     }
-    //     else
-    //     {
-    //         x -= 1;
-    //     }
-    // }
-    // for _ in map::MAP_GRIDS_Y_RANGE
-    // {
-    //     if demo.dots_sum_y(y) != 0
-    //     {
-    //         break;
-    //     }
-    //     else
-    //     {
-    //         y -= 1;
-    //     }
-    // }
     *demo.dots_rect_max_mut() = IVec2::new(x, y);
 
     Ok(())

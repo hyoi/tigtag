@@ -8,6 +8,6 @@ pub use schedule::Schedule;
 pub mod auto_drive;
 
 //デモの情報表示
-// mod footer;
+mod footer;
 
 //End of code.
