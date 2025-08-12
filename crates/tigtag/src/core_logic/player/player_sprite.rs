@@ -173,42 +173,7 @@ pub fn move_sprite(
         else
         {
             // demoの場合
-            autodrive(&mut player, map, opt_demo, qry_chasers);
-            //     // demoの場合 入力相当のデータをアルゴリズムで作る
-            //     player.is_stop = false; // demoでは自機は停止しない
-
-            //     let mut sides = map.get_side_spaces_list(player.next_grid); // 脇道のリスト
-            //     sides.retain(|side| player.next_grid + side != player.grid); // 戻り路を取り除く
-
-            //     new_side = match sides.len().cmp(&1)
-            //     {
-            //         Ordering::Equal =>
-            //         // 一本道 ⇒ 道なりに進む
-            //             sides[0],
-            //         Ordering::Greater =>
-            //         // 三叉路または十字路
-            //             if let (Some(autodrive), Some(demo)) =
-            //                 (player.fn_autodrive, opt_demo)
-            //             {
-            //                 // 外部関数で進行方向を決める
-            //                 autodrive(&player, qry_chasers, map, demo, &sides)
-            //             }
-            //             else
-            //             {
-            //                 // 外部関数を使えないなら乱数で決める
-            //                 let mut rng = rand::rng();
-            //                 sides[rng.random_range(0..sides.len())]
-            //             },
-            //         Ordering::Less =>
-            //         // 行き止まり ⇒ 逆走 (このゲームに行き止まりはないけど)
-            //             match player.direction
-            //             {
-            //                 News::North => News::South,
-            //                 News::South => News::North,
-            //                 News::East => News::West,
-            //                 News::West => News::East,
-            //             },
-            //     };
+            new_side = autodrive(&mut player, map, opt_demo, qry_chasers);
         }
 
         // プレイヤーの向きが変わったなら
