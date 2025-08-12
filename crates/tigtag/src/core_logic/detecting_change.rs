@@ -15,7 +15,7 @@ pub fn scoring_and_stage_clear(
     opt_record: Option<ResMut<Record>>,
     state: Res<State<MyState>>,
     mut evt_clear: EventWriter<EventStageClear>,
-    // mut evt_eatdot: EventWriter<EventEatDot>,
+    mut evt_eatdot: EventWriter<EventEatDot>, // demo用event
     mut cmds: Commands,
     // asset_svr: Res<AssetServer>,
 ) -> Result
@@ -35,7 +35,7 @@ pub fn scoring_and_stage_clear(
     //ドットの削除
     cmds.entity(dot).despawn();
     *map.opt_entity_mut(player.grid) = None;
-    // evt_eatdot.send( EventEatDot ( player.grid ) ); //tigtag3d用の追加フィールド
+    evt_eatdot.write(EventEatDot(player.grid)); //tigtag3d用の追加フィールド
 
     //スコア更新
     *record.score_mut() += 1;

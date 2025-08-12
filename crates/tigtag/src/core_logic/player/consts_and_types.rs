@@ -36,7 +36,8 @@ impl Default for Player
             is_stop: true,
             px_start: Vec2::default(),
             px_end: Vec2::default(),
-            fn_autodrive: None,
+            // fn_autodrive: None, //デモ時、プレイヤーが乱数で自走する
+            fn_autodrive: Some(demo_play::auto_drive::select_escape_route),
             anime: SpriteAnimationParams {
                 timer: Timer::from_seconds(ANIME_TIMER_PLAYER, TimerMode::Repeating),
                 ..default()

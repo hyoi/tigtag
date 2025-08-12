@@ -176,17 +176,24 @@ struct IVec2Rect
     max: IVec2,
 }
 
-// impl DemoMapParams
-// {   pub fn dots_sum_x    ( &    self, x: i32 ) ->      i32 {      self.dots_sum_x[ x as usize ] }
-//     pub fn dots_sum_x_mut( &mut self, x: i32 ) -> &mut i32 { &mut self.dots_sum_x[ x as usize ] }
-//     pub fn dots_sum_y    ( &    self, y: i32 ) ->      i32 {      self.dots_sum_y[ y as usize ] }
-//     pub fn dots_sum_y_mut( &mut self, y: i32 ) -> &mut i32 { &mut self.dots_sum_y[ y as usize ] }
+impl DemoMapParams
+{
+    pub fn dots_sum_x(&self, x: i32) -> i32 { self.dots_sum_x[x as usize] }
+    pub fn dots_sum_x_mut(&mut self, x: i32) -> &mut i32
+    {
+        &mut self.dots_sum_x[x as usize]
+    }
+    pub fn dots_sum_y(&self, y: i32) -> i32 { self.dots_sum_y[y as usize] }
+    pub fn dots_sum_y_mut(&mut self, y: i32) -> &mut i32
+    {
+        &mut self.dots_sum_y[y as usize]
+    }
 
-//     pub fn dots_rect_min    ( &    self ) ->       IVec2 {      self.dots_rect.min }
-//     pub fn dots_rect_min_mut( &mut self ) ->  &mut IVec2 { &mut self.dots_rect.min }
-//     pub fn dots_rect_max    ( &    self ) ->       IVec2 {      self.dots_rect.max }
-//     pub fn dots_rect_max_mut( &mut self ) ->  &mut IVec2 { &mut self.dots_rect.max }
-// }
+    pub fn dots_rect_min(&self) -> IVec2 { self.dots_rect.min }
+    pub fn dots_rect_min_mut(&mut self) -> &mut IVec2 { &mut self.dots_rect.min }
+    pub fn dots_rect_max(&self) -> IVec2 { self.dots_rect.max }
+    pub fn dots_rect_max_mut(&mut self) -> &mut IVec2 { &mut self.dots_rect.max }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -199,10 +206,12 @@ pub struct EventGameOver;
 pub struct EventCountDown;
 #[derive(Event)]
 pub struct EventHitAnyKey;
+#[derive(Event)]
+pub struct EventEatDot(pub IVec2); //tigtag3d用の追加フィールド
+
 // #[derive(Event)]
 // pub struct EventTimerPlayer;
 // #[allow( dead_code )]
-// #[derive( Event )] pub struct EventEatDot ( pub IVec2 ); //tigtag3d用の追加フィールド
 // #[derive( Event )] pub struct EventTimerPlayer;
 // #[allow( dead_code )]
 // #[derive( Event )] pub struct EventTimerChasers ( pub Vec<Color> ); //tigtag3d用の追加フィールド

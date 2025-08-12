@@ -27,6 +27,7 @@ use std::{
     sync::LazyLock,
     ops::{Range, Deref, DerefMut, Add, AddAssign},
     f32::consts::{PI, TAU},
+    collections::VecDeque,
 };
 
 // proc-macro
@@ -43,6 +44,8 @@ mod core_logic; // ゲームアプリの中核
 use core_logic::*;
 
 mod popup_text_ui; //ポップアップTextUI関連
+
+mod demo_play; //DEMO
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -74,8 +77,8 @@ fn main() -> AppExit
         .add_event::<EventGameOver>()   // ゲームオーバーの伝達
         .add_event::<EventCountDown>()  // カウントダウンの終了を伝達
         .add_event::<EventHitAnyKey>()  // Hit Any Keyの入力を伝達
+        .add_event::<EventEatDot>()     // スコアリングの伝達
         // .add_event::<EventTimerPlayer>()  //プレイヤー移動タイマーのfinishedの伝達
-        // .add_event::<EventEatDot>() //スコアリングの伝達
         // .add_event::<EventTimerChasers>() //敵キャラ移動タイマーのfinishedの伝達
         ;
 
@@ -284,6 +287,7 @@ fn main() -> AppExit
     // MyState::TitleDemoスケジュール
     // タイトル画面の処理
     application
+        .add_plugins(demo_play::Schedule)
         .add_systems(
             OnEnter(MyState::TitleDemo),
             //ポップアップTextUI表示
@@ -311,8 +315,7 @@ fn main() -> AppExit
                 //scoreとstageをゼロクリアする(DEMOでステージクリアの時はしない)
                 initialize_record_except_hi_score,
             ),
-        )
-    ;
+        );
 
     // アプリを実行
     application.run()
