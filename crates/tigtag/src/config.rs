@@ -483,8 +483,8 @@ const POPUP_GAME_OVER: &[ popup_text_ui::TextUiSpanSettings ] = &[
     ( _CDPH_          , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
 ];
 
-const TITLE_COLOR1: Color = Color::srgba( 0.6, 1.0, 0.4, 0.75 );
-const TITLE_COLOR2: Color = Color::srgba( 0.0, 0.7, 0.5, 0.75 );
+const TITLE_COLOR1: Color = Color::srgba(0.6, 1.0, 0.4, 0.75);
+const TITLE_COLOR2: Color = Color::srgba(0.0, 0.7, 0.5, 0.75);
 
 #[rustfmt::skip]
 const POPUP_TITLE_DEMO: &[ popup_text_ui::TextUiSpanSettings ] = &[
