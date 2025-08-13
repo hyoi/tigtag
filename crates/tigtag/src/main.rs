@@ -263,7 +263,7 @@ fn main() -> AppExit
                     popup_text_ui::effect::hit_any_key::<popup::GameOver>, //Hit ANY Key
                 ),
                 // Stateの条件付き遷移
-                set_next_state::<StageStart>.run_if(on_event::<EventCountDown>),
+                set_next_state::<TitleDemo>.run_if(on_event::<EventCountDown>),
                 set_next_state::<StageStart>.run_if(on_event::<EventHitAnyKey>),
             )
                 .chain()
