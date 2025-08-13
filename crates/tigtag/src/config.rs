@@ -343,80 +343,143 @@ const COLOR_NONE: Color = Color::NONE;
 ////////////////////////////////////////////////////////////////////////////////
 
 //マーカーComponent
-#[rustfmt::skip]
 pub mod popup
 {
     use super::*;
 
-    #[derive(Component, Clone)] pub struct StageSatrt ( pub i32, pub Timer, pub i32 );
-    #[derive(Component, Clone)] pub struct StageClear ( pub i32, pub Timer, pub i32 );
-    #[derive(Component, Clone)] pub struct GameOver   ( pub i32, pub Timer, pub i32, pub f32, pub usize );
-    #[derive(Component, Clone)] pub struct TitleDemo  ( pub f32, pub usize );
+    #[derive(Component, Clone)]
+    pub struct StageSatrt
+    {
+        start_value: i32,
+        timer: Timer,
+        counter: i32,
+    }
+    #[derive(Component, Clone)]
+    pub struct StageClear
+    {
+        start_value: i32,
+        timer: Timer,
+        counter: i32,
+    }
+    #[derive(Component, Clone)]
+    pub struct GameOver
+    {
+        start_value: i32,
+        timer: Timer,
+        counter: i32,
+        blink_cycle: f32,
+        blink_index: usize,
+    }
+    #[derive(Component, Clone)]
+    pub struct TitleDemo
+    {
+        blink_cycle: f32,
+        blink_index: usize,
+    }
 
-    impl Default for StageSatrt {
-        fn default() -> Self {
-            Self ( 5, Timer::from_seconds( 1.0, TimerMode::Once ), 0 )
+    impl Default for StageSatrt
+    {
+        fn default() -> Self
+        {
+            Self {
+                start_value: 5,
+                timer: Timer::from_seconds(1.0, TimerMode::Once),
+                counter: 0,
+            }
         }
     }
-    impl Default for StageClear {
-        fn default() -> Self {
-            Self ( 10, Timer::from_seconds( 1.0, TimerMode::Once ), 0 )
+    impl Default for StageClear
+    {
+        fn default() -> Self
+        {
+            Self {
+                start_value: 10,
+                timer: Timer::from_seconds(1.0, TimerMode::Once),
+                counter: 0,
+            }
         }
     }
-    impl Default for GameOver {
-        fn default() -> Self {
-            Self ( 10, Timer::from_seconds( 1.0, TimerMode::Once ), 0, 0.0, 2 )
+    impl Default for GameOver
+    {
+        fn default() -> Self
+        {
+            Self {
+                start_value: 10,
+                timer: Timer::from_seconds(1.0, TimerMode::Once),
+                counter: 0,
+                blink_cycle: 0.0,
+                blink_index: 2,
+            }
         }
     }
-    impl Default for TitleDemo {
-        fn default() -> Self {
-            Self ( 0.0, 5 )
+    impl Default for TitleDemo
+    {
+        fn default() -> Self
+        {
+            Self {
+                blink_cycle: 0.0,
+                blink_index: 5,
+            }
         }
     }
 
-    impl popup_text_ui::effect::CountDown for StageSatrt {
-        fn init( &mut self ) { *self = Self::default(); }
-        fn placeholder( &self ) -> Option<usize> { POPUP_STAGE_START.iter().position( |x| x.0 == _CDPH_ ) }
-        fn timer( &mut self ) -> &mut Timer { &mut self.1 }
-        fn counter( &mut self ) -> &mut i32 { &mut self.2 }
-        fn start_value( &self ) -> i32 { self.0 }
+    impl popup_text_ui::effect::CountDown for StageSatrt
+    {
+        fn init(&mut self) { *self = Self::default(); }
+        fn placeholder(&self) -> Option<usize>
+        {
+            POPUP_STAGE_START.iter().position(|x| x.0 == _CDPH_)
+        }
+        fn start_value(&self) -> i32 { self.start_value }
+        fn timer(&mut self) -> &mut Timer { &mut self.timer }
+        fn counter(&mut self) -> &mut i32 { &mut self.counter }
     }
-    impl popup_text_ui::effect::CountDown for StageClear {
-        fn init( &mut self ) { *self = Self::default(); }
-        fn placeholder( &self ) -> Option<usize> { POPUP_STAGE_CLEAR.iter().position( |x| x.0 == _CDPH_ ) }
-        fn timer( &mut self ) -> &mut Timer { &mut self.1 }
-        fn counter( &mut self ) -> &mut i32 { &mut self.2 }
-        fn start_value( &self ) -> i32 { self.0 }
+    impl popup_text_ui::effect::CountDown for StageClear
+    {
+        fn init(&mut self) { *self = Self::default(); }
+        fn placeholder(&self) -> Option<usize>
+        {
+            POPUP_STAGE_CLEAR.iter().position(|x| x.0 == _CDPH_)
+        }
+        fn start_value(&self) -> i32 { self.start_value }
+        fn timer(&mut self) -> &mut Timer { &mut self.timer }
+        fn counter(&mut self) -> &mut i32 { &mut self.counter }
     }
-    impl popup_text_ui::effect::CountDown for GameOver   {
-        fn init( &mut self ) { *self = Self::default(); }
-        fn placeholder( &self ) -> Option<usize> { POPUP_GAME_OVER.iter().position( |x| x.0 == _CDPH_ ) }
-        fn timer( &mut self ) -> &mut Timer { &mut self.1 }
-        fn counter( &mut self ) -> &mut i32 { &mut self.2 }
-        fn start_value( &self ) -> i32 { self.0 }
+    impl popup_text_ui::effect::CountDown for GameOver
+    {
+        fn init(&mut self) { *self = Self::default(); }
+        fn placeholder(&self) -> Option<usize>
+        {
+            POPUP_GAME_OVER.iter().position(|x| x.0 == _CDPH_)
+        }
+        fn start_value(&self) -> i32 { self.start_value }
+        fn timer(&mut self) -> &mut Timer { &mut self.timer }
+        fn counter(&mut self) -> &mut i32 { &mut self.counter }
     }
 
     impl popup_text_ui::effect::Blinking for GameOver
     {
-        fn alpha( &mut self, time_delta: f32 ) -> f32
-        {   let radian = &mut self.3;
+        fn alpha(&mut self, time_delta: f32) -> f32
+        {
+            let radian = &mut self.blink_cycle;
             *radian += TAU * time_delta;
             *radian -= if *radian > TAU { TAU } else { 0.0 };
 
-            ( *radian ).sin() * 0.5 + 0.5 //0.0 ～ 1.0
+            (*radian).sin() * 0.5 + 0.5 //0.0 ～ 1.0
         }
-        fn blink_index( &self ) -> usize { self.4 }
+        fn blink_index(&self) -> usize { self.blink_index }
     }
     impl popup_text_ui::effect::Blinking for TitleDemo
     {
-        fn alpha( &mut self, time_delta: f32 ) -> f32
-        {   let radian = &mut self.0;
+        fn alpha(&mut self, time_delta: f32) -> f32
+        {
+            let radian = &mut self.blink_cycle;
             *radian += TAU * time_delta;
             *radian -= if *radian > TAU { TAU } else { 0.0 };
 
-            ( *radian ).sin() * 0.5 + 0.5 //0.0 ～ 1.0
+            (*radian).sin() * 0.5 + 0.5 //0.0 ～ 1.0
         }
-        fn blink_index( &self ) -> usize { self.1 }
+        fn blink_index(&self) -> usize { self.blink_index }
     }
 
     impl popup_text_ui::effect::HitAnyKey for GameOver {}
