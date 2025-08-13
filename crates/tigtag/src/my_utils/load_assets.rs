@@ -243,11 +243,9 @@ fn is_loading_done(
                 dbg!(err); // for debug
                 let mut filename = "Unknown".to_string();
                 if let Some(asset_path) = handle.path()
+                    && let Some(s) = asset_path.path().to_str()
                 {
-                    if let Some(s) = asset_path.path().to_str()
-                    {
-                        filename = s.to_string();
-                    }
+                    filename = s.to_string();
                 }
                 panic!("Error: Failed loading asset file \"{filename}\"");
             }

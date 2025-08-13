@@ -6,11 +6,11 @@ use super::*;
 #[derive(Resource)]
 pub struct Map
 {
-    pub rng: rand::prelude::StdRng,         // マップ生成専用の乱数生成器(再現性を持たせるため)
-    bit_flags: Vec<Vec<usize>>,             // マップの各グリッドの状態をbitで保存
+    pub rng: rand::prelude::StdRng, // マップ生成専用の乱数生成器(再現性を持たせるため)
+    bit_flags: Vec<Vec<usize>>,     // マップの各グリッドの状態をbitで保存
     dot_entities: Vec<Vec<Option<Entity>>>, // ドットをdespawnする際に使うEntityIDを保存
     pub remaining_dots: i32,                // マップに残っているドットの数
-    dummy_none: Option<Entity>,             // 範囲外アクセスで&mut Noneを返すために使用？？？
+    dummy_none: Option<Entity>, // 範囲外アクセスで&mut Noneを返すために使用？？？
 }
 
 impl Default for Map

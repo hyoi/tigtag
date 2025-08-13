@@ -47,8 +47,8 @@ pub fn select_escape_route(
     //緊急回避でbad_moveを除いた結果sidesが空なら運任せ
     if sides.is_empty()
     {
-        let mut rng = rand::thread_rng();
-        return org_sides[rng.gen_range(0..org_sides.len())];
+        let mut rng = rand::rng();
+        return org_sides[rng.random_range(0..org_sides.len())];
     }
 
     //sidesの要素数が１ならそれで決まり
@@ -119,8 +119,8 @@ pub fn select_escape_route(
             }
 
             //プレイヤーが残dotsを含む最小の矩形の中にいる場合、乱数で決める
-            let mut rng = rand::thread_rng();
-            ptr_sides[rng.gen_range(0..ptr_sides.len())].0
+            let mut rng = rand::rng();
+            ptr_sides[rng.random_range(0..ptr_sides.len())].0
         }
     }
 }

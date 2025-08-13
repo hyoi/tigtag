@@ -84,7 +84,7 @@ pub fn spawn_sprite(
 ////////////////////////////////////////////////////////////////////////////////
 
 // プレイヤーを移動させる
-// #[allow(clippy::too_many_arguments)]
+#[allow(clippy::too_many_arguments)]
 pub fn move_sprite(
     mut qry_player: Query<(&mut Transform, &mut Player)>,
     mut qry_sprite: Query<&mut Sprite, With<Player>>,
@@ -93,7 +93,6 @@ pub fn move_sprite(
     opt_demo: Option<Res<DemoMapParams>>,
     qry_chasers: Query<&chaser::Chaser>,
     state: ResMut<State<MyState>>,
-    // mut evt_timer: EventWriter<EventTimerPlayer>,
     time: Res<Time>,
 ) -> Result
 {
@@ -108,9 +107,6 @@ pub fn move_sprite(
     // 移動タイマーがfinishしたなら
     if player.timer.tick(time_delta).finished()
     {
-        // 後続の処理にtimer finishedを伝達する
-        // evt_timer.write(EventTimerPlayer);
-
         // スプライトがグリッド間の中途に位置したら
         if player.px_start != player.px_end
         {

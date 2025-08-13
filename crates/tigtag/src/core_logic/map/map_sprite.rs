@@ -89,9 +89,10 @@ pub struct SpriteWall;
 pub struct SpriteDot;
 
 // スプライトをspawnしてマップを表示する
+type SpriteWallOrDot = Or<(With<SpriteWall>, With<SpriteDot>)>;
 pub fn spawn_sprite(
     opt_map: Option<ResMut<Map>>,
-    qry_entity: Query<Entity, Or<(With<SpriteWall>, With<SpriteDot>)>>,
+    qry_entity: Query<Entity, SpriteWallOrDot>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
