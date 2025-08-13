@@ -318,13 +318,13 @@ pub const KEY_MAP: [(KeyCode, player::CallBack); 8] = [
 #[rustfmt::skip]
 pub const PAD_MAP: [(GamepadInput, player::CallBack); 6] = [
     // 十字ボタン
-    ( GamepadInput::Button( DPadUp   ), player::move_up    ),
-    ( GamepadInput::Button( DPadDown ), player::move_down  ),
-    ( GamepadInput::Button( DPadLeft ), player::move_left  ),
-    ( GamepadInput::Button( DPadRight), player::move_right ),
+    ( GamepadInput::Button( GamepadButton::DPadUp   ), player::move_up    ),
+    ( GamepadInput::Button( GamepadButton::DPadDown ), player::move_down  ),
+    ( GamepadInput::Button( GamepadButton::DPadLeft ), player::move_left  ),
+    ( GamepadInput::Button( GamepadButton::DPadRight), player::move_right ),
     // 左スティック
-    ( GamepadInput::Axis( LeftStickX ), player::axis_x_normal ),
-    ( GamepadInput::Axis( LeftStickY ), player::axis_y_normal ),
+    ( GamepadInput::Axis( GamepadAxis::LeftStickX ), player::axis_x_normal ),
+    ( GamepadInput::Axis( GamepadAxis::LeftStickY ), player::axis_y_normal ),
 ];
 
 ////////////////////////////////////////////////////////////////////////////////

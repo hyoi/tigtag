@@ -12,12 +12,9 @@ use bevy::{
     render::camera::Viewport,
     diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
     input::{
-        gamepad::{
-            GamepadInput, GamepadButton::*, GamepadAxis::*, GamepadAxisChangedEvent,
-        },
+        gamepad::{GamepadInput, GamepadAxisChangedEvent},
         keyboard::NativeKeyCode,
     },
-    // ecs::query::QueryFilter,
 };
 use rand::prelude::*;
 use rustc_hash::{FxHashMap, FxHashSet};
