@@ -27,64 +27,62 @@ use std::{
     collections::VecDeque,
 };
 
-// proc-macro
+// my proc-macro
 use macros::MyState;
 
-// internal submodules
+// my internal submodules
 mod config; // 設定
-use config::*;
+use config::*; // モジュール名なしで識別子を使えるように
 
 mod my_utils; // 共通ライブラリ
-use my_utils::*;
+use my_utils::*; // モジュール名なしで識別子を使えるように
 
 mod core_logic; // ゲームアプリの中核
-use core_logic::*;
+use core_logic::*; // モジュール名なしで識別子を使えるように
 
-mod popup_text_ui; //ポップアップTextUI関連
+mod popup_text_ui; // ポップアップTextUI関連
 
-mod demo_play; //DEMO
+mod demo_play; // DEMO
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // メイン関数
 fn main() -> AppExit
 {
-    // エラーハンドラ変更（Note: App生成前に設定すること）
+    // エラーハンドラ設定
     GLOBAL_ERROR_HANDLER.set(warn).expect(
-        "Error handler should be set only once in main() before app-initialization.",
+        "Configure the error handler in main() once, prior to app initialization.",
     );
 
     // アプリを生成
     let mut application = App::new();
 
-    //各種登録・準備
+    //各種準備・登録
     application
         // アプリを初期化しassetsをロードする
         .add_plugins(init_app::Schedule)
         .add_plugins(load_assets::Schedule)
-        .insert_resource(load_assets::NextState(MyState::InitGame)) // ロード完了後の遷移先State
+        .insert_resource(load_assets::ChangeTo(MyState::InitGame)) // ロード完了後の遷移先State
         // Resourceを登録
         .init_resource::<Record>() // ゲームの成績
         .init_resource::<map::Map>() // ステージのマップ
         .init_resource::<player::PlayerInput>() // プレイヤーの入力
-        .insert_resource(player::KeyMap(FxHashMap::from_iter(KEY_MAP))) //マッピング（キー）
-        .insert_resource(player::PadMap(FxHashMap::from_iter(PAD_MAP))) //マッピング（ゲームパッド）
+        .insert_resource(player::KeyMap(FxHashMap::from_iter(KEY_MAP))) // マッピング（キー）
+        .insert_resource(player::PadMap(FxHashMap::from_iter(PAD_MAP))) // マッピング（ゲームパッド）
         // Eventを登録
-        .add_event::<EventStageClear>() // ステージクリアの伝達
-        .add_event::<EventGameOver>()   // ゲームオーバーの伝達
-        .add_event::<EventCountDown>()  // カウントダウンの終了を伝達
-        .add_event::<EventHitAnyKey>()  // Hit Any Keyの入力を伝達
-        .add_event::<EventEatDot>()     // スコアリングの伝達
-        // .add_event::<EventTimerPlayer>()  //プレイヤー移動タイマーのfinishedの伝達
-        // .add_event::<EventTimerChasers>() //敵キャラ移動タイマーのfinishedの伝達
+        .add_event::<EventStageClear>() // ステージクリアの伝達用
+        .add_event::<EventGameOver>()   // ゲームオーバーの伝達用
+        .add_event::<EventCountDown>()  // カウントダウン終了の伝達用
+        .add_event::<EventHitAnyKey>()  // Hit Any Keyの入力あり伝達用
+        .add_event::<EventEatDot>()     // スコアリングの伝達用
         ;
 
     // Updateスケジュール（without State）
-    // State関係なしの処理（例えばPause中も動作し続ける処理）
     application
-        .insert_resource(header_info::PlaceHolder(PLACE_HOLDER)) // 表示位置
-        .insert_resource(PlaceHolderFps(header_footer::BottomLeft, 1)) // 表示位置
-        .add_plugins(FrameTimeDiagnosticsPlugin::default()) // FPS Plugin
+        // ヘッダー／フッターの表示位置の指定
+        .insert_resource(header_info::PlaceHolder(PLACE_HOLDER))
+        .insert_resource(PlaceHolderFps(header_footer::BottomLeft, 1))
+        // State関係なしで実行する処理
         .add_systems(
             Update,
             (

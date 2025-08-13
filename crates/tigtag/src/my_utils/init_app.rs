@@ -6,7 +6,7 @@ use super::*;
 pub struct Schedule;
 impl Plugin for Schedule
 {
-    fn build(&self, appl: &mut App)
+    fn build(&self, application: &mut App)
     {
         // アプリの準備
         let window_plugin = WindowPlugin {
@@ -17,25 +17,27 @@ impl Plugin for Schedule
             filter: (if DEBUG() { LOG_LV_DEV } else { LOG_LV_REL }).into(),
             ..default()
         };
-        appl.add_plugins(
-            DefaultPlugins
-                .set(window_plugin) // 主ウィンドウ
-                .set(log_plugin) // ログレベル
-                .set(ImagePlugin::default_nearest()), // ピクセルパーフェクト
-        );
 
-        // Stateの初期化（DefaultPluginsの後に記述すること）
-        appl.init_state::<MyState>();
-
-        //----------------------------------------------------------------------
-        // Update
-        //----------------------------------------------------------------------
-
-        // キー入力でアプリ終了
-        appl.add_systems(Update, misc::app_close_on_key.run_if(not(WASM)));
-
-        // フルスクリーン切換
-        appl.add_systems(Update, misc::toggle_window_mode.run_if(not(WASM)));
+        application
+            // first party plugins
+            .add_plugins((
+                DefaultPlugins
+                    .set(window_plugin) // 主ウィンドウ
+                    .set(log_plugin) // ログレベル
+                    .set(ImagePlugin::default_nearest()), // ピクセルパーフェクト
+                FrameTimeDiagnosticsPlugin::default(), // FPS Plugin
+            ))
+            // Stateの初期化
+            .init_state::<MyState>()
+            // Updateスケジュール（without State）
+            .add_systems(
+                Update,
+                (
+                    // 特別なキー入力
+                    misc::app_close_on_key.run_if(not(WASM)), // アプリ終了
+                    misc::toggle_window_mode.run_if(not(WASM)), // 全画面切換
+                ),
+            );
     }
 }
 

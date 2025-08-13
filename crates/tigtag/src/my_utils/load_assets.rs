@@ -2,75 +2,79 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// ローディングが完了した後の遷移先
-#[derive(Resource)]
-pub struct NextState(pub MyState);
-impl ChangeMyState for NextState
-{
-    fn state(&self) -> MyState { self.0 }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // プラグインの設定
 pub struct Schedule;
 impl Plugin for Schedule
 {
-    fn build(&self, appl: &mut App)
+    fn build(&self, application: &mut App)
     {
-        //----------------------------------------------------------------------
-        // MyState::LoadAssets
-        //----------------------------------------------------------------------
-
-        // ロード中のアニメーション
-        appl.add_systems(
-            OnEnter(MyState::LoadAssets),
-            spawn_sprite_with_camera2d, // アニメ用のカメラとスプライトのspawn
-        )
-        .add_systems(
-            Update,
-            move_sprite // スプライトを移動させる
-                .run_if(in_state(MyState::LoadAssets)),
-        );
-
-        // アセットのローディング
-        appl.add_systems(
-            OnEnter(MyState::LoadAssets),
-            start_loading, // Assetsのロード開始
-        )
-        .add_systems(
-            Update,
-            (
-                // ローディング完了フラグを立てる
-                is_loading_done,
-                // ループ脱出
-                change_state_by::<NextState>
-                    .run_if(resource_exists::<IsLoadingFinished>) //完了フラグが立つこと
-                    .run_if(resource_exists::<NextState>), //遷移先がinsert済であること
+        // MyState::LoadAssetsスケジュール
+        application
+            // 前処理
+            .add_systems(
+                OnEnter(MyState::LoadAssets),
+                (
+                    // カメラとスプライトのspawn
+                    spawn_sprite_with_camera2d,
+                    // Assetsのロード開始
+                    start_loading,
+                ),
             )
-                .run_if(in_state(MyState::LoadAssets)),
-        );
-
-        // 後処理
-        appl.add_systems(
-            OnExit(MyState::LoadAssets),
-            (
-                // LoadingAnimeのスプライトの削除
-                misc::despawn_component::<SpriteTile>,
-                // 専用カメラの削除
-                misc::despawn_component::<LoadingAnimeCam2d>,
-            ),
-        );
+            // ループ処理
+            .add_systems(
+                Update,
+                (
+                    // スプライトを移動させる
+                    move_sprite,
+                    // ローディング完了を検知してフラグを立てる
+                    is_loading_done,
+                    // ループ脱出
+                    change_state_by::<ChangeTo>
+                        .run_if(resource_exists::<ChangeTo>) //遷移先がinsertされたこと
+                        .run_if(resource_exists::<IsLoadingFinished>), //完了フラグが立つこと
+                )
+                    .run_if(in_state(MyState::LoadAssets)),
+            )
+            // 後処理
+            .add_systems(
+                OnExit(MyState::LoadAssets),
+                (
+                    // スプライトとカメラの削除
+                    misc::despawn_component::<SpriteTile>,
+                    misc::despawn_component::<LoadingAnimeCam2d>,
+                ),
+            );
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// ローディングが完了した後の遷移先
+#[derive(Resource)]
+pub struct ChangeTo(pub MyState);
+
+impl ChangeMyState for ChangeTo
+{
+    fn state(&self) -> MyState { self.0 }
+}
+
+//------------------------------------------------------------------------------
+
+// ロードしたAssetsのハンドルの保存先
+#[derive(Resource, Deref)]
+struct LoadedAssets(Vec<Handle<LoadedUntypedAsset>>);
+
+// ローディング完了フラグ
+#[derive(Resource)]
+struct IsLoadingFinished;
+
+////////////////////////////////////////////////////////////////////////////////
+
 // ローディングアニメ用2Dカメラのレンダリング順序と位置、マーカー
-// ※注意事項：マルチカメラの場合、順序が他とバッティングするとWARNが出力される
+// Note: マルチカメラの場合、順序が他とバッティングするとWARNが出力される
 const CAMERA_2D_ORDER: isize = 999;
 
-// ※注意事項：第四象限。左上隅が(0,0)で、X軸はプラス方向へ、Y軸はマイナス方向へ伸びる
+// Note: 第四象限。左上隅が(0,0)で、X軸はプラス方向へ、Y軸はマイナス方向へ伸びる
 const CAMERA_2D_POSITION: Vec3 = Vec3::new(
     SCREEN_PIXELS_WIDTH * 0.5,
     SCREEN_PIXELS_HEIGHT * -0.5,
@@ -80,38 +84,7 @@ const CAMERA_2D_POSITION: Vec3 = Vec3::new(
 #[derive(Component)]
 pub struct LoadingAnimeCam2d;
 
-// ローディングメッセージ
-static NOWLOADING: LazyLock<LoadingMessage> = LazyLock::new(|| {
-    let design = vec![
-        " ##  #           #                            ", // 0
-        " ##  # ### #   # #    ###  #  ##  # #  #  ##  ", // 1
-        " # # # # # # # # #    # # # # # #   ## # #    ", // 2
-        " # # # # # # # # #    # # # # # # # #### # ## ", // 3
-        " #  ## # #  # #  #    # # ### # # # # ## #  # ", // 4
-        " #  ## ###  # #  #### ### # # ##  # #  #  ##  ", // 5
-        "",                                               // 6
-        "",                                               // 7
-        " ###                      #   #           # # ", // 8
-        " #  # #   ###  #  ### ### # # #  #  # ### # # ", // 9
-        " #  # #   #   # # #   #   # # # # #    #  # # ", // 10
-        " ###  #   ### # # ### ### # # # # # #  #  # # ", // 11
-        " #    #   #   ###   # #    # #  ### #  #      ", // 12
-        " #    ### ### # # ### ###  # #  # # #  #  # # ", // 13
-    ]; // 123456789_123456789_123456789_123456789_12345
-
-    LoadingMessage {
-        width: design[0].len() as f32 * PIXELS_PER_GRID,
-        height: design.len() as f32 * PIXELS_PER_GRID,
-        design,
-    }
-});
-
-struct LoadingMessage<'a>
-{
-    width: f32,
-    height: f32,
-    design: Vec<&'a str>,
-}
+//------------------------------------------------------------------------------
 
 // ローディングアニメ用スプライトのz-indexとマーカー
 const DEPTH_SPRITE_LOADING_MSG: f32 = 999.0;
@@ -122,7 +95,48 @@ struct SpriteTile
     goal: (i32, i32),
 }
 
-// ローディングアニメ用スプライトを生成する
+//------------------------------------------------------------------------------
+
+// ローディングメッセージのデザイン
+struct LoadingMessage<'a>
+{
+    width: f32,
+    height: f32,
+    design: Vec<&'a str>,
+}
+
+impl<'a> Default for LoadingMessage<'a>
+{
+    fn default() -> Self
+    {
+        let design = vec![
+            " ##  #           #                            ", // 0
+            " ##  # ### #   # #    ###  #  ##  # #  #  ##  ", // 1
+            " # # # # # # # # #    # # # # # #   ## # #    ", // 2
+            " # # # # # # # # #    # # # # # # # #### # ## ", // 3
+            " #  ## # #  # #  #    # # ### # # # # ## #  # ", // 4
+            " #  ## ###  # #  #### ### # # ##  # #  #  ##  ", // 5
+            "",                                               // 6
+            "",                                               // 7
+            " ###                      #   #           # # ", // 8
+            " #  # #   ###  #  ### ### # # #  #  # ### # # ", // 9
+            " #  # #   #   # # #   #   # # # # #    #  # # ", // 10
+            " ###  #   ### # # ### ### # # # # # #  #  # # ", // 11
+            " #    #   #   ###   # #    # #  ### #  #      ", // 12
+            " #    ### ### # # ### ###  # #  # # #  #  # # ", // 13
+        ]; // 123456789_123456789_123456789_123456789_12345
+
+        LoadingMessage {
+            width: design[0].len() as f32 * PIXELS_PER_GRID,
+            height: design.len() as f32 * PIXELS_PER_GRID,
+            design,
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// スプライトとカメラを生成する
 fn spawn_sprite_with_camera2d(mut cmds: Commands)
 {
     // 準備
@@ -142,49 +156,46 @@ fn spawn_sprite_with_camera2d(mut cmds: Commands)
     ));
 
     // デザインに従ってスプライトをspawnする
-    for (goal_y, line) in NOWLOADING.design.iter().enumerate()
-    {
-        for (goal_x, char) in line.chars().enumerate()
-        {
-            // 空白文字は無視
-            if char == ' '
+    let message = LoadingMessage::default();
+    (0..).zip(message.design.iter()).for_each(|(y, line)| {
+        (0..).zip(line.chars()).for_each(|(x, char)| {
+            // 空白文字でないなら
+            if char != ' '
             {
-                continue;
+                // スプライトの初期座標(スタート)はランダム
+                let rnd_x = rng.random_range(GRIDS_X_RANGE);
+                let rnd_y = rng.random_range(GRIDS_Y_RANGE);
+                let vec2 = (rnd_x, rnd_y).to_vec2_of_screen();
+                let vec3 = vec2.extend(DEPTH_SPRITE_LOADING_MSG);
+
+                // スプライトをspawnする
+                cmds.spawn((
+                    Sprite {
+                        color,
+                        custom_size,
+                        ..default()
+                    },
+                    Transform::from_translation(vec3),
+                    SpriteTile { goal: (x, y) },
+                ));
             }
-
-            // スプライトの初期座標(スタート)
-            let rnd_x = rng.random_range(GRIDS_X_RANGE);
-            let rnd_y = rng.random_range(GRIDS_Y_RANGE);
-            let vec2 = (rnd_x, rnd_y).to_vec2_of_screen();
-            let vec3 = vec2.extend(DEPTH_SPRITE_LOADING_MSG);
-
-            // スプライトをspawnする
-            cmds.spawn((
-                Sprite {
-                    color,
-                    custom_size,
-                    ..default()
-                },
-                Transform::from_translation(vec3),
-                SpriteTile {
-                    goal: (goal_x as i32, goal_y as i32),
-                },
-            ));
-        }
-    }
+        });
+    });
 }
 
-// スプライトを動かしてローディングアニメを見せる
+// スプライトを動かす（ローディングアニメーション）
 fn move_sprite(
     mut qry_transform: Query<(&mut Transform, &SpriteTile)>,
     time: Res<Time>,
 )
 {
+    // 準備
     let time_delta = time.delta().as_secs_f32() * 2.0;
+    let message = LoadingMessage::default();
+    let scaling = SCREEN_PIXELS_WIDTH / message.width; // 横方向に長いのでWidthを使う
+    let adjuster_y = (SCREEN_PIXELS_HEIGHT - message.height * scaling) * 0.5;
 
-    let scaling = SCREEN_PIXELS_WIDTH / NOWLOADING.width; // 横方向に長いのでWidthを使う
-    let adjuster_y = (SCREEN_PIXELS_HEIGHT - NOWLOADING.height * scaling) * 0.5;
-
+    // スプライトの移動
     qry_transform
         .iter_mut()
         .for_each(|(mut transform, sprite)| {
@@ -201,16 +212,6 @@ fn move_sprite(
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// ロードしたAssetsのハンドルの保存先とローディング完了フラグ
-#[derive(Resource)]
-struct LoadedAssets
-{
-    handles: Vec<Handle<LoadedUntypedAsset>>,
-}
-
-#[derive(Resource)]
-struct IsLoadingFinished;
-
 // Assetsのロードを開始する
 fn start_loading(mut cmds: Commands, asset_svr: Res<AssetServer>)
 {
@@ -221,7 +222,7 @@ fn start_loading(mut cmds: Commands, asset_svr: Res<AssetServer>)
         .for_each(|fname| handles.push(asset_svr.load_untyped(*fname)));
 
     // 解放しないようリソースに登録する
-    cmds.insert_resource(LoadedAssets { handles });
+    cmds.insert_resource(LoadedAssets(handles));
 }
 
 // Assetsのロードは完了したか？
@@ -232,7 +233,7 @@ fn is_loading_done(
 )
 {
     // 事前ロードが完了したか？
-    for handle in assets.handles.iter()
+    for handle in assets.iter()
     {
         match asset_svr.get_load_state(handle)
         {
@@ -247,9 +248,9 @@ fn is_loading_done(
                 {
                     filename = s.to_string();
                 }
-                panic!("Error: Failed loading asset file \"{filename}\"");
+                panic!("Failed loading asset file \"{filename}\"");
             }
-            _ => return, // ロード中（スケジュールがUPDATEなので繰り返し実行される）
+            _ => return, // スケジュールがUPDATEなので繰り返し実行
         }
     }
 

@@ -72,14 +72,6 @@ pub fn despawn_component<T: Component>(
     qry_entity.iter().for_each(|id| cmds.entity(id).despawn());
 }
 
-// QueryしたEnityを削除する（条件がQueryFilter）
-// pub fn despawn_by_filter<T: QueryFilter>
-// (   qry_entity: Query<Entity, T>,
-//     cmds: &mut Commands, //System ParamsではないのでSystemとして使えない！
-// )
-// {   qry_entity.iter().for_each( | id | cmds.entity( id ).despawn() );
-// }
-
 ////////////////////////////////////////////////////////////////////////////////
 
 // UIを描画するカメラにComponent「IsDefaultUiCamera」を追加する
