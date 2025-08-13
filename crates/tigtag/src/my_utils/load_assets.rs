@@ -14,7 +14,7 @@ impl Plugin for Schedule
             .add_systems(
                 OnEnter(MyState::LoadAssets),
                 (
-                    // カメラとスプライトのspawn
+                    // スプライト（とカメラ）のspawn
                     spawn_sprite_with_camera2d,
                     // Assetsのロード開始
                     start_loading,
@@ -136,24 +136,28 @@ impl<'a> Default for LoadingMessage<'a>
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// スプライトとカメラを生成する
-fn spawn_sprite_with_camera2d(mut cmds: Commands)
+// スプライト（とカメラ）を生成する
+fn spawn_sprite_with_camera2d(query_camera2d: Query<&Camera2d>, mut cmds: Commands)
 {
     // 準備
     let mut rng = rand::rng();
     let color = css::YELLOW.into();
     let custom_size = Some(GRID_CUSTOM_SIZE * 0.9);
 
-    // 専用2Dカメラをspawnする
-    cmds.spawn((
-        Camera2d,
-        Camera {
-            order: CAMERA_2D_ORDER,
-            ..default()
-        },
-        Transform::from_translation(CAMERA_2D_POSITION),
-        LoadingAnimeCam2d, // マーカー
-    ));
+    // カメラ2Dが存在しないなら
+    if query_camera2d.is_empty()
+    {
+        // 専用2Dカメラをspawnする
+        cmds.spawn((
+            LoadingAnimeCam2d, // マーカーComponent（despawnに使う）
+            Camera2d,
+            Camera {
+                order: CAMERA_2D_ORDER,
+                ..default()
+            },
+            Transform::from_translation(CAMERA_2D_POSITION),
+        ));
+    }
 
     // デザインに従ってスプライトをspawnする
     let message = LoadingMessage::default();
