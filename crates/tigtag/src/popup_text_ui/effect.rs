@@ -2,49 +2,69 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//効果「カウントダウン」のトレイト
+// 効果の種類毎のパラメータ
+#[derive(Clone)]
+pub struct CountDownParams
+{
+    pub start_value: i32,
+    pub timer: Timer,
+    pub counter: i32,
+    pub spans_index: usize,
+}
+#[derive(Clone)]
+pub struct BlinkingParams
+{
+    pub cycle: f32,
+    pub spans_index: usize,
+}
+#[derive(Clone)]
+pub struct HitAnyKeyParams
+{
+    pub ignore_keys: &'static [KeyCode],
+}
+
+// 効果の種類毎のトレイト
 pub trait CountDown
 {
     fn init(&mut self);
-    fn placeholder(&self) -> Option<usize>;
+    fn index(&self) -> usize;
     fn timer(&mut self) -> &mut Timer;
     fn counter(&mut self) -> &mut i32;
     fn start_value(&self) -> i32;
 }
-
-//効果「テキスト明滅」のトレイト
 pub trait Blinking
 {
     fn alpha(&mut self, time_delta: f32) -> f32;
-    fn blink_index(&self) -> usize;
+    fn index(&self) -> usize;
 }
-
-//効果「Hit Any Key」のトレイト
-pub trait HitAnyKey {}
+pub trait HitAnyKey
+{
+    fn ignore_keys(&self) -> &[KeyCode];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //カウントダウンのパラメータを初期化する
-pub fn init_count<T>(
-    mut qrt_count_params: Query<&mut T>,
-    mut event: ResMut<Events<EventCountDown>>,
+pub fn init_countdown<T>(
+    mut query_countdown_params: Query<&mut T>,
+    mut event_countdown: ResMut<Events<EventCountDown>>,
 ) -> Result
 where
     T: Component<Mutability = Mutable> + CountDown,
 {
     //準備
-    let mut count_params = qrt_count_params.single_mut()?;
+    let mut countdown_params = query_countdown_params.single_mut()?;
 
     //初期化
-    count_params.init();
-    event.clear(); //[対策]StageClear等のCountDownイベントが生きているので（v0.16.1）
+    countdown_params.init();
+    event_countdown.clear(); //[対策]StageClear等のCountDownイベントが生きているので（v0.16.1）
 
     Ok(())
 }
 
 //カウントダウンを表示しゼロになったらEventをセットする
-pub fn count_down<T>(
-    mut query: Query<(&Children, &mut T)>,
+pub fn countdown<T>(
+    mut query_countdown_params: Query<(&mut T, &Children)>,
     mut text_writer: TextUiWriter,
     time: Res<Time>,
     mut event: EventWriter<EventCountDown>,
@@ -52,28 +72,29 @@ pub fn count_down<T>(
 where
     T: Component<Mutability = Mutable> + CountDown,
 {
-    //準備
-    let (children, mut count_params) = query.single_mut()?;
-    let entity = children.iter().next().ok_or("Child Entity not found.")?;
-    let index = count_params.placeholder().ok_or("err")?;
+    // 準備
+    let (mut countdown, text_spans) = query_countdown_params.single_mut()?;
+
+    let root_entity = text_spans.iter().next().ok_or("Text spans not found.")?;
+    let span_index = countdown.index();
 
     //1秒経過したら
-    if count_params.timer().tick(time.delta()).finished()
+    if countdown.timer().tick(time.delta()).finished()
     {
-        *count_params.counter() += 1; //カウント
-        count_params.timer().reset(); //1秒タイマーリセット
+        *countdown.counter() += 1; //カウント
+        countdown.timer().reset(); //1秒タイマーリセット
     }
 
     //カウントダウンが続いているなら
-    let count_down = count_params.start_value() - *count_params.counter();
+    let count = countdown.start_value() - *countdown.counter();
 
-    if count_down >= 0
+    if count >= 0
     {
         //カウントダウンの表示を更新する
         let mut text = text_writer
-            .get_text(entity, index)
-            .ok_or(format!("No entity with a matching index: {index}"))?;
-        *text = format!("{}", count_down);
+            .get_text(root_entity, span_index)
+            .ok_or(format!("No entity with a matching index: {span_index}"))?;
+        *text = format!("{}", count);
     }
     else
     {
@@ -88,23 +109,24 @@ where
 
 //テキストを明滅させる
 pub fn blinking_text<T>(
-    mut query: Query<(&Children, &mut T)>,
+    mut query_countdown_params: Query<(&mut T, &Children)>,
     mut text_writer: TextUiWriter,
     time: Res<Time>,
 ) -> Result
 where
     T: Component<Mutability = Mutable> + Blinking,
 {
-    //準備
-    let (children, mut count_params) = query.single_mut()?;
-    let entity = children.iter().next().ok_or("Child Entity not found.")?;
-    let index = count_params.blink_index();
+    // 準備
+    let (mut blinking, text_spans) = query_countdown_params.single_mut()?;
+
+    let root_entity = text_spans.iter().next().ok_or("Text spans not found.")?;
+    let span_index = blinking.index();
 
     //透明度を変化させる
-    let alpha = count_params.alpha(time.delta().as_secs_f32());
+    let alpha = blinking.alpha(time.delta().as_secs_f32());
     let mut text_color = text_writer
-        .get_color(entity, index)
-        .ok_or(format!("No entity with a matching index: {index}"))?;
+        .get_color(root_entity, span_index)
+        .ok_or(format!("No entity with a matching index: {span_index}"))?;
 
     text_color.set_alpha(alpha);
 
@@ -113,45 +135,32 @@ where
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//Hit ANY Keyの処理で無視するキーとボタン
-#[rustfmt::skip]
-const IGNORE_KEYS: &[KeyCode] = &[
-    KeyCode::AltLeft    , KeyCode::AltRight,
-    KeyCode::ControlLeft, KeyCode::ControlRight,
-    KeyCode::ShiftLeft  , KeyCode::ShiftRight,
-    KeyCode::SuperLeft  , KeyCode::SuperRight,
-    KeyCode::ArrowUp    , KeyCode::ArrowDown,
-    KeyCode::ArrowRight , KeyCode::ArrowLeft,
-    KeyCode::CapsLock   , KeyCode::Fn,
-    KeyCode::Tab,
-    KeyCode::Unidentified(NativeKeyCode::Windows(57443)), //ThinkPad [Fn]
-];
-// const IGNORE_BUTTONS: &[ GamepadButtonType ] =
-// &[
-//     GamepadButtonType::DPadUp,    GamepadButtonType::DPadDown,
-//     GamepadButtonType::DPadRight, GamepadButtonType::DPadLeft,
-// ];
-
-//入力があればStateを変更する
+//何かしら入力があればEventをセットする
 pub fn hit_any_key<T>(
+    query_hitanykey_params: Query<&T>,
     input_keycode: Res<ButtonInput<KeyCode>>,
-    opt_target_gamepad: Option<ResMut<my_utils::misc::TargetGamepad>>,
-    qry_gamepads: Query<&Gamepad>,
+    // opt_target_gamepad: Option<ResMut<my_utils::misc::TargetGamepad>>,
+    // qry_gamepads: Query<&Gamepad>,
     mut event: EventWriter<EventHitAnyKey>,
 ) -> Result
 where
     T: Component<Mutability = Mutable> + HitAnyKey,
 {
-    //無視キー以外のキー入力はあるか
-    if input_keycode.any_pressed(IGNORE_KEYS.iter().copied())
+    // 準備
+    let hitanykey = query_hitanykey_params.single()?;
+    let ignore_keys = hitanykey.ignore_keys();
+
+    //無視するキーなら
+    let check1 = input_keycode.any_pressed(ignore_keys.iter().copied());
+    let check2 = input_keycode.any_just_pressed(ignore_keys.iter().copied()); //[Fn]対策
+    let mut is_pressed = if check1 || check2
     {
         return Ok(());
     }
-    if input_keycode.any_just_pressed(IGNORE_KEYS.iter().copied())
+    else
     {
-        return Ok(());
-    } //[Fn]対策
-    let mut is_pressed = input_keycode.get_just_pressed().len();
+        input_keycode.get_just_pressed().len()
+    };
 
     #[cfg(debug_assertions)]
     if is_pressed != 0
@@ -171,7 +180,7 @@ where
     //     is_pressed = inbtn.get_just_pressed().filter( |x| x.gamepad == id ).count();
     // }
 
-    //Stateを遷移させる
+    // Eventをセットする
     if is_pressed > 0
     {
         event.write(EventHitAnyKey);

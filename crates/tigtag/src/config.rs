@@ -346,45 +346,47 @@ const COLOR_NONE: Color = Color::NONE;
 pub mod popup
 {
     use super::*;
+    use popup_text_ui::effect::{CountDownParams, BlinkingParams, HitAnyKeyParams};
+
+    //--------------------------------------------------------------------------
 
     #[derive(Component, Clone)]
     pub struct StageSatrt
     {
-        start_value: i32,
-        timer: Timer,
-        counter: i32,
+        countdown: CountDownParams,
     }
     #[derive(Component, Clone)]
     pub struct StageClear
     {
-        start_value: i32,
-        timer: Timer,
-        counter: i32,
+        countdown: CountDownParams,
     }
     #[derive(Component, Clone)]
     pub struct GameOver
     {
-        start_value: i32,
-        timer: Timer,
-        counter: i32,
-        blink_cycle: f32,
-        blink_index: usize,
+        countdown: CountDownParams,
+        blinking: BlinkingParams,
+        hit_any_key: HitAnyKeyParams,
     }
     #[derive(Component, Clone)]
     pub struct TitleDemo
     {
-        blink_cycle: f32,
-        blink_index: usize,
+        blinking: BlinkingParams,
+        hit_any_key: HitAnyKeyParams,
     }
+
+    //--------------------------------------------------------------------------
 
     impl Default for StageSatrt
     {
         fn default() -> Self
         {
             Self {
-                start_value: 5,
-                timer: Timer::from_seconds(1.0, TimerMode::Once),
-                counter: 0,
+                countdown: CountDownParams {
+                    start_value: 5,
+                    timer: Timer::from_seconds(1.0, TimerMode::Once),
+                    counter: 0,
+                    spans_index: 2,
+                },
             }
         }
     }
@@ -393,9 +395,12 @@ pub mod popup
         fn default() -> Self
         {
             Self {
-                start_value: 10,
-                timer: Timer::from_seconds(1.0, TimerMode::Once),
-                counter: 0,
+                countdown: CountDownParams {
+                    start_value: 10,
+                    timer: Timer::from_seconds(1.0, TimerMode::Once),
+                    counter: 0,
+                    spans_index: 2,
+                },
             }
         }
     }
@@ -404,11 +409,19 @@ pub mod popup
         fn default() -> Self
         {
             Self {
-                start_value: 10,
-                timer: Timer::from_seconds(1.0, TimerMode::Once),
-                counter: 0,
-                blink_cycle: 0.0,
-                blink_index: 2,
+                countdown: CountDownParams {
+                    start_value: 10,
+                    timer: Timer::from_seconds(1.0, TimerMode::Once),
+                    counter: 0,
+                    spans_index: 7,
+                },
+                blinking: BlinkingParams {
+                    cycle: 0.0,
+                    spans_index: 2,
+                },
+                hit_any_key: HitAnyKeyParams {
+                    ignore_keys: IGNORE_KEYS,
+                },
             }
         }
     }
@@ -417,73 +430,81 @@ pub mod popup
         fn default() -> Self
         {
             Self {
-                blink_cycle: 0.0,
-                blink_index: 5,
+                blinking: BlinkingParams {
+                    cycle: 0.0,
+                    spans_index: 5,
+                },
+                hit_any_key: HitAnyKeyParams {
+                    ignore_keys: IGNORE_KEYS,
+                },
             }
         }
     }
 
+    //--------------------------------------------------------------------------
+
     impl popup_text_ui::effect::CountDown for StageSatrt
     {
         fn init(&mut self) { *self = Self::default(); }
-        fn placeholder(&self) -> Option<usize>
-        {
-            POPUP_STAGE_START.iter().position(|x| x.0 == _CDPH_)
-        }
-        fn start_value(&self) -> i32 { self.start_value }
-        fn timer(&mut self) -> &mut Timer { &mut self.timer }
-        fn counter(&mut self) -> &mut i32 { &mut self.counter }
+        fn index(&self) -> usize { self.countdown.spans_index }
+        fn start_value(&self) -> i32 { self.countdown.start_value }
+        fn timer(&mut self) -> &mut Timer { &mut self.countdown.timer }
+        fn counter(&mut self) -> &mut i32 { &mut self.countdown.counter }
     }
     impl popup_text_ui::effect::CountDown for StageClear
     {
         fn init(&mut self) { *self = Self::default(); }
-        fn placeholder(&self) -> Option<usize>
-        {
-            POPUP_STAGE_CLEAR.iter().position(|x| x.0 == _CDPH_)
-        }
-        fn start_value(&self) -> i32 { self.start_value }
-        fn timer(&mut self) -> &mut Timer { &mut self.timer }
-        fn counter(&mut self) -> &mut i32 { &mut self.counter }
+        fn index(&self) -> usize { self.countdown.spans_index }
+        fn start_value(&self) -> i32 { self.countdown.start_value }
+        fn timer(&mut self) -> &mut Timer { &mut self.countdown.timer }
+        fn counter(&mut self) -> &mut i32 { &mut self.countdown.counter }
     }
     impl popup_text_ui::effect::CountDown for GameOver
     {
         fn init(&mut self) { *self = Self::default(); }
-        fn placeholder(&self) -> Option<usize>
-        {
-            POPUP_GAME_OVER.iter().position(|x| x.0 == _CDPH_)
-        }
-        fn start_value(&self) -> i32 { self.start_value }
-        fn timer(&mut self) -> &mut Timer { &mut self.timer }
-        fn counter(&mut self) -> &mut i32 { &mut self.counter }
+        fn index(&self) -> usize { self.countdown.spans_index }
+        fn start_value(&self) -> i32 { self.countdown.start_value }
+        fn timer(&mut self) -> &mut Timer { &mut self.countdown.timer }
+        fn counter(&mut self) -> &mut i32 { &mut self.countdown.counter }
     }
+
+    //--------------------------------------------------------------------------
 
     impl popup_text_ui::effect::Blinking for GameOver
     {
         fn alpha(&mut self, time_delta: f32) -> f32
         {
-            let radian = &mut self.blink_cycle;
+            let radian = &mut self.blinking.cycle;
             *radian += TAU * time_delta;
             *radian -= if *radian > TAU { TAU } else { 0.0 };
 
             (*radian).sin() * 0.5 + 0.5 //0.0 ～ 1.0
         }
-        fn blink_index(&self) -> usize { self.blink_index }
+        fn index(&self) -> usize { self.blinking.spans_index }
     }
     impl popup_text_ui::effect::Blinking for TitleDemo
     {
         fn alpha(&mut self, time_delta: f32) -> f32
         {
-            let radian = &mut self.blink_cycle;
+            let radian = &mut self.blinking.cycle;
             *radian += TAU * time_delta;
             *radian -= if *radian > TAU { TAU } else { 0.0 };
 
             (*radian).sin() * 0.5 + 0.5 //0.0 ～ 1.0
         }
-        fn blink_index(&self) -> usize { self.blink_index }
+        fn index(&self) -> usize { self.blinking.spans_index }
     }
 
-    impl popup_text_ui::effect::HitAnyKey for GameOver {}
-    impl popup_text_ui::effect::HitAnyKey for TitleDemo {}
+    //--------------------------------------------------------------------------
+
+    impl popup_text_ui::effect::HitAnyKey for GameOver
+    {
+        fn ignore_keys(&self) -> &[KeyCode] { self.hit_any_key.ignore_keys }
+    }
+    impl popup_text_ui::effect::HitAnyKey for TitleDemo
+    {
+        fn ignore_keys(&self) -> &[KeyCode] { self.hit_any_key.ignore_keys }
+    }
 }
 
 // ポップアップメッセージをspawnするために必要な情報のリスト（Resource）
@@ -559,6 +580,25 @@ const POPUP_TITLE_DEMO: &[ popup_text_ui::TextUiSpanSettings ] = &[
     ( "or\n"          , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, COLOR_CYAN   ),
     ( "ANY button!"   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN   ),
 ];
+
+//Hit ANY Keyの処理で無視するキーとボタン
+#[rustfmt::skip]
+const IGNORE_KEYS: &[KeyCode] = &[
+    KeyCode::AltLeft    , KeyCode::AltRight,
+    KeyCode::ControlLeft, KeyCode::ControlRight,
+    KeyCode::ShiftLeft  , KeyCode::ShiftRight,
+    KeyCode::SuperLeft  , KeyCode::SuperRight,
+    KeyCode::ArrowUp    , KeyCode::ArrowDown,
+    KeyCode::ArrowRight , KeyCode::ArrowLeft,
+    KeyCode::CapsLock   , KeyCode::Fn,
+    KeyCode::Tab,
+    KeyCode::Unidentified(NativeKeyCode::Windows(57443)), //ThinkPad [Fn]
+];
+// const IGNORE_BUTTONS: &[ GamepadButtonType ] =
+// &[
+//     GamepadButtonType::DPadUp,    GamepadButtonType::DPadDown,
+//     GamepadButtonType::DPadRight, GamepadButtonType::DPadLeft,
+// ];
 
 ////////////////////////////////////////////////////////////////////////////////
 

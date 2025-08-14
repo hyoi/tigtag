@@ -154,7 +154,7 @@ fn main() -> AppExit
                     .chain(),
                 (
                     // ポップアップTextUI表示
-                    popup_text_ui::effect::init_count::<popup::StageSatrt>,
+                    popup_text_ui::effect::init_countdown::<popup::StageSatrt>,
                     misc::show_component::<popup::StageSatrt>,
                 )
                     .chain(),
@@ -164,7 +164,7 @@ fn main() -> AppExit
             Update,
             (
                 // カウントダウン後にStateを遷移
-                popup_text_ui::effect::count_down::<popup::StageSatrt>,
+                popup_text_ui::effect::countdown::<popup::StageSatrt>,
                 set_next_state::<MainLoop>.run_if(on_event::<EventCountDown>),
             )
                 .chain()
@@ -218,7 +218,7 @@ fn main() -> AppExit
             OnEnter(MyState::StageClear),
             (
                 // ポップアップTextUI表示
-                popup_text_ui::effect::init_count::<popup::StageClear>,
+                popup_text_ui::effect::init_countdown::<popup::StageClear>,
                 misc::show_component::<popup::StageClear>,
             )
                 .chain(),
@@ -227,7 +227,7 @@ fn main() -> AppExit
             Update,
             (
                 // カウントダウン後にStateを遷移
-                popup_text_ui::effect::count_down::<popup::StageClear>,
+                popup_text_ui::effect::countdown::<popup::StageClear>,
                 set_next_state::<StageStart>.run_if(on_event::<EventCountDown>),
             )
                 .chain()
@@ -248,7 +248,7 @@ fn main() -> AppExit
             OnEnter(MyState::GameOver),
             (
                 //ポップアップTextUI表示
-                popup_text_ui::effect::init_count::<popup::GameOver>,
+                popup_text_ui::effect::init_countdown::<popup::GameOver>,
                 misc::show_component::<popup::GameOver>,
             )
                 .chain(),
@@ -258,7 +258,7 @@ fn main() -> AppExit
             (
                 (
                     //ポップアップTextUIの表示効果
-                    popup_text_ui::effect::count_down::<popup::GameOver>, //カウントダウン
+                    popup_text_ui::effect::countdown::<popup::GameOver>, //カウントダウン
                     popup_text_ui::effect::blinking_text::<popup::GameOver>, //Replay? の明滅
                     popup_text_ui::effect::hit_any_key::<popup::GameOver>, //Hit ANY Key
                 ),
