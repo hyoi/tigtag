@@ -350,24 +350,24 @@ pub mod popup
 
     //--------------------------------------------------------------------------
 
-    #[derive(Component, Clone)]
+    #[derive(Component, Clone, CountDown)]
     pub struct StageSatrt
     {
         countdown: CountDownParams,
     }
-    #[derive(Component, Clone)]
+    #[derive(Component, Clone, CountDown)]
     pub struct StageClear
     {
         countdown: CountDownParams,
     }
-    #[derive(Component, Clone)]
+    #[derive(Component, Clone, CountDown, Blinking, HitAnyKey)]
     pub struct GameOver
     {
         countdown: CountDownParams,
         blinking: BlinkingParams,
         hit_any_key: HitAnyKeyParams,
     }
-    #[derive(Component, Clone)]
+    #[derive(Component, Clone, Blinking, HitAnyKey)]
     pub struct TitleDemo
     {
         blinking: BlinkingParams,
@@ -439,71 +439,6 @@ pub mod popup
                 },
             }
         }
-    }
-
-    //--------------------------------------------------------------------------
-
-    impl popup_text_ui::effect::CountDown for StageSatrt
-    {
-        fn init(&mut self) { *self = Self::default(); }
-        fn index(&self) -> usize { self.countdown.spans_index }
-        fn start_value(&self) -> i32 { self.countdown.start_value }
-        fn timer(&mut self) -> &mut Timer { &mut self.countdown.timer }
-        fn counter(&mut self) -> &mut i32 { &mut self.countdown.counter }
-    }
-    impl popup_text_ui::effect::CountDown for StageClear
-    {
-        fn init(&mut self) { *self = Self::default(); }
-        fn index(&self) -> usize { self.countdown.spans_index }
-        fn start_value(&self) -> i32 { self.countdown.start_value }
-        fn timer(&mut self) -> &mut Timer { &mut self.countdown.timer }
-        fn counter(&mut self) -> &mut i32 { &mut self.countdown.counter }
-    }
-    impl popup_text_ui::effect::CountDown for GameOver
-    {
-        fn init(&mut self) { *self = Self::default(); }
-        fn index(&self) -> usize { self.countdown.spans_index }
-        fn start_value(&self) -> i32 { self.countdown.start_value }
-        fn timer(&mut self) -> &mut Timer { &mut self.countdown.timer }
-        fn counter(&mut self) -> &mut i32 { &mut self.countdown.counter }
-    }
-
-    //--------------------------------------------------------------------------
-
-    impl popup_text_ui::effect::Blinking for GameOver
-    {
-        fn alpha(&mut self, time_delta: f32) -> f32
-        {
-            let radian = &mut self.blinking.cycle;
-            *radian += TAU * time_delta;
-            *radian -= if *radian > TAU { TAU } else { 0.0 };
-
-            (*radian).sin() * 0.5 + 0.5 //0.0 ～ 1.0
-        }
-        fn index(&self) -> usize { self.blinking.spans_index }
-    }
-    impl popup_text_ui::effect::Blinking for TitleDemo
-    {
-        fn alpha(&mut self, time_delta: f32) -> f32
-        {
-            let radian = &mut self.blinking.cycle;
-            *radian += TAU * time_delta;
-            *radian -= if *radian > TAU { TAU } else { 0.0 };
-
-            (*radian).sin() * 0.5 + 0.5 //0.0 ～ 1.0
-        }
-        fn index(&self) -> usize { self.blinking.spans_index }
-    }
-
-    //--------------------------------------------------------------------------
-
-    impl popup_text_ui::effect::HitAnyKey for GameOver
-    {
-        fn ignore_keys(&self) -> &[KeyCode] { self.hit_any_key.ignore_keys }
-    }
-    impl popup_text_ui::effect::HitAnyKey for TitleDemo
-    {
-        fn ignore_keys(&self) -> &[KeyCode] { self.hit_any_key.ignore_keys }
     }
 }
 

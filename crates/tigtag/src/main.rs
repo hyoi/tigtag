@@ -28,7 +28,7 @@ use std::{
 };
 
 // my proc-macro
-use macros::MyState;
+use macros::{MyState, CountDown, Blinking, HitAnyKey};
 
 // my internal submodules
 mod config; // 設定
