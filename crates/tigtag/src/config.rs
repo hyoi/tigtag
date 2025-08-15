@@ -541,7 +541,7 @@ const IGNORE_KEYS: &[KeyCode] = &[
     KeyCode::ArrowUp    , KeyCode::ArrowDown,
     KeyCode::ArrowRight , KeyCode::ArrowLeft,
     KeyCode::CapsLock   , KeyCode::Fn,
-    KeyCode::Tab,
+    KeyCode::Tab        , EXIT_APP_KEY,
     KeyCode::Unidentified(NativeKeyCode::Windows(57443)), //ThinkPad [Fn]
 ];
 // const IGNORE_BUTTONS: &[ GamepadButtonType ] =

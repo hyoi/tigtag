@@ -338,7 +338,7 @@ fn hook_exit_key_and_pause(
     mut input_keycode: ResMut<ButtonInput<KeyCode>>,
     mut state: ResMut<State<MyState>>,
     mut back_to: Local<MyState>,
-    mut query: Query<&mut Visibility, With<popup::Pause>>,
+    mut query_popup: Query<&mut Visibility, With<popup::Pause>>,
 )
 {
     // アプリ終了キーが押下されているなら
@@ -348,24 +348,30 @@ fn hook_exit_key_and_pause(
         input_keycode.reset(EXIT_APP_KEY);
 
         // State が MyState::Pause なら
-        if state.get().is_pause()
+        let display = if state.get().is_pause()
         {
-            // OnEnter／OnExitを実行せす遷移する（戻る）
+            // OnEnter／OnExitを実行せずに元のStateへ戻る
             *state = State::new(*back_to);
 
-            //QueryしたComponentを不可視にする
-            query.iter_mut().for_each(|mut v| *v = Visibility::Hidden);
+            // popupを隠す指定
+            Visibility::Hidden
         }
         else
         {
             // 遷移元のStateをローカルに保存する
             *back_to = *state.get();
 
-            // OnEnter／OnExitを実行せす遷移する（Pause）
+            // OnEnter／OnExitを実行せずにStateをPauseへ変える
             *state = State::new(MyState::Pause);
 
-            //QueryしたComponentを可視化する
-            query.iter_mut().for_each(|mut v| *v = Visibility::Visible);
+            // popupを見せる指定
+            Visibility::Visible
+        };
+
+        // popupの表示状態を変更する
+        if let Ok(mut visibility) = query_popup.single_mut()
+        {
+            *visibility = display;
         }
 
         #[cfg(debug_assertions)]
