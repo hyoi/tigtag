@@ -373,6 +373,8 @@ pub mod popup
         blinking: BlinkingParams,
         hit_any_key: HitAnyKeyParams,
     }
+    #[derive(Component, Clone)]
+    pub struct Pause;
 
     //--------------------------------------------------------------------------
 
@@ -467,6 +469,7 @@ impl Default for PopupMessages
                 Box::new(popup::TitleDemo::default()),
                 Vec::from(POPUP_TITLE_DEMO),
             ),
+            (Box::new(popup::Pause), Vec::from(POPUP_PAUSE)),
         ])
     }
 }
@@ -514,6 +517,18 @@ const POPUP_TITLE_DEMO: &[ popup_text_ui::TextUiSpanSettings ] = &[
     ( "Hit ANY key!\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN   ),
     ( "or\n"          , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, COLOR_CYAN   ),
     ( "ANY button!"   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN   ),
+];
+
+//メニューアイテムの色
+const MENU_ITEM_COLOR_SELECTED: Color = Color::Srgba(css::YELLOW);
+const MENU_ITEM_COLOR_NORMAL: Color = COLOR_CYAN;
+
+//メニューアイテムの設定
+#[rustfmt::skip]
+const POPUP_PAUSE: &[ popup_text_ui::TextUiSpanSettings ] = &[
+    ( "PAUSE", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, MENU_ITEM_COLOR_SELECTED ),
+    // ( "\n"   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 2.0, COLOR_NONE               ),
+    // ( "EXIT" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 2.0, MENU_ITEM_COLOR_NORMAL   ),
 ];
 
 //Hit ANY Keyの処理で無視するキーとボタン

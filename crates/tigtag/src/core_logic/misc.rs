@@ -18,41 +18,6 @@ pub fn initialize_record_except_hi_score(
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// Pause等の処理の雛形
-// fn hook_exit_app_key(
-//     mut input_keycode: ResMut<ButtonInput<KeyCode>>,
-//     mut state: ResMut<State<MyState>>,
-//     mut back_to: Local<MyState>,
-// )
-// {
-//     // キーが押下されているか
-//     if input_keycode.just_pressed(EXIT_APP_KEY)
-//     {
-//         // キー押下をリセットする（misc::app_close_on_keyが実行されないように）
-//         input_keycode.reset(EXIT_APP_KEY);
-
-//         // Pauseのトグル処理
-//         if state.get().is_pause()
-//         {
-//             // OnEnter／OnExitを実行せす遷移する
-//             *state = State::new(*back_to);
-//         }
-//         else
-//         {
-//             // 遷移元のStateをローカルに保存する
-//             *back_to = *state.get();
-
-//             // OnEnter／OnExitを実行せす遷移する
-//             *state = State::new(MyState::Pause);
-//         }
-
-//         #[cfg(debug_assertions)]
-//         dbg!(state);
-//     }
-// }
-
-////////////////////////////////////////////////////////////////////////////////
-
 // 更新対象の位置を指定するためのResource
 #[derive(Resource)]
 pub struct PlaceHolderFps(pub header_footer::Position, pub usize);

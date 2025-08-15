@@ -99,15 +99,10 @@ fn main() -> AppExit
                 chaser::rotate_chaser_shape.run_if(SPRITE_OFF), // チェイサー回転
                 // UI Nodeのアウトラインの表示／非表示を切替える
                 misc::toggle_ui_outline_gizmo.run_if(DEBUG),
+                // アプリ終了キーをフックしてPause処理を挿入
+                hook_exit_key_and_pause.before(misc::app_close_on_key),
             ),
-        )
-        // アプリ終了キーをフックして処理を挿入
-        // appl.add_systems(
-        //     Update,
-        //     hook_exit_app_key // Pause等の雛型
-        //         .before(misc::app_close_on_key),
-        // )
-        ;
+        );
 
     // MyState::InitGameスケジュール
     // ゲームの初期化
@@ -312,8 +307,70 @@ fn main() -> AppExit
             ),
         );
 
+    // MyState::Pauseスケジュール
+    // Pause画面の処理
+    // application
+    //     .add_systems(
+    //         OnEnter(MyState::Pause),
+    //         //ポップアップTextUI表示
+    //         misc::show_component::<popup::Pause>,
+    //     )
+    //     .add_systems(
+    //         Update,
+    //         (
+    //         )
+    //         .run_if(in_state(MyState::Pause)),
+    //     )
+    //     .add_systems(
+    //         OnExit(MyState::Pause),
+    //         //ポップアップTextUI非表示
+    //         misc::hide_component::<popup::Pause>,
+    //     );
+
     // アプリを実行
     application.run()
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// Pause等の処理の雛形
+fn hook_exit_key_and_pause(
+    mut input_keycode: ResMut<ButtonInput<KeyCode>>,
+    mut state: ResMut<State<MyState>>,
+    mut back_to: Local<MyState>,
+    mut query: Query<&mut Visibility, With<popup::Pause>>,
+)
+{
+    // アプリ終了キーが押下されているなら
+    if input_keycode.just_pressed(EXIT_APP_KEY)
+    {
+        // キー押下をリセットする（misc::app_close_on_keyが実行されないように）
+        input_keycode.reset(EXIT_APP_KEY);
+
+        // State が MyState::Pause なら
+        if state.get().is_pause()
+        {
+            // OnEnter／OnExitを実行せす遷移する（戻る）
+            *state = State::new(*back_to);
+
+            //QueryしたComponentを不可視にする
+            query.iter_mut().for_each(|mut v| *v = Visibility::Hidden);
+        }
+        else
+        {
+            // 遷移元のStateをローカルに保存する
+            *back_to = *state.get();
+
+            // OnEnter／OnExitを実行せす遷移する（Pause）
+            *state = State::new(MyState::Pause);
+
+            //QueryしたComponentを可視化する
+            query.iter_mut().for_each(|mut v| *v = Visibility::Visible);
+        }
+
+        #[cfg(debug_assertions)]
+        dbg!(state);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
