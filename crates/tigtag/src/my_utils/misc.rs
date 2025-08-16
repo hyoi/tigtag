@@ -22,14 +22,14 @@ pub fn app_close_on_key(
 
 // ウィンドウとフルスクリーンの切換(トグル動作)
 pub fn toggle_window_mode(
-    mut qry_window: Query<&mut Window>,
+    mut query_window: Query<&mut Window>,
     input_keycode: Res<ButtonInput<KeyCode>>,
     // qry_gamepads: Query<(Entity, &Gamepad)>,
     // opt_target_gamepad: Option<ResMut<TargetGamepad>>,
 ) -> Result
 {
-    // windowがない？
-    let mut window = qry_window.single_mut()?;
+    // 準備
+    let mut window = query_window.single_mut()?;
 
     // キーの押下状態
     let is_pressed = input_keycode.just_pressed(FULL_SCREEN_KEY)
@@ -48,14 +48,28 @@ pub fn toggle_window_mode(
     // 切換(トグル動作)
     if is_pressed
     {
-        window.mode = match window.mode
+        #[cfg(debug_assertions)]
+        dbg!("before", &window.mode, &window.resolution);
+
+        match window.mode
         {
-            WindowMode::Windowed => WindowMode::Fullscreen(
-                MonitorSelection::Primary,
-                VideoModeSelection::Current,
-            ),
-            _ => WindowMode::Windowed,
+            WindowMode::Windowed =>
+            {
+                window.resolution.set_scale_factor(2.0);
+                window.mode = WindowMode::Fullscreen(
+                    MonitorSelection::Primary,
+                    VideoModeSelection::Current,
+                );
+            }
+            _ =>
+            {
+                window.resolution.set_scale_factor(1.0);
+                window.mode = WindowMode::Windowed;
+            }
         };
+
+        #[cfg(debug_assertions)]
+        dbg!("after", &window.mode, &window.resolution);
     }
 
     Ok(())
