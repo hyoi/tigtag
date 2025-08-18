@@ -269,7 +269,6 @@ pub const PLACE_HOLDER: &[header_info::PlaceHolderLabel] = &[
 ////////////////////////////////////////////////////////////////////////////////
 
 // スプライト重なり
-// pub const DEPTH_SPRITE_DEBUG_GRID: f32 = 999.0; // 重なりの最大値
 pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0; // フッターの蟹アイコン
 
 //==============================================================================
@@ -335,6 +334,8 @@ pub const SHOW_HIDE_GIZMO_TOGGLE_KEY: KeyCode = KeyCode::Tab;
 ////////////////////////////////////////////////////////////////////////////////
 
 //色の短縮表記
+const COLOR_YELLOW: Color = Color::Srgba(css::YELLOW);
+const COLOR_SILVER: Color = Color::Srgba(css::SILVER);
 const COLOR_CYAN: Color = Color::Srgba(css::AQUA);
 const COLOR_GOLD: Color = Color::Srgba(css::GOLD);
 const COLOR_RED: Color = Color::Srgba(css::RED);
@@ -346,7 +347,9 @@ const COLOR_NONE: Color = Color::NONE;
 pub mod popup
 {
     use super::*;
-    use popup_text_ui::effect::{CountDownParams, BlinkingParams, HitAnyKeyParams};
+    use popup_text_ui::effect::{
+        CountDownParams, BlinkingParams, HitAnyKeyParams, ScalingParams,
+    };
 
     //--------------------------------------------------------------------------
 
@@ -374,7 +377,33 @@ pub mod popup
         hit_any_key: HitAnyKeyParams,
     }
     #[derive(Component, Clone)]
-    pub struct Pause;
+    pub struct Pause
+    {
+        scaling: ScalingParams,
+    }
+    impl popup_text_ui::effect::PopupMenu for Pause
+    {
+        fn init(&mut self) { *self = Self::default(); }
+        fn resize_font(&mut self, time_delta: f32) -> f32
+        {
+            let radian = &mut self.scaling.cycle;
+            *radian += TAU * time_delta;
+            *radian -= if *radian > TAU { TAU } else { 0.0 };
+
+            let size = self.scaling.selected_base_size
+                + self.scaling.max_scaling * ((*radian).sin() * 0.5 + 0.5); //0.0 ～ 1.0
+
+            (size as i32) as f32 //小数点未満を切り捨て
+        }
+        fn selected_menuitem_index(&self) -> usize { self.scaling.spans_index }
+        fn selected_menuitem_index_mut(&mut self) -> &mut usize
+        {
+            &mut self.scaling.spans_index
+        }
+        fn menuitem_len(&self) -> usize { self.scaling.spans_len }
+        fn unselected_size(&self) -> f32 { self.scaling.unselected_size }
+        fn selected_base_size(&self) -> f32 { self.scaling.selected_base_size }
+    }
 
     //--------------------------------------------------------------------------
 
@@ -442,6 +471,22 @@ pub mod popup
             }
         }
     }
+    impl Default for Pause
+    {
+        fn default() -> Self
+        {
+            Self {
+                scaling: ScalingParams {
+                    unselected_size: PIXELS_PER_GRID * 1.5,
+                    selected_base_size: PIXELS_PER_GRID * 2.5,
+                    max_scaling: PIXELS_PER_GRID * 1.0,
+                    cycle: 0.0,
+                    spans_index: 0,
+                    spans_len: POPUP_PAUSE.len(),
+                },
+            }
+        }
+    }
 }
 
 // ポップアップメッセージをspawnするために必要な情報のリスト（Resource）
@@ -469,7 +514,7 @@ impl Default for PopupMessages
                 Box::new(popup::TitleDemo::default()),
                 Vec::from(POPUP_TITLE_DEMO),
             ),
-            (Box::new(popup::Pause), Vec::from(POPUP_PAUSE)),
+            (Box::new(popup::Pause::default()), Vec::from(POPUP_PAUSE)),
         ])
     }
 }
@@ -519,18 +564,6 @@ const POPUP_TITLE_DEMO: &[ popup_text_ui::TextUiSpanSettings ] = &[
     ( "ANY button!"   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN   ),
 ];
 
-//メニューアイテムの色
-const MENU_ITEM_COLOR_SELECTED: Color = Color::Srgba(css::YELLOW);
-const MENU_ITEM_COLOR_NORMAL: Color = COLOR_CYAN;
-
-//メニューアイテムの設定
-#[rustfmt::skip]
-const POPUP_PAUSE: &[ popup_text_ui::TextUiSpanSettings ] = &[
-    ( "PAUSE", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, MENU_ITEM_COLOR_SELECTED ),
-    // ( "\n"   , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 2.0, COLOR_NONE               ),
-    // ( "EXIT" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 2.0, MENU_ITEM_COLOR_NORMAL   ),
-];
-
 //Hit ANY Keyの処理で無視するキーとボタン
 #[rustfmt::skip]
 const IGNORE_KEYS: &[KeyCode] = &[
@@ -548,6 +581,27 @@ const IGNORE_KEYS: &[KeyCode] = &[
 // &[
 //     GamepadButtonType::DPadUp,    GamepadButtonType::DPadDown,
 //     GamepadButtonType::DPadRight, GamepadButtonType::DPadLeft,
+// ];
+
+//メニューアイテムの色
+pub const MENU_ITEM_COLOR_SELECTED: Color = COLOR_YELLOW;
+pub const MENU_ITEM_COLOR_NORMAL: Color = COLOR_SILVER;
+
+//メニューアイテムの設定
+#[rustfmt::skip]
+const POPUP_PAUSE: &[ popup_text_ui::TextUiSpanSettings ] = &[
+    ( "PAUSE\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 1.5, MENU_ITEM_COLOR_NORMAL ),
+    ( "EXIT\n" , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 1.5, MENU_ITEM_COLOR_NORMAL ),
+    ( "CONFIG" , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 1.5, MENU_ITEM_COLOR_NORMAL ),
+];
+
+//
+// #[rustfmt::skip]
+// const MENU_SELECT_KEYS: &[KeyCode] = &[
+//     (KeyCode::ArrowUp  , popup_text_ui::effect::MenuItemSelect::Above ),
+//     (KeyCode::KeyW     , popup_text_ui::effect::MenuItemSelect::Above ),
+//     (KeyCode::ArrowDown, popup_text_ui::effect::MenuItemSelect::Below ),
+//     (KeyCode::KeyS     , popup_text_ui::effect::MenuItemSelect::Below ),
 // ];
 
 ////////////////////////////////////////////////////////////////////////////////

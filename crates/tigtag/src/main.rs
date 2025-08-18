@@ -75,6 +75,9 @@ fn main() -> AppExit
         .add_event::<EventCountDown>()  // カウントダウン終了の伝達用
         .add_event::<EventHitAnyKey>()  // Hit Any Keyの入力あり伝達用
         .add_event::<EventEatDot>()     // スコアリングの伝達用
+        .add_event::<EventPauseMenuInit>() //
+        .add_event::<EventAppExit>()    // Exitが選択されたことの伝達用
+        .add_event::<EventAppConfig>()  // Configが選択されたことの伝達用
         ;
 
     // Updateスケジュール（without State）
@@ -309,23 +312,26 @@ fn main() -> AppExit
 
     // MyState::Pauseスケジュール
     // Pause画面の処理
-    // application
-    //     .add_systems(
-    //         OnEnter(MyState::Pause),
-    //         //ポップアップTextUI表示
-    //         misc::show_component::<popup::Pause>,
-    //     )
-    //     .add_systems(
-    //         Update,
-    //         (
-    //         )
-    //         .run_if(in_state(MyState::Pause)),
-    //     )
-    //     .add_systems(
-    //         OnExit(MyState::Pause),
-    //         //ポップアップTextUI非表示
-    //         misc::hide_component::<popup::Pause>,
-    //     );
+    application.add_systems(
+        Update,
+        (
+            // pauseメニューのパラメータを初期化する
+            popup_text_ui::effect::init_pause_menu::<popup::Pause>
+                .run_if(on_event::<EventPauseMenuInit>),
+            (
+                // pauseメニューのメニューアイテムを拡縮表示する
+                popup_text_ui::effect::scale_selected_text::<popup::Pause>,
+                // pauseメニューのメニューアイテムを選択し適用する
+                popup_text_ui::effect::select_menu_item::<popup::Pause>,
+            ),
+            // アプリを終了する
+            app_close.run_if(on_event::<EventAppExit>),
+            // アプリのコンフィグStateへ遷移
+            // app_config.run_if(on_event::<EventAppConfig>),
+        )
+            .chain()
+            .run_if(in_state(MyState::Pause)),
+    );
 
     // アプリを実行
     application.run()
@@ -333,12 +339,13 @@ fn main() -> AppExit
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// Pause等の処理の雛形
+// Pause処理
 fn hook_exit_key_and_pause(
     mut input_keycode: ResMut<ButtonInput<KeyCode>>,
     mut state: ResMut<State<MyState>>,
     mut back_to: Local<MyState>,
     mut query_popup: Query<&mut Visibility, With<popup::Pause>>,
+    mut event_init: EventWriter<EventPauseMenuInit>,
 )
 {
     // アプリ終了キーが押下されているなら
@@ -363,6 +370,7 @@ fn hook_exit_key_and_pause(
 
             // OnEnter／OnExitを実行せずにStateをPauseへ変える
             *state = State::new(MyState::Pause);
+            event_init.write(EventPauseMenuInit);
 
             // popupを見せる指定
             Visibility::Visible
@@ -377,6 +385,22 @@ fn hook_exit_key_and_pause(
         #[cfg(debug_assertions)]
         dbg!(state);
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// アプリを終了する
+pub fn app_close(
+    query_window: Query<(Entity, &Window)>,
+    mut cmds: Commands,
+) -> Result
+{
+    query_window
+        .iter()
+        .filter(|(_, window)| window.focused)
+        .for_each(|(id, _)| cmds.entity(id).despawn());
+
+    Ok(())
 }
 
 ////////////////////////////////////////////////////////////////////////////////

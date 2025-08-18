@@ -208,6 +208,12 @@ pub struct EventCountDown;
 pub struct EventHitAnyKey;
 #[derive(Event)]
 pub struct EventEatDot(pub IVec2); //tigtag3d用の追加フィールド
+#[derive(Event)]
+pub struct EventPauseMenuInit;
+#[derive(Event)]
+pub struct EventAppExit;
+#[derive(Event)]
+pub struct EventAppConfig;
 
 // #[derive(Event)]
 // pub struct EventTimerPlayer;
