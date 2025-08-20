@@ -33,8 +33,8 @@ const TARGET: header_footer::Position = header_footer::Position::BottomLeft;
 //追加するtext spans
 #[rustfmt::skip]
 const ADDITIONAL_DEMO_RECORD: &[header_footer::MessageSpan] = &[
-    ( " demo ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.35, css::TEAL   ),
-    ( _DRPH_  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.26, css::SILVER ),
+    ( " demo ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.35, COLOR_TEAL   ),
+    ( _DRPH_  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.26, COLOR_SILVER ),
 ];
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ fn add_footerleft_text_spans(
                     font_size: *size,
                     ..default()
                 },
-                TextColor(Color::Srgba(*color)),
+                TextColor(*color),
             ));
         }
     });

@@ -49,7 +49,8 @@ pub type MessageSpan = (
     &'static str, // 表示文字列
     &'static str, // フォントのAssets
     f32,          // フォントのサイズ
-    Srgba,        // フォントの色
+    // Srgba,        // フォントの色
+    Color, // フォントの色
 );
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -136,7 +137,7 @@ impl AddTextBlock for EntityCommands<'_>
                     font_size: *size,
                     ..default()
                 },
-                TextColor(Color::Srgba(*color)),
+                TextColor(*color),
                 BackgroundColor(text_block.bg_color.into()),
                 Node {
                     grid_row: GridPlacement::start(row),
@@ -157,7 +158,7 @@ impl AddTextBlock for EntityCommands<'_>
                             font_size: *size,
                             ..default()
                         },
-                        TextColor(Color::Srgba(*color)),
+                        TextColor(*color),
                     ));
                 }
             });
