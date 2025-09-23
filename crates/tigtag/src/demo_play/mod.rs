@@ -1,13 +1,9 @@
 use super::*;
 
-//デモ用スケジュール
-pub mod schedule;
+pub mod schedule; // デモ用スケジュール
 pub use schedule::Schedule;
 
-//デモ用の自機アルゴリズム
-pub mod auto_drive;
-
-//デモの情報表示
-mod footer;
+mod auto_drive; // デモ用の自機アルゴリズム
+mod footer; // デモの情報表示
 
 //End of code.

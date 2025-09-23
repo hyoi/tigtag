@@ -3,44 +3,49 @@ use bevy::{
     prelude::*,
     ecs::{
         error::{GLOBAL_ERROR_HANDLER, warn},
+        system::SystemParam,
         component::Mutable,
     },
-    log::LogPlugin,
     window::{EnabledButtons, WindowMode},
+    log::LogPlugin,
+    diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
     color::palettes::*,
     asset::{LoadedUntypedAsset, LoadState},
     render::camera::Viewport,
-    diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
     input::{
-        gamepad::{GamepadInput, GamepadAxisChangedEvent},
         keyboard::NativeKeyCode,
+        gamepad::{GamepadInput, GamepadAxisChangedEvent},
     },
+    audio::Volume,
 };
 use rand::prelude::*;
 use rustc_hash::{FxHashMap, FxHashSet};
 
 // standard library
 use std::{
-    sync::LazyLock,
+    slice::Iter,
     ops::{Range, Deref, DerefMut, Add, AddAssign},
-    f32::consts::{PI, TAU},
+    f32::consts::{TAU, PI},
     collections::VecDeque,
+    //     sync::LazyLock,
 };
 
 // my proc-macro
-use macros::{MyState, CountDown, Blinking, HitAnyKey};
+use macros::MyState;
+use macros::{OverlayMessage, Blinking, CountDown};
+use macros::{OverlayMenu, ScalingItem};
+use macros::derive_appctrl_input;
 
 // my internal submodules
-mod config; // 設定
-use config::*; // モジュール名なしで識別子を使えるように
-
 mod my_utils; // 共通ライブラリ
-use my_utils::*; // モジュール名なしで識別子を使えるように
+use my_utils::*;
+
+mod config; // 各種設定
+use config::*;
 
 mod core_logic; // ゲームアプリの中核
-use core_logic::*; // モジュール名なしで識別子を使えるように
-
-mod popup_text_ui; // ポップアップTextUI関連
+use core_logic::*;
+use core_logic::overlay_ui::OverlayMessage;
 
 mod demo_play; // DEMO
 
@@ -57,350 +62,281 @@ fn main() -> AppExit
     // アプリを生成
     let mut application = App::new();
 
-    //各種準備・登録
+    // 汎用的なアプリ初期化とアセットのロード
     application
-        // アプリを初期化しassetsをロードする
         .add_plugins(init_app::Schedule)
-        .add_plugins(load_assets::Schedule)
-        .insert_resource(load_assets::ChangeTo(MyState::InitGame)) // ロード完了後の遷移先State
-        // Resourceを登録
-        .init_resource::<Record>() // ゲームの成績
-        .init_resource::<map::Map>() // ステージのマップ
-        .init_resource::<player::PlayerInput>() // プレイヤーの入力
-        .insert_resource(player::KeyMap(FxHashMap::from_iter(KEY_MAP))) // マッピング（キー）
-        .insert_resource(player::PadMap(FxHashMap::from_iter(PAD_MAP))) // マッピング（ゲームパッド）
-        // Eventを登録
-        .add_event::<EventStageClear>() // ステージクリアの伝達用
-        .add_event::<EventGameOver>()   // ゲームオーバーの伝達用
-        .add_event::<EventCountDown>()  // カウントダウン終了の伝達用
-        .add_event::<EventHitAnyKey>()  // Hit Any Keyの入力あり伝達用
-        .add_event::<EventEatDot>()     // スコアリングの伝達用
-        .add_event::<EventPauseMenuInit>() //
-        .add_event::<EventAppExit>()    // Exitが選択されたことの伝達用
-        .add_event::<EventAppConfig>()  // Configが選択されたことの伝達用
+        .insert_resource(init_app::ChangeTo(MyState::Initialize)) // 処理が完了したらState変更
         ;
 
-    // Updateスケジュール（without State）
+    //--------------------------------------------------------------------------
+    // 各種登録
     application
-        // ヘッダー／フッターの表示位置の指定
-        .insert_resource(header_info::PlaceHolder(PLACE_HOLDER))
-        .insert_resource(PlaceHolderFps(header_footer::BottomLeft, 1))
-        // State関係なしで実行する処理
+        // Eventの登録
+        .add_event::<misc::AnyButtonPressed>() //「Hit Any Key」の入力通知
+        .add_event::<CountDownFinished>()      // カウントダウンの終了通知
+        .add_event::<EventPlayerInputNews>()   // プレイヤーキャラクターの操作入力通知
+        .add_event::<DotEaten>()               // スコアリングの伝達用
+        .add_event::<DotsAllEaten >()          // ステージクリアの伝達用
+        .add_event::<PlayerCaught>()           // ゲームオーバーの伝達用
+        .add_event::<SkipOverlayMessage>()     // 全画面メッセージ表示のスキップに使用
+
+        // Resourceの登録
+        .init_resource::<CameraSettings>()                  // カメラの設定を登録
+        .init_resource::<Record>()                          // ゲームの成績
+        .init_resource::<map::Map>()                        // ステージのマップ
+        .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
+        .insert_resource(player::KeyMap::from( KEY_MAP ))   // マッピング（キー）
+        .insert_resource(player::GamepadMap::from(PAD_MAP)) // マッピング（ゲームパッド）
+        ;
+
+    //--------------------------------------------------------------------------
+    // 常に実行する処理（Update without MyState）
+    application
         .add_systems(
-            Update,
+            Update, // without MyState
             (
-                // ゲームパッドの接続状態を検出する
-                misc::detect_gamepad_connection,
-                //ヘッダーの表示情報を更新する
-                header_info::update::<header_info::PlaceHolder>,
-                //フッターの表示情報を更新する
-                update_fps::<PlaceHolderFps>,
                 //スプライトアニメーション
                 animate_sprites::<player::Player>, // プレイヤー
                 animate_sprites::<chaser::Chaser>, // チェイサー
                 // スプライト表示OFFの場合のアニメーション
                 chaser::rotate_chaser_shape.run_if(SPRITE_OFF), // チェイサー回転
-                // UI Nodeのアウトラインの表示／非表示を切替える
-                misc::toggle_ui_outline_gizmo.run_if(DEBUG),
-                // アプリ終了キーをフックしてPause処理を挿入
-                hook_exit_key_and_pause.before(misc::app_close_on_key),
+                //ヘッダーとフッターの表示情報を更新する
+                information::update_header_footer,
             ),
-        );
+        )
+        // Pauseメニューのスケジュールを追加
+        .add_plugins(overlay_ui::pause_menu::Schedule);
 
-    // MyState::InitGameスケジュール
-    // ゲームの初期化
+    //--------------------------------------------------------------------------
+    // 初期化（MyState::InitGame）
     application
-        .insert_resource(simple_camera::Settings(CAMERA_SETTINGS.clone()))
+        // 前処理
         .add_systems(
-            OnEnter(MyState::InitGame),
+            OnEnter(MyState::Initialize),
             (
-                // カメラをspawnする
-                simple_camera::spawn::<simple_camera::Settings>
+                simple_camera::spawn::<CameraSettings> // カメラのspawn
                     .before(misc::select_ui_camera),
-                misc::select_ui_camera, // UIを描画するカメラを選ぶ
+                misc::select_ui_camera, // UIを描画するカメラの選択
+            ),
+        )
+        // ループ処理
+        .add_systems(
+            Update, // within MyState::Initialize
+            (
+                set_next_state::<TitleDemo>
                 // 無条件遷移
-                set_next_state::<TitleDemo>,
-            ),
+            )
+                .run_if(in_state(MyState::Initialize)),
         )
-        .insert_resource(header_footer::Settings(HEADER_FOOTER)) // UIの情報
-        .init_resource::<PopupMessages>() // ポップアップTextUIの情報
+        // 後処理
         .add_systems(
-            OnExit(MyState::InitGame),
+            OnExit(MyState::Initialize),
             (
-                // ヘッダー／フッターの準備
-                header_footer::spawn_header_footer,
-                // ポップアップTextUIの準備
-                popup_text_ui::spawn::<PopupMessages>,
+                header_footer::spawn,       // ヘッダー／フッターのspawn
+                overlay_ui::spawn_messages, //全画面メッセージのspawn
             ),
         );
 
-    // MyState::StageStartスケジュール
-    // ゲーム開始の処理
+    //--------------------------------------------------------------------------
+    // タイトル画面の処理（MyState::TitleDemo）
     application
-        .add_systems(
-            OnEnter(MyState::StageStart),
-            (
-                (
-                    //ステージ初期化
-                    map::make_new_stage_data, //マップデータ
-                    (
-                        map::spawn_sprite,    //マップスプライト
-                        player::spawn_sprite, //プレーヤースプライト
-                        chaser::spawn_sprite, //チェイサースプライト
-                    ),
-                )
-                    .chain(),
-                (
-                    // ポップアップTextUI表示
-                    popup_text_ui::effect::init_countdown::<popup::StageSatrt>,
-                    misc::show_component::<popup::StageSatrt>,
-                )
-                    .chain(),
-            ),
-        )
-        .add_systems(
-            Update,
-            (
-                // カウントダウン後にStateを遷移
-                popup_text_ui::effect::countdown::<popup::StageSatrt>,
-                set_next_state::<MainLoop>.run_if(on_event::<EventCountDown>),
-            )
-                .chain()
-                .run_if(in_state(MyState::StageStart)),
-        )
-        .add_systems(
-            OnExit(MyState::StageStart),
-            (
-                // ポップアップTextUI非表示
-                misc::hide_component::<popup::StageSatrt>,
-            ),
-        );
-
-    // MyState::MainLoopスケジュール
-    // メインループ
-    application.add_systems(
-        Update,
-        (
-            // スコアリング＆クリア判定
-            detecting_change::scoring_and_stage_clear,
-            // 衝突判定
-            detecting_change::collisions_and_gameover
-                .run_if(not(on_event::<EventStageClear>)), // ステージクリアならチェックしない
-            // Stateの条件付き遷移
-            set_next_state::<StageClear>.run_if(on_event::<EventStageClear>),
-            set_next_state::<GameOver>.run_if(on_event::<EventGameOver>),
-            // スプライトの位置を更新する
-            (
-                (
-                    // プレイヤーの移動
-                    (
-                        // 入力に従ってResourceを更新する
-                        player::input_from_keyboard, // キー
-                        player::input_from_gamepad,  // ゲームパッド
-                    ),
-                    player::move_sprite,
-                )
-                    .chain(),
-                // チェイサーの移動
-                chaser::move_sprite,
-            ),
-        )
-            .chain()
-            .run_if(in_state(MyState::MainLoop)),
-    );
-
-    // MyState::StageClearスケジュール
-    // ステージクリアの処理
-    application
-        .add_systems(
-            OnEnter(MyState::StageClear),
-            (
-                // ポップアップTextUI表示
-                popup_text_ui::effect::init_countdown::<popup::StageClear>,
-                misc::show_component::<popup::StageClear>,
-            )
-                .chain(),
-        )
-        .add_systems(
-            Update,
-            (
-                // カウントダウン後にStateを遷移
-                popup_text_ui::effect::countdown::<popup::StageClear>,
-                set_next_state::<StageStart>.run_if(on_event::<EventCountDown>),
-            )
-                .chain()
-                .run_if(in_state(MyState::StageClear)),
-        )
-        .add_systems(
-            OnExit(MyState::StageClear),
-            (
-                // ポップアップTextUI非表示
-                misc::hide_component::<popup::StageClear>,
-            ),
-        );
-
-    // MyState::GameOverスケジュール
-    // ゲームオーバーの処理
-    application
-        .add_systems(
-            OnEnter(MyState::GameOver),
-            (
-                //ポップアップTextUI表示
-                popup_text_ui::effect::init_countdown::<popup::GameOver>,
-                misc::show_component::<popup::GameOver>,
-            )
-                .chain(),
-        )
-        .add_systems(
-            Update,
-            (
-                (
-                    //ポップアップTextUIの表示効果
-                    popup_text_ui::effect::countdown::<popup::GameOver>, //カウントダウン
-                    popup_text_ui::effect::blinking_text::<popup::GameOver>, //Replay? の明滅
-                    popup_text_ui::effect::hit_any_key::<popup::GameOver>, //Hit ANY Key
-                ),
-                // Stateの条件付き遷移
-                set_next_state::<TitleDemo>.run_if(on_event::<EventCountDown>),
-                set_next_state::<StageStart>.run_if(on_event::<EventHitAnyKey>),
-            )
-                .chain()
-                .run_if(in_state(MyState::GameOver)),
-        )
-        .add_systems(
-            OnExit(MyState::GameOver),
-            (
-                //scoreとstageをゼロクリアする
-                initialize_record_except_hi_score,
-                //ポップアップTextUI非表示
-                misc::hide_component::<popup::GameOver>,
-            ),
-        );
-
-    // MyState::TitleDemoスケジュール
-    // タイトル画面の処理
-    application
-        .add_plugins(demo_play::Schedule)
+        // 前処理
         .add_systems(
             OnEnter(MyState::TitleDemo),
-            //ポップアップTextUI表示
-            misc::show_component::<popup::TitleDemo>,
-        )
-        .add_systems(
-            Update,
             (
+                // 全画面メッセージ（タイトル）表示
+                OverlayTitleDemo::init(),
+                misc::show_component::<OverlayTitleDemo>
+                    .after(OverlayTitleDemo::init()),
+            ),
+        )
+        // ループ処理
+        .add_systems(
+            Update, // within MyState::TitleDemo
+            (
+                // Hit ANY Key に反応あればState遷移
+                misc::check_hit_any_key,
                 (
-                    //ポップアップTextUIの表示効果
-                    popup_text_ui::effect::blinking_text::<popup::TitleDemo>, //DEMO の明滅
-                    popup_text_ui::effect::hit_any_key::<popup::TitleDemo>, //Hit ANY Key
-                ),
-                // Stateの条件付き遷移
-                set_next_state::<StageStart>.run_if(on_event::<EventHitAnyKey>),
+                    // scoreとstageをゼロクリアする(demoの情報消去)
+                    detecting_change::initialize_score_stage,
+                    set_next_state::<StageStart>,
+                )
+                    .run_if(on_event::<misc::AnyButtonPressed>)
+                    .after(misc::check_hit_any_key),
+                // DEMO の明滅
+                overlay_ui::effect::blinking_text::<OverlayTitleDemo>,
             )
-                .chain()
                 .run_if(in_state(MyState::TitleDemo)),
         )
+        // 後処理
         .add_systems(
             OnExit(MyState::TitleDemo),
             (
-                //ポップアップTextUI非表示
-                misc::hide_component::<popup::TitleDemo>,
-                //scoreとstageをゼロクリアする(DEMOでステージクリアの時はしない)
-                initialize_record_except_hi_score,
+                // 全画面メッセージ（タイトル）非表示
+                misc::hide_component::<OverlayTitleDemo>,
+            ),
+        )
+        // デモプレイplugin
+        .add_plugins(demo_play::Schedule);
+
+    //--------------------------------------------------------------------------
+    // ゲーム開始処理（MyState::StageStart）
+    application
+        // 前処理
+        .add_systems(
+            OnEnter(MyState::StageStart),
+            (
+                //ステージ初期化
+                map::make_new_stage_data, // マップデータ
+                (
+                    map::spawn_sprite,    // マップスプライト
+                    player::spawn_sprite, // プレーヤースプライト
+                    chaser::spawn_sprite, // チェイサースプライト
+                )
+                    .after(map::make_new_stage_data),
+                // 全画面メッセージの表示スキップ指示があるなら即メインループへ
+                set_next_state::<MainLoop>.run_if(on_event::<SkipOverlayMessage>),
+                // 全画面メッセージ（ステージ開始）表示
+                (
+                    OverlayStageStart::init(),
+                    misc::show_component::<OverlayStageStart>
+                        .after(OverlayStageStart::init()),
+                )
+                    .run_if(not(on_event::<SkipOverlayMessage>)),
+            ),
+        )
+        // ループ処理
+        .add_systems(
+            Update, // within MyState::StageStart
+            (
+                // カウントダウン完了後にState遷移
+                overlay_ui::effect::countdown::<OverlayStageStart>,
+                set_next_state::<MainLoop>
+                    .run_if(on_event::<CountDownFinished>)
+                    .after(overlay_ui::effect::countdown::<OverlayStageStart>),
+            )
+                .run_if(in_state(MyState::StageStart)),
+        )
+        // 後処理
+        .add_systems(
+            OnExit(MyState::StageStart),
+            (
+                // 全画面メッセージ（ステージ開始）非表示
+                misc::hide_component::<OverlayStageStart>,
             ),
         );
 
-    // MyState::Pauseスケジュール
-    // Pause画面の処理
-    application.add_systems(
-        Update,
-        (
-            // pauseメニューのパラメータを初期化する
-            popup_text_ui::effect::init_pause_menu::<popup::Pause>
-                .run_if(on_event::<EventPauseMenuInit>),
+    //--------------------------------------------------------------------------
+    // メインループ処理（MyState::MainLoop）
+    application
+        // ループ処理
+        .add_systems(
+            Update, // within MyState::MainLoop
             (
-                // pauseメニューのメニューアイテムを拡縮表示する
-                popup_text_ui::effect::scale_selected_text::<popup::Pause>,
-                // pauseメニューのメニューアイテムを選択し適用する
-                popup_text_ui::effect::select_menu_item::<popup::Pause>,
+                (
+                    // スプライトの位置を更新する
+                    player::input_from_keyboard, // キー
+                    player::input_from_gamepad,  // ゲームパッド
+                    player::move_sprite
+                        .after(player::input_from_keyboard)
+                        .after(player::input_from_gamepad),
+                    chaser::move_sprite,
+                ),
+                // スコアリング＆クリア判定
+                detecting_change::scoring_and_stage_clear,
+                set_next_state::<StageClear>.run_if(on_event::<DotsAllEaten>),
+                // 衝突判定
+                detecting_change::collisions_and_gameover
+                    .run_if(not(on_event::<DotsAllEaten>)), // DotsAllEaten ➡ スキップ
+                set_next_state::<GameOver>.run_if(on_event::<PlayerCaught>),
+            )
+                .chain()
+                .run_if(in_state(MyState::MainLoop)),
+        );
+
+    //--------------------------------------------------------------------------
+    // ステージクリアの処理（MyState::StageClear）
+    application
+        // 前処理
+        .add_systems(
+            OnEnter(MyState::StageClear),
+            (
+                // 全画面メッセージ（ステージクリア）表示
+                OverlayStageClear::init(),
+                misc::show_component::<OverlayStageClear>
+                    .after(OverlayStageClear::init()),
             ),
-            // アプリを終了する
-            app_close.run_if(on_event::<EventAppExit>),
-            // アプリのコンフィグStateへ遷移
-            // app_config.run_if(on_event::<EventAppConfig>),
         )
-            .chain()
-            .run_if(in_state(MyState::Pause)),
-    );
+        // ループ処理
+        .add_systems(
+            Update, // within MyState::StageClear
+            (
+                // カウントダウン完了後にState遷移
+                overlay_ui::effect::countdown::<OverlayStageClear>,
+                set_next_state::<StageStart>
+                    .run_if(on_event::<CountDownFinished>)
+                    .after(overlay_ui::effect::countdown::<OverlayStageClear>),
+            )
+                .run_if(in_state(MyState::StageClear)),
+        )
+        // 後処理
+        .add_systems(
+            OnExit(MyState::StageClear),
+            (
+                // 全画面メッセージ（ステージクリア）非表示
+                misc::hide_component::<OverlayStageClear>,
+                // 後続の MyState::StageStart で全画面メッセージを表示しない
+                misc::set_event::<SkipOverlayMessage>,
+            ),
+        );
+
+    //--------------------------------------------------------------------------
+    // ゲームオーバーの処理（MyState::GameOver）
+    application
+        // 前処理
+        .add_systems(
+            OnEnter(MyState::GameOver),
+            (
+                // 全画面メッセージ（ステージクリア）表示
+                OverlayGameOver::init(),
+                misc::show_component::<OverlayGameOver>
+                    .after(OverlayGameOver::init()),
+            ),
+        )
+        .add_systems(
+            // ループ処理
+            Update, // within MyState::GameOver
+            (
+                // カウントダウン完了後にState遷移
+                overlay_ui::effect::countdown::<OverlayGameOver>,
+                set_next_state::<TitleDemo>
+                    .run_if(on_event::<CountDownFinished>)
+                    .after(overlay_ui::effect::countdown::<OverlayGameOver>),
+                // Replay? の明滅
+                overlay_ui::effect::blinking_text::<OverlayGameOver>,
+                // Hit ANY Key に反応あればState遷移
+
+                // misc::check_hit_any_key,
+
+                set_next_state::<StageStart>
+                    .run_if(on_event::<misc::AnyButtonPressed>)
+                    .after(misc::check_hit_any_key),
+            )
+                .run_if(in_state(MyState::GameOver)),
+        )
+        // 後処理
+        .add_systems(
+            OnExit(MyState::GameOver),
+            (
+                // 全画面メッセージ（ステージクリア）非表示
+                misc::hide_component::<OverlayGameOver>,
+                // scoreとstageをゼロクリアする
+                detecting_change::initialize_score_stage,
+            ),
+        );
 
     // アプリを実行
     application.run()
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// Pause処理
-fn hook_exit_key_and_pause(
-    mut input_keycode: ResMut<ButtonInput<KeyCode>>,
-    mut state: ResMut<State<MyState>>,
-    mut back_to: Local<MyState>,
-    mut query_popup: Query<&mut Visibility, With<popup::Pause>>,
-    mut event_init: EventWriter<EventPauseMenuInit>,
-)
-{
-    // アプリ終了キーが押下されているなら
-    if input_keycode.just_pressed(EXIT_APP_KEY)
-    {
-        // キー押下をリセットする（misc::app_close_on_keyが実行されないように）
-        input_keycode.reset(EXIT_APP_KEY);
-
-        // State が MyState::Pause なら
-        let display = if state.get().is_pause()
-        {
-            // OnEnter／OnExitを実行せずに元のStateへ戻る
-            *state = State::new(*back_to);
-
-            // popupを隠す指定
-            Visibility::Hidden
-        }
-        else
-        {
-            // 遷移元のStateをローカルに保存する
-            *back_to = *state.get();
-
-            // OnEnter／OnExitを実行せずにStateをPauseへ変える
-            *state = State::new(MyState::Pause);
-            event_init.write(EventPauseMenuInit);
-
-            // popupを見せる指定
-            Visibility::Visible
-        };
-
-        // popupの表示状態を変更する
-        if let Ok(mut visibility) = query_popup.single_mut()
-        {
-            *visibility = display;
-        }
-
-        #[cfg(debug_assertions)]
-        dbg!(state);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// アプリを終了する
-pub fn app_close(
-    query_window: Query<(Entity, &Window)>,
-    mut cmds: Commands,
-) -> Result
-{
-    query_window
-        .iter()
-        .filter(|(_, window)| window.focused)
-        .for_each(|(id, _)| cmds.entity(id).despawn());
-
-    Ok(())
 }
 
 ////////////////////////////////////////////////////////////////////////////////

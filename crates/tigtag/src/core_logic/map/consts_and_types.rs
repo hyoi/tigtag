@@ -20,23 +20,35 @@ impl Default for Map
         // seedを決める（develpでは定数、releaseではランダム）
         let seed_dev = 1234567890;
         let seed_rel = rand::rng().random::<u64>();
-        let seed = if DEBUG() { seed_dev } else { seed_rel };
+        let seed = if misc::DEBUG() { seed_dev } else { seed_rel };
 
         Self {
             rng: StdRng::seed_from_u64(seed),
             bit_flags: vec![
-                vec![0; MAP_GRIDS_HEIGHT as usize];
-                MAP_GRIDS_WIDTH as usize
+                vec![0; MAP_HEIGHT_IN_CELLS as usize];
+                MAP_WIDTH_IN_CELLS as usize
             ],
             dot_entities: vec![
-                vec![None; MAP_GRIDS_HEIGHT as usize];
-                MAP_GRIDS_WIDTH as usize
+                vec![None; MAP_HEIGHT_IN_CELLS as usize];
+                MAP_WIDTH_IN_CELLS as usize
             ],
             remaining_dots: 0,
             dummy_none: None,
         }
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+// マップ縦横幅
+pub const MAP_WIDTH_IN_CELLS: i32 = SCREEN_GRIDS_WIDTH; // w <= SCREEN_GRIDS_WIDTH;
+pub const MAP_HEIGHT_IN_CELLS: i32 = SCREEN_GRIDS_HEIGHT - 2; // h <= SCREEN_GRIDS_HEIGHT - 2;
+
+// マップのレンジ（外壁含む）
+pub const MAP_CELLS_X_RANGE: Range<i32> = 0..MAP_WIDTH_IN_CELLS;
+pub const MAP_CELLS_Y_RANGE: Range<i32> = 0..MAP_HEIGHT_IN_CELLS;
+
+////////////////////////////////////////////////////////////////////////////////
 
 // マップのメソッド
 // メソッド経由にすることで配列の範囲外アクセスもパニックさせず意図した値を返す。
@@ -55,15 +67,15 @@ impl Map
 
     fn is_inside(&self, grid: IVec2) -> bool
     {
-        MAP_GRIDS_X_RANGE.contains(&grid.x) && MAP_GRIDS_Y_RANGE.contains(&grid.y)
+        MAP_CELLS_X_RANGE.contains(&grid.x) && MAP_CELLS_Y_RANGE.contains(&grid.y)
     }
 
     // 非公開定数：マスの状態の定義
-    const BIT_WALL: usize = 0b00000001; // 壁
+    const BIT_WALL      : usize = 0b00000001; // 壁
     const BIT_PATH_RIGHT: usize = 0b00000010; // 右に道
-    const BIT_PATH_LEFT: usize = 0b00000100; // 左に道
-    const BIT_PATH_DOWN: usize = 0b00001000; // 上に道
-    const BIT_PATH_UP: usize = 0b00010000; // 下に道
+    const BIT_PATH_LEFT : usize = 0b00000100; // 左に道
+    const BIT_PATH_DOWN : usize = 0b00001000; // 上に道
+    const BIT_PATH_UP   : usize = 0b00010000; // 下に道
 
     // 公開メソッド
     pub fn set_wall(&mut self, grid: IVec2)
@@ -85,15 +97,6 @@ impl Map
         *flags &= !Map::BIT_WALL; // 壁フラグOFF
     }
 
-    pub fn is_wall(&self, grid: IVec2) -> bool
-    {
-        if !self.is_inside(grid)
-        {
-            return true;
-        } // 範囲外は壁
-        let flags = self.bits(grid);
-        flags & Map::BIT_WALL != 0
-    }
     pub fn is_space(&self, grid: IVec2) -> bool
     {
         if !self.is_inside(grid)
@@ -102,6 +105,15 @@ impl Map
         } // 範囲外は通路ではない
         let flags = self.bits(grid);
         flags & Map::BIT_WALL == 0
+    }
+    pub fn is_wall(&self, grid: IVec2) -> bool
+    {
+        if !self.is_inside(grid)
+        {
+            return true;
+        } // 範囲外は壁
+        let flags = self.bits(grid);
+        flags & Map::BIT_WALL != 0
     }
 
     pub fn opt_entity(&self, grid: IVec2) -> Option<Entity>
@@ -123,9 +135,9 @@ impl Map
 
     pub fn init_path_bits(&mut self)
     {
-        for y in MAP_GRIDS_Y_RANGE
+        for y in MAP_CELLS_Y_RANGE
         {
-            for x in MAP_GRIDS_X_RANGE
+            for x in MAP_CELLS_X_RANGE
             {
                 let grid = IVec2::new(x, y);
                 if self.is_space(grid + News::East)
@@ -164,12 +176,12 @@ impl Map
         }
     }
 
-    pub fn get_side_spaces_list(&self, grid: IVec2) -> Vec<News>
+    pub fn get_side_spaces_list(&self, cell: IVec2) -> Vec<News>
     {
         let mut vec = Vec::<News>::with_capacity(4);
-        if self.is_inside(grid)
+        if self.is_inside(cell)
         {
-            let bits = self.bits(grid);
+            let bits = self.bits(cell);
             if bits & Map::BIT_PATH_RIGHT != 0
             {
                 vec.push(News::East)
@@ -190,16 +202,6 @@ impl Map
         vec // 範囲外は空になる（最外壁の外の座標だから上下左右に道はない）
     }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-
-// マップ縦横幅
-pub const MAP_GRIDS_WIDTH: i32 = SCREEN_GRIDS_WIDTH; // w <= SCREEN_GRIDS_WIDTH;
-pub const MAP_GRIDS_HEIGHT: i32 = SCREEN_GRIDS_HEIGHT - 2; // h <= SCREEN_GRIDS_HEIGHT - 2;
-
-// マップのレンジ（外壁含む）
-pub const MAP_GRIDS_X_RANGE: Range<i32> = 0..MAP_GRIDS_WIDTH;
-pub const MAP_GRIDS_Y_RANGE: Range<i32> = 0..MAP_GRIDS_HEIGHT;
 
 ////////////////////////////////////////////////////////////////////////////////
 

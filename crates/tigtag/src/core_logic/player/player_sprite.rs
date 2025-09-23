@@ -14,40 +14,42 @@ pub fn spawn_sprite(
 ) -> Result
 {
     // 準備
-    qry_entity.iter().for_each(|id| cmds.entity(id).despawn()); // 既存スプライトがあれば削除する
-    let mut map = opt_map.ok_or("ResMut<Map> not found.")?; // 必須のResource
+    let mut map = opt_map.ok_or("Resource not found.")?;
+
+    // 既存スプライトがあれば削除する
+    qry_entity.iter().for_each(|id| cmds.entity(id).despawn());
 
     // 乱数で初期位置を決める(マップ中央付近の通路)
-    let half_w = map::MAP_GRIDS_WIDTH / 2;
-    let half_h = map::MAP_GRIDS_HEIGHT / 2;
+    let half_w = map::MAP_WIDTH_IN_CELLS / 2;
+    let half_h = map::MAP_HEIGHT_IN_CELLS / 2;
     let short_side = if half_w >= half_h { half_h } else { half_w };
     let x1 = short_side - 1;
     let y1 = short_side - 1;
-    let x2 = map::MAP_GRIDS_WIDTH - short_side;
-    let y2 = map::MAP_GRIDS_HEIGHT - short_side;
+    let x2 = map::MAP_WIDTH_IN_CELLS - short_side;
+    let y2 = map::MAP_HEIGHT_IN_CELLS - short_side;
 
-    let player_grid = loop
+    let player_cell = loop
     {
         let x = map.rng.random_range(x1..=x2);
         let y = map.rng.random_range(y1..=y2);
-        let grid = IVec2::new(x, y);
+        let cell = IVec2::new(x, y);
 
-        if map.is_space(grid)
+        if map.is_space(cell)
         {
-            break grid;
+            break cell;
         }
     };
-    let vec2 = player_grid.to_vec2_on_game_map();
-    let vec3 = vec2.extend(DEPTH_SPRITE_PLAYER);
-    let transform = Transform::from_translation(vec3);
+    let translation = player_cell
+        .to_screen_pixels_map_adjusted()
+        .extend(DEPTH_SPRITE_PLAYER);
+    let transform = Transform::from_translation(translation);
 
     // プレイヤーのデータを初期化する
     let player = Player {
-        grid: player_grid,
-        next_grid: player_grid,
-        px_start: vec2,
-        px_end: vec2,
-        // opt_fn_autodrive: Some ( demo::auto_drive::choice_way ), //default()に任せるとNone
+        cell: player_cell,
+        next_cell: player_cell,
+        px_start: translation,
+        px_end: translation,
         ..default()
     };
 
@@ -66,14 +68,14 @@ pub fn spawn_sprite(
     else
     {
         // アニメーションするスプライトをspawnする
-        let layout = texture_atlases_layout.add(SPRITESHEET_LAYOUT.clone());
+        let layout = texture_atlases_layout.add(MySpriteSheetLayout::default().0);
         let index = player.sprite_sheet_offset(player.direction()) as usize;
 
         let mut sprite = Sprite::from_atlas_image(
-            asset_svr.load(ASSETS_SPRITE_SHEET_PLAYER),
+            asset_svr.load(ASSETS_SPRITESHEET_PLAYER),
             TextureAtlas { layout, index },
         );
-        sprite.custom_size = Some(GRID_CUSTOM_SIZE);
+        sprite.custom_size = Some(CELL_CUSTOM_SIZE);
 
         cmds.spawn((sprite, transform, player));
     }
@@ -84,22 +86,28 @@ pub fn spawn_sprite(
 ////////////////////////////////////////////////////////////////////////////////
 
 // プレイヤーを移動させる
-#[allow(clippy::too_many_arguments)]
 pub fn move_sprite(
-    mut qry_player: Query<(&mut Transform, &mut Player)>,
-    mut qry_sprite: Query<&mut Sprite, With<Player>>,
-    opt_map: Option<Res<map::Map>>,
-    opt_input: Option<ResMut<PlayerInput>>,
-    opt_demo: Option<Res<DemoMapParams>>,
-    qry_chasers: Query<&chaser::Chaser>,
-    state: ResMut<State<MyState>>,
+    mut query_player: Query<(&mut Player, &mut Transform)>,
+    mut query_sprite: Query<&mut Sprite, With<Player>>, //SPRITE_OFFだとspawnされないので空
+    option_map: Option<Res<map::Map>>,
+    option_state: Option<Res<State<MyState>>>,
+    mut event_reader: EventReader<EventPlayerInputNews>,
     time: Res<Time>,
+    query_chaser: Query<&chaser::Chaser>,
+    option_demo_params: Option<Res<DemoMapParams>>,
+    option_autodrive_fn: Option<Res<DemoAutoDriveFn>>,
 ) -> Result
 {
     //準備
-    let (mut transform, mut player) = qry_player.single_mut()?;
-    let map = opt_map.ok_or("Res<Map> not found.")?;
-    let mut input = opt_input.ok_or("ResMut<InputDirection> not found.")?;
+    let (mut player, mut transform) = query_player.single_mut()?;
+    let map = option_map.ok_or("Resource not found.")?;
+    let state = option_state.ok_or("Resource not found.")?;
+
+    // 入力（NEWS）のイベントをハッシュ集合へ統合する
+    let mut input_news = FxHashSet::<News>::default();
+    event_reader
+        .read()
+        .for_each(|event| input_news.extend(&event.0));
 
     // 前回からの経過時間 × スピードアップ係数（プレイヤーのスピードアップは未実装）
     let time_delta = time.delta().mul_f32(player.speedup); //speedup > 1.0
@@ -107,77 +115,96 @@ pub fn move_sprite(
     // 移動タイマーがfinishしたなら
     if player.timer.tick(time_delta).finished()
     {
-        // スプライトがグリッド間の中途に位置したら
+        // セルの間を移動中のスプライトが半端な位置にいるなら
         if player.px_start != player.px_end
         {
-            // グリッドにフィットさせる
+            // 移動先のセルにフィットさせる
             player.px_start = player.px_end;
-            player.px_end = player.next_grid.to_vec2_on_game_map();
-            transform.translation = player.px_end.extend(DEPTH_SPRITE_PLAYER);
+            player.px_end = player
+                .next_cell
+                .to_screen_pixels_map_adjusted()
+                .extend(DEPTH_SPRITE_PLAYER);
+            transform.translation = player.px_end;
         }
 
         // プレイヤーが次に進む方向を決める
         let mut new_side = player.direction;
         player.is_stop = true; // 停止フラグを立てておく
-        if !state.get().is_demoplay()
-        {
-            //準備
-            let count = input.len();
-            let direction = &mut Vec::<News>::with_capacity(4);
 
+        // Demoなら
+        if state.get().is_demoplay()
+            && let Some(demo_params) = option_demo_params
+            && let Some(autodrive) = option_autodrive_fn
+        {
+            //demoの場合 入力相当のデータを作る
+            player.is_stop = false; //demoでは自機は停止しない
+            let mut sides = map.get_side_spaces_list(player.next_cell); //脇道のリスト
+            sides.retain(|side| player.next_cell + *side != player.cell); //戻り路を取り除く
+            let count = sides.len(); // 1～4（通常は1～3。スタート地点が十字路の場合のみ4）
+
+            new_side = match count
+            {
+                1 => sides[0], //一本道 ⇒ 道なりに進む
+                2 | 3 | 4 =>
+                    autodrive.0(&player, query_chaser, map, demo_params, &sides), //三叉路または十字路
+                _ =>
+                {
+                    // countが4になってpanicする不具合アリ！
+                    unreachable!("Bad count of autodrive paths. count: {count}")
+                },
+            };
+        }
+        // Demoではないなら
+        else
+        {
+            // 準備
+            let count = input_news.len(); // cout: 0～4
+            let input_direction = &mut Vec::<News>::with_capacity(4);
+
+            // 入力が１つなら
             if count == 1
             {
-                //入力が１なら
-                direction.push(*input.iter().next().unwrap());
+                input_direction.push(*input_news.iter().next().unwrap());
             }
+            // 入力が２つ以上なら
             else if count >= 2
             {
-                //入力が２つ以上あれば、
-                //プレイヤーの正面（前方）、逆向き（後方）、それ以外（左右）として、
-                //後方、左右、前方の順に優先して並べ替えたVecを作る。
-                let opt_front = input.take(&player.direction);
-                let opt_back = input.take(&player.direction.back());
-                opt_back.iter().for_each(|&x| direction.push(x));
-
-                //frontとbackはtake済みなので残りは(あれば)右折か左折だけ
-                direction.extend(input.iter());
-
-                opt_front.iter().for_each(|&x| direction.push(x));
+                // プレイヤーの正面（前方）、背面（後方）、それ以外（左右）として、
+                // 後方➡左右➡前方の順に優先して並べ替えたVecを作る。
+                let option_front = input_news.take(&player.direction);
+                let option_back = input_news.take(&player.direction.back());
+                input_direction.extend(option_back);
+                input_direction.extend(input_news.drain()); //(あれば)左右
+                input_direction.extend(option_front);
             }
 
             // 入力を処理する
-            for &input_news in direction.iter()
+            for news in &*input_direction
             {
-                // 入力された向きのグリッドが壁でないなら
-                if map.is_space(player.next_grid + input_news)
+                // 入力された向きが壁でないなら
+                if map.is_space(player.next_cell + *news)
                 {
-                    new_side = input_news;
+                    new_side = *news;
                     player.is_stop = false;
-
-                    // directionの要素は優先順に並んでいる前提なので即break
-                    break;
+                    break; // directionの要素は優先順に並んでいるので脱出
                 }
 
-                // ループの先頭要素なら（入力された向きのグリッドが壁でも）
-                if input_news == direction[0]
+                // ループの先頭要素なら（入力された向きが壁でも）
+                if *news == input_direction[0]
                 {
-                    //向きを変える
-                    new_side = input_news;
+                    //向きだけ変える（アニメ演出用）
+                    new_side = *news;
                 }
             }
-        }
-        else
-        {
-            // demoの場合
-            new_side = autodrive(&mut player, map, opt_demo, qry_chasers);
         }
 
         // プレイヤーの向きが変わったなら
         if new_side != player.direction
         {
-            if let Ok(mut sprite) = qry_sprite.single_mut()
-                && let Some(sprite_sheet) = &mut sprite.texture_atlas.as_mut()
-                && !SPRITE_OFF()
+            // スプライトシートのアニメなら
+            if !SPRITE_OFF()
+                && let Ok(mut sprite) = query_sprite.single_mut()
+                && let Some(sprite_sheet) = &mut sprite.texture_atlas
             {
                 // スプライトシートのindexを変更してスプライトの向きを変更
                 let old_news = player.direction;
@@ -189,18 +216,20 @@ pub fn move_sprite(
             else
             {
                 //三角形を回転して向きを変更
-                rotate_player_triangle(&player, &mut transform, new_side);
+                let angle = rotate_player_triangle(&player, new_side);
+                let quat = Quat::from_rotation_z(angle);
+                transform.rotate(quat);
             }
 
-            //プレイヤーの向きの情報の更新
+            //プレイヤーの向き情報を更新
             player.direction = new_side;
         }
 
         // 位置を更新
-        player.grid = player.next_grid; //現在の位置を更新
+        player.cell = player.next_cell; //現在の位置を更新
         if !player.is_stop
         {
-            player.next_grid += new_side; //次の位置を更新
+            player.next_cell += new_side; //次の位置を更新
         }
 
         // 移動タイマーをリセットする
@@ -220,105 +249,97 @@ pub fn move_sprite(
 
         //当たり判定用の微小区間の座標更新
         player.px_start = player.px_end;
-        player.px_end = transform.translation.truncate();
+        player.px_end = transform.translation;
     }
 
     //入力のクリア
-    input.clear();
+    input_news.clear();
 
     Ok(())
 }
 
 // プレイヤー（三角形）を回転させる
-fn rotate_player_triangle(
-    player: &Player,
-    transform: &mut Mut<Transform>,
-    input: News,
-)
+fn rotate_player_triangle(player: &Player, new_side: News) -> f32
 {
     //入力と現在の向きから回転角を決める
-    let angle: f32 = match player.direction
+    match player.direction
     {
-        News::North => match input
+        News::North => match new_side
         {
             News::West => PI / 2.0,
             News::East => PI / -2.0,
             _ => PI,
         },
-        News::South => match input
+        News::South => match new_side
         {
             News::East => PI / 2.0,
             News::West => PI / -2.0,
             _ => PI,
         },
-        News::East => match input
+        News::East => match new_side
         {
             News::North => PI / 2.0,
             News::South => PI / -2.0,
             _ => PI,
         },
-        News::West => match input
+        News::West => match new_side
         {
             News::South => PI / 2.0,
             News::North => PI / -2.0,
             _ => PI,
         },
-    };
-
-    //回転させる
-    let quat = Quat::from_rotation_z(angle);
-    transform.rotate(quat);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // demo用に入力相当のデータを作る
-fn autodrive(
-    player: &mut Player,
-    map: Res<map::Map>,
-    opt_demo: Option<Res<DemoMapParams>>,
-    qry_chasers: Query<&chaser::Chaser>,
-) -> News
-{
-    // demoでは停止しない
-    player.is_stop = false;
+// fn autodrive(
+//     player: &mut Player,
+//     map: Res<map::Map>,
+//     query_chasers: Query<&chaser::Chaser>,
+//     option_demo_params: Option<Res<DemoMapParams>>,
+// ) -> News
+// {
+//     // demoでは停止しない
+//     player.is_stop = false;
 
-    //進入できる脇道のリストを作る
-    let mut sides = map.get_side_spaces_list(player.next_grid);
-    sides.retain(|side| player.next_grid + side != player.grid); // 戻り路は除く
-    let count = sides.len();
+//     //進入できる脇道のリストを作る
+//     let mut sides = map.get_side_spaces_list(player.next_grid);
+//     sides.retain(|side| player.next_grid + side != player.grid); // 戻り路は除く
+//     let count = sides.len();
 
-    //進入できる脇道の数で処理を分ける
-    if count == 1
-    {
-        sides[0] // 一本道 ⇒ 道なりに進む
-    }
-    else if count > 1
-    {
-        // 三叉路または十字路 ⇒ 外部関数で進行方向を決める
-        if let (Some(autodrive), Some(demo)) = (player.fn_autodrive, opt_demo)
-        {
-            autodrive(player, qry_chasers, map, demo, &sides)
-        }
-        else
-        {
-            // 外部関数を使えないなら乱数で決める
-            let mut rng = rand::rng();
-            sides[rng.random_range(0..sides.len())]
-        }
-    }
-    else
-    {
-        // 行き止まり ⇒ 逆走 (このゲームに行き止まりはないが)
-        match player.direction
-        {
-            News::North => News::South,
-            News::South => News::North,
-            News::East => News::West,
-            News::West => News::East,
-        }
-    }
-}
+//     //進入できる脇道の数で処理を分ける
+//     if count == 1
+//     {
+//         sides[0] // 一本道 ⇒ 道なりに進む
+//     }
+//     else if count > 1
+//     {
+//         // 三叉路または十字路 ⇒ 外部関数で進行方向を決める
+//         if let (Some(autodrive), Some(demo)) = (player.fn_autodrive, opt_demo)
+//         {
+//             autodrive(player, qry_chasers, map, demo, &sides)
+//         }
+//         else
+//         {
+//             // 外部関数を使えないなら乱数で決める
+//             let mut rng = rand::rng();
+//             sides[rng.random_range(0..sides.len())]
+//         }
+//     }
+//     else
+//     {
+//         // 行き止まり ⇒ 逆走 (このゲームに行き止まりはないが)
+//         match player.direction
+//         {
+//             News::North => News::South,
+//             News::South => News::North,
+//             News::East => News::West,
+//             News::West => News::East,
+//         }
+//     }
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 

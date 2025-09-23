@@ -2,10 +2,6 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// カメラをspawnするために必要な情報のリスト（Resource）
-#[derive(Resource, Deref, DerefMut)]
-pub struct Settings(pub Vec<Setting>);
-
 // カメラをspawnするために必要な情報
 pub struct Setting(
     isize,               // カメラのレンダリング優先度
@@ -14,10 +10,19 @@ pub struct Setting(
     Transform,           // カメラの位置
 );
 
-// SettingのCloneトレイトの実装
-impl Clone for Setting
+// 型がバラバラなComponetをリストに収納する為のトレイト
+pub trait BoxedTrait: Send + Sync + 'static
 {
-    fn clone(&self) -> Self { Setting(self.0, self.1, self.2.clone_box(), self.3) }
+    // カメラのspawnメソッド
+    fn spawn_camera(
+        self: Box<Self>,
+        cmds: &mut Commands,
+        order: isize,
+        color: Color,
+        transform: Transform,
+    );
+    // SettingのCloneを実装する場合に必要になるメソッド
+    // fn clone_box(&self) -> Box<dyn BoxedTrait>;
 }
 
 // タプル(isize, Color, C1, C2, Transform)からSettingへの変換トレイト（From）の実装
@@ -32,35 +37,10 @@ where
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-// リストを基にカメラをspawnするSystem
-pub fn spawn<T: Resource + Deref<Target = Vec<Setting>> + DerefMut>(
-    mut settings: ResMut<T>,
-    mut cmds: Commands,
-)
-{
-    settings.drain(..).for_each(
-        |Setting(order, bg_color, boxed_trait, transform)| {
-            boxed_trait.spawn_camera(&mut cmds, order, bg_color, transform)
-        },
-    );
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// 型がバラバラなComponetをリストに収納する為のトレイト
-pub trait BoxedTrait: Send + Sync + 'static
-{
-    fn clone_box(&self) -> Box<dyn BoxedTrait>;
-    fn spawn_camera(
-        self: Box<Self>,
-        cmds: &mut Commands,
-        order: isize,
-        color: Color,
-        transform: Transform,
-    );
-}
+// Camera2dとCamera3dを同列に扱うためのトレイト
+trait IsCamera {}
+impl IsCamera for Camera2d {}
+impl IsCamera for Camera3d {}
 
 // タプル(Component1, Component2)のBoxedTraitの実装
 impl<C1, C2> BoxedTrait for (C1, C2)
@@ -68,7 +48,6 @@ where
     C1: Clone + 'static + Component,
     C2: Clone + 'static + Component + IsCamera,
 {
-    fn clone_box(&self) -> Box<dyn BoxedTrait> { Box::new(self.clone()) }
     fn spawn_camera(
         self: Box<Self>,
         cmds: &mut Commands,
@@ -89,14 +68,15 @@ where
             Msaa::Sample4,
         ));
     }
+    // SettingのCloneを実装する場合に必要になるメソッド
+    // fn clone_box(&self) -> Box<dyn BoxedTrait> { Box::new(self.clone()) }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-// Camera2dとCamera3dを同列に扱うためのトレイト
-trait IsCamera {}
-impl IsCamera for Camera2d {}
-impl IsCamera for Camera3d {}
+// SettingのCloneを実装する場合に必要になるメソッド
+// impl Clone for Setting
+// {
+//     fn clone(&self) -> Self { Setting(self.0, self.1, self.2.clone_box(), self.3) }
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -119,6 +99,21 @@ fn gen_viewport() -> Option<Viewport>
         }
         _ => None,
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// リストを基にカメラをspawnするSystem
+pub fn spawn<T: Resource + Deref<Target = Vec<Setting>> + DerefMut>(
+    mut settings: ResMut<T>,
+    mut cmds: Commands,
+)
+{
+    settings.drain(..).for_each(
+        |Setting(order, bg_color, boxed_trait, transform)| {
+            boxed_trait.spawn_camera(&mut cmds, order, bg_color, transform)
+        },
+    );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

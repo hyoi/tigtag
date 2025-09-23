@@ -2,6 +2,29 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// System間通知用イベント
+pub use my_events::*;
+#[rustfmt::skip]
+mod my_events
+{
+    use super::*;
+    #[derive(Event, Default)] pub struct CountDownFinished;
+    #[derive(Event, Default)] pub struct EventPlayerInputNews ( pub player::HashNews );
+    #[derive(Event, Default)] pub struct DotsAllEaten ;
+    #[derive(Event, Default)] pub struct DotEaten ;
+    #[derive(Event, Default)] pub struct PlayerCaught;
+    #[derive(Event, Default)] pub struct SkipOverlayMessage;
+}
+
+// #[derive(Event)]
+// pub struct EventEatDot(pub IVec2); //tigtag3d用の追加フィールド
+// #[allow( dead_code )]
+// #[derive( Event )] pub struct EventTimerPlayer;
+// #[allow( dead_code )]
+// #[derive( Event )] pub struct EventTimerChasers ( pub Vec<Color> ); //tigtag3d用の追加フィールド
+
+////////////////////////////////////////////////////////////////////////////////
+
 // ゲームの成績記録用のResource
 #[derive(Resource, Default)]
 pub struct Record
@@ -23,14 +46,14 @@ pub struct DemoRecord
 // フィールドアクセス
 impl Record
 {
+    pub fn stage(&self) -> i32 { self.stage }
+    pub fn stage_mut(&mut self) -> &mut i32 { &mut self.stage }
+
     pub fn score(&self) -> i32 { self.score }
     pub fn score_mut(&mut self) -> &mut i32 { &mut self.score }
 
     pub fn hi_score(&self) -> i32 { self.hi_score }
     pub fn hi_score_mut(&mut self) -> &mut i32 { &mut self.hi_score }
-
-    pub fn stage(&self) -> i32 { self.stage }
-    pub fn stage_mut(&mut self) -> &mut i32 { &mut self.stage }
 
     pub fn demo_hi_score(&self) -> i32 { self.demo.hi_score }
     pub fn demo_hi_score_mut(&mut self) -> &mut i32 { &mut self.demo.hi_score }
@@ -52,41 +75,6 @@ pub enum News
     South,
 }
 
-impl News
-{
-    // //時計回りで方角を得る
-    // pub fn turn_right( &self ) -> Self
-    // {   match self
-    //     {   News::North => News::East,
-    //         News::East  => News::South,
-    //         News::West  => News::North,
-    //         News::South => News::West,
-    //     }
-    // }
-
-    // //反時計回りで方角を得る
-    // pub fn turn_left( &self ) -> Self
-    // {   match self
-    //     {   News::North => News::West,
-    //         News::East  => News::North,
-    //         News::West  => News::South,
-    //         News::South => News::East,
-    //     }
-    // }
-
-    //背面の方角を得る
-    pub fn back(&self) -> Self
-    {
-        match self
-        {
-            News::North => News::South,
-            News::East => News::West,
-            News::West => News::East,
-            News::South => News::North,
-        }
-    }
-}
-
 // IVec2 = IVec2 + News
 impl Add<News> for IVec2
 {
@@ -99,23 +87,6 @@ impl Add<News> for IVec2
             News::East => self.x += 1,
             News::West => self.x -= 1,
             News::South => self.y += 1,
-        }
-        self
-    }
-}
-
-// IVec2 = IVec2 + &News
-impl Add<&News> for IVec2
-{
-    type Output = IVec2;
-    fn add(mut self, news: &News) -> IVec2
-    {
-        match news
-        {
-            News::North => self.y -= 1,
-            News::South => self.y += 1,
-            News::East => self.x += 1,
-            News::West => self.x -= 1,
         }
         self
     }
@@ -136,91 +107,79 @@ impl AddAssign<News> for IVec2
     }
 }
 
+// IVec2 = IVec2 + &mut News
+// impl Add<&mut News> for IVec2
+// {
+//     type Output = IVec2;
+//     fn add(mut self, news: &mut News) -> IVec2
+//     {
+//         match news
+//         {
+//             News::North => self.y -= 1,
+//             News::South => self.y += 1,
+//             News::East => self.x += 1,
+//             News::West => self.x -= 1,
+//         }
+//         self
+//     }
+// }
+
+impl News
+{
+    //背面の方角を得る
+    pub fn back(&self) -> Self
+    {
+        match self
+        {
+            News::North => News::South,
+            News::East => News::West,
+            News::West => News::East,
+            News::South => News::North,
+        }
+    }
+
+    // //時計回りで方角を得る
+    // pub fn turn_right( &self ) -> Self
+    // {   match self
+    //     {   News::North => News::East,
+    //         News::East  => News::South,
+    //         News::West  => News::North,
+    //         News::South => News::West,
+    //     }
+    // }
+
+    // //反時計回りで方角を得る
+    // pub fn turn_left( &self ) -> Self
+    // {   match self
+    //     {   News::North => News::West,
+    //         News::East  => News::North,
+    //         News::West  => News::South,
+    //         News::South => News::East,
+    //     }
+    // }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // オーファンルール対策（glamの型にメソッドを追加する準備）
 pub trait GridToPixelOnMap
 {
-    fn to_vec2_on_game_map(&self) -> Vec2;
+    fn to_screen_pixels_map_adjusted(&self) -> Vec2;
 }
 
 // glamの型にメソッドを追加する
 impl GridToPixelOnMap for IVec2
 {
     // マップと画面の座標調整値を加味してvec2へ変換する
-    fn to_vec2_on_game_map(&self) -> Vec2
+    fn to_screen_pixels_map_adjusted(&self) -> Vec2
     {
         let grid = *self + ADJUST_MAP_ON_SCREEN;
-        grid.to_vec2_of_screen()
+        grid.to_screen_pixels()
     }
 }
 
 // アジャスタ（マップ座標から画面座標への変換調整値）
 const ADJUST_MAP_ON_SCREEN: IVec2 = IVec2::new(0, 1);
-
-////////////////////////////////////////////////////////////////////////////////
-
-// demo用のマップ情報Resource
-#[derive(Resource, Default)]
-pub struct DemoMapParams
-{
-    dots_rect: IVec2Rect, // dotsを内包する最小の矩形
-    dots_sum_x: [i32; map::MAP_GRIDS_WIDTH as usize], // 列に残っているdotsを数えた配列
-    dots_sum_y: [i32; map::MAP_GRIDS_HEIGHT as usize], // 行に残っているdotsを数えた配列
-}
-
-#[derive(Default)]
-struct IVec2Rect
-{
-    min: IVec2,
-    max: IVec2,
-}
-
-impl DemoMapParams
-{
-    pub fn dots_sum_x(&self, x: i32) -> i32 { self.dots_sum_x[x as usize] }
-    pub fn dots_sum_x_mut(&mut self, x: i32) -> &mut i32
-    {
-        &mut self.dots_sum_x[x as usize]
-    }
-    pub fn dots_sum_y(&self, y: i32) -> i32 { self.dots_sum_y[y as usize] }
-    pub fn dots_sum_y_mut(&mut self, y: i32) -> &mut i32
-    {
-        &mut self.dots_sum_y[y as usize]
-    }
-
-    pub fn dots_rect_min(&self) -> IVec2 { self.dots_rect.min }
-    pub fn dots_rect_min_mut(&mut self) -> &mut IVec2 { &mut self.dots_rect.min }
-    pub fn dots_rect_max(&self) -> IVec2 { self.dots_rect.max }
-    pub fn dots_rect_max_mut(&mut self) -> &mut IVec2 { &mut self.dots_rect.max }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// System間の通知用イベント
-#[derive(Event)]
-pub struct EventStageClear;
-#[derive(Event)]
-pub struct EventGameOver;
-#[derive(Event)]
-pub struct EventCountDown;
-#[derive(Event)]
-pub struct EventHitAnyKey;
-#[derive(Event)]
-pub struct EventEatDot(pub IVec2); //tigtag3d用の追加フィールド
-#[derive(Event)]
-pub struct EventPauseMenuInit;
-#[derive(Event)]
-pub struct EventAppExit;
-#[derive(Event)]
-pub struct EventAppConfig;
-
-// #[derive(Event)]
-// pub struct EventTimerPlayer;
-// #[allow( dead_code )]
-// #[derive( Event )] pub struct EventTimerPlayer;
-// #[allow( dead_code )]
-// #[derive( Event )] pub struct EventTimerChasers ( pub Vec<Color> ); //tigtag3d用の追加フィールド
 
 ////////////////////////////////////////////////////////////////////////////////
 

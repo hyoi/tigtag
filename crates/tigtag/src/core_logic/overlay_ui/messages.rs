@@ -2,40 +2,45 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// ポップアップメッセージをspawnするために必要な情報
-pub type TextBlock = (
-    Box<dyn PopupMessage>,   // マーカーComponent
-    Vec<TextUiSpanSettings>, // TextUiのspans
-);
+// 設定リストから全画面メッセージをspawnする
+pub fn spawn_messages(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
+{
+    MessageSettings::default()
+        .drain(..)
+        .for_each(|boxed_component| {
+            boxed_component.spawn_overlay_msg(&mut cmds, &asset_svr)
+        });
 
-// TextUiのspanをspawnする為に必要な情報
-pub type TextUiSpanSettings = (&'static str, &'static str, f32, Color);
+    Ok(())
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//マーカーComponentをBoxで束ねるためのトレイト境界
-pub trait PopupMessage: Send + Sync + 'static
+// 全画面メッセージの設定を格納する型
+#[derive(Deref, DerefMut)]
+pub struct MessageSettings(pub Vec<Box<dyn BoxedOverlayMessage>>);
+
+// 全画面メッセージspawn用のトレイト
+pub trait BoxedOverlayMessage: Send + Sync + 'static
 {
-    fn spawn_textui(
+    fn spawn_overlay_msg(
         self: Box<Self>,
         cmds: &mut Commands,
         asset_svr: &Res<AssetServer>,
-        vec_text_spans: Vec<TextUiSpanSettings>,
     );
 }
 
-//トレイト境界をジェネリクス(T: Component)対象に実装する
-impl<T: Component + Clone + 'static> PopupMessage for T
+// トレイトの実装
+impl<T: Component + Clone + 'static + OverlayMessage> BoxedOverlayMessage for T
 {
-    fn spawn_textui(
+    fn spawn_overlay_msg(
         self: Box<Self>,
         cmds: &mut Commands,
         asset_svr: &Res<AssetServer>,
-        vec_text_spans: Vec<TextUiSpanSettings>,
     )
     {
         cmds.spawn((
-            *self, // マーカーComponent
+            *self.clone(), // マーカーComponent
             Visibility::Hidden,
             Node {
                 width: Val::Percent(100.0),
@@ -46,50 +51,67 @@ impl<T: Component + Clone + 'static> PopupMessage for T
                 ..default()
             },
         ))
-        .add_popup_message(vec_text_spans, asset_svr);
+        .add_text_spans(self.text_spans(), asset_svr);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// リストを基にポップアップメッセージをspawnするSystem
-pub fn spawn<T: Resource + Deref<Target = Vec<TextBlock>> + DerefMut>(
-    mut settings: ResMut<T>,
-    mut cmds: Commands,
-    asset_svr: Res<AssetServer>,
-)
+// 全画面メッセージComponentのトレイト境界
+pub trait OverlayMessage
+where
+    Self: Component<Mutability = Mutable> + Send + Sync + 'static + Default,
 {
-    settings
-        .drain(..)
-        .for_each(|(boxed_trait, vec_text_spans)| {
-            boxed_trait.spawn_textui(&mut cmds, &asset_svr, vec_text_spans)
-        });
+    // Structの内部にアクセスするメソッド
+    fn text_spans(&self) -> &'static [overlay_ui::TextUiSpan];
+
+    // 表示直前にパラメータを初期化するメソッド（デフォルト実装）
+    fn init(
+    ) -> impl FnMut(Query<&mut Self>, ResMut<Events<CountDownFinished>>) -> Result
+    where
+        Self: std::marker::Sized,
+    {
+        move |mut query_params: Query<&mut Self>,
+              mut event_countdown: ResMut<Events<CountDownFinished>>| {
+            //準備
+            let mut params = query_params.single_mut()?;
+
+            //初期化
+            *params = Self::default();
+            event_countdown.clear(); //[対策]EventCountDownが生きているので（v0.16.1）
+
+            Ok(())
+        }
+    }
 }
+
+// 全画面メッセージの文字情報を格納する型
+pub type TextUiSpan = (&'static str, &'static str, f32, Color);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// bevyのEntityCommands型を拡張し、TextBlockを扱いやすくする
-pub trait AddPopupMessage
+// bevyのEntityCommands型を拡張し、TextSpansを扱いやすくするトレイト
+pub trait AddOverlatMessage
 {
-    fn add_popup_message(
+    fn add_text_spans(
         &mut self,
-        text_block: Vec<TextUiSpanSettings>,
+        text_spans: &[TextUiSpan],
         asset_svr: &Res<AssetServer>,
     ) -> &mut Self;
 }
 
-// TextBlock追加メッソド
-impl AddPopupMessage for EntityCommands<'_>
+// bevyのEntityCommands型を拡張し、TextSpansを扱いやすくするトレイトの実装
+impl AddOverlatMessage for EntityCommands<'_>
 {
-    fn add_popup_message(
+    fn add_text_spans(
         &mut self,
-        text_block: Vec<TextUiSpanSettings>,
+        text_spans: &[TextUiSpan],
         asset_svr: &Res<AssetServer>,
     ) -> &mut Self
     {
         // 準備
         let parent = self.id();
-        let mut spans = text_block.iter();
+        let mut spans = text_spans.iter();
         let (span, file, size, color) = spans.next().unwrap(); // spansの先頭は特別扱い
 
         // テキストブロックをspawnする
@@ -107,6 +129,7 @@ impl AddPopupMessage for EntityCommands<'_>
                     linebreak: LineBreak::NoWrap,
                 },
                 TextColor(*color),
+                // Visibility::Visible, // ★debug時はVisible
             ))
             .with_children(|cmds| {
                 for (span, file, size, color) in spans

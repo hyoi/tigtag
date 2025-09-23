@@ -8,29 +8,27 @@ impl Plugin for Schedule
 {
     fn build(&self, application: &mut App)
     {
-        //MyState::InitGame スケジュール
-        application.add_systems(
-            OnExit(MyState::InitGame),
-            //既存のフッターを改造する
-            add_footerleft_text_spans.after(header_footer::spawn_header_footer),
-        );
-
-        //MyState::TitleDemo スケジュール
-        application.add_systems(
-            Update,
-            //demo record表示の更新
-            update_demo_record.run_if(in_state(MyState::TitleDemo)),
-        );
+        application
+            //MyState::Initialize スケジュール
+            .add_systems(
+                OnExit(MyState::Initialize),
+                extend_footerleft_text_spans //既存のフッターを改造する
+                    .after(header_footer::spawn),
+            )
+            //MyState::TitleDemo スケジュール
+            .add_systems(
+                Update,
+                update_demo_record //demo record表示の更新
+                    .run_if(in_state(MyState::TitleDemo)),
+            );
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//変更するヘッダー／フッター
-const _DRPH_: &str = "##-#####";
+// 拡張するヘッダー／フッター
 const TARGET: header_footer::Position = header_footer::Position::BottomLeft;
-
-//追加するtext spans
+const _DRPH_: &str = "##-#####";
 #[rustfmt::skip]
 const ADDITIONAL_DEMO_RECORD: &[header_footer::MessageSpan] = &[
     ( " demo ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.35, COLOR_TEAL   ),
@@ -40,7 +38,7 @@ const ADDITIONAL_DEMO_RECORD: &[header_footer::MessageSpan] = &[
 ////////////////////////////////////////////////////////////////////////////////
 
 //フッターのUIを改造する
-fn add_footerleft_text_spans(
+fn extend_footerleft_text_spans(
     qry_text_block: Query<(Entity, &header_footer::Position)>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
@@ -77,14 +75,14 @@ fn add_footerleft_text_spans(
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//UIの表示を更新する(demo record)
+// UIの表示を更新する(demo record)
 fn update_demo_record(
     qry_text_block: Query<(Entity, &header_footer::Position)>,
     opt_record: Option<ResMut<Record>>,
     mut text_writer: TextUiWriter,
 ) -> Result
 {
-    //準備
+    // 準備
     let (entity, _) =
         qry_text_block
             .iter()
@@ -93,21 +91,21 @@ fn update_demo_record(
                 "header_footer::Position::{:?} Component not found.",
                 TARGET
             ))?;
-    let index = FOOTER_FPS.spans.len()
+    let index = FOOTER_FPS.textspans.len()
         + ADDITIONAL_DEMO_RECORD
             .iter()
             .position(|x| x.0 == _DRPH_)
             .ok_or(format!("Placeholder &str \"{}\" not found.", _DRPH_))?;
-    let mut record = opt_record.ok_or("ResMut<Record> not found.")?;
+    let mut record = opt_record.ok_or("Resource not found.")?;
 
-    //demo中スコアがdemoのハイスコアを超えた場合 記録を更新する
+    // demo中スコアがdemoのハイスコアを超えた場合 記録を更新する
     if record.score() > record.demo_hi_score()
     {
         *record.demo_hi_score_mut() = record.score();
         *record.demo_stage_mut() = record.stage();
     }
 
-    //表示を更新する
+    // 表示を更新する
     let value = format!("{:02}-{:05}", record.demo_stage(), record.demo_hi_score(),);
     let mut text = text_writer
         .get_text(entity, index)

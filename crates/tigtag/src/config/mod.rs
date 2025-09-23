@@ -1,17 +1,15 @@
 use super::*;
 
-// internal submodules
-mod config;
-pub use config::*;
+mod general_settings; // ゲーム関係の諸々の設定
+pub use general_settings::*;
 
-mod ui_popup_msg;
-pub use ui_popup_msg::*;
+mod consts; // 設定で使う定数
+pub use consts::*;
 
-mod ui_header_footer;
-pub use ui_header_footer::*;
+mod header_footer_settings; // ヘッダー・フッターの設定
+pub use header_footer_settings::*;
 
-// 色名の単純な表記
-mod color_name;
-pub use color_name::*;
+mod overlay_ui_settings; // 全画面UIの設定
+pub use overlay_ui_settings::*;
 
 // End of code.

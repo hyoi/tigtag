@@ -4,117 +4,254 @@ use super::*;
 
 // チェイサーをspawnする
 pub fn spawn_sprite(
-    qry_entity: Query<Entity, With<Chaser>>,
-    opt_record: Option<Res<Record>>,
+    query_entity: Query<Entity, With<Chaser>>,
+    option_record: Option<Res<Record>>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
     mut texture_atlases_layout: ResMut<Assets<TextureAtlasLayout>>,
 ) -> Result
 {
     // 準備
-    qry_entity.iter().for_each(|id| cmds.entity(id).despawn()); // 既存スプライトがあれば削除する
-    let record = opt_record.ok_or("Res<Record> not found.")?; // 必須のResource
+    let record = option_record.ok_or("Resource not found.")?;
+
+    // 既存スプライトがあれば削除する
+    query_entity.iter().for_each(|id| cmds.entity(id).despawn());
 
     // チェイサーを初期位置に配置する
-    (0..).zip(CHASER_START_POSITION).for_each(|(idx, &grid)| {
-        // 初期位置
-        let vec2 = grid.to_vec2_on_game_map();
-        let vec3 = vec2.extend(DEPTH_SPRITE_CHASER);
-        let transform = Transform::from_translation(vec3);
+    (0..)
+        .zip(CHASER_START_POSITION)
+        .for_each(|(loop_index, &chaser_cell)| {
+            // 初期位置
+            let translation = chaser_cell
+                .to_screen_pixels_map_adjusted()
+                .extend(DEPTH_SPRITE_CHASER);
+            let transform = Transform::from_translation(translation);
 
-        // index（0,1,2,3）を作る
-        let index = ((record.stage() - 1 + idx) % 4) as usize;
+            // 四隅のチェイサーを4ステージで１周ローテーションさせるためにindex（0,1,2,3）を利用
+            let index = ((loop_index + record.stage() - 1) % 4) as usize;
+            let (asset_file, color, opt_fn_autochase) = CHASERS_SPRITE_INFO[index];
 
-        //チェイサーの情報
-        let (asset_file, color, opt_fn_autochase) = CHASERS_SPRITE_INFO[index];
+            // チェイサーのデータを初期化する
+            let chaser = Chaser {
+                cell: chaser_cell,
+                next_cell: chaser_cell,
+                px_start: translation,
+                px_end: translation,
+                color,
+                opt_fn_autochase,
+                ..default()
+            };
 
-        // チェイサーのデータを初期化する
-        let chaser = Chaser {
-            grid,
-            next_grid: grid,
-            px_start: vec2,
-            px_end: vec2,
-            color,
-            opt_fn_autochase,
-            ..default()
-        };
+            if SPRITE_OFF()
+            {
+                // 正方形のメッシュを作る
+                cmds.spawn((
+                    Sprite {
+                        //imageを指定しないと正方形のメッシュを表示するのを利用する
+                        color: Color::Srgba(color),
+                        custom_size: Some(CELL_CUSTOM_SIZE * CHASER_SPRITE_SCALING),
+                        ..default()
+                    },
+                    transform,
+                    chaser,
+                ));
+            }
+            else
+            {
+                // アニメーションするスプライトをspawnする
+                let layout =
+                    texture_atlases_layout.add(MySpriteSheetLayout::default().0);
+                let index = chaser.sprite_sheet_offset(chaser.direction()) as usize;
 
-        if SPRITE_OFF()
-        {
-            // 正方形のメッシュを作る
-            cmds.spawn((
-                Sprite {
-                    //imageを指定しないと正方形のメッシュを表示するのを利用する
-                    color: Color::Srgba(color),
-                    custom_size: Some(GRID_CUSTOM_SIZE * CHASER_SPRITE_SCALING),
-                    ..default()
-                },
-                transform,
-                chaser,
-            ));
-        }
-        else
-        {
-            // アニメーションするスプライトをspawnする
-            let layout = texture_atlases_layout.add(SPRITESHEET_LAYOUT.clone());
-            let index = chaser.sprite_sheet_offset(chaser.direction()) as usize;
+                let mut sprite = Sprite::from_atlas_image(
+                    asset_svr.load(asset_file),
+                    TextureAtlas { layout, index },
+                );
+                sprite.custom_size = Some(CELL_CUSTOM_SIZE);
 
-            let mut sprite = Sprite::from_atlas_image(
-                asset_svr.load(asset_file),
-                TextureAtlas { layout, index },
-            );
-            sprite.custom_size = Some(GRID_CUSTOM_SIZE);
-
-            cmds.spawn((sprite, transform, chaser));
-        }
-    });
+                cmds.spawn((sprite, transform, chaser));
+            }
+        });
 
     Ok(())
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// 進む方向を決める(赤)
+// pub const SELECT_PATH_RED: Option<FnAutoChase> = None;
+pub const SELECT_PATH_RED: Option<FnAutoChase> = Some(select_path_red);
+fn select_path_red(
+    chaser: &mut Chaser,
+    player: &player::Player,
+    sides: &[News],
+) -> News
+{
+    let priority = [
+        (News::West, player.next_cell.x < chaser.cell.x),
+        (News::East, player.next_cell.x > chaser.cell.x),
+        (News::North, player.next_cell.y < chaser.cell.y),
+        (News::South, player.next_cell.y > chaser.cell.y),
+    ];
+    for (direction, condition) in priority
+    {
+        if condition && sides.contains(&direction)
+        {
+            return direction;
+        }
+    }
+
+    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
+    *sides.choose(&mut rand::rng()).unwrap()
+}
+
+// 進む方向を決める(青)
+// pub const SELECT_PATH_BLUE: Option<FnAutoChase> = None;
+pub const SELECT_PATH_BLUE: Option<FnAutoChase> = Some(select_path_blue);
+fn select_path_blue(
+    chaser: &mut Chaser,
+    player: &player::Player,
+    sides: &[News],
+) -> News
+{
+    let priority = [
+        (News::South, player.next_cell.y > chaser.cell.y),
+        (News::West, player.next_cell.x < chaser.cell.x),
+        (News::East, player.next_cell.x > chaser.cell.x),
+        (News::North, player.next_cell.y < chaser.cell.y),
+    ];
+    for (direction, condition) in priority
+    {
+        if condition && sides.contains(&direction)
+        {
+            return direction;
+        }
+    }
+
+    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
+    *sides.choose(&mut rand::rng()).unwrap()
+}
+
+// 進む方向を決める(緑)
+// pub const SELECT_PATH_GREEN: Option<FnAutoChase> = None;
+pub const SELECT_PATH_GREEN: Option<FnAutoChase> = Some(select_path_green);
+fn select_path_green(
+    chaser: &mut Chaser,
+    player: &player::Player,
+    sides: &[News],
+) -> News
+{
+    let priority = [
+        (News::North, player.next_cell.y < chaser.cell.y),
+        (News::South, player.next_cell.y > chaser.cell.y),
+        (News::West, player.next_cell.x < chaser.cell.x),
+        (News::East, player.next_cell.x > chaser.cell.x),
+    ];
+    for (direction, condition) in priority
+    {
+        if condition && sides.contains(&direction)
+        {
+            return direction;
+        }
+    }
+
+    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
+    *sides.choose(&mut rand::rng()).unwrap()
+}
+
+// 進む方向を決める(ピンク)
+// pub const SELECT_PATH_PINK: Option<FnAutoChase> = None;
+pub const SELECT_PATH_PINK: Option<FnAutoChase> = Some(select_path_pink);
+fn select_path_pink(
+    chaser: &mut Chaser,
+    player: &player::Player,
+    sides: &[News],
+) -> News
+{
+    let priority = [
+        (News::East, player.next_cell.x > chaser.cell.x),
+        (News::North, player.next_cell.y < chaser.cell.y),
+        (News::South, player.next_cell.y > chaser.cell.y),
+        (News::West, player.next_cell.x < chaser.cell.x),
+    ];
+    for (direction, condition) in priority
+    {
+        if condition && sides.contains(&direction)
+        {
+            return direction;
+        }
+    }
+
+    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
+    *sides.choose(&mut rand::rng()).unwrap()
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// チェイサー（正方形）を回転させる
+pub fn rotate_chaser_shape(
+    mut query_chaser: Query<&mut Transform, With<Chaser>>,
+    time: Res<Time>,
+)
+{
+    let time_delta = time.delta().as_secs_f32();
+    let radian = TAU * time_delta;
+    let quat = Quat::from_rotation_z(radian);
+
+    // 回転させる
+    query_chaser
+        .iter_mut()
+        .for_each(|mut transform| transform.rotate(quat));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // チェイサーを移動させる
 pub fn move_sprite(
-    mut qry_chaser: Query<(&mut Transform, &mut Sprite, &mut Chaser)>,
-    opt_map: Option<Res<map::Map>>,
-    qry_player: Query<&player::Player>,
-    // mut evt_timer: EventWriter<EventTimerChasers>,
+    mut query_chaser: Query<(&mut Transform, &mut Sprite, &mut Chaser)>,
+    query_player: Query<&player::Player>,
+    option_map: Option<Res<map::Map>>,
     time: Res<Time>,
+    // mut evt_timer: EventWriter<EventTimerChasers>,
 ) -> Result
 {
-    //準備
-    let player = qry_player.single()?;
-    let map = opt_map.ok_or("Res<Map> not found.")?;
+    // 準備
+    let player = query_player.single()?;
+    let map = option_map.ok_or("Resource not found.")?;
     let time_delta = time.delta();
-    let mut chaser_timer_finished = Vec::new();
 
-    //敵キャラは複数なのでループ処理する
-    for (mut transform, mut sprite, mut chaser) in qry_chaser.iter_mut()
+    // let mut chaser_timer_finished = Vec::new();
+
+    // 複数のチェイサーをループで処理する
+    for (mut transform, mut sprite, mut chaser) in query_chaser.iter_mut()
     {
-        // 前回からの経過時間 × スピードアップ係数
+        // スピードアップ係数をかけて、経過時間を割り増しする
         let time_delta = time_delta.mul_f32(chaser.speedup); //speedup > 1.0
 
         // 移動タイマーがfinishしたなら
         if chaser.timer.tick(time_delta).finished()
         {
-            chaser_timer_finished.push(chaser.color); //後続の処理にtimer finishedを伝達する
+            //後続の処理にtimer finishedを伝達する
+            // chaser_timer_finished.push(chaser.color);
 
-            // スプライトがグリッド間の中途に位置したら
+            // セルの間を移動中のスプライトが半端な位置にいるなら
             if chaser.px_start != chaser.px_end
             {
-                // グリッドにフィットさせる
+                // 移動先のセルにフィットさせる
                 chaser.px_start = chaser.px_end;
-                chaser.px_end = chaser.next_grid.to_vec2_on_game_map();
-                transform.translation = chaser.px_end.extend(DEPTH_SPRITE_CHASER);
+                chaser.px_end = chaser
+                    .next_cell
+                    .to_screen_pixels_map_adjusted()
+                    .extend(DEPTH_SPRITE_CHASER);
+                transform.translation = chaser.px_end;
             }
 
-            //四方の脇道を取得する
-            let mut sides = map.get_side_spaces_list(chaser.next_grid); //脇道のリスト
-            sides.retain(|side| chaser.next_grid + side != chaser.grid); //戻り路を取り除く
+            // 後退を除く三方の道を取得する
+            let mut sides = map.get_side_spaces_list(chaser.next_cell); //脇道のリスト
+            sides.retain(|side| chaser.next_cell + *side != chaser.cell); //戻り路を削除
 
-            //敵キャラが次に進む方向を決める
-            chaser.is_stop = false; //停止フラグを倒す(敵キャラはスタート後は止まらない)
+            // チェイサーが次に進む方向を決める
+            chaser.is_stop = false; //停止フラグを倒す(停止はスタート時のみ)
             let count = sides.len();
             let new_side = match count
             {
@@ -142,8 +279,9 @@ pub fn move_sprite(
             // チェイサーの向きが変わったなら
             if new_side != chaser.direction
             {
-                if let Some(sprite_sheet) = &mut sprite.texture_atlas.as_mut()
-                    && !SPRITE_OFF()
+                // スプライトシートのアニメなら
+                if !SPRITE_OFF()
+                    && let Some(sprite_sheet) = &mut sprite.texture_atlas
                 {
                     // スプライトシートのindexを変更してスプライトの向きを変更
                     let old_news = chaser.direction;
@@ -153,17 +291,13 @@ pub fn move_sprite(
                     *index = *index + new_offset - old_offset;
                 }
 
-                // チェイサーの向きの情報の更新
+                // チェイサーの向き情報を更新
                 chaser.direction = new_side;
             }
 
             // 位置を更新
-            chaser.grid = chaser.next_grid; //現在の位置を更新
-            if !chaser.is_stop
-            {
-                let side = chaser.direction; //✕ chaser.direction += chaser.next_grid
-                chaser.next_grid += side; //次の位置を更新
-            }
+            chaser.cell = chaser.next_cell; //現在の位置を更新
+            chaser.next_cell += new_side; //次の位置を更新
 
             // 移動タイマーをリセットする
             chaser.timer.reset();
@@ -182,7 +316,7 @@ pub fn move_sprite(
 
             //当たり判定用の微小区間の座標更新
             chaser.px_start = chaser.px_end;
-            chaser.px_end = transform.translation.truncate();
+            chaser.px_end = transform.translation;
         }
     }
 
@@ -191,154 +325,26 @@ pub fn move_sprite(
     // {   evt_timer.send( EventTimerChasers ( chaser_timer_finished ) ); //tigtag3d用の追加フィールド
     // }
 
-    //敵キャラは重なるとスピードアップする
-    let mut color_grid = Vec::with_capacity(qry_chaser.iter().len());
-
-    for (_, _, mut chaser) in qry_chaser.iter_mut()
+    // チェイサーは重なるとスピードアップする
+    let mut colors = Vec::with_capacity(query_chaser.iter().len());
+    for (_, _, mut chaser) in query_chaser.iter_mut()
     {
-        color_grid.push((chaser.color, chaser.next_grid));
-        chaser.speedup = 1.0;
+        colors.push((chaser.color, chaser.next_cell));
+        chaser.speedup = 1.0; // スピードアップ係数初期化
     }
-
-    for (color, grid) in color_grid
+    for (color, cell) in colors
     {
-        for (_, _, mut chaser) in qry_chaser.iter_mut()
+        for (_, _, mut chaser) in query_chaser.iter_mut()
         {
-            //グリッドが一致し、自分以外の色なら
-            if grid == chaser.next_grid && color != chaser.color
+            // セルが一致し、自分以外の色なら
+            if cell == chaser.next_cell && color != chaser.color
             {
-                chaser.speedup += CHASER_ACCEL;
+                chaser.speedup += CHASER_ACCEL; // スピードアップ係数を割り増し
             }
         }
     }
 
     Ok(())
-}
-
-// チェイサー（正方形）を回転させる
-pub fn rotate_chaser_shape(
-    mut qry_chaser: Query<&mut Transform, With<Chaser>>,
-    time: Res<Time>,
-)
-{
-    let time_delta = time.delta().as_secs_f32();
-    let radian = TAU * time_delta;
-    let quat = Quat::from_rotation_z(radian);
-
-    // 回転させる
-    qry_chaser
-        .iter_mut()
-        .for_each(|mut transform| transform.rotate(quat));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// 進む方向を決める(赤)
-// pub const SELECT_PATH_RED: Option<FnAutoChase> = None;
-pub const SELECT_PATH_RED: Option<FnAutoChase> = Some(select_path_red);
-fn select_path_red(
-    chaser: &mut Chaser,
-    player: &player::Player,
-    sides: &[News],
-) -> News
-{
-    let priority = [
-        (News::West, player.next_grid.x < chaser.grid.x),
-        (News::East, player.next_grid.x > chaser.grid.x),
-        (News::North, player.next_grid.y < chaser.grid.y),
-        (News::South, player.next_grid.y > chaser.grid.y),
-    ];
-    for (direction, condition) in priority
-    {
-        if condition && sides.contains(&direction)
-        {
-            return direction;
-        }
-    }
-
-    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
-    *sides.choose(&mut rand::rng()).unwrap()
-}
-
-// 進む方向を決める(青)
-// pub const SELECT_PATH_BLUE: Option<FnAutoChase> = None;
-pub const SELECT_PATH_BLUE: Option<FnAutoChase> = Some(select_path_blue);
-fn select_path_blue(
-    chaser: &mut Chaser,
-    player: &player::Player,
-    sides: &[News],
-) -> News
-{
-    let priority = [
-        (News::South, player.next_grid.y > chaser.grid.y),
-        (News::West, player.next_grid.x < chaser.grid.x),
-        (News::East, player.next_grid.x > chaser.grid.x),
-        (News::North, player.next_grid.y < chaser.grid.y),
-    ];
-    for (direction, condition) in priority
-    {
-        if condition && sides.contains(&direction)
-        {
-            return direction;
-        }
-    }
-
-    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
-    *sides.choose(&mut rand::rng()).unwrap()
-}
-
-// 進む方向を決める(緑)
-// pub const SELECT_PATH_GREEN: Option<FnAutoChase> = None;
-pub const SELECT_PATH_GREEN: Option<FnAutoChase> = Some(select_path_green);
-fn select_path_green(
-    chaser: &mut Chaser,
-    player: &player::Player,
-    sides: &[News],
-) -> News
-{
-    let priority = [
-        (News::North, player.next_grid.y < chaser.grid.y),
-        (News::South, player.next_grid.y > chaser.grid.y),
-        (News::West, player.next_grid.x < chaser.grid.x),
-        (News::East, player.next_grid.x > chaser.grid.x),
-    ];
-    for (direction, condition) in priority
-    {
-        if condition && sides.contains(&direction)
-        {
-            return direction;
-        }
-    }
-
-    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
-    *sides.choose(&mut rand::rng()).unwrap()
-}
-
-// 進む方向を決める(ピンク)
-// pub const SELECT_PATH_PINK: Option<FnAutoChase> = None;
-pub const SELECT_PATH_PINK: Option<FnAutoChase> = Some(select_path_pink);
-fn select_path_pink(
-    chaser: &mut Chaser,
-    player: &player::Player,
-    sides: &[News],
-) -> News
-{
-    let priority = [
-        (News::East, player.next_grid.x > chaser.grid.x),
-        (News::North, player.next_grid.y < chaser.grid.y),
-        (News::South, player.next_grid.y > chaser.grid.y),
-        (News::West, player.next_grid.x < chaser.grid.x),
-    ];
-    for (direction, condition) in priority
-    {
-        if condition && sides.contains(&direction)
-        {
-            return direction;
-        }
-    }
-
-    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
-    *sides.choose(&mut rand::rng()).unwrap()
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -29,16 +29,58 @@ impl Default for SpriteAnimationParams
     }
 }
 
-// スプライトシートの情報２（TextureAtlasLayout）
-pub static SPRITESHEET_LAYOUT: LazyLock<TextureAtlasLayout> = LazyLock::new(|| {
-    TextureAtlasLayout::from_grid(
-        UVec2::new(8, 8), // １セルの縦横px
-        4,                // columns（アニメのパターン数）
-        4,                // rows（上下左右の向きで４つ）
-        None,             // padding
-        None,             // offset
-    )
-});
+// スプライトシートの情報２
+pub struct MySpriteSheetLayout(pub TextureAtlasLayout);
+impl Default for MySpriteSheetLayout
+{
+    fn default() -> Self
+    {
+        Self(TextureAtlasLayout::from_grid(
+            UVec2::new(8, 8), // １セルの縦横px
+            4,                // columns（アニメのパターン数）
+            4,                // rows（上下左右の向きで４つ）
+            None,             // padding
+            None,             // offset
+        ))
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// スプライトシートアニメーション用トレイト
+pub trait SpriteAnimation
+{
+    fn sprite_sheet_offset(&self, news: News) -> u32;
+    fn direction(&self) -> News;
+    fn anime_timer_mut(&mut self) -> &mut Timer;
+    fn num_patterns(&self) -> u32;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// Playerのトレイト実装
+impl SpriteAnimation for player::Player
+{
+    fn sprite_sheet_offset(&self, news: News) -> u32
+    {
+        *self.anime.sprite_sheet_offsets.get(&news).unwrap()
+    }
+    fn direction(&self) -> News { self.direction }
+    fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime.timer }
+    fn num_patterns(&self) -> u32 { self.anime.num_patterns }
+}
+
+// Chaserのトレイト実装
+impl SpriteAnimation for chaser::Chaser
+{
+    fn sprite_sheet_offset(&self, news: News) -> u32
+    {
+        *self.anime.sprite_sheet_offsets.get(&news).unwrap()
+    }
+    fn direction(&self) -> News { self.direction }
+    fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime.timer }
+    fn num_patterns(&self) -> u32 { self.anime.num_patterns }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -70,43 +112,6 @@ pub fn animate_sprites<T>(
             *index = offset + (*index - offset) % count;
         }
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// スプライトシートアニメーション用トレイト
-pub trait SpriteAnimation
-{
-    fn anime_timer_mut(&mut self) -> &mut Timer;
-    fn num_patterns(&self) -> u32;
-    fn sprite_sheet_offset(&self, news: News) -> u32;
-    fn direction(&self) -> News;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// Playerのトレイト実装
-impl SpriteAnimation for player::Player
-{
-    fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime.timer }
-    fn num_patterns(&self) -> u32 { self.anime.num_patterns }
-    fn sprite_sheet_offset(&self, news: News) -> u32
-    {
-        *self.anime.sprite_sheet_offsets.get(&news).unwrap()
-    }
-    fn direction(&self) -> News { self.direction }
-}
-
-// Chaserのトレイト実装
-impl SpriteAnimation for chaser::Chaser
-{
-    fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime.timer }
-    fn num_patterns(&self) -> u32 { self.anime.num_patterns }
-    fn sprite_sheet_offset(&self, news: News) -> u32
-    {
-        *self.anime.sprite_sheet_offsets.get(&news).unwrap()
-    }
-    fn direction(&self) -> News { self.direction }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
