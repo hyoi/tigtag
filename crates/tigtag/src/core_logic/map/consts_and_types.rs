@@ -71,11 +71,11 @@ impl Map
     }
 
     // 非公開定数：マスの状態の定義
-    const BIT_WALL      : usize = 0b00000001; // 壁
+    const BIT_WALL: usize = 0b00000001; // 壁
     const BIT_PATH_RIGHT: usize = 0b00000010; // 右に道
-    const BIT_PATH_LEFT : usize = 0b00000100; // 左に道
-    const BIT_PATH_DOWN : usize = 0b00001000; // 上に道
-    const BIT_PATH_UP   : usize = 0b00010000; // 下に道
+    const BIT_PATH_LEFT: usize = 0b00000100; // 左に道
+    const BIT_PATH_DOWN: usize = 0b00001000; // 上に道
+    const BIT_PATH_UP: usize = 0b00010000; // 下に道
 
     // 公開メソッド
     pub fn set_wall(&mut self, grid: IVec2)
