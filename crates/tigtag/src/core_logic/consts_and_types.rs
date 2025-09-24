@@ -25,6 +25,17 @@ mod my_events
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// システムの実行順を制御するためのラベル
+#[derive(SystemSet, Hash, Debug, Eq, PartialEq, Clone)]
+pub enum MyLabel
+{
+    BeforeHitAnyKey,
+    HitAnyKey,
+    AfterHitAnyKey,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // ゲームの成績記録用のResource
 #[derive(Resource, Default)]
 pub struct Record

@@ -23,7 +23,7 @@ impl Plugin for Schedule
                 // Pauseメニューの表示／非表示（トグル動作）
                 hook_input_and_toggle_pause
                     // Hit Any KeyおよびAppExit処理の前に実行すること
-                    .before(misc::check_hit_any_key)
+                    .in_set(MyLabel::BeforeHitAnyKey)
                     .before(appctrl_input::send_app_exit_event),
             )
             // ループ処理２

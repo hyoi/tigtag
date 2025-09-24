@@ -43,11 +43,11 @@ impl Plugin for Schedule
                         appctrl_input::send_app_exit_event, // アプリの終了
                         appctrl_input::toggle_fullscreen,   // 全画面切換
                     )
-                        .before(misc::check_hit_any_key)
+                        .in_set(MyLabel::BeforeHitAnyKey)
                         .run_if(not(misc::WASM)), // WASMでは実行しない
                     // UI outline表示
                     appctrl_input::toggle_outline_gizmo_ui
-                        .before(misc::check_hit_any_key)
+                        .in_set(MyLabel::BeforeHitAnyKey)
                         .run_if(misc::DEBUG),
                 ),
             );

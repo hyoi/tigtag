@@ -104,6 +104,16 @@ fn main() -> AppExit
                 information::update_header_footer,
             ),
         )
+        // システムセット間の実行順序を管理する
+        .configure_sets(
+            Update,
+            (
+                // BeforeHitAnyKey は HitAnyKey の前に実行
+                MyLabel::BeforeHitAnyKey.before(MyLabel::HitAnyKey),
+                // AfterHitAnyKey は HitAnyKey の後に実行
+                MyLabel::AfterHitAnyKey.after(MyLabel::HitAnyKey),
+            ),
+        )
         // Pauseメニューのスケジュールを追加
         .add_plugins(overlay_ui::pause_menu::Schedule);
 
@@ -155,14 +165,14 @@ fn main() -> AppExit
             Update, // within MyState::TitleDemo
             (
                 // Hit ANY Key に反応あればState遷移
-                misc::check_hit_any_key,
+                misc::check_hit_any_key.in_set(MyLabel::HitAnyKey),
                 (
                     // scoreとstageをゼロクリアする(demoの情報消去)
                     detecting_change::initialize_score_stage,
                     set_next_state::<StageStart>,
                 )
-                    .run_if(on_event::<misc::AnyButtonPressed>)
-                    .after(misc::check_hit_any_key),
+                    .in_set(MyLabel::AfterHitAnyKey)
+                    .run_if(on_event::<misc::AnyButtonPressed>),
                 // DEMO の明滅
                 overlay_ui::effect::blinking_text::<OverlayTitleDemo>,
             )
@@ -315,12 +325,10 @@ fn main() -> AppExit
                 // Replay? の明滅
                 overlay_ui::effect::blinking_text::<OverlayGameOver>,
                 // Hit ANY Key に反応あればState遷移
-
-                // misc::check_hit_any_key,
-
+                misc::check_hit_any_key.in_set(MyLabel::HitAnyKey),
                 set_next_state::<StageStart>
-                    .run_if(on_event::<misc::AnyButtonPressed>)
-                    .after(misc::check_hit_any_key),
+                    .in_set(MyLabel::AfterHitAnyKey)
+                    .run_if(on_event::<misc::AnyButtonPressed>),
             )
                 .run_if(in_state(MyState::GameOver)),
         )
