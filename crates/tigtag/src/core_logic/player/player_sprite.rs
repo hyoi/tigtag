@@ -144,14 +144,13 @@ pub fn move_sprite(
 
             new_side = match count
             {
-                1 => sides[0], //一本道 ⇒ 道なりに進む
-                2 | 3 | 4 =>
-                    autodrive.0(&player, query_chaser, map, demo_params, &sides), //三叉路または十字路
-                _ =>
-                {
-                    // countが4になってpanicする不具合アリ！
-                    unreachable!("Bad count of autodrive paths. count: {count}")
-                },
+                // 一本道 ⇒ 道なりに進む
+                1 => sides[0],
+                // 三叉路または十字路
+                2..=4 =>
+                    autodrive.0(&player, query_chaser, map, demo_params, &sides),
+                // panic
+                _ => unreachable!("Bad count of autodrive paths, count is {count}."),
             };
         }
         // Demoではないなら
