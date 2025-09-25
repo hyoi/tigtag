@@ -20,7 +20,7 @@ impl InitWindowPlugin for WindowPlugin
                 maximize: false, // 最大化ボタン非表示
                 close: true,     // クローズボタン表示
             },
-            fit_canvas_to_parent: true, // v0.13で廃止(#11057)、v0.14で復活(#11278)
+            // fit_canvas_to_parent: true, // v0.13で廃止(#11057)、v0.14で復活(#11278)
             ..default()
         };
 
