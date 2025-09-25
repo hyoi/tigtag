@@ -149,7 +149,7 @@ impl Default for OverlayGameOver
                 ( "Game Over\n"   , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 4.0, COLOR_RED  ),
                 ( " \n"           , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.6, COLOR_NONE ),
                 ( "REPLAY?"       , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 2.0, COLOR_GOLD ),
-                ( " \n"           , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, COLOR_NONE ),
+                ( "\n"            , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, COLOR_NONE ),
                 ( "Hit ANY key!\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN ),
                 ( "or\n"          , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, COLOR_CYAN ),
                 ( "ANY button!\n" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN ),
