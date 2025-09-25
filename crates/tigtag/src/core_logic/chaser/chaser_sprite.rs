@@ -29,7 +29,8 @@ pub fn spawn_sprite(
 
             // 四隅のチェイサーを4ステージで１周ローテーションさせるためにindex（0,1,2,3）を利用
             let index = ((loop_index + record.stage() - 1) % 4) as usize;
-            let (asset_file, color, opt_fn_autochase) = CHASERS_SPRITE_INFO[index];
+            let (asset_file, color, option_fn_autochase) =
+                CHASERS_SPRITE_INFO[index];
 
             // チェイサーのデータを初期化する
             let chaser = Chaser {
@@ -38,7 +39,7 @@ pub fn spawn_sprite(
                 px_start: translation,
                 px_end: translation,
                 color,
-                opt_fn_autochase,
+                option_fn_autochase,
                 ..default()
             };
 
@@ -47,7 +48,7 @@ pub fn spawn_sprite(
                 // 正方形のメッシュを作る
                 cmds.spawn((
                     Sprite {
-                        //imageを指定しないと正方形のメッシュを表示するのを利用する
+                        // imageを指定しないと正方形のメッシュを表示するのを利用する
                         color: Color::Srgba(color),
                         custom_size: Some(CELL_CUSTOM_SIZE * CHASER_SPRITE_SCALING),
                         ..default()
@@ -101,7 +102,7 @@ fn select_path_red(
         }
     }
 
-    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
+    // sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
     *sides.choose(&mut rand::rng()).unwrap()
 }
 
@@ -128,7 +129,7 @@ fn select_path_blue(
         }
     }
 
-    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
+    // sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
     *sides.choose(&mut rand::rng()).unwrap()
 }
 
@@ -155,7 +156,7 @@ fn select_path_green(
         }
     }
 
-    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
+    // sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
     *sides.choose(&mut rand::rng()).unwrap()
 }
 
@@ -182,7 +183,7 @@ fn select_path_pink(
         }
     }
 
-    //sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
+    // sidesが2要素以上であることを呼び出し側関数で確認している為、心置きなく.unwrap()できる
     *sides.choose(&mut rand::rng()).unwrap()
 }
 
@@ -212,7 +213,6 @@ pub fn move_sprite(
     query_player: Query<&player::Player>,
     option_map: Option<Res<map::Map>>,
     time: Res<Time>,
-    // mut evt_timer: EventWriter<EventTimerChasers>,
 ) -> Result
 {
     // 準備
@@ -231,7 +231,7 @@ pub fn move_sprite(
         // 移動タイマーがfinishしたなら
         if chaser.timer.tick(time_delta).finished()
         {
-            //後続の処理にtimer finishedを伝達する
+            // 後続の処理にtimer finishedを伝達する
             // chaser_timer_finished.push(chaser.color);
 
             // セルの間を移動中のスプライトが半端な位置にいるなら
@@ -260,15 +260,15 @@ pub fn move_sprite(
                 // 三叉路か十字路なので進行方向を考える
                 2.. =>
                 {
-                    //自動追尾の関数がセットされているなら
-                    if let Some(autochase) = chaser.opt_fn_autochase
+                    // 自動追尾の関数がセットされているなら
+                    if let Some(autochase) = chaser.option_fn_autochase
                     {
-                        //追尾関数
+                        // 追尾関数
                         autochase(&mut chaser, player, &sides)
                     }
                     else
                     {
-                        //進行方向をランダムに決める
+                        // 進行方向をランダムに決める
                         sides[rand::rng().random_range(0..count)]
                     }
                 }
@@ -314,16 +314,11 @@ pub fn move_sprite(
                 News::West => transform.translation.x -= delta,
             }
 
-            //当たり判定用の微小区間の座標更新
+            // 当たり判定用の微小区間の座標更新
             chaser.px_start = chaser.px_end;
             chaser.px_end = transform.translation;
         }
     }
-
-    //後続の処理にtimer finishedを伝達する
-    // if ! chaser_timer_finished.is_empty()
-    // {   evt_timer.send( EventTimerChasers ( chaser_timer_finished ) ); //tigtag3d用の追加フィールド
-    // }
 
     // チェイサーは重なるとスピードアップする
     let mut colors = Vec::with_capacity(query_chaser.iter().len());

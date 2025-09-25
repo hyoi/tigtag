@@ -70,7 +70,7 @@ where
             if check
             {
                 // 押下された入力（主キーのみ）をリセットする
-                let (main_key, _opt_vec_mod) = appctrl_keys;
+                let (main_key, _option_vec_mod) = appctrl_keys;
                 let input_keycode = &mut self.input_keycode;
                 input_keycode.reset(*main_key);
             }
@@ -211,12 +211,12 @@ pub struct UiOutline;
 pub fn toggle_outline_gizmo_ui(
     appctrl: Local<UiOutline>, //初回のみdefault()で初期化
     mut input_device: InputDevicePack,
-    opt_ui_debug_options: Option<ResMut<UiDebugOptions>>,
+    option_ui_debug_options: Option<ResMut<UiDebugOptions>>,
 ) -> Result
 {
     // 準備
     let mut ui_debug_options =
-        opt_ui_debug_options.ok_or("UiDebugOptions not found.")?;
+        option_ui_debug_options.ok_or("UiDebugOptions not found.")?;
 
     // UI outline表示／非表示の切替キー・ボタンが押下されたなら
     if input_device.is_pressed_with_reset(&*appctrl)

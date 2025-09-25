@@ -2,7 +2,7 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//
+// DemoAutoDriveFnのResource初期化用default
 impl Default for player::DemoAutoDriveFn
 {
     fn default() -> Self { Self(select_escape_route) }
@@ -10,10 +10,10 @@ impl Default for player::DemoAutoDriveFn
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//demo時のプレイヤー自走に使うメソッド
+// demo時のプレイヤー自走に使うメソッド
 impl player::DemoMapParams
 {
-    //指定のマスが、残dotsの最小矩形の中か？
+    // 指定のマスが、残dotsの最小矩形の中か？
     pub fn is_inside_rect(&self, grid: IVec2) -> bool
     {
         let IVec2 { x: x1, y: y1 } = self.dots_rect_min();
@@ -22,7 +22,7 @@ impl player::DemoMapParams
         (x1..=x2).contains(&grid.x) && (y1..=y2).contains(&grid.y)
     }
 
-    //指定のマスから残dotsの最小矩形までの単純距離(dx+dy)を求める
+    // 指定のマスから残dotsの最小矩形までの単純距離(dx+dy)を求める
     pub fn how_far_to_rect(&self, grid: IVec2) -> i32
     {
         let IVec2 { x: x1, y: y1 } = self.dots_rect_min();
@@ -59,7 +59,7 @@ impl player::DemoMapParams
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//デモ時の自走プレイヤーの移動方向を決める関数
+// デモ時の自走プレイヤーの移動方向を決める関数
 pub fn select_escape_route(
     player: &player::Player,
     query_chaser: Query<&chaser::Chaser>,
@@ -128,17 +128,17 @@ pub fn select_escape_route(
 
         if let Some(risk) = option_risk
         {
-            //リスクがある場合
+            // リスクがある場合
             risk_rating.push((side, risk as i32)); // 方向とリスク値を記録
         }
         else
         {
-            //リスクがないと判定されたら、隣接する四方のドットを数える（高得点を狙うのに使う）
+            // リスクがないと判定されたら、隣接する四方のドットを数える（高得点を狙うのに使う）
             risk_none.push((side, map.count_dots_4sides(byway)));
         }
     }
 
-    //リスクなしの道があるか？によって操作対象のVecを変える
+    // リスクなしの道があるか？によって操作対象のVecを変える
     let ptr_sides = if risk_none.is_empty()
     {
         &mut risk_rating
@@ -148,30 +148,30 @@ pub fn select_escape_route(
         &mut risk_none
     };
 
-    //進む道を決める
+    // 進む道を決める
     if ptr_sides.len() == 1
     {
-        //道が１つだけの場合
+        // 道が１つだけの場合
         ptr_sides[0].0
     }
     else
     {
-        //道が複数ある場合(２～３)
+        // 道が複数ある場合(２～３)
         ptr_sides.sort_by(|a, b| b.1.cmp(&a.1)); //大きい順(＝安全な順or高得点な順)にソート
         let max_val = ptr_sides[0].1; //先頭の最大値
         ptr_sides.retain(|x| x.1 >= max_val); //最大値だけのリストにする
 
         if ptr_sides.len() == 1
         {
-            //道が１つだけの場合
+            // 道が１つだけの場合
             ptr_sides[0].0
         }
         else
         {
-            //道が複数ある場合
+            // 道が複数ある場合
             if !demo.is_inside_rect(player.next_cell)
             {
-                //自機が残dotsを含む最小の矩形の外にいる場合
+                // 自機が残dotsを含む最小の矩形の外にいる場合
                 if let Some(side) =
                     heuristic_dots_rect(player.next_cell, ptr_sides, demo)
                 {
@@ -179,21 +179,21 @@ pub fn select_escape_route(
                 }
             }
 
-            //プレイヤーが残dotsを含む最小の矩形の中にいる場合、乱数で決める
+            // プレイヤーが残dotsを含む最小の矩形の中にいる場合、乱数で決める
             let mut rng = rand::rng();
             ptr_sides[rng.random_range(0..ptr_sides.len())].0
         }
     }
 }
 
-//プレイヤーが残dotsを含む最小の矩形の外にいる場合のheuristic関数
+// プレイヤーが残dotsを含む最小の矩形の外にいる場合のheuristic関数
 fn heuristic_dots_rect(
     grid: IVec2,
     sides: &[(News, i32)],
     demo: Res<player::DemoMapParams>,
 ) -> Option<News>
 {
-    //脇道ごとにdots_rectまでの単純距離(dx+dy)を求める
+    // 脇道ごとにdots_rectまでの単純距離(dx+dy)を求める
     let mut vec = Vec::with_capacity(3);
     for &(dxdy, _) in sides
     {
@@ -202,12 +202,12 @@ fn heuristic_dots_rect(
         vec.push((dxdy, count));
     }
 
-    //単純距離が最短の脇道を探す
+    // 単純距離が最短の脇道を探す
     vec.sort_by(|a, b| a.1.cmp(&b.1)); //小さい順にソート
     let min_val = vec[0].1; //先頭の最小値
     vec.retain(|x| x.1 <= min_val); //最小値だけのリストにする
 
-    //脇道が1つだけならそれを、そうでないならNoneを返す
+    // 脇道が1つだけならそれを、そうでないならNoneを返す
     if vec.len() == 1
     {
         Some(vec[0].0)
@@ -220,22 +220,22 @@ fn heuristic_dots_rect(
 
 impl map::Map
 {
-    //指定した座標とその四方のドットを数える(結果は0～4)
+    // 指定した座標とその四方のドットを数える(結果は0～4)
     fn count_dots_4sides(&self, center: IVec2) -> i32
     {
-        //指定の座標にドットはあるか
-        let mut count = i32::from(self.opt_entity(center).is_some()); //true:1,false:0
+        // 指定の座標にドットはあるか
+        let mut count = i32::from(self.option_entity(center).is_some()); //true:1,false:0
 
-        //四方にドットはあるか
+        // 四方にドットはあるか
         self.get_side_spaces_list(center).iter().for_each(
-            |side| count += i32::from(self.opt_entity(center + *side).is_some()), //true:1,false:0
+            |side| count += i32::from(self.option_entity(center + *side).is_some()), //true:1,false:0
         );
 
         count
     }
 }
 
-//脇道を走査してリスクを評価する
+// 脇道を走査してリスクを評価する
 fn check_byway_risk(
     mut target: IVec2,   //初期値：player.next_grid + side
     mut previous: IVec2, //初期値：player.next_grid
@@ -243,7 +243,7 @@ fn check_byway_risk(
     map: &Res<map::Map>,
 ) -> Option<usize>
 {
-    //chasersが空の場合(全ての追手が衝突寸前)、脇道にはリスクがない
+    // chasersが空の場合(全ての追手が衝突寸前)、脇道にはリスクがない
     if chasers.is_empty()
     {
         return None;
@@ -254,25 +254,25 @@ fn check_byway_risk(
     let mut crossing = None;
 
     'Outside: loop
-    //全pathsを調べるループ
+    // 全pathsを調べるループ
     {
         'Inside: loop
-        //paths[ 0 ]を調べるループ
+        // paths[ 0 ]を調べるループ
         {
             let path_0_len = paths[0].len();
 
-            //chaserのどれかにぶつかれば、そのpathの調査は終わり
+            // chaserのどれかにぶつかれば、そのpathの調査は終わり
             if chasers.contains(&target)
             {
                 if risk.is_none() || path_0_len < risk.unwrap()
                 {
-                    //最短距離を更新する
+                    // 最短距離を更新する
                     risk = Some(path_0_len);
 
-                    //交差点を探し、あればその距離を記録する
+                    // 交差点を探し、あればその距離を記録する
                     let mut work = None;
                     for i in 2..path_0_len
-                    //２×２領域で回り続けないよう、[2]から調べる
+                    // ２×２領域で回り続けないよう、[2]から調べる
                     {
                         let count_byways =
                             map.get_side_spaces_list(paths[0][i]).len();
@@ -288,75 +288,75 @@ fn check_byway_risk(
                 break 'Inside;
             }
 
-            //既に見つかっている最短経路より長くなるなら、それ以上調べない
+            // 既に見つかっている最短経路より長くなるなら、それ以上調べない
             if risk.is_some_and(|x| path_0_len >= x)
             {
                 break 'Inside;
             }
 
-            //targetが交差点か調べる
+            // targetが交差点か調べる
             let mut sides = map.get_side_spaces_list(target); //脇道のリスト
             sides.retain(|side| target + *side != previous); //戻り路を排除
 
-            //ざっくりチェイサーに近い順に交差点の入り口を並べ替える
+            // ざっくりチェイサーに近い順に交差点の入り口を並べ替える
             sides.sort_by_key(|side| heuristic(target + *side, chasers));
 
-            //Ｔ字路(2)か十字路(3)の場合、分岐PATHを作る
+            // Ｔ字路(2)か十字路(3)の場合、分岐PATHを作る
             for side in sides.iter().skip(1)
-            //一本道(1)はループに入らない
+            // 一本道(1)はループに入らない
             {
                 let byway = target + *side;
 
-                //それまで通った道に入り込まない（蛇の頭が自分の胴体にかみついた）
+                // それまで通った道に入り込まない（蛇の頭が自分の胴体にかみついた）
                 if paths[0].contains(&byway)
                 {
                     continue;
                 }
 
-                //それまでの経路(paths[ 0 ])を複製し、脇道を追加
+                // それまでの経路(paths[ 0 ])を複製し、脇道を追加
                 paths.push_back(paths[0].clone());
                 let last_index = paths.len() - 1;
                 paths[last_index].push(byway);
             }
 
-            //それまで通った道に到達したらそれ以上調べない（蛇の頭が自分の胴体にかみついた）
+            // それまで通った道に到達したらそれ以上調べない（蛇の頭が自分の胴体にかみついた）
             let byway = target + sides[0];
             if paths[0].contains(&byway)
             {
                 break 'Inside;
             }
 
-            //一歩進む
+            // 一歩進む
             paths[0].push(byway);
             previous = target;
             target = byway;
         }
 
-        //paths[ 0 ]を調べ終わったので削除してpathsが空になればチェック完了
+        // paths[ 0 ]を調べ終わったので削除してpathsが空になればチェック完了
         paths.pop_front();
         if paths.is_empty()
         {
             break 'Outside;
         }
 
-        //次のpath[ 0 ]を調べる準備
+        // 次のpath[ 0 ]を調べる準備
         target = paths[0][paths[0].len() - 1];
         previous = paths[0][paths[0].len() - 2];
     }
 
-    //チェイサーとの間に交差点がないか、あっても中央よりチェイサー側にある場合はリスクあり
+    // チェイサーとの間に交差点がないか、あっても中央よりチェイサー側にある場合はリスクあり
     if crossing.is_none() || crossing.unwrap() * 2 >= risk.unwrap() - 1
     {
         risk
     }
     else
     {
-        //チェイサーとの間で中央より手前に交差点があればリスクなし(曲がって逃げられるから)
+        // チェイサーとの間で中央より手前に交差点があればリスクなし(曲がって逃げられるから)
         None
     }
 }
 
-//ざっくりチェイサーとの距離を測って最小値を返す
+// ざっくりチェイサーとの距離を測って最小値を返す
 fn heuristic(target: IVec2, chasers: &[IVec2]) -> i32
 {
     let mut shortest = map::MAP_WIDTH_IN_CELLS + map::MAP_HEIGHT_IN_CELLS;
@@ -370,4 +370,4 @@ fn heuristic(target: IVec2, chasers: &[IVec2]) -> i32
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//End of code.
+// End of code.

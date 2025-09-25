@@ -9,13 +9,13 @@ pub fn update_header_footer(
         &header_footer::Position,
         &header_footer::UpdateInfo,
     )>,
-    opt_record: Option<Res<Record>>,
+    option_record: Option<Res<Record>>,
     diag_store: Res<DiagnosticsStore>,
     mut text_writer: TextUiWriter,
 ) -> Result
 {
     // 準備
-    let record = opt_record.ok_or("Resource not found.")?;
+    let record = option_record.ok_or("Resource not found.")?;
 
     // ヘッダー・フッターの中でupdate_infoがSomeのものを処理する
     for (root_entity, position, update_info) in query_text_spans

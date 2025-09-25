@@ -4,13 +4,13 @@ use super::*;
 
 // マップのデータを作る
 pub fn make_new_stage_data(
-    opt_record: Option<ResMut<Record>>,
-    opt_map: Option<ResMut<Map>>,
+    option_record: Option<ResMut<Record>>,
+    option_map: Option<ResMut<Map>>,
 ) -> Result
 {
     // 必須のResource
-    let mut record = opt_record.ok_or("Resource not found.")?;
-    let mut map = opt_map.ok_or("Resource not found.")?;
+    let mut record = option_record.ok_or("Resource not found.")?;
+    let mut map = option_map.ok_or("Resource not found.")?;
 
     // 二次元配列の矩形領域を指定の値によって埋める無名関数
     let origin_bottom_right =
@@ -93,8 +93,8 @@ type WithWallAndDotSprite = Or<(With<SpriteWall>, With<SpriteDot>)>;
 
 // スプライトをspawnしてマップを表示する
 pub fn spawn_sprite(
-    opt_map: Option<ResMut<Map>>,
-    qry_entity: Query<Entity, WithWallAndDotSprite>,
+    option_map: Option<ResMut<Map>>,
+    query_entity: Query<Entity, WithWallAndDotSprite>,
     mut cmds: Commands,
     asset_svr: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -102,8 +102,8 @@ pub fn spawn_sprite(
 ) -> Result
 {
     // 準備
-    let mut map = opt_map.ok_or("Resource not found.")?; // 必須のResource
-    qry_entity.iter().for_each(|id| cmds.entity(id).despawn()); // 既存スプライトがあれば削除する
+    let mut map = option_map.ok_or("Resource not found.")?; // 必須のResource
+    query_entity.iter().for_each(|id| cmds.entity(id).despawn()); // 既存スプライトがあれば削除する
     map.remaining_dots = 0; // カウンターのゼロクリア
 
     // 壁とドットのスプライトを配置する
@@ -177,7 +177,7 @@ pub fn spawn_sprite(
                         SpriteDot, // マーカー
                     ))
                     .id();
-                *map.opt_entity_mut(grid) = Some(id); // idを保存(プレー中にdespawnするため)
+                *map.option_entity_mut(grid) = Some(id); // idを保存(プレー中にdespawnするため)
                 map.remaining_dots += 1; // ドットを数える
             }
         })

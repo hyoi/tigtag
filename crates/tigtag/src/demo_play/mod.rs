@@ -4,6 +4,6 @@ pub mod schedule; // デモ用スケジュール
 pub use schedule::Schedule;
 
 mod auto_drive; // デモ用の自機アルゴリズム
-mod footer; // デモの情報表示
+mod extend_footer; // デモの情報表示
 
-//End of code.
+// End of code.

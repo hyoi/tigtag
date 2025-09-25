@@ -43,11 +43,11 @@ impl Plugin for Schedule
                         appctrl_input::send_app_exit_event, // アプリの終了
                         appctrl_input::toggle_fullscreen,   // 全画面切換
                     )
-                        .in_set(MyLabel::BeforeHitAnyKey)
+                        .in_set(MyLabel::BeforeHitAnyKey) // HitAnyKeyより前に実行
                         .run_if(not(misc::WASM)), // WASMでは実行しない
                     // UI outline表示
                     appctrl_input::toggle_outline_gizmo_ui
-                        .in_set(MyLabel::BeforeHitAnyKey)
+                        .in_set(MyLabel::BeforeHitAnyKey) // HitAnyKeyより前に実行
                         .run_if(misc::DEBUG),
                 ),
             );
@@ -153,8 +153,6 @@ struct SpriteTile
     goal_grid: (i32, i32),
 }
 
-//------------------------------------------------------------------------------
-
 // スプライト（とカメラ）を生成する
 fn spawn_sprite_with_camera2d(
     query_camera2d: Query<&Camera2d>,
@@ -208,8 +206,6 @@ fn spawn_sprite_with_camera2d(
     Ok(())
 }
 
-//------------------------------------------------------------------------------
-
 // スプライトを動かす（ローディングアニメーション）
 fn move_sprite(
     mut query_transform: Query<(&mut Transform, &SpriteTile)>,
@@ -249,8 +245,6 @@ struct LoadedAssets(Vec<Handle<LoadedUntypedAsset>>);
 #[derive(Resource)]
 struct IsLoadingDone;
 
-//------------------------------------------------------------------------------
-
 // Assetsのロードを開始する
 fn start_loading(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
 {
@@ -265,8 +259,6 @@ fn start_loading(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
 
     Ok(())
 }
-
-//------------------------------------------------------------------------------
 
 // Assetsのロードは完了したか？
 fn check_loading_done(

@@ -200,10 +200,9 @@ impl Default for OverlayPauseMenu
                     ( Label , ( "PAUSE" , ASSETS_FONT_ORBITRON_BLACK, PAUSE_TITLE_SIZE     , COLOR_GOLD         ) ),
                     ( Label , ( " "     , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 1.2, COLOR_NONE         ) ),
                     ( Exit  , ( "EXIT"  , ASSETS_FONT_ORBITRON_BLACK, PAUSE_BASE_SIZE      , PAUSE_NORMAL_COLOR ) ),
-                    ( Label , ( " "     , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.8, COLOR_NONE         ) ),
-                    ( Config, ( "CONFIG", ASSETS_FONT_ORBITRON_BLACK, PAUSE_BASE_SIZE      , PAUSE_NORMAL_COLOR ) ),
-                ])
-                ,
+                    // ( Label , ( " "     , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.8, COLOR_NONE         ) ),
+                    // ( Config, ( "CONFIG", ASSETS_FONT_ORBITRON_BLACK, PAUSE_BASE_SIZE      , PAUSE_NORMAL_COLOR ) ),
+                ]),
                 selected_index: 2,
             },
             scaling_item: overlay_ui::pause_menu::ScalingItemParams::default(),
@@ -247,7 +246,11 @@ impl Default for overlay_ui::pause_menu::PauseMenuApply
     fn default() -> Self
     {
         Self {
-            keys: vec![(KeyCode::Enter, None), (KeyCode::KeyE, None)],
+            keys: vec![
+                (KeyCode::Enter, None),
+                (KeyCode::Space, None),
+                (KeyCode::KeyE, None),
+            ],
             buttons: vec![GamepadButton::East],
         }
     }

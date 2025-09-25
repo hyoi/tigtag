@@ -22,8 +22,7 @@ impl Plugin for Schedule
                 Update, // without MyState
                 // Pauseメニューの表示／非表示（トグル動作）
                 hook_input_and_toggle_pause
-                    // Hit Any KeyおよびAppExit処理の前に実行すること
-                    .in_set(MyLabel::BeforeHitAnyKey)
+                    .in_set(MyLabel::BeforeHitAnyKey) // HitAnyKeyより前に実行
                     .before(appctrl_input::send_app_exit_event),
             )
             // ループ処理２

@@ -73,10 +73,10 @@ where
     {
         move |mut query_params: Query<&mut Self>,
               mut event_countdown: ResMut<Events<CountDownFinished>>| {
-            //準備
+            // 準備
             let mut params = query_params.single_mut()?;
 
-            //初期化
+            // 初期化
             *params = Self::default();
             event_countdown.clear(); //[対策]EventCountDownが生きているので（v0.16.1）
 

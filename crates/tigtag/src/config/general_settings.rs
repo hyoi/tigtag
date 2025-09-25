@@ -244,7 +244,7 @@ pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//Hit ANY Keyの処理で無視するキーとボタン
+// Hit ANY Keyの処理で無視するキーとボタン
 #[rustfmt::skip]
 pub const IGNORE_KEYS_HITANYKEY: &[KeyCode] = &[
     KeyCode::AltLeft    , KeyCode::AltRight,

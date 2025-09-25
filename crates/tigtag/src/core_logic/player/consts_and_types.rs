@@ -95,13 +95,14 @@ impl DemoMapParams
 
 // 自走プレイヤー(デモ時)の移動方向を決める関数（関数ポインタ）
 #[derive(Resource)]
+#[allow(clippy::type_complexity)]
 pub struct DemoAutoDriveFn(
     pub  fn(
         &Player,                // プレイヤーのComponent
         Query<&chaser::Chaser>, // チェイサーのComponent
         Res<map::Map>,          // マップ
         Res<DemoMapParams>,     // デモ用情報
-        &[News],                //
+        &[News],                // プレイヤーがいるセルの四方の道のリスト
     ) -> News,
 );
 

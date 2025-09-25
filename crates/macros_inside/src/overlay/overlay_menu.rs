@@ -2,7 +2,7 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//#[derive( OverlayMenu )]
+// #[derive( OverlayMenu )]
 pub fn derive_overlay_menu(input: TokenStream) -> TokenStream
 {
     // 入力を分解する
@@ -40,7 +40,7 @@ pub fn derive_overlay_menu(input: TokenStream) -> TokenStream
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//#[derive( ScalingItem )]
+// #[derive( ScalingItem )]
 pub fn derive_scaling_item(input: TokenStream) -> TokenStream
 {
     // 入力を分解する

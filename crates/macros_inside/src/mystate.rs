@@ -2,7 +2,7 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//#[derive( MyState )]
+// #[derive( MyState )]
 pub fn derive_mystate(input: TokenStream) -> TokenStream
 {
     // 入力を分解する
@@ -35,12 +35,12 @@ pub fn derive_mystate(input: TokenStream) -> TokenStream
 
     // 文字列を作成して出力する
     quote! {
-        //MyStateの遷移に使うTrait境界
+        // MyStateの遷移に使うTrait境界
         pub trait ChangeMyState
         {   fn state( &self ) -> #enum_type;
         }
 
-        //バリアントと同名のstructからバリアントを取得させるための仕込み
+        // バリアントと同名のstructからバリアントを取得させるための仕込み
         #(  #[derive( Default )]
             pub struct #enum_variant;
             impl ChangeMyState for #enum_variant
@@ -48,7 +48,7 @@ pub fn derive_mystate(input: TokenStream) -> TokenStream
             }
         )*
 
-        //同名structによって指定されたMyStateへ遷移するSystem
+        // 同名structによって指定されたMyStateへ遷移するSystem
         pub fn set_next_state<T: Send + Sync + Default + ChangeMyState>
         (   next: Local<T>,
             mut next_state: ResMut<NextState<#enum_type>>
@@ -56,12 +56,12 @@ pub fn derive_mystate(input: TokenStream) -> TokenStream
         {   next_state.set( next.state() );
         }
 
-        //ResourceにセットされたMyStateへ遷移するSystem
+        // ResourceにセットされたMyStateへ遷移するSystem
         pub fn change_state_by_resource<T: Resource + ChangeMyState>
-        (   opt_state: Option<Res<T>>,
+        (   option_state: Option<Res<T>>,
             mut next_state: ResMut<NextState<#enum_type>>
         )
-        {   let Some ( next ) = opt_state else { warn!( "opt_state is None." ); return };
+        {   let Some ( next ) = option_state else { warn!( "option_state is None." ); return };
             next_state.set( next.state() );
         }
 

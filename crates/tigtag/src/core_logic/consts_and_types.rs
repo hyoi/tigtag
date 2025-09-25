@@ -16,22 +16,16 @@ mod my_events
     #[derive(Event, Default)] pub struct SkipOverlayMessage;
 }
 
-// #[derive(Event)]
-// pub struct EventEatDot(pub IVec2); //tigtag3d用の追加フィールド
-// #[allow( dead_code )]
-// #[derive( Event )] pub struct EventTimerPlayer;
-// #[allow( dead_code )]
-// #[derive( Event )] pub struct EventTimerChasers ( pub Vec<Color> ); //tigtag3d用の追加フィールド
-
 ////////////////////////////////////////////////////////////////////////////////
 
 // システムの実行順を制御するためのラベル
 #[derive(SystemSet, Hash, Debug, Eq, PartialEq, Clone)]
+#[allow(clippy::enum_variant_names)]
 pub enum MyLabel
 {
-    BeforeHitAnyKey,
+    BeforeHitAnyKey, // HitAnyKeyの前に実行するSystem用ラベル
     HitAnyKey,
-    AfterHitAnyKey,
+    AfterHitAnyKey, // HitAnyKeyの後に実行するSystem用ラベル
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,7 +131,7 @@ impl AddAssign<News> for IVec2
 
 impl News
 {
-    //背面の方角を得る
+    // 背面の方角を得る
     pub fn back(&self) -> Self
     {
         match self

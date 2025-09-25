@@ -16,7 +16,7 @@ pub struct Chaser
     pub is_stop: bool,    // 移動停止フラグ
     pub base_speed: f32,  // 基準の移動速度
     pub anime: SpriteAnimationParams, // スプライトアニメーションの情報
-    pub opt_fn_autochase: Option<FnAutoChase>, // 敵キャラの移動方向を決める関数
+    pub option_fn_autochase: Option<FnAutoChase>, // 敵キャラの移動方向を決める関数
     pub color: Srgba,     // 敵キャラの表示色
 }
 
@@ -88,7 +88,7 @@ impl Default for Chaser
                 timer: Timer::from_seconds(ANIME_TIMER_CHASER, TimerMode::Repeating),
                 ..default()
             },
-            opt_fn_autochase: None,
+            option_fn_autochase: None,
             color: Srgba::NONE,
         }
     }
@@ -104,7 +104,7 @@ pub const CHASER_SPRITE_SCALING: f32 = 0.6;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//スピードアップの割増
+// スピードアップの割増
 pub const CHASER_ACCEL: f32 = 0.4;
 
 ////////////////////////////////////////////////////////////////////////////////

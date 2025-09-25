@@ -2,7 +2,7 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//スプライトアニメーションの情報
+// スプライトアニメーションの情報
 pub struct SpriteAnimationParams
 {
     pub timer: Timer,                               // タイマー
@@ -86,29 +86,29 @@ impl SpriteAnimation for chaser::Chaser
 
 // スプライトをアニメーションさせる
 pub fn animate_sprites<T>(
-    mut qry_target: Query<(&mut Sprite, &mut T)>,
+    mut query_target: Query<(&mut Sprite, &mut T)>,
     time: Res<Time>,
 ) where
     T: Component<Mutability = Mutable> + SpriteAnimation,
 {
-    for (mut sprite, mut character) in &mut qry_target
+    for (mut sprite, mut character) in &mut query_target
     {
-        //アニメーションのタイマー
+        // アニメーションのタイマー
         let delta = time.delta();
         let finished = character.anime_timer_mut().tick(delta).just_finished();
 
         if finished && let Some(texture_atlas) = &mut sprite.texture_atlas
         {
-            //アニメのパターンを1つ進める
+            // アニメのパターンを1つ進める
             let index = &mut texture_atlas.index;
             *index += 1;
 
-            //スプライトシートの情報を取り出す
+            // スプライトシートの情報を取り出す
             let news = character.direction();
             let offset = character.sprite_sheet_offset(news) as usize;
             let count = character.num_patterns() as usize;
 
-            //アニメのパターンを周期的に繰り返す
+            // アニメのパターンを周期的に繰り返す
             *index = offset + (*index - offset) % count;
         }
     }

@@ -2,7 +2,7 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//.run_if( condition )用の定数
+// .run_if( condition )用の定数
 pub const DEBUG: fn() -> bool = || cfg!(debug_assertions);
 pub const WASM: fn() -> bool = || cfg!(target_arch = "wasm32");
 
@@ -103,13 +103,13 @@ pub fn select_ui_camera(
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//QueryしたComponentを可視化する
+// QueryしたComponentを可視化する
 pub fn show_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
 {
     query.iter_mut().for_each(|mut v| *v = Visibility::Visible);
 }
 
-//QueryしたComponentを不可視にする
+// QueryしたComponentを不可視にする
 pub fn hide_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
 {
     query.iter_mut().for_each(|mut v| *v = Visibility::Hidden);

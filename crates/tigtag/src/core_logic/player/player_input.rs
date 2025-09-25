@@ -134,10 +134,10 @@ pub fn input_from_gamepad(
         // スティックの処理
         // 変化時だけ発火するイベントの情報を保存する（スティックの角度）
         axis_events.read().for_each(|change_axis| {
-            //ゲームパッドが一致するなら（ゲームパッドは複数接続できるので）
+            // ゲームパッドが一致するなら（ゲームパッドは複数接続できるので）
             if change_axis.entity == gamepad_entity
             {
-                //スティックが中央に戻ったなら（0.0）
+                // スティックが中央に戻ったなら（0.0）
                 if change_axis.value == 0.0
                 {
                     axis_values.remove(&change_axis.axis);

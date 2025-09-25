@@ -2,7 +2,7 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//#[derive( OverlayMessage )]
+// #[derive( OverlayMessage )]
 pub fn derive_overlay_message(input: TokenStream) -> TokenStream
 {
     // 入力を分解する
@@ -35,7 +35,7 @@ pub fn derive_overlay_message(input: TokenStream) -> TokenStream
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//#[derive( Blinking )]
+// #[derive( Blinking )]
 pub fn derive_blinking(input: TokenStream) -> TokenStream
 {
     // 入力を分解する
@@ -76,7 +76,7 @@ pub fn derive_blinking(input: TokenStream) -> TokenStream
 
 ////////////////////////////////////////////////////////////////////////////////
 
-//#[derive( CountDown )]
+// #[derive( CountDown )]
 pub fn derive_countdown(input: TokenStream) -> TokenStream
 {
     // 入力を分解する
