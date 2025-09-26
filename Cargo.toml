@@ -34,7 +34,6 @@ macros.workspace = true
 
 bevy = "=0.17.0-rc.2"
 #bevy = { version = "0.16", features = [
-#bevy = { version = "=0.17.0-rc.2", features = [
 #    "configurable_error_handler", # v0.17廃止
 #    "bevy_ui_debug"
 #] }

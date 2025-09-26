@@ -2,7 +2,7 @@
 use bevy::{
     prelude::*,
     ecs::{
-        error::{/*GLOBAL_ERROR_HANDLER,*/ warn},
+        error::warn,
     //     system::SystemParam,
     //     component::Mutable,
     },
@@ -36,15 +36,15 @@ use bevy::{
 // use macros::derive_appctrl_input;
 
 // internal submodules
-// mod my_utils; // 共通ライブラリ
-// use my_utils::*;
+mod core_logic; // ゲームロジック
+// use core_logic::*;
+// use core_logic::overlay_ui::OverlayMessage;
+
+mod my_utils; // 共通ライブラリ
+use my_utils::*;
 
 // mod config; // 設定各種
 // use config::*;
-
-// mod core_logic; // ゲームロジック
-// use core_logic::*;
-// use core_logic::overlay_ui::OverlayMessage;
 
 // mod demo_play; // demoロジック
 
@@ -53,17 +53,10 @@ use bevy::{
 // メイン関数
 fn main() -> AppExit
 {
-    // エラーハンドラ設定
-    // GLOBAL_ERROR_HANDLER.set(warn).expect(
-    //     "Configure the error handler in main() once, prior to app initialization.",
-    // );
-
     // アプリの生成
     App::new()
-        // エラーハンドラ設定
-        .set_error_handler(warn)
         // メインスケジュール
-        // .add_plugins(core_logic::MainSchedule)
+        .add_plugins(core_logic::schedule::Schedule)
         // アプリ実行
         .run()
 }
