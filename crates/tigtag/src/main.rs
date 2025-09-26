@@ -6,7 +6,7 @@ use bevy::{
         system::SystemParam,
     //     component::Mutable,
     },
-    window::{EnabledButtons/*, WindowMode*/},
+    window::{EnabledButtons, WindowMode},
     log::LogPlugin,
     diagnostic::{FrameTimeDiagnosticsPlugin/*, DiagnosticsStore*/},
     // color::palettes::*,

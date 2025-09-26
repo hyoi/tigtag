@@ -123,22 +123,21 @@ impl Default for appctrl_input::ExitAppInput
 //------------------------------------------------------------------------------
 
 // 全画面切替のキーとボタンの設定
-// impl Default for appctrl_input::FullScreen
-// {
-//     fn default() -> Self
-//     {
-//         Self {
-//             keys: vec![
-//                 (KeyCode::Enter, Some(Vec::from(MODIFIERS_ALT))),
-//                 (KeyCode::F11, None),
-//             ],
-//             buttons: vec![
-//                 GamepadButton::Select, //ps4[SHARE]
-//                 // GamepadButton::Start,  //ps4[OPTIONS]
-//             ],
-//         }
-//     }
-// }
+impl Default for appctrl_input::FullScreenToggleInput
+{
+    fn default() -> Self
+    {
+        Self {
+            keys: vec![
+                (KeyCode::Enter, Some(Vec::from(MODIFIERS_ALT))),
+                (KeyCode::F11, None),
+            ],
+            buttons: vec![
+                GamepadButton::Select, //ps4[SHARE]
+            ],
+        }
+    }
+}
 
 //------------------------------------------------------------------------------
 

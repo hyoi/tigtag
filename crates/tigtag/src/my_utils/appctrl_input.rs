@@ -143,7 +143,7 @@ pub struct ExitAppInput;
 
 // アプリ終了
 pub fn send_exit_app_message(
-    appctrl: Local<ExitAppInput>, //初回のみdefault()で初期化
+    appctrl: Local<ExitAppInput>, // 初回のみdefault()で初期化
     mut input_device: InputDevicePack,
     mut message_exit_app: MessageWriter<AppExit>,
 ) -> Result
@@ -160,45 +160,45 @@ pub fn send_exit_app_message(
 ////////////////////////////////////////////////////////////////////////////////
 
 // 全画面切替のキーとボタンの設定
-// #[derive_appctrl_input]
-// pub struct FullScreen;
+#[derive_appctrl_input]
+pub struct FullScreenToggleInput;
 
 // ウィンドウとフルスクリーンを切り替える(トグル動作)
-// pub fn toggle_fullscreen(
-//     appctrl: Local<FullScreen>, //初回のみdefault()で初期化
-//     mut input_device: InputDevicePack,
-//     mut query_window: Query<&mut Window>,
-// ) -> Result
-// {
-//     // 準備
-//     let mut window = query_window.single_mut()?;
+pub fn toggle_fullscreen(
+    appctrl: Local<FullScreenToggleInput>, // 初回のみdefault()で初期化
+    mut input_device: InputDevicePack,
+    mut query_window: Query<&mut Window>,
+) -> Result
+{
+    // 準備
+    let mut window = query_window.single_mut()?;
 
-//     // ウィンドウ／フルスクリーンの切替キー・ボタンが押下されたなら
-//     if input_device.is_pressed_with_reset(&*appctrl)
-//     {
-//         match window.mode
-//         {
-//             WindowMode::Windowed =>
-//             {
-//                 window.resolution.set_scale_factor(2.0);
-//                 window.mode = WindowMode::Fullscreen(
-//                     MonitorSelection::Primary,
-//                     VideoModeSelection::Current,
-//                 );
-//             }
-//             _ =>
-//             {
-//                 window.resolution.set_scale_factor(1.0);
-//                 window.mode = WindowMode::Windowed;
-//             }
-//         };
+    // ウィンドウ／フルスクリーンの切替キー・ボタンが押下されたなら
+    if input_device.is_pressed_with_reset(&*appctrl)
+    {
+        match window.mode
+        {
+            WindowMode::Windowed =>
+            {
+                window.resolution.set_scale_factor(2.0);
+                window.mode = WindowMode::Fullscreen(
+                    MonitorSelection::Primary,
+                    VideoModeSelection::Current,
+                );
+            }
+            _ =>
+            {
+                window.resolution.set_scale_factor(1.0);
+                window.mode = WindowMode::Windowed;
+            }
+        };
 
-//         #[cfg(debug_assertions)]
-//         dbg!(&window.mode, &window.resolution);
-//     }
+        #[cfg(debug_assertions)]
+        dbg!(&window.mode, &window.resolution);
+    }
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

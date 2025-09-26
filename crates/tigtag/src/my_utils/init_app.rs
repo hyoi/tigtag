@@ -31,7 +31,7 @@ impl Plugin for Schedule
                     // 特別な入力のハンドリング
                     (
                         appctrl_input::send_exit_app_message, // アプリの終了
-                        // appctrl_input::toggle_fullscreen,   // 全画面切換
+                        appctrl_input::toggle_fullscreen,     // 全画面切換
                     )
         //                 .in_set(MyLabel::BeforeHitAnyKey) // HitAnyKeyより前に実行
         //                 .run_if(not(misc::WASM)), // WASMでは実行しない
