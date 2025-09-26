@@ -9,7 +9,7 @@ use bevy::{
     window::{EnabledButtons, WindowMode},
     log::LogPlugin,
     diagnostic::{FrameTimeDiagnosticsPlugin/*, DiagnosticsStore*/},
-    // color::palettes::*,
+    color::palettes::*,
     // asset::{LoadedUntypedAsset, LoadState},
     // render::camera::Viewport,
     // input::{
@@ -18,13 +18,13 @@ use bevy::{
     // },
     // audio::Volume,
 };
-// use rand::prelude::*;
+use rand::prelude::*;
 // use rustc_hash::{FxHashMap, FxHashSet};
 
 // standard library
 use std::{
     slice::Iter,
-//     ops::{Range, Deref, DerefMut, Add, AddAssign},
+    ops::{Range/*, Deref, DerefMut, Add, AddAssign*/},
 //     f32::consts::{TAU, PI},
 //     collections::VecDeque,
 };

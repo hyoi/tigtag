@@ -151,6 +151,32 @@ pub enum SystemOrderHitAnyKey
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// スクリーン(第四象限)のピクセル座標(Vec2)へ変換する
+
+// (i32, i32)とIVec2を拡張するトレイト
+pub trait I32x2TypeExt
+{
+    fn to_screen_pixels(&self) -> Vec2;
+}
+
+// Y軸は負方向。アンカーがグリッド中央なので補正(0.5)が必要
+impl I32x2TypeExt for (i32, i32)
+{
+    fn to_screen_pixels(&self) -> Vec2
+    {
+        Vec2::new(self.0 as f32 + 0.5, -self.1 as f32 - 0.5) * PIXELS_PER_GRID
+    }
+}
+// impl I32x2TypeExt for IVec2
+// {
+//     fn to_screen_pixels(&self) -> Vec2
+//     {
+//         Vec2::new(self.x as f32 + 0.5, -self.y as f32 - 0.5) * PIXELS_PER_GRID
+//     }
+// }
+
+////////////////////////////////////////////////////////////////////////////////
+
 // QueryしたEnityを削除する（条件がComponent）
 // pub fn despawn_component<T: Component>(
 //     query_entity: Query<Entity, With<T>>,
@@ -194,32 +220,6 @@ pub enum SystemOrderHitAnyKey
 // pub fn hide_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
 // {
 //     query.iter_mut().for_each(|mut v| *v = Visibility::Hidden);
-// }
-
-////////////////////////////////////////////////////////////////////////////////
-
-// スクリーン(第四象限)のピクセル座標(Vec2)へ変換する
-
-// (i32, i32)とIVec2を拡張するトレイト
-// pub trait I32x2TypeExt
-// {
-//     fn to_screen_pixels(&self) -> Vec2;
-// }
-
-// Y軸は負方向。アンカーがグリッド中央なので補正(0.5)が必要
-// impl I32x2TypeExt for (i32, i32)
-// {
-//     fn to_screen_pixels(&self) -> Vec2
-//     {
-//         Vec2::new(self.0 as f32 + 0.5, -self.1 as f32 - 0.5) * PIXELS_PER_GRID
-//     }
-// }
-// impl I32x2TypeExt for IVec2
-// {
-//     fn to_screen_pixels(&self) -> Vec2
-//     {
-//         Vec2::new(self.x as f32 + 0.5, -self.y as f32 - 0.5) * PIXELS_PER_GRID
-//     }
 // }
 
 ////////////////////////////////////////////////////////////////////////////////
