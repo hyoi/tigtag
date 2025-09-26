@@ -17,8 +17,8 @@ impl Plugin for Schedule
                 DefaultPlugins
                     .set(WindowPlugin::initialize()) // 主ウィンドウ初期化
                     .set(LogPlugin::initialize())    // ログレベル初期化
-                //     .set(ImagePlugin::default_nearest()), // ピクセルパーフェクト
-                // FrameTimeDiagnosticsPlugin::default(), // FPS Plugin
+                    .set(ImagePlugin::default_nearest()), // ピクセルパーフェクト
+                FrameTimeDiagnosticsPlugin::default(), // FPS Plugin
             ))
         //     // Stateの初期化
         //     .init_state::<MyState>()
