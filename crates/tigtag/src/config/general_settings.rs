@@ -4,16 +4,16 @@ use super::*;
 
 // WindowPluginの初期化
 #[rustfmt::skip]
-pub trait InitWindowPlugin { fn my_init() -> Self; }
+pub trait InitWindowPlugin { fn initialize() -> Self; }
 impl InitWindowPlugin for WindowPlugin
 {
-    fn my_init() -> Self
+    fn initialize() -> Self
     {
         // 主ウィンドウの設定
         let window = Window {
-            resolution: SCREEN_PIXELS_RESO.into(), // ウィンドウのサイズ
-            resizable: false,                      // リサイズ不可
-            decorations: true,                     // タイトルバー表示
+            resolution: SCREEN_PIXELS_RESO.into(),    // ウィンドウのサイズ
+            resizable: false,                         // リサイズ不可
+            decorations: true,                        // タイトルバー表示
             title: format!("{APP_TITLE} v{APP_VER}"), // タイトルバーに表示するタイトル
             enabled_buttons: EnabledButtons {
                 minimize: false, // 最小化ボタン非表示
@@ -33,8 +33,8 @@ impl InitWindowPlugin for WindowPlugin
 }
 
 // ウィンドウ縦横(Pixel)
-pub const SCREEN_PIXELS_RESO: Vec2 =
-    Vec2::new(SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT);
+pub const SCREEN_PIXELS_RESO: UVec2 =
+    UVec2::new(SCREEN_PIXELS_WIDTH as u32, SCREEN_PIXELS_HEIGHT as u32);
 pub const SCREEN_PIXELS_WIDTH: f32 = PIXELS_PER_GRID * SCREEN_GRIDS_WIDTH as f32;
 pub const SCREEN_PIXELS_HEIGHT: f32 = PIXELS_PER_GRID * SCREEN_GRIDS_HEIGHT as f32;
 
@@ -55,255 +55,255 @@ pub const COPYRIGHT: &str = "hyoi 2021 - 2025";
 ////////////////////////////////////////////////////////////////////////////////
 
 // LogPluginの初期化
-#[rustfmt::skip]
-pub trait InitLogPlugin { fn my_init() -> Self; }
-impl InitLogPlugin for LogPlugin
-{
-    fn my_init() -> Self
-    {
-        // ログレベルの設定
-        let develop = "warn,wgpu_hal=error";
-        let release = "error";
+// #[rustfmt::skip]
+// pub trait InitLogPlugin { fn my_init() -> Self; }
+// impl InitLogPlugin for LogPlugin
+// {
+//     fn my_init() -> Self
+//     {
+//         // ログレベルの設定
+//         let develop = "warn,wgpu_hal=error";
+//         let release = "error";
 
-        // 返り値
-        let log_level = if misc::DEBUG() { develop } else { release };
-        Self {
-            filter: log_level.into(),
-            ..default()
-        }
-    }
-}
+//         // 返り値
+//         let log_level = if misc::DEBUG() { develop } else { release };
+//         Self {
+//             filter: log_level.into(),
+//             ..default()
+//         }
+//     }
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // ゲームの状態
-#[rustfmt::skip]
-#[allow(dead_code)]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States, MyState)]
-pub enum MyState
-{
-    #[default]
-    LoadAssets,
-    Initialize,
-    TitleDemo, DemoLoop,
-    StageStart, MainLoop, StageClear, GameOver,
-    Pause,
-}
+// #[rustfmt::skip]
+// #[allow(dead_code)]
+// #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States, MyState)]
+// pub enum MyState
+// {
+//     #[default]
+//     LoadAssets,
+//     Initialize,
+//     TitleDemo, DemoLoop,
+//     StageStart, MainLoop, StageClear, GameOver,
+//     Pause,
+// }
 
 // ゲームの状態の判定
-#[allow(dead_code)]
-impl MyState
-{
-    pub fn is_demoplay(&self) -> bool { self.is_titledemo() || self.is_demoloop() }
-    //     pub fn is_playing(&self) -> bool
-    //     {
-    //         self.is_stagestart() || self.is_mainloop() || self.is_stageclear()
-    //     }
-}
+// #[allow(dead_code)]
+// impl MyState
+// {
+//     pub fn is_demoplay(&self) -> bool { self.is_titledemo() || self.is_demoloop() }
+//     pub fn is_playing(&self) -> bool
+//     {
+//         self.is_stagestart() || self.is_mainloop() || self.is_stageclear()
+//     }
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // アプリ終了のキーとボタンの設定
-impl Default for appctrl_input::ExitApp
-{
-    fn default() -> Self
-    {
-        Self {
-            keys: vec![
-                (KeyCode::Escape, None),
-                (KeyCode::F4, Some(Vec::from(MODIFIERS_ALT))),
-            ],
-            buttons: vec![
-                GamepadButton::Mode, //ps4[PSボタン]
-            ],
-        }
-    }
-}
+// impl Default for appctrl_input::ExitApp
+// {
+//     fn default() -> Self
+//     {
+//         Self {
+//             keys: vec![
+//                 (KeyCode::Escape, None),
+//                 (KeyCode::F4, Some(Vec::from(MODIFIERS_ALT))),
+//             ],
+//             buttons: vec![
+//                 GamepadButton::Mode, //ps4[PSボタン]
+//             ],
+//         }
+//     }
+// }
 
 // 全画面切替のキーとボタンの設定
-impl Default for appctrl_input::FullScreen
-{
-    fn default() -> Self
-    {
-        Self {
-            keys: vec![
-                (KeyCode::Enter, Some(Vec::from(MODIFIERS_ALT))),
-                (KeyCode::F11, None),
-            ],
-            buttons: vec![
-                GamepadButton::Select, //ps4[SHARE]
-                                       // GamepadButton::Start,  //ps4[OPTIONS]
-            ],
-        }
-    }
-}
+// impl Default for appctrl_input::FullScreen
+// {
+//     fn default() -> Self
+//     {
+//         Self {
+//             keys: vec![
+//                 (KeyCode::Enter, Some(Vec::from(MODIFIERS_ALT))),
+//                 (KeyCode::F11, None),
+//             ],
+//             buttons: vec![
+//                 GamepadButton::Select, //ps4[SHARE]
+//                 // GamepadButton::Start,  //ps4[OPTIONS]
+//             ],
+//         }
+//     }
+// }
 
 // UI outlineの表示／非表示を切替えるキー
-impl Default for appctrl_input::UiOutline
-{
-    fn default() -> Self
-    {
-        Self {
-            keys: vec![(KeyCode::Tab, Some(Vec::from(MODIFIERS_CTRL)))],
-            buttons: vec![],
-        }
-    }
-}
+// impl Default for appctrl_input::UiOutline
+// {
+//     fn default() -> Self
+//     {
+//         Self {
+//             keys: vec![(KeyCode::Tab, Some(Vec::from(MODIFIERS_CTRL)))],
+//             buttons: vec![],
+//         }
+//     }
+// }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 // 事前ロード対象
-pub const PRELOAD_ASSETS: &[&str] = &[
-    ASSETS_FONT_ORBITRON_BLACK,
-    ASSETS_FONT_PRESSSTART2P_REGULAR,
-    ASSETS_FONT_REGGAEONE_REGULAR,
-    ASSETS_SPRITE_KANI_DOTOWN,
-    ASSETS_SPRITE_BRICK_WALL,
-    ASSETS_SPRITESHEET_PLAYER,
-    ASSETS_SPRITESHEET_CHASER_RED,
-    ASSETS_SPRITESHEET_CHASER_GREEN,
-    ASSETS_SPRITESHEET_CHASER_BLUE,
-    ASSETS_SPRITESHEET_CHASER_PINK,
-    ASSETS_SOUND_BEEP,
-];
+// pub const PRELOAD_ASSETS: &[&str] = &[
+//     ASSETS_FONT_ORBITRON_BLACK,
+//     ASSETS_FONT_PRESSSTART2P_REGULAR,
+//     ASSETS_FONT_REGGAEONE_REGULAR,
+//     ASSETS_SPRITE_KANI_DOTOWN,
+//     ASSETS_SPRITE_BRICK_WALL,
+//     ASSETS_SPRITESHEET_PLAYER,
+//     ASSETS_SPRITESHEET_CHASER_RED,
+//     ASSETS_SPRITESHEET_CHASER_GREEN,
+//     ASSETS_SPRITESHEET_CHASER_BLUE,
+//     ASSETS_SPRITESHEET_CHASER_PINK,
+//     ASSETS_SOUND_BEEP,
+// ];
 
 // assets（フォント）
-pub const ASSETS_FONT_ORBITRON_BLACK: &str = "font/Orbitron-Black.ttf";
-pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "font/PressStart2P-Regular.ttf";
-pub const ASSETS_FONT_REGGAEONE_REGULAR: &str = "font/ReggaeOne-Regular.ttf";
+// pub const ASSETS_FONT_ORBITRON_BLACK: &str = "font/Orbitron-Black.ttf";
+// pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "font/PressStart2P-Regular.ttf";
+// pub const ASSETS_FONT_REGGAEONE_REGULAR: &str = "font/ReggaeOne-Regular.ttf";
 
 // assets（スプライト）
-pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "image/sprite/kani_DOTOWN.png";
-pub const ASSETS_SPRITE_BRICK_WALL: &str = "image/sprite/brick_wall.png";
+// pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "image/sprite/kani_DOTOWN.png";
+// pub const ASSETS_SPRITE_BRICK_WALL: &str = "image/sprite/brick_wall.png";
 
 // assets（スプライトシート）
-pub const ASSETS_SPRITESHEET_PLAYER: &str = "image/spritesheet/player.png";
-pub const ASSETS_SPRITESHEET_CHASER_RED: &str = "image/spritesheet/chaser_red.png";
-pub const ASSETS_SPRITESHEET_CHASER_GREEN: &str =
-    "image/spritesheet/chaser_green.png";
-pub const ASSETS_SPRITESHEET_CHASER_BLUE: &str = "image/spritesheet/chaser_blue.png";
-pub const ASSETS_SPRITESHEET_CHASER_PINK: &str = "image/spritesheet/chaser_pink.png";
+// pub const ASSETS_SPRITESHEET_PLAYER: &str = "image/spritesheet/player.png";
+// pub const ASSETS_SPRITESHEET_CHASER_RED: &str = "image/spritesheet/chaser_red.png";
+// pub const ASSETS_SPRITESHEET_CHASER_GREEN: &str =
+//     "image/spritesheet/chaser_green.png";
+// pub const ASSETS_SPRITESHEET_CHASER_BLUE: &str = "image/spritesheet/chaser_blue.png";
+// pub const ASSETS_SPRITESHEET_CHASER_PINK: &str = "image/spritesheet/chaser_pink.png";
 
 // assets（サウンド）
-pub const ASSETS_SOUND_BEEP: &str = "audio/sound/beep.ogg";
-pub const VOLUME_SOUND_BEEP: Volume = Volume::Linear(0.1); //SEボリューム
+// pub const ASSETS_SOUND_BEEP: &str = "audio/sound/beep.ogg";
+// pub const VOLUME_SOUND_BEEP: Volume = Volume::Linear(0.1); //SEボリューム
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // カメラの情報を格納するResourceの定義
-#[derive(Resource, Deref, DerefMut)]
-pub struct CameraSettings(pub Vec<simple_camera::Setting>);
+// #[derive(Resource, Deref, DerefMut)]
+// pub struct CameraSettings(pub Vec<simple_camera::Setting>);
 
 // カメラの情報
-impl Default for CameraSettings
-{
-    fn default() -> Self
-    {
-        Self(vec![simple_camera::Setting::from((
-            1,              // カメラのレンダリング優先度（0が最後）
-            Color::BLACK,   // レンダリング時の背景色（NONEは透明）
-            SimpleCamera2d, // マーカー（Component）
-            Camera2d,       // カメラ種類（Component）
-            Transform::from_translation(CAMERA2D_POSITION), // カメラの位置
-        ))])
-    }
-}
+// impl Default for CameraSettings
+// {
+//     fn default() -> Self
+//     {
+//         Self(vec![simple_camera::Setting::from((
+//             1,              // カメラのレンダリング優先度（0が最後）
+//             Color::BLACK,   // レンダリング時の背景色（NONEは透明）
+//             SimpleCamera2d, // マーカー（Component）
+//             Camera2d,       // カメラ種類（Component）
+//             Transform::from_translation(CAMERA2D_POSITION), // カメラの位置
+//         ))])
+//     }
+// }
 
 // カメラのComponent
-#[derive(Component, Clone)]
-pub struct SimpleCamera2d;
+// #[derive(Component, Clone)]
+// pub struct SimpleCamera2d;
 
 // 2Dカメラの位置
 // 第四象限を利用する。左上隅が(0,0)で、X軸はプラス方向へ、Y軸はマイナス方向へ伸びる
-pub const CAMERA2D_POSITION: Vec3 = Vec3::new(
-    SCREEN_PIXELS_WIDTH * 0.5,
-    SCREEN_PIXELS_HEIGHT * -0.5,
-    999.0, // 0.0だとスプライトの子のText2dがZ軸1.0(Vec3::Z)で表示されない不具合が発生(v0.14)
-);
+// pub const CAMERA2D_POSITION: Vec3 = Vec3::new(
+//     SCREEN_PIXELS_WIDTH * 0.5,
+//     SCREEN_PIXELS_HEIGHT * -0.5,
+//     999.0, // 0.0だとスプライトの子のText2dがZ軸1.0(Vec3::Z)で表示されない不具合が発生(v0.14)
+// );
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // コンパイル オプションの定数
-pub const ATTACH_VIEWPORT: fn() -> bool = || cfg!(feature = "attach_viewport");
-pub const SPRITE_OFF: fn() -> bool = || cfg!(feature = "sprite_off");
+// pub const ATTACH_VIEWPORT: fn() -> bool = || cfg!(feature = "attach_viewport");
+// pub const SPRITE_OFF: fn() -> bool = || cfg!(feature = "sprite_off");
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // スプライト重なり
-pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0; // フッターの蟹アイコン
-pub const DEPTH_SPRITE_CHASER: f32 = 700.0; // チェイサーのスプライト
-pub const DEPTH_SPRITE_PLAYER: f32 = 600.0; // プレイヤーのスプライト
-pub const DEPTH_SPRITE_DOT: f32 = 500.0; // ドットスプライト
-pub const DEPTH_SPRITE_BRICK_WALL: f32 = 400.0; // 壁スプライト
+// pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0; // フッターの蟹アイコン
+// pub const DEPTH_SPRITE_CHASER: f32 = 700.0; // チェイサーのスプライト
+// pub const DEPTH_SPRITE_PLAYER: f32 = 600.0; // プレイヤーのスプライト
+// pub const DEPTH_SPRITE_DOT: f32 = 500.0; // ドットスプライト
+// pub const DEPTH_SPRITE_BRICK_WALL: f32 = 400.0; // 壁スプライト
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // ドットのスプライトの情報
-pub const SPRITE_DOT_RADIUS: f32 = PIXELS_PER_GRID * 0.08;
-pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
+// pub const SPRITE_DOT_RADIUS: f32 = PIXELS_PER_GRID * 0.08;
+// pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // Hit ANY Keyの処理で無視するキーとボタン
-#[rustfmt::skip]
-pub const IGNORE_KEYS_HITANYKEY: &[KeyCode] = &[
-    KeyCode::AltLeft    , KeyCode::AltRight,
-    KeyCode::ControlLeft, KeyCode::ControlRight,
-    KeyCode::ShiftLeft  , KeyCode::ShiftRight,
-    KeyCode::SuperLeft  , KeyCode::SuperRight,
-    KeyCode::ArrowUp    , KeyCode::ArrowDown,
-    KeyCode::ArrowRight , KeyCode::ArrowLeft,
-    KeyCode::Fn,
-    KeyCode::Unidentified(NativeKeyCode::Windows(57443)), //ThinkPad [Fn]
-];
-#[rustfmt::skip]
-pub const IGNORE_BUTTONS_HITANYKEY: &[GamepadButton] = &[
-    GamepadButton::Select, //ps4[SHARE]
-    GamepadButton::Start,  //ps4[OPTIONS]
-    GamepadButton::Mode,   //ps4[PSボタン]
-];
+// #[rustfmt::skip]
+// pub const IGNORE_KEYS_HITANYKEY: &[KeyCode] = &[
+//     KeyCode::AltLeft    , KeyCode::AltRight,
+//     KeyCode::ControlLeft, KeyCode::ControlRight,
+//     KeyCode::ShiftLeft  , KeyCode::ShiftRight,
+//     KeyCode::SuperLeft  , KeyCode::SuperRight,
+//     KeyCode::ArrowUp    , KeyCode::ArrowDown,
+//     KeyCode::ArrowRight , KeyCode::ArrowLeft,
+//     KeyCode::Fn,
+//     KeyCode::Unidentified(NativeKeyCode::Windows(57443)), //ThinkPad [Fn]
+// ];
+// #[rustfmt::skip]
+// pub const IGNORE_BUTTONS_HITANYKEY: &[GamepadButton] = &[
+//     GamepadButton::Select, //ps4[SHARE]
+//     GamepadButton::Start,  //ps4[OPTIONS]
+//     GamepadButton::Mode,   //ps4[PSボタン]
+// ];
 
 // init_resource()用default
-impl Default for misc::MaskHitAnyKeyInput
-{
-    fn default() -> Self
-    {
-        Self {
-            keys: FxHashSet::from_iter(IGNORE_KEYS_HITANYKEY.iter()),
-            buttons: FxHashSet::from_iter(IGNORE_BUTTONS_HITANYKEY.iter()),
-        }
-    }
-}
+// impl Default for misc::MaskHitAnyKeyInput
+// {
+//     fn default() -> Self
+//     {
+//         Self {
+//             keys: FxHashSet::from_iter(IGNORE_KEYS_HITANYKEY.iter()),
+//             buttons: FxHashSet::from_iter(IGNORE_BUTTONS_HITANYKEY.iter()),
+//         }
+//     }
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // キーコードとコールバック関数の対応
-#[rustfmt::skip]
-pub const KEY_MAP: player::KeyMapSlice = &[
-    // WASD
-    ( KeyCode::KeyW, player::callback::move_up    ),
-    ( KeyCode::KeyS, player::callback::move_down  ),
-    ( KeyCode::KeyA, player::callback::move_left  ),
-    ( KeyCode::KeyD, player::callback::move_right ),
-    // カーソルキー
-    ( KeyCode::ArrowUp   , player::callback::move_up    ),
-    ( KeyCode::ArrowDown , player::callback::move_down  ),
-    ( KeyCode::ArrowLeft , player::callback::move_left  ),
-    ( KeyCode::ArrowRight, player::callback::move_right ),
-];
+// #[rustfmt::skip]
+// pub const KEY_MAP: player::KeyMapSlice = &[
+//     // WASD
+//     ( KeyCode::KeyW, player::callback::move_up    ),
+//     ( KeyCode::KeyS, player::callback::move_down  ),
+//     ( KeyCode::KeyA, player::callback::move_left  ),
+//     ( KeyCode::KeyD, player::callback::move_right ),
+//     // カーソルキー
+//     ( KeyCode::ArrowUp   , player::callback::move_up    ),
+//     ( KeyCode::ArrowDown , player::callback::move_down  ),
+//     ( KeyCode::ArrowLeft , player::callback::move_left  ),
+//     ( KeyCode::ArrowRight, player::callback::move_right ),
+// ];
 
 // ゲームパッドのボタン／スティックとコールバック関数の対応
-#[rustfmt::skip]
-pub const PAD_MAP: player::GamepadMapSlice = &[
-    // 十字ボタン
-    ( GamepadInput::Button( GamepadButton::DPadUp   ), player::callback::move_up    ),
-    ( GamepadInput::Button( GamepadButton::DPadDown ), player::callback::move_down  ),
-    ( GamepadInput::Button( GamepadButton::DPadLeft ), player::callback::move_left  ),
-    ( GamepadInput::Button( GamepadButton::DPadRight), player::callback::move_right ),
-    // 左スティック
-    ( GamepadInput::Axis( GamepadAxis::LeftStickX ), player::callback::axis_x_normal ),
-    ( GamepadInput::Axis( GamepadAxis::LeftStickY ), player::callback::axis_y_normal ),
-];
+// #[rustfmt::skip]
+// pub const PAD_MAP: player::GamepadMapSlice = &[
+//     // 十字ボタン
+//     ( GamepadInput::Button( GamepadButton::DPadUp   ), player::callback::move_up    ),
+//     ( GamepadInput::Button( GamepadButton::DPadDown ), player::callback::move_down  ),
+//     ( GamepadInput::Button( GamepadButton::DPadLeft ), player::callback::move_left  ),
+//     ( GamepadInput::Button( GamepadButton::DPadRight), player::callback::move_right ),
+//     // 左スティック
+//     ( GamepadInput::Axis( GamepadAxis::LeftStickX ), player::callback::axis_x_normal ),
+//     ( GamepadInput::Axis( GamepadAxis::LeftStickY ), player::callback::axis_y_normal ),
+// ];
 
 ////////////////////////////////////////////////////////////////////////////////
 

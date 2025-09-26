@@ -6,7 +6,7 @@ use bevy::{
     //     system::SystemParam,
     //     component::Mutable,
     },
-    // window::{EnabledButtons, WindowMode},
+    window::{EnabledButtons/*, WindowMode*/},
     // log::LogPlugin,
     // diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
     // color::palettes::*,
@@ -43,8 +43,8 @@ mod core_logic; // ゲームロジック
 mod my_utils; // 共通ライブラリ
 use my_utils::*;
 
-// mod config; // 設定各種
-// use config::*;
+mod config; // 設定各種
+use config::*;
 
 // mod demo_play; // demoロジック
 

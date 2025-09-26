@@ -15,7 +15,7 @@ impl Plugin for Schedule
             // first party plugins
             .add_plugins((
                 DefaultPlugins
-                //     .set(WindowPlugin::my_init()) // 主ウィンドウ初期化
+                    .set(WindowPlugin::initialize()) // 主ウィンドウ初期化
                 //     .set(LogPlugin::my_init()) // ログレベル初期化
                 //     .set(ImagePlugin::default_nearest()), // ピクセルパーフェクト
                 // FrameTimeDiagnosticsPlugin::default(), // FPS Plugin
