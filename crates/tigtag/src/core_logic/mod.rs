@@ -2,8 +2,8 @@ use super::*;
 
 pub mod schedule; // スケジュール
 
-mod consts_and_types; // 定数＆型定義
-pub use consts_and_types::*;
+// mod consts_and_types; // 定数＆型定義
+// pub use consts_and_types::*;
 
 // mod animate_sprites; //スプライトアニメーション
 // pub use animate_sprites::*;

@@ -70,6 +70,87 @@ pub fn watch_gamepad_connections(
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// システムの実行順を制御するためのSystemSet
+#[derive(SystemSet, Hash, Debug, Eq, PartialEq, Clone)]
+pub enum SystemOrderHitAnyKey
+{
+    Before, // HitAnyKeyの前に実行するSystem
+    Marker,
+    After, // HitAnyKeyの後に実行するSystem
+}
+
+//------------------------------------------------------------------------------
+
+// Hit Any Keyの入力フィルターを保存するResource（Todo: ゲームパッドボタンも必要）
+// #[derive(Resource)]
+// pub struct MaskHitAnyKeyInput
+// {
+//     pub keys: FxHashSet<&'static KeyCode>,
+//     pub buttons: FxHashSet<&'static GamepadButton>,
+// }
+
+// 何かしら入力があったことを通知するイベント
+// #[derive(Event)]
+// pub struct AnyButtonPressed;
+
+// 何かしら入力によりEventHitAnyKeyをセットする
+// pub fn check_hit_any_key(
+//     option_masking_input: Option<Res<MaskHitAnyKeyInput>>,
+//     input_keycode: Res<ButtonInput<KeyCode>>,
+//     option_target_gamepad: Option<Res<TargetGamepad>>,
+//     query_gamepads: Query<&Gamepad>,
+//     mut event: EventWriter<AnyButtonPressed>,
+// ) -> Result
+// {
+//     // 準備
+//     let masking_input = option_masking_input.ok_or("Resource not found.")?;
+
+//     // キー入力を数える（マスクされるキーは除く）
+//     let mut is_pressed = input_keycode
+//         .get_just_pressed() // .get_pressed()だと[Fn]がすり抜けることがある
+//         .filter(|key| !masking_input.keys.contains(key))
+//         .count();
+
+//     #[cfg(debug_assertions)]
+//     if is_pressed != 0
+//     {
+//         input_keycode.get_just_pressed().for_each(|key| {
+//             dbg!(key);
+//         });
+//     }
+
+//     // キー入力がなく、ゲームパッドが接続されているなら
+//     if is_pressed == 0
+//         && let Some(target_gamepad) = option_target_gamepad
+//         && let Some(gamepad_entity) = target_gamepad.entity()
+//         && let Ok(gamepad) = query_gamepads.get(gamepad_entity)
+//     {
+//         // ボタン入力を数える（マスクされるボタンは除く）
+//         is_pressed = gamepad
+//             .get_just_pressed()
+//             .filter(|button| !masking_input.buttons.contains(button))
+//             .count();
+
+//         #[cfg(debug_assertions)]
+//         if is_pressed != 0
+//         {
+//             gamepad.get_just_pressed().for_each(|button| {
+//                 dbg!(button);
+//             });
+//         }
+//     }
+
+//     // キーかボタンの入力があるなら
+//     if is_pressed > 0
+//     {
+//         event.write(AnyButtonPressed);
+//     }
+
+//     Ok(())
+// }
+
+////////////////////////////////////////////////////////////////////////////////
+
 // QueryしたEnityを削除する（条件がComponent）
 // pub fn despawn_component<T: Component>(
 //     query_entity: Query<Entity, With<T>>,
@@ -139,76 +220,6 @@ pub fn watch_gamepad_connections(
 //     {
 //         Vec2::new(self.x as f32 + 0.5, -self.y as f32 - 0.5) * PIXELS_PER_GRID
 //     }
-// }
-
-////////////////////////////////////////////////////////////////////////////////
-
-// Hit Any Keyの入力フィルターを保存するResource（Todo: ゲームパッドボタンも必要）
-// #[derive(Resource)]
-// pub struct MaskHitAnyKeyInput
-// {
-//     pub keys: FxHashSet<&'static KeyCode>,
-//     pub buttons: FxHashSet<&'static GamepadButton>,
-// }
-
-// 何かしら入力があったことを通知するイベント
-// #[derive(Event)]
-// pub struct AnyButtonPressed;
-
-// 何かしら入力によりEventHitAnyKeyをセットする
-// pub fn check_hit_any_key(
-//     option_masking_input: Option<Res<MaskHitAnyKeyInput>>,
-//     input_keycode: Res<ButtonInput<KeyCode>>,
-//     option_target_gamepad: Option<Res<TargetGamepad>>,
-//     query_gamepads: Query<&Gamepad>,
-//     mut event: EventWriter<AnyButtonPressed>,
-// ) -> Result
-// {
-//     // 準備
-//     let masking_input = option_masking_input.ok_or("Resource not found.")?;
-
-//     // キー入力を数える（マスクされるキーは除く）
-//     let mut is_pressed = input_keycode
-//         .get_just_pressed() // .get_pressed()だと[Fn]がすり抜けることがある
-//         .filter(|key| !masking_input.keys.contains(key))
-//         .count();
-
-//     #[cfg(debug_assertions)]
-//     if is_pressed != 0
-//     {
-//         input_keycode.get_just_pressed().for_each(|key| {
-//             dbg!(key);
-//         });
-//     }
-
-//     // キー入力がなく、ゲームパッドが接続されているなら
-//     if is_pressed == 0
-//         && let Some(target_gamepad) = option_target_gamepad
-//         && let Some(gamepad_entity) = target_gamepad.entity()
-//         && let Ok(gamepad) = query_gamepads.get(gamepad_entity)
-//     {
-//         // ボタン入力を数える（マスクされるボタンは除く）
-//         is_pressed = gamepad
-//             .get_just_pressed()
-//             .filter(|button| !masking_input.buttons.contains(button))
-//             .count();
-
-//         #[cfg(debug_assertions)]
-//         if is_pressed != 0
-//         {
-//             gamepad.get_just_pressed().for_each(|button| {
-//                 dbg!(button);
-//             });
-//         }
-//     }
-
-//     // キーかボタンの入力があるなら
-//     if is_pressed > 0
-//     {
-//         event.write(AnyButtonPressed);
-//     }
-
-//     Ok(())
 // }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -50,16 +50,6 @@ impl Plugin for Schedule
         //             // ヘッダーとフッターの表示情報を更新する
         //             information::update_header_footer,
         //         ),
-        //     )
-        //     // システムセット間の実行順序を制御する
-        //     .configure_sets(
-        //         Update,
-        //         (
-        //             // BeforeHitAnyKey は HitAnyKey の前に実行
-        //             MyLabel::BeforeHitAnyKey.before(MyLabel::HitAnyKey),
-        //             // AfterHitAnyKey は HitAnyKey の後に実行
-        //             MyLabel::AfterHitAnyKey.after(MyLabel::HitAnyKey),
-        //         ),
         //     );
 
         //--------------------------------------------------------------------------

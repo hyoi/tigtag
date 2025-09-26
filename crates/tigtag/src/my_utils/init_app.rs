@@ -33,12 +33,22 @@ impl Plugin for Schedule
                         appctrl_input::send_exit_app_message, // アプリの終了
                         appctrl_input::toggle_fullscreen,     // 全画面切換
                     )
-                        .in_set(SystemExecOrder::BeforeHitAnyKey) // HitAnyKeyより前に実行
+                        .in_set(misc::SystemOrderHitAnyKey::Before) // HitAnyKeyの前に実行
                         .run_if(not(misc::WASM)), // WASMでは実行しない
                     // UI outline表示
                     appctrl_input::toggle_ui_outline_gizmo
-                        .in_set(SystemExecOrder::BeforeHitAnyKey) // HitAnyKeyより前に実行
+                        .in_set(misc::SystemOrderHitAnyKey::Before) // HitAnyKeyの前に実行
                         .run_if(misc::DEBUG),
+                ),
+            )
+            // システムセット間の実行順序を登録
+            .configure_sets(
+                Update,
+                (
+                    // HitAnyKey（Marker）の前に実行
+                    misc::SystemOrderHitAnyKey::Before.before(misc::SystemOrderHitAnyKey::Marker),
+                    // HitAnyKey（Marker）の後に実行
+                    misc::SystemOrderHitAnyKey::After.after(misc::SystemOrderHitAnyKey::Marker),
                 ),
             );
 

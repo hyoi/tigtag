@@ -2,18 +2,6 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// システムの実行順を制御するためのSystemSet
-#[derive(SystemSet, Hash, Debug, Eq, PartialEq, Clone)]
-#[allow(clippy::enum_variant_names)]
-pub enum SystemExecOrder
-{
-    BeforeHitAnyKey, // HitAnyKeyの前に実行するSystem
-    // HitAnyKey,
-    // AfterHitAnyKey, // HitAnyKeyの後に実行するSystem
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // System間通知用イベント
 // pub use my_events::*;
 // #[rustfmt::skip]
