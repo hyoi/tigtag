@@ -142,16 +142,16 @@ impl Default for appctrl_input::FullScreenToggleInput
 //------------------------------------------------------------------------------
 
 // UI outlineの表示／非表示を切替えるキー
-// impl Default for appctrl_input::UiOutline
-// {
-//     fn default() -> Self
-//     {
-//         Self {
-//             keys: vec![(KeyCode::Tab, Some(Vec::from(MODIFIERS_CTRL)))],
-//             buttons: vec![],
-//         }
-//     }
-// }
+impl Default for appctrl_input::UiOutlineToggleInput
+{
+    fn default() -> Self
+    {
+        Self {
+            keys: vec![(KeyCode::Tab, Some(Vec::from(MODIFIERS_CTRL)))],
+            buttons: vec![],
+        }
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 

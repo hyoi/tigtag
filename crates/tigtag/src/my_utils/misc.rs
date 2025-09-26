@@ -4,7 +4,7 @@ use super::*;
 
 // .run_if( condition )用の定数
 pub const DEBUG: fn() -> bool = || cfg!(debug_assertions);
-// pub const WASM: fn() -> bool = || cfg!(target_arch = "wasm32");
+pub const WASM: fn() -> bool = || cfg!(target_arch = "wasm32");
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -203,28 +203,28 @@ pub fn toggle_fullscreen(
 ////////////////////////////////////////////////////////////////////////////////
 
 // UI outline表示切替のキーとボタンの設定
-// #[derive_appctrl_input]
-// pub struct UiOutline;
+#[derive_appctrl_input]
+pub struct UiOutlineToggleInput;
 
 // UI outlineの表示／非表示を切り替える(トグル動作)
-// pub fn toggle_outline_gizmo_ui(
-//     appctrl: Local<UiOutline>, //初回のみdefault()で初期化
-//     mut input_device: InputDevicePack,
-//     option_ui_debug_options: Option<ResMut<UiDebugOptions>>,
-// ) -> Result
-// {
-//     // 準備
-//     let mut ui_debug_options =
-//         option_ui_debug_options.ok_or("UiDebugOptions not found.")?;
+pub fn toggle_ui_outline_gizmo(
+    appctrl: Local<UiOutlineToggleInput>, // 初回のみdefault()で初期化
+    mut input_device: InputDevicePack,
+    option_ui_debug_options: Option<ResMut<UiDebugOptions>>,
+) -> Result
+{
+    // 準備
+    let mut ui_debug_options =
+        option_ui_debug_options.ok_or("ResMut<UiDebugOptions> not found.")?;
 
-//     // UI outline表示／非表示の切替キー・ボタンが押下されたなら
-//     if input_device.is_pressed_with_reset(&*appctrl)
-//     {
-//         ui_debug_options.toggle();
-//     }
+    // UI outline表示／非表示の切替キー・ボタンが押下されたなら
+    if input_device.is_pressed_with_reset(&*appctrl)
+    {
+        ui_debug_options.toggle();
+    }
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

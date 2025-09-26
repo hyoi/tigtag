@@ -31,7 +31,7 @@ use std::{
 
 // internal submodules
 mod core_logic; // ゲームロジック
-// use core_logic::*;
+use core_logic::*;
 // use core_logic::overlay_ui::OverlayMessage;
 
 mod my_utils; // 共通ライブラリ
