@@ -7,7 +7,7 @@ use bevy::{
     //     component::Mutable,
     },
     window::{EnabledButtons/*, WindowMode*/},
-    // log::LogPlugin,
+    log::LogPlugin,
     // diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
     // color::palettes::*,
     // asset::{LoadedUntypedAsset, LoadState},

@@ -55,24 +55,24 @@ pub const COPYRIGHT: &str = "hyoi 2021 - 2025";
 ////////////////////////////////////////////////////////////////////////////////
 
 // LogPluginの初期化
-// #[rustfmt::skip]
-// pub trait InitLogPlugin { fn my_init() -> Self; }
-// impl InitLogPlugin for LogPlugin
-// {
-//     fn my_init() -> Self
-//     {
-//         // ログレベルの設定
-//         let develop = "warn,wgpu_hal=error";
-//         let release = "error";
+#[rustfmt::skip]
+pub trait InitLogPlugin { fn initialize() -> Self; }
+impl InitLogPlugin for LogPlugin
+{
+    fn initialize() -> Self
+    {
+        // ログレベルの設定
+        let develop = "warn,wgpu_hal=error";
+        let release = "error";
 
-//         // 返り値
-//         let log_level = if misc::DEBUG() { develop } else { release };
-//         Self {
-//             filter: log_level.into(),
-//             ..default()
-//         }
-//     }
-// }
+        // 返り値
+        let log_level = if misc::DEBUG() { develop } else { release };
+        Self {
+            filter: log_level.into(),
+            ..default()
+        }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
