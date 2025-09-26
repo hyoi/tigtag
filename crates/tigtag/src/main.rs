@@ -3,7 +3,7 @@ use bevy::{
     prelude::*,
     ecs::{
         error::warn,
-    //     system::SystemParam,
+        system::SystemParam,
     //     component::Mutable,
     },
     window::{EnabledButtons/*, WindowMode*/},
@@ -22,12 +22,12 @@ use bevy::{
 // use rustc_hash::{FxHashMap, FxHashSet};
 
 // standard library
-// use std::{
-//     slice::Iter,
+use std::{
+    slice::Iter,
 //     ops::{Range, Deref, DerefMut, Add, AddAssign},
 //     f32::consts::{TAU, PI},
 //     collections::VecDeque,
-// };
+};
 
 // internal submodules
 mod core_logic; // ゲームロジック
@@ -44,9 +44,9 @@ use config::*;
 
 // proc-macro
 use macros::MyState;
+use macros::derive_appctrl_input;
 // use macros::{OverlayMessage, Blinking, CountDown};
 // use macros::{OverlayMenu, ScalingItem};
-// use macros::derive_appctrl_input;
 
 ////////////////////////////////////////////////////////////////////////////////
 

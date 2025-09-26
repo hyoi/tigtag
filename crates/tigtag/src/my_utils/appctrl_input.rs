@@ -28,7 +28,7 @@ pub struct InputDevicePack<'w, 's>
 
 pub trait IsPressed<T: AppCtrl>
 {
-    fn is_pressed(&self, appctrl: &T) -> bool;
+    // fn is_pressed(&self, appctrl: &T) -> bool;
     fn is_pressed_with_reset(&mut self, appctrl: &T) -> bool;
 }
 
@@ -37,29 +37,29 @@ where
     T: AppCtrl,
 {
     // キー入力とゲームパッドのボタン入力をチェックする
-    fn is_pressed(&self, appctrl_setting: &T) -> bool
-    {
-        // キーが押下されているか
-        let is_keys_pressed = appctrl_setting
-            .keys_iter()
-            .any(|appctrl_keys| self.input_keycode.is_just_pressed(appctrl_keys));
+    // fn is_pressed(&self, appctrl_setting: &T) -> bool
+    // {
+    //     // キーが押下されているか
+    //     let is_keys_pressed = appctrl_setting
+    //         .keys_iter()
+    //         .any(|appctrl_keys| self.input_keycode.is_just_pressed(appctrl_keys));
 
-        // キーの押下がないなら
-        let mut is_buttons_pressed = false;
-        if !is_keys_pressed
-            && let Some(target_gamepad) = &self.option_target_gamepad
-            && let Some(gamepad_entity) = target_gamepad.entity()
-            && let Ok(gamepad) = self.query_gamepads.get(gamepad_entity)
-        {
-            // ゲームパッドのボタンが押下されているか
-            is_buttons_pressed = appctrl_setting
-                .buttons_iter()
-                .any(|&appctrl_btn| gamepad.just_pressed(appctrl_btn));
-        }
+    //     // キーの押下がないなら
+    //     let mut is_buttons_pressed = false;
+    //     if !is_keys_pressed
+    //         && let Some(target_gamepad) = &self.option_target_gamepad
+    //         && let Some(gamepad_entity) = target_gamepad.entity()
+    //         && let Ok(gamepad) = self.query_gamepads.get(gamepad_entity)
+    //     {
+    //         // ゲームパッドのボタンが押下されているか
+    //         is_buttons_pressed = appctrl_setting
+    //             .buttons_iter()
+    //             .any(|&appctrl_btn| gamepad.just_pressed(appctrl_btn));
+    //     }
 
-        // 戻り値
-        is_keys_pressed || is_buttons_pressed
-    }
+    //     // 戻り値
+    //     is_keys_pressed || is_buttons_pressed
+    // }
 
     // .is_pressed()の拡張版。戻り値は同じ。副作用で押下された入力をキャンセルする
     fn is_pressed_with_reset(&mut self, appctrl_setting: &T) -> bool
@@ -103,8 +103,7 @@ where
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 主キー＋装飾キーの押下判定
-// ButtonInput<KeyCode> に拡張トレイトを追加する
+// 主キー＋装飾キーの押下判定（ButtonInput<KeyCode> にトレイトを追加）
 pub trait ButtonInputKeyCodeExt
 {
     fn is_just_pressed(&self, keys: &MainKeyAndModifiers) -> bool;
@@ -140,19 +139,19 @@ impl ButtonInputKeyCodeExt for ButtonInput<KeyCode>
 
 // アプリ終了のキーとボタンの設定
 #[derive_appctrl_input]
-pub struct ExitApp;
+pub struct ExitAppInput;
 
 // アプリ終了
-pub fn send_app_exit_event(
-    appctrl: Local<ExitApp>, //初回のみdefault()で初期化
+pub fn send_exit_app_message(
+    appctrl: Local<ExitAppInput>, //初回のみdefault()で初期化
     mut input_device: InputDevicePack,
-    mut event_app_exit: EventWriter<AppExit>,
+    mut message_exit_app: MessageWriter<AppExit>,
 ) -> Result
 {
     // アプリ終了キー・ボタンが押下されたなら
     if input_device.is_pressed_with_reset(&*appctrl)
     {
-        event_app_exit.write(AppExit::Success); // アプリ終了イベント
+        message_exit_app.write(AppExit::Success); // アプリ終了メッセージを送信
     }
 
     Ok(())
@@ -161,71 +160,71 @@ pub fn send_app_exit_event(
 ////////////////////////////////////////////////////////////////////////////////
 
 // 全画面切替のキーとボタンの設定
-#[derive_appctrl_input]
-pub struct FullScreen;
+// #[derive_appctrl_input]
+// pub struct FullScreen;
 
 // ウィンドウとフルスクリーンを切り替える(トグル動作)
-pub fn toggle_fullscreen(
-    appctrl: Local<FullScreen>, //初回のみdefault()で初期化
-    mut input_device: InputDevicePack,
-    mut query_window: Query<&mut Window>,
-) -> Result
-{
-    // 準備
-    let mut window = query_window.single_mut()?;
+// pub fn toggle_fullscreen(
+//     appctrl: Local<FullScreen>, //初回のみdefault()で初期化
+//     mut input_device: InputDevicePack,
+//     mut query_window: Query<&mut Window>,
+// ) -> Result
+// {
+//     // 準備
+//     let mut window = query_window.single_mut()?;
 
-    // ウィンドウ／フルスクリーンの切替キー・ボタンが押下されたなら
-    if input_device.is_pressed_with_reset(&*appctrl)
-    {
-        match window.mode
-        {
-            WindowMode::Windowed =>
-            {
-                window.resolution.set_scale_factor(2.0);
-                window.mode = WindowMode::Fullscreen(
-                    MonitorSelection::Primary,
-                    VideoModeSelection::Current,
-                );
-            }
-            _ =>
-            {
-                window.resolution.set_scale_factor(1.0);
-                window.mode = WindowMode::Windowed;
-            }
-        };
+//     // ウィンドウ／フルスクリーンの切替キー・ボタンが押下されたなら
+//     if input_device.is_pressed_with_reset(&*appctrl)
+//     {
+//         match window.mode
+//         {
+//             WindowMode::Windowed =>
+//             {
+//                 window.resolution.set_scale_factor(2.0);
+//                 window.mode = WindowMode::Fullscreen(
+//                     MonitorSelection::Primary,
+//                     VideoModeSelection::Current,
+//                 );
+//             }
+//             _ =>
+//             {
+//                 window.resolution.set_scale_factor(1.0);
+//                 window.mode = WindowMode::Windowed;
+//             }
+//         };
 
-        #[cfg(debug_assertions)]
-        dbg!(&window.mode, &window.resolution);
-    }
+//         #[cfg(debug_assertions)]
+//         dbg!(&window.mode, &window.resolution);
+//     }
 
-    Ok(())
-}
+//     Ok(())
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // UI outline表示切替のキーとボタンの設定
-#[derive_appctrl_input]
-pub struct UiOutline;
+// #[derive_appctrl_input]
+// pub struct UiOutline;
 
 // UI outlineの表示／非表示を切り替える(トグル動作)
-pub fn toggle_outline_gizmo_ui(
-    appctrl: Local<UiOutline>, //初回のみdefault()で初期化
-    mut input_device: InputDevicePack,
-    option_ui_debug_options: Option<ResMut<UiDebugOptions>>,
-) -> Result
-{
-    // 準備
-    let mut ui_debug_options =
-        option_ui_debug_options.ok_or("UiDebugOptions not found.")?;
+// pub fn toggle_outline_gizmo_ui(
+//     appctrl: Local<UiOutline>, //初回のみdefault()で初期化
+//     mut input_device: InputDevicePack,
+//     option_ui_debug_options: Option<ResMut<UiDebugOptions>>,
+// ) -> Result
+// {
+//     // 準備
+//     let mut ui_debug_options =
+//         option_ui_debug_options.ok_or("UiDebugOptions not found.")?;
 
-    // UI outline表示／非表示の切替キー・ボタンが押下されたなら
-    if input_device.is_pressed_with_reset(&*appctrl)
-    {
-        ui_debug_options.toggle();
-    }
+//     // UI outline表示／非表示の切替キー・ボタンが押下されたなら
+//     if input_device.is_pressed_with_reset(&*appctrl)
+//     {
+//         ui_debug_options.toggle();
+//     }
 
-    Ok(())
-}
+//     Ok(())
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 

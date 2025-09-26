@@ -22,26 +22,25 @@ impl Plugin for Schedule
             ))
             // Stateの初期化
             .init_state::<MyState>()
-        //     // 汎用的な処理の登録
-        //     .add_systems(
-        //         Update, // without MyState
-        //         (
-        //             // gamepadの接続を検出
-        //             misc::watch_gamepad_connections,
-        //             // 特別な入力のハンドリング
-        //             (
-        //                 appctrl_input::send_app_exit_event, // アプリの終了
-        //                 appctrl_input::toggle_fullscreen,   // 全画面切換
-        //             )
+            // 汎用的な処理の登録
+            .add_systems(
+                Update, // without MyState
+                (
+                    // gamepadの接続を検出
+                    misc::watch_gamepad_connections,
+                    // 特別な入力のハンドリング
+                    (
+                        appctrl_input::send_exit_app_message, // アプリの終了
+                        // appctrl_input::toggle_fullscreen,   // 全画面切換
+                    )
         //                 .in_set(MyLabel::BeforeHitAnyKey) // HitAnyKeyより前に実行
         //                 .run_if(not(misc::WASM)), // WASMでは実行しない
         //             // UI outline表示
         //             appctrl_input::toggle_outline_gizmo_ui
         //                 .in_set(MyLabel::BeforeHitAnyKey) // HitAnyKeyより前に実行
         //                 .run_if(misc::DEBUG),
-        //         ),
-        //     );
-        ;
+                ),
+            );
 
         // ローディングアニメを表示しながらアセットをロードする
         // application

@@ -50,7 +50,7 @@ pub const SCREEN_GRIDS_HEIGHT: i32 = 19; // memo: 19 best 24
 // アプリの情報
 pub const APP_TITLE: &str = "TigTag"; // env!("CARGO_PKG_NAME");
 pub const APP_VER: &str = env!("CARGO_PKG_VERSION");
-pub const COPYRIGHT: &str = "hyoi 2021 - 2025";
+// pub const COPYRIGHT: &str = "hyoi 2021 - 2025";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -104,21 +104,23 @@ pub enum MyState
 ////////////////////////////////////////////////////////////////////////////////
 
 // アプリ終了のキーとボタンの設定
-// impl Default for appctrl_input::ExitApp
-// {
-//     fn default() -> Self
-//     {
-//         Self {
-//             keys: vec![
-//                 (KeyCode::Escape, None),
-//                 (KeyCode::F4, Some(Vec::from(MODIFIERS_ALT))),
-//             ],
-//             buttons: vec![
-//                 GamepadButton::Mode, //ps4[PSボタン]
-//             ],
-//         }
-//     }
-// }
+impl Default for appctrl_input::ExitAppInput
+{
+    fn default() -> Self
+    {
+        Self {
+            keys: vec![
+                (KeyCode::Escape, None),
+                (KeyCode::F4, Some(Vec::from(MODIFIERS_ALT))),
+            ],
+            buttons: vec![
+                GamepadButton::Mode, //ps4[PSボタン]
+            ],
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
 
 // 全画面切替のキーとボタンの設定
 // impl Default for appctrl_input::FullScreen
@@ -137,6 +139,8 @@ pub enum MyState
 //         }
 //     }
 // }
+
+//------------------------------------------------------------------------------
 
 // UI outlineの表示／非表示を切替えるキー
 // impl Default for appctrl_input::UiOutline
