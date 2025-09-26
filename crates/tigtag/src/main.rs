@@ -29,12 +29,6 @@ use bevy::{
 //     collections::VecDeque,
 // };
 
-// proc-macro
-// use macros::MyState;
-// use macros::{OverlayMessage, Blinking, CountDown};
-// use macros::{OverlayMenu, ScalingItem};
-// use macros::derive_appctrl_input;
-
 // internal submodules
 mod core_logic; // ゲームロジック
 // use core_logic::*;
@@ -47,6 +41,12 @@ mod config; // 設定各種
 use config::*;
 
 // mod demo_play; // demoロジック
+
+// proc-macro
+use macros::MyState;
+// use macros::{OverlayMessage, Blinking, CountDown};
+// use macros::{OverlayMenu, ScalingItem};
+// use macros::derive_appctrl_input;
 
 ////////////////////////////////////////////////////////////////////////////////
 

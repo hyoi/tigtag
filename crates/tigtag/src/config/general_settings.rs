@@ -77,18 +77,18 @@ impl InitLogPlugin for LogPlugin
 ////////////////////////////////////////////////////////////////////////////////
 
 // ゲームの状態
-// #[rustfmt::skip]
-// #[allow(dead_code)]
-// #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States, MyState)]
-// pub enum MyState
-// {
-//     #[default]
-//     LoadAssets,
-//     Initialize,
-//     TitleDemo, DemoLoop,
-//     StageStart, MainLoop, StageClear, GameOver,
-//     Pause,
-// }
+#[rustfmt::skip]
+#[allow(dead_code)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States, MyState)]
+pub enum MyState
+{
+    #[default]
+    LoadAssets,
+    Initialize,
+    TitleDemo, DemoLoop,
+    StageStart, MainLoop, StageClear, GameOver,
+    Pause,
+}
 
 // ゲームの状態の判定
 // #[allow(dead_code)]

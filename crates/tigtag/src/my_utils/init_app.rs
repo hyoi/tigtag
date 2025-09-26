@@ -20,8 +20,8 @@ impl Plugin for Schedule
                     .set(ImagePlugin::default_nearest()), // ピクセルパーフェクト
                 FrameTimeDiagnosticsPlugin::default(), // FPS Plugin
             ))
-        //     // Stateの初期化
-        //     .init_state::<MyState>()
+            // Stateの初期化
+            .init_state::<MyState>()
         //     // 汎用的な処理の登録
         //     .add_systems(
         //         Update, // without MyState
