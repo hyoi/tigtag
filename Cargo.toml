@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 
 [workspace.package]
-version = "0.16.0"
+version = "0.17.0"
 edition = "2024"
 
 [[bin]]
@@ -32,10 +32,12 @@ macros.workspace = true
 #bevy = { git = "https://github.com/bevyengine/bevy", tag = "v0.15.0-rc.3", features = [
 #bevy = { git = "https://github.com/bevyengine/bevy", branch = "release-0.14.0", features = [
 
-bevy = { version = "0.16", features = [
-    "configurable_error_handler",
-    "bevy_ui_debug"
-] }
+bevy = "=0.17.0-rc.2"
+#bevy = { version = "0.16", features = [
+#bevy = { version = "=0.17.0-rc.2", features = [
+#    "configurable_error_handler", # v0.17廃止
+#    "bevy_ui_debug"
+#] }
 
 #依存するその他のcrate
 rand = "0.9"
