@@ -178,15 +178,15 @@ impl I32x2TypeExt for (i32, i32)
 ////////////////////////////////////////////////////////////////////////////////
 
 // QueryしたEnityを削除する（条件がComponent）
-// pub fn despawn_component<T: Component>(
-//     query_entity: Query<Entity, With<T>>,
-//     mut cmds: Commands, // cmdsをmoveするので通常の関数としては使い勝手が悪い！
-// ) -> Result
-// {
-//     query_entity.iter().for_each(|id| cmds.entity(id).despawn());
+pub fn despawn_component<T: Component>(
+    query_entity: Query<Entity, With<T>>,
+    mut cmds: Commands, // cmdsをmoveするので通常の関数としては使い勝手が悪い！
+) -> Result
+{
+    query_entity.iter().for_each(|id| cmds.entity(id).despawn());
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

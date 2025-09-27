@@ -61,34 +61,34 @@ impl Plugin for Schedule
                     // スプライト（とカメラ）のspawn
                     spawn_sprite_with_camera2d,
                     // Assetsのロード開始
-                    // start_loading,
+                    start_loading,
                 ),
             )
             // ループ処理
+            .add_message::<AssetsAllLoaded>() // ロード完了フラグ
             .add_systems(
                 Update, // within MyState::LoadAssets
                 (
                     // スプライトを移動させる
                     move_sprite,
                     // ローディング完了を検知してフラグを立てる
-                    // check_loading_done,
+                    check_loading_done,
                     // ループ脱出
-                    // change_state_by_resource::<ChangeTo>
-                    //     .run_if(resource_exists::<ChangeTo>) //State変更先がinsertされたこと
-                    //     .run_if(resource_exists::<IsLoadingDone>), //完了フラグが立つこと
+                    change_state_by_resource::<ChangeTo>
+                        .run_if(resource_exists::<ChangeTo>)    //State変更先がinsertされていること
+                        .run_if(on_message::<AssetsAllLoaded>), //完了フラグが立つこと
                 )
                     .run_if(in_state(MyState::LoadAssets)),
             )
             // 後処理
-            // .add_systems(
-            //     OnExit(MyState::LoadAssets),
-            //     (
-            //         // スプライトとカメラ（あれば）の削除
-            //         misc::despawn_component::<SpriteTile>,
-            //         misc::despawn_component::<LoadingAnimeCam2d>,
-            //     ),
-            // )
-            ;
+            .add_systems(
+                OnExit(MyState::LoadAssets),
+                (
+                    // スプライトとカメラ（あれば）の削除
+                    misc::despawn_component::<SpriteTile>,
+                    misc::despawn_component::<LoadingAnimeCam2d>,
+                ),
+            );
     }
 }
 
@@ -236,74 +236,74 @@ fn move_sprite(
 ////////////////////////////////////////////////////////////////////////////////
 
 // ロードしたAssetsのハンドルの保存先
-// #[derive(Resource, Deref)]
-// struct LoadedAssets(Vec<Handle<LoadedUntypedAsset>>);
+#[derive(Resource, Deref)]
+struct LoadedAssets(Vec<Handle<LoadedUntypedAsset>>);
 
 // ローディング完了フラグ
-// #[derive(Resource)]
-// struct IsLoadingDone;
+#[derive(Message)]
+struct AssetsAllLoaded;
 
 // Assetsのロードを開始する
-// fn start_loading(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
-// {
-//     // Assetsのロードを開始
-//     let mut handles = Vec::new();
-//     PRELOAD_ASSETS
-//         .iter()
-//         .for_each(|fname| handles.push(asset_svr.load_untyped(*fname)));
+fn start_loading(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
+{
+    // Assetsのロードを開始
+    let mut handles = Vec::new();
+    PRELOAD_ASSETS
+        .iter()
+        .for_each(|fname| handles.push(asset_svr.load_untyped(*fname)));
 
-//     // 解放しないようリソースに登録する
-//     cmds.insert_resource(LoadedAssets(handles));
+    // 解放しないようリソースに登録する
+    cmds.insert_resource(LoadedAssets(handles));
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 // Assetsのロードは完了したか？
-// fn check_loading_done(
-//     assets: Res<LoadedAssets>,
-//     mut cmds: Commands,
-//     asset_svr: Res<AssetServer>,
-// ) -> Result
-// {
-//     // 事前ロードが完了したか？
-//     for handle in assets.iter()
-//     {
-//         match asset_svr.get_load_state(handle)
-//         {
-//             Some(LoadState::Loaded) => (), // ロード完了
-//             Some(LoadState::Failed(err)) =>
-//             {
-//                 // ロード失敗⇒パニック
-//                 dbg!(err); // for debug
-//                 let mut filename = "Unknown".to_string();
-//                 if let Some(asset_path) = handle.path()
-//                     && let Some(s) = asset_path.path().to_str()
-//                 {
-//                     filename = s.to_string();
-//                 }
-//                 panic!("Failed loading asset file \"{filename}\"");
-//             }
-//             _ => return Ok(()), // スケジュールがUPDATEなので繰り返し実行
-//         }
-//     }
+fn check_loading_done(
+    assets: Res<LoadedAssets>,
+    asset_svr: Res<AssetServer>,
+    mut message_assets_all_loaded: MessageWriter<AssetsAllLoaded>,
+) -> Result
+{
+    // 事前ロードが完了したか？
+    for handle in assets.iter()
+    {
+        match asset_svr.get_load_state(handle)
+        {
+            Some(LoadState::Loaded) => (), // ロード完了
+            Some(LoadState::Failed(err)) =>
+            {
+                // ロード失敗⇒パニック
+                dbg!(err); // for debug
+                let mut filename = "Unknown".to_string();
+                if let Some(asset_path) = handle.path()
+                    && let Some(s) = asset_path.path().to_str()
+                {
+                    filename = s.to_string();
+                }
+                panic!("Failed loading asset file \"{filename}\"");
+            }
+            _ => return Ok(()), // スケジュールがUPDATEなので繰り返し実行
+        }
+    }
 
-//     // ローディング完了フラグを立てる
-//     cmds.insert_resource(IsLoadingDone);
+    // ローディング完了を通知
+    message_assets_all_loaded.write(AssetsAllLoaded);
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // 処理が完了した後のState変更先を格納するResource
-// #[derive(Resource)]
-// pub struct ChangeTo(pub MyState);
+#[derive(Resource)]
+pub struct ChangeTo(pub MyState);
 
 // ChangeMyStateトレイトの実装
-// impl ChangeMyState for ChangeTo
-// {
-//     fn state(&self) -> MyState { self.0 }
-// }
+impl ChangeMyState for ChangeTo
+{
+    fn state(&self) -> MyState { self.0 }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

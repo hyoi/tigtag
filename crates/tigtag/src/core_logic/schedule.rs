@@ -13,7 +13,7 @@ impl Plugin for Schedule
         application
             // スケジュールの追加
             .add_plugins(init_app::Schedule)                          // アプリ初期化とアセットロード
-            // .insert_resource(init_app::ChangeTo(MyState::Initialize)) // 処理が完了したらState変更
+            .insert_resource(init_app::ChangeTo(MyState::Initialize)) // 処理が完了したらState変更
             // .add_plugins(overlay_ui::pause_menu::Schedule)            // Pauseメニュー
             // .add_plugins(demo_play::Schedule)                         // デモプレイ
 

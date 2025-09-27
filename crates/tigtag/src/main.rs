@@ -10,7 +10,7 @@ use bevy::{
     log::LogPlugin,
     diagnostic::{FrameTimeDiagnosticsPlugin/*, DiagnosticsStore*/},
     color::palettes::*,
-    // asset::{LoadedUntypedAsset, LoadState},
+    asset::{LoadedUntypedAsset, LoadState},
     // render::camera::Viewport,
     // input::{
     //     keyboard::NativeKeyCode,
