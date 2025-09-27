@@ -10,21 +10,10 @@ pub struct TextBlock<'a>
     pub justify_self: JustifySelf,    // textblock内の寄せ（左中右）
     pub bg_color: Srgba,              // textblockの背景色
     pub textspans: &'a [MessageSpan], // 表示文字列の情報
-    pub update_info: Option<(usize, FnFormatter)>,
+    pub update_info: Option<(usize, FormatterFn)>,
 }
 
-// 表示情報の更新で使う整形関数のfnポインタ型
-pub type FnFormatter = fn(&dyn std::fmt::Display) -> String;
-
-// TextUIの文字列の情報を格納する型
-pub type MessageSpan = (
-    &'static str, // 表示文字列
-    &'static str, // フォントのAssets
-    f32,          // フォントのサイズ
-    Color,        // フォントの色
-);
-
-// シンプル ヘッダー／フッターのComponent
+// ヘッダー／フッターのComponent
 #[derive(Component, Clone, Copy, Debug, PartialEq)]
 pub enum Position
 {
@@ -51,15 +40,24 @@ impl Position
     }
 }
 
+// TextUIの文字列の情報を格納する型
+pub type MessageSpan = (
+    &'static str, // 表示文字列
+    &'static str, // フォントのAssets
+    f32,          // フォントのサイズ
+    Color,        // フォントの色
+);
+
+// 表示情報の更新で使う整形関数のfnポインタ型
+pub type FormatterFn = fn(&dyn std::fmt::Display) -> String;
+
 // 表示情報の更新用
 #[derive(Component)]
-pub struct UpdateInfo(pub Option<(usize, FnFormatter)>);
-
-// pub use Position::*; //enum Positionのバリアントを剥き身で公開する
+pub struct UpdateInfo(pub Option<(usize, FormatterFn)>);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// シンプル ヘッダー／フッターをspawnする
+// ヘッダー／フッターをspawnする
 pub fn spawn(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
 {
     // 親ノード（GRIDレイアウト(3x3)）

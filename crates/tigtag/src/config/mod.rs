@@ -6,8 +6,8 @@ pub use general_settings::*;
 mod consts; // 設定で使う定数
 pub use consts::*;
 
-// mod header_footer_settings; // ヘッダー・フッターの設定
-// pub use header_footer_settings::*;
+mod header_footer_settings; // ヘッダー・フッターの設定
+pub use header_footer_settings::*;
 
 // mod overlay_ui_settings; // 全画面UIの設定
 // pub use overlay_ui_settings::*;

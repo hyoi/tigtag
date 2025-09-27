@@ -42,29 +42,19 @@ impl Plugin for Schedule
             .add_systems(
                 OnEnter(MyState::Initialize),
                 (
-                    simple_camera::spawn::<CameraSettings> // カメラのspawn
-                        .before(misc::select_ui_camera),
-                    misc::select_ui_camera, // UIを描画するカメラの選択
+                    // カメラのspawn
+                    simple_camera::spawn::<CameraSettings>,
+                    misc::select_ui_camera // UIを描画するカメラの選択
+                        .after(simple_camera::spawn::<CameraSettings>),
+
+                    // TextUIのspawn
+                    header_footer::spawn,       // ヘッダー／フッター
+                    // overlay_ui::spawn_messages, //全画面メッセージ
+
+                    // 無条件遷移
+                    set_next_state::<TitleDemo>,
                 ),
-            )
-            // ループ処理
-            // .add_systems(
-            //     Update, // within MyState::Initialize
-            //     (
-            //         // 無条件遷移
-            //         set_next_state::<TitleDemo>,
-            //     )
-            //         .run_if(in_state(MyState::Initialize)),
-            // )
-            // 後処理
-            // .add_systems(
-            //     OnExit(MyState::Initialize),
-            //     (
-            //         header_footer::spawn,       // ヘッダー／フッターのspawn
-            //         overlay_ui::spawn_messages, //全画面メッセージのspawn
-            //     ),
-            // )
-            ;
+            );
 
         //--------------------------------------------------------------------------
         // 常に実行する処理（Update without MyState）

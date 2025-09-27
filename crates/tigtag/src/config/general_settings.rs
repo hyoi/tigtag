@@ -50,7 +50,7 @@ pub const SCREEN_GRIDS_HEIGHT: i32 = 19; // memo: 19 best 24
 // アプリの情報
 pub const APP_TITLE: &str = "TigTag"; // env!("CARGO_PKG_NAME");
 pub const APP_VER: &str = env!("CARGO_PKG_VERSION");
-// pub const COPYRIGHT: &str = "hyoi 2021 - 2025";
+pub const COPYRIGHT: &str = "hyoi 2021 - 2025";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -157,10 +157,10 @@ impl Default for appctrl_input::UiOutlineToggleInput
 
 // 事前ロード対象
 pub const PRELOAD_ASSETS: &[&str] = &[
-    // ASSETS_FONT_ORBITRON_BLACK,
-    // ASSETS_FONT_PRESSSTART2P_REGULAR,
+    ASSETS_FONT_ORBITRON_BLACK,
+    ASSETS_FONT_PRESSSTART2P_REGULAR,
     // ASSETS_FONT_REGGAEONE_REGULAR,
-    // ASSETS_SPRITE_KANI_DOTOWN,
+    ASSETS_SPRITE_KANI_DOTOWN,
     // ASSETS_SPRITE_BRICK_WALL,
     // ASSETS_SPRITESHEET_PLAYER,
     // ASSETS_SPRITESHEET_CHASER_RED,
@@ -171,12 +171,12 @@ pub const PRELOAD_ASSETS: &[&str] = &[
 ];
 
 // assets（フォント）
-// pub const ASSETS_FONT_ORBITRON_BLACK: &str = "font/Orbitron-Black.ttf";
-// pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "font/PressStart2P-Regular.ttf";
+pub const ASSETS_FONT_ORBITRON_BLACK: &str = "font/Orbitron-Black.ttf";
+pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "font/PressStart2P-Regular.ttf";
 // pub const ASSETS_FONT_REGGAEONE_REGULAR: &str = "font/ReggaeOne-Regular.ttf";
 
 // assets（スプライト）
-// pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "image/sprite/kani_DOTOWN.png";
+pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "image/sprite/kani_DOTOWN.png";
 // pub const ASSETS_SPRITE_BRICK_WALL: &str = "image/sprite/brick_wall.png";
 
 // assets（スプライトシート）
@@ -233,7 +233,7 @@ pub const ATTACH_VIEWPORT: fn() -> bool = || cfg!(feature = "attach_viewport");
 ////////////////////////////////////////////////////////////////////////////////
 
 // スプライト重なり
-// pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0; // フッターの蟹アイコン
+pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0; // フッターの蟹アイコン
 // pub const DEPTH_SPRITE_CHASER: f32 = 700.0; // チェイサーのスプライト
 // pub const DEPTH_SPRITE_PLAYER: f32 = 600.0; // プレイヤーのスプライト
 // pub const DEPTH_SPRITE_DOT: f32 = 500.0; // ドットスプライト
