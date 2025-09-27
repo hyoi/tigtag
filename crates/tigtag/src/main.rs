@@ -11,7 +11,7 @@ use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin /*, DiagnosticsStore*/},
     color::palettes::*,
     asset::{LoadedUntypedAsset, LoadState},
-    // render::camera::Viewport,
+    camera::Viewport,
     // input::{
     //     keyboard::NativeKeyCode,
     //     gamepad::{GamepadInput, GamepadAxisChangedEvent},
@@ -24,7 +24,7 @@ use rand::prelude::*;
 // standard library
 use std::{
     slice::Iter,
-    ops::{Range /*, Deref, DerefMut, Add, AddAssign*/},
+    ops::{Range, Deref, DerefMut, /*Add, AddAssign*/},
     // f32::consts::{TAU, PI},
     // collections::VecDeque,
 };

@@ -25,6 +25,8 @@ pub trait BoxedTrait: Send + Sync + 'static
     // fn clone_box(&self) -> Box<dyn BoxedTrait>;
 }
 
+//------------------------------------------------------------------------------
+
 // タプル(isize, Color, C1, C2, Transform)からSettingへの変換トレイト（From）の実装
 impl<C1, C2> From<(isize, Color, C1, C2, Transform)> for Setting
 where
@@ -89,11 +91,9 @@ fn gen_viewport() -> Option<Viewport>
     {
         true =>
         {
-            let zero = UVec2::new(0, 0);
-            let size = SCREEN_PIXELS_RESO.as_uvec2();
             Some(Viewport {
-                physical_position: zero,
-                physical_size: size,
+                physical_position: UVec2::ZERO,
+                physical_size: SCREEN_PIXELS_RESO,
                 ..default()
             })
         }

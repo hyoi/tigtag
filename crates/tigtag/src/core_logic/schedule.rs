@@ -17,6 +17,14 @@ impl Plugin for Schedule
             // .add_plugins(overlay_ui::pause_menu::Schedule)            // Pauseメニュー
             // .add_plugins(demo_play::Schedule)                         // デモプレイ
 
+            // Resourceの登録
+            .init_resource::<CameraSettings>()                  // カメラの設定を登録
+            // .init_resource::<Record>()                          // ゲームの成績
+            // .init_resource::<map::Map>()                        // ステージのマップ
+            // .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
+            // .insert_resource(player::KeyMap::from( KEY_MAP ))   // マッピング（キー）
+            // .insert_resource(player::GamepadMap::from(PAD_MAP)) // マッピング（ゲームパッド）
+
             // // Eventの登録
             // .add_event::<misc::AnyButtonPressed>() //「Hit Any Key」の入力通知
             // .add_event::<CountDownFinished>()      // カウントダウンの終了通知
@@ -25,14 +33,37 @@ impl Plugin for Schedule
             // .add_event::<DotsAllEaten >()          // ステージクリアの伝達用
             // .add_event::<PlayerCaught>()           // ゲームオーバーの伝達用
             // .add_event::<SkipOverlayMessage>()     // 全画面メッセージ表示のスキップに使用
+            ;
 
-            // // Resourceの登録
-            // .init_resource::<CameraSettings>()                  // カメラの設定を登録
-            // .init_resource::<Record>()                          // ゲームの成績
-            // .init_resource::<map::Map>()                        // ステージのマップ
-            // .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
-            // .insert_resource(player::KeyMap::from( KEY_MAP ))   // マッピング（キー）
-            // .insert_resource(player::GamepadMap::from(PAD_MAP)) // マッピング（ゲームパッド）
+        //--------------------------------------------------------------------------
+        // 初期化（MyState::Initialize）
+        application
+            // 前処理
+            .add_systems(
+                OnEnter(MyState::Initialize),
+                (
+                    simple_camera::spawn::<CameraSettings> // カメラのspawn
+                        .before(misc::select_ui_camera),
+                    misc::select_ui_camera, // UIを描画するカメラの選択
+                ),
+            )
+            // ループ処理
+            // .add_systems(
+            //     Update, // within MyState::Initialize
+            //     (
+            //         // 無条件遷移
+            //         set_next_state::<TitleDemo>,
+            //     )
+            //         .run_if(in_state(MyState::Initialize)),
+            // )
+            // 後処理
+            // .add_systems(
+            //     OnExit(MyState::Initialize),
+            //     (
+            //         header_footer::spawn,       // ヘッダー／フッターのspawn
+            //         overlay_ui::spawn_messages, //全画面メッセージのspawn
+            //     ),
+            // )
             ;
 
         //--------------------------------------------------------------------------
@@ -49,36 +80,6 @@ impl Plugin for Schedule
         //             chaser::rotate_chaser_shape.run_if(SPRITE_OFF), // チェイサー回転
         //             // ヘッダーとフッターの表示情報を更新する
         //             information::update_header_footer,
-        //         ),
-        //     );
-
-        //--------------------------------------------------------------------------
-        // 初期化（MyState::InitGame）
-        // application
-        //     // 前処理
-        //     .add_systems(
-        //         OnEnter(MyState::Initialize),
-        //         (
-        //             simple_camera::spawn::<CameraSettings> // カメラのspawn
-        //                 .before(misc::select_ui_camera),
-        //             misc::select_ui_camera, // UIを描画するカメラの選択
-        //         ),
-        //     )
-        //     // ループ処理
-        //     .add_systems(
-        //         Update, // within MyState::Initialize
-        //         (
-        //             // 無条件遷移
-        //             set_next_state::<TitleDemo>,
-        //         )
-        //             .run_if(in_state(MyState::Initialize)),
-        //     )
-        //     // 後処理
-        //     .add_systems(
-        //         OnExit(MyState::Initialize),
-        //         (
-        //             header_footer::spawn,       // ヘッダー／フッターのspawn
-        //             overlay_ui::spawn_messages, //全画面メッセージのspawn
         //         ),
         //     );
 

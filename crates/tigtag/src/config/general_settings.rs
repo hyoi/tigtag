@@ -194,40 +194,40 @@ pub const PRELOAD_ASSETS: &[&str] = &[
 ////////////////////////////////////////////////////////////////////////////////
 
 // カメラの情報を格納するResourceの定義
-// #[derive(Resource, Deref, DerefMut)]
-// pub struct CameraSettings(pub Vec<simple_camera::Setting>);
-
-// カメラの情報
-// impl Default for CameraSettings
-// {
-//     fn default() -> Self
-//     {
-//         Self(vec![simple_camera::Setting::from((
-//             1,              // カメラのレンダリング優先度（0が最後）
-//             Color::BLACK,   // レンダリング時の背景色（NONEは透明）
-//             SimpleCamera2d, // マーカー（Component）
-//             Camera2d,       // カメラ種類（Component）
-//             Transform::from_translation(CAMERA2D_POSITION), // カメラの位置
-//         ))])
-//     }
-// }
+#[derive(Resource, Deref, DerefMut)]
+pub struct CameraSettings(pub Vec<simple_camera::Setting>);
 
 // カメラのComponent
-// #[derive(Component, Clone)]
-// pub struct SimpleCamera2d;
+#[derive(Component, Clone)]
+pub struct SimpleCamera2d;
 
 // 2Dカメラの位置
 // 第四象限を利用する。左上隅が(0,0)で、X軸はプラス方向へ、Y軸はマイナス方向へ伸びる
-// pub const CAMERA2D_POSITION: Vec3 = Vec3::new(
-//     SCREEN_PIXELS_WIDTH * 0.5,
-//     SCREEN_PIXELS_HEIGHT * -0.5,
-//     999.0, // 0.0だとスプライトの子のText2dがZ軸1.0(Vec3::Z)で表示されない不具合が発生(v0.14)
-// );
+pub const CAMERA2D_POSITION: Vec3 = Vec3::new(
+    SCREEN_PIXELS_WIDTH * 0.5,
+    SCREEN_PIXELS_HEIGHT * -0.5,
+    999.0, // 0.0だとスプライトの子のText2dがZ軸1.0(Vec3::Z)で表示されない不具合が発生(v0.14)
+);
+
+// カメラ情報の初期化
+impl Default for CameraSettings
+{
+    fn default() -> Self
+    {
+        Self(vec![simple_camera::Setting::from((
+            1,              // カメラのレンダリング優先度（0が最後）
+            Color::BLACK,   // レンダリング時の背景色（NONEは透明）
+            SimpleCamera2d, // マーカー（Component）
+            Camera2d,       // カメラ種類（Component）
+            Transform::from_translation(CAMERA2D_POSITION), // カメラの位置
+        ))])
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // コンパイル オプションの定数
-// pub const ATTACH_VIEWPORT: fn() -> bool = || cfg!(feature = "attach_viewport");
+pub const ATTACH_VIEWPORT: fn() -> bool = || cfg!(feature = "attach_viewport");
 // pub const SPRITE_OFF: fn() -> bool = || cfg!(feature = "sprite_off");
 
 ////////////////////////////////////////////////////////////////////////////////

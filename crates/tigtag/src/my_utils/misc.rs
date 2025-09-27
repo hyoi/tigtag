@@ -191,22 +191,22 @@ pub fn despawn_component<T: Component>(
 ////////////////////////////////////////////////////////////////////////////////
 
 // UIを描画するカメラにComponent「IsDefaultUiCamera」を追加する
-// pub fn select_ui_camera(
-//     camera2d_entity: Query<Entity, With<Camera2d>>,
-//     camera3d_entity: Query<Entity, With<Camera3d>>,
-//     mut cmds: Commands,
-// ) -> Result
-// {
-//     // カメラのEntity IDを決定する(優先:Camera2d)
-//     let id = camera2d_entity
-//         .single()
-//         .or_else(|_| camera3d_entity.single())?;
+pub fn select_ui_camera(
+    camera2d_entity: Query<Entity, With<Camera2d>>,
+    camera3d_entity: Query<Entity, With<Camera3d>>,
+    mut cmds: Commands,
+) -> Result
+{
+    // カメラのEntity IDを決定する(優先:Camera2d)
+    let id = camera2d_entity
+        .single()
+        .or_else(|_| camera3d_entity.single())?;
 
-//     // UIを描画するCameraにマーカーComponentを追加する
-//     cmds.entity(id).insert(IsDefaultUiCamera);
+    // UIを描画するCameraにマーカーComponentを追加する
+    cmds.entity(id).insert(IsDefaultUiCamera);
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
