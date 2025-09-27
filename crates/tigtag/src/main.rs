@@ -4,11 +4,11 @@ use bevy::{
     ecs::{
         error::warn,
         system::SystemParam,
-    //     component::Mutable,
+        // component::Mutable,
     },
     window::{EnabledButtons, WindowMode},
     log::LogPlugin,
-    diagnostic::{FrameTimeDiagnosticsPlugin/*, DiagnosticsStore*/},
+    diagnostic::{FrameTimeDiagnosticsPlugin /*, DiagnosticsStore*/},
     color::palettes::*,
     asset::{LoadedUntypedAsset, LoadState},
     // render::camera::Viewport,
@@ -24,9 +24,9 @@ use rand::prelude::*;
 // standard library
 use std::{
     slice::Iter,
-    ops::{Range/*, Deref, DerefMut, Add, AddAssign*/},
-//     f32::consts::{TAU, PI},
-//     collections::VecDeque,
+    ops::{Range /*, Deref, DerefMut, Add, AddAssign*/},
+    // f32::consts::{TAU, PI},
+    // collections::VecDeque,
 };
 
 // internal submodules

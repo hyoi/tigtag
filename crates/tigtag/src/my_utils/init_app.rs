@@ -15,10 +15,10 @@ impl Plugin for Schedule
             // first party plugins
             .add_plugins((
                 DefaultPlugins
-                    .set(WindowPlugin::initialize())      // 主ウィンドウ初期化
-                    .set(LogPlugin::initialize())         // ログレベル初期化
+                    .set(WindowPlugin::initialize()) // 主ウィンドウ初期化
+                    .set(LogPlugin::initialize()) // ログレベル初期化
                     .set(ImagePlugin::default_nearest()), // ピクセルパーフェクト
-                FrameTimeDiagnosticsPlugin::default(),    // FPS Plugin
+                FrameTimeDiagnosticsPlugin::default(), // FPS Plugin
             ))
             // Stateの初期化
             .init_state::<MyState>()
@@ -46,9 +46,11 @@ impl Plugin for Schedule
                 Update,
                 (
                     // HitAnyKey（Marker）の前に実行
-                    misc::SystemOrderHitAnyKey::Before.before(misc::SystemOrderHitAnyKey::Marker),
+                    misc::SystemOrderHitAnyKey::Before
+                        .before(misc::SystemOrderHitAnyKey::Marker),
                     // HitAnyKey（Marker）の後に実行
-                    misc::SystemOrderHitAnyKey::After.after(misc::SystemOrderHitAnyKey::Marker),
+                    misc::SystemOrderHitAnyKey::After
+                        .after(misc::SystemOrderHitAnyKey::Marker),
                 ),
             );
 
@@ -75,8 +77,8 @@ impl Plugin for Schedule
                     check_loading_done,
                     // ループ脱出
                     change_state_by_resource::<ChangeTo>
-                        .run_if(resource_exists::<ChangeTo>)    //State変更先がinsertされていること
-                        .run_if(on_message::<AssetsAllLoaded>), //完了フラグが立つこと
+                        .run_if(resource_exists::<ChangeTo>) // State変更先がinsertされていること
+                        .run_if(on_message::<AssetsAllLoaded>), // 完了フラグが立つこと
                 )
                     .run_if(in_state(MyState::LoadAssets)),
             )

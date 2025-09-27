@@ -11,9 +11,9 @@ impl InitWindowPlugin for WindowPlugin
     {
         // 主ウィンドウの設定
         let window = Window {
-            resolution: SCREEN_PIXELS_RESO.into(),    // ウィンドウのサイズ
-            resizable: false,                         // リサイズ不可
-            decorations: true,                        // タイトルバー表示
+            resolution: SCREEN_PIXELS_RESO.into(), // ウィンドウのサイズ
+            resizable: false,                      // リサイズ不可
+            decorations: true,                     // タイトルバー表示
             title: format!("{APP_TITLE} v{APP_VER}"), // タイトルバーに表示するタイトル
             enabled_buttons: EnabledButtons {
                 minimize: false, // 最小化ボタン非表示
