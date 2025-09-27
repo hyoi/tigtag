@@ -2,8 +2,10 @@ use super::*;
 
 pub mod schedule; // スケジュール
 
-// mod consts_and_types; // 定数＆型定義
-// pub use consts_and_types::*;
+mod consts_and_types; // 定数＆型定義
+pub use consts_and_types::*;
+
+pub mod information; // 表示情報更新（ヘッダー・フッター）
 
 // mod animate_sprites; //スプライトアニメーション
 // pub use animate_sprites::*;
@@ -13,7 +15,6 @@ pub mod schedule; // スケジュール
 // pub mod chaser; // チェイサー
 
 // pub mod overlay_ui; // 全画面メッセージ関連
-// pub mod information; // 表示情報更新（ヘッダー・フッター）
 // pub mod detecting_change; // ステージクリアとゲームオーバーの判定
 
 // End of code.

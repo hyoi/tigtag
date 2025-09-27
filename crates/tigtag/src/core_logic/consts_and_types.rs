@@ -2,6 +2,45 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// ゲームの成績記録用のResource
+#[derive(Resource, Default)]
+pub struct Record
+{
+    score: i32,       // スコア
+    hi_score: i32,    // ハイスコア
+    stage: i32,       // ステージ数
+    // demo: DemoRecord, // demo用の記録
+}
+
+// demo用
+// #[derive(Default)]
+// pub struct DemoRecord
+// {
+//     hi_score: i32, // ハイスコア
+//     stage: i32,    // ステージ数
+// }
+
+// フィールドアクセス
+impl Record
+{
+    pub fn stage(&self) -> i32 { self.stage }
+    // pub fn stage_mut(&mut self) -> &mut i32 { &mut self.stage }
+
+    pub fn score(&self) -> i32 { self.score }
+    // pub fn score_mut(&mut self) -> &mut i32 { &mut self.score }
+
+    pub fn hi_score(&self) -> i32 { self.hi_score }
+    // pub fn hi_score_mut(&mut self) -> &mut i32 { &mut self.hi_score }
+
+    // pub fn demo_hi_score(&self) -> i32 { self.demo.hi_score }
+    // pub fn demo_hi_score_mut(&mut self) -> &mut i32 { &mut self.demo.hi_score }
+
+    // pub fn demo_stage(&self) -> i32 { self.demo.stage }
+    // pub fn demo_stage_mut(&mut self) -> &mut i32 { &mut self.demo.stage }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // System間通知用イベント
 // pub use my_events::*;
 // #[rustfmt::skip]
@@ -14,45 +53,6 @@ use super::*;
 //     #[derive(Event, Default)] pub struct DotEaten ;
 //     #[derive(Event, Default)] pub struct PlayerCaught;
 //     #[derive(Event, Default)] pub struct SkipOverlayMessage;
-// }
-
-////////////////////////////////////////////////////////////////////////////////
-
-// ゲームの成績記録用のResource
-// #[derive(Resource, Default)]
-// pub struct Record
-// {
-//     score: i32,       // スコア
-//     hi_score: i32,    // ハイスコア
-//     stage: i32,       // ステージ数
-//     demo: DemoRecord, // demo用の記録
-// }
-
-// demo用
-// #[derive(Default)]
-// pub struct DemoRecord
-// {
-//     hi_score: i32, // ハイスコア
-//     stage: i32,    // ステージ数
-// }
-
-// フィールドアクセス
-// impl Record
-// {
-//     pub fn stage(&self) -> i32 { self.stage }
-//     pub fn stage_mut(&mut self) -> &mut i32 { &mut self.stage }
-
-//     pub fn score(&self) -> i32 { self.score }
-//     pub fn score_mut(&mut self) -> &mut i32 { &mut self.score }
-
-//     pub fn hi_score(&self) -> i32 { self.hi_score }
-//     pub fn hi_score_mut(&mut self) -> &mut i32 { &mut self.hi_score }
-
-//     pub fn demo_hi_score(&self) -> i32 { self.demo.hi_score }
-//     pub fn demo_hi_score_mut(&mut self) -> &mut i32 { &mut self.demo.hi_score }
-
-//     pub fn demo_stage(&self) -> i32 { self.demo.stage }
-//     pub fn demo_stage_mut(&mut self) -> &mut i32 { &mut self.demo.stage }
 // }
 
 ////////////////////////////////////////////////////////////////////////////////

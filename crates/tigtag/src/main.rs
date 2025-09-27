@@ -8,7 +8,7 @@ use bevy::{
     },
     window::{EnabledButtons, WindowMode},
     log::LogPlugin,
-    diagnostic::{FrameTimeDiagnosticsPlugin /*, DiagnosticsStore*/},
+    diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
     color::palettes::*,
     asset::{LoadedUntypedAsset, LoadState},
     camera::Viewport,
