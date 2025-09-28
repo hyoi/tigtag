@@ -157,7 +157,7 @@ pub fn spawn_sprite(
                             },
                             TextColor(css::YELLOW.into()),
                             TextLayout {
-                                justify: JustifyText::Center,
+                                justify: Justify::Center,
                                 ..default()
                             },
                             Transform::from_translation(Vec3::Z),

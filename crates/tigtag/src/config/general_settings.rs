@@ -161,7 +161,7 @@ pub const PRELOAD_ASSETS: &[&str] = &[
     ASSETS_FONT_PRESSSTART2P_REGULAR,
     ASSETS_FONT_REGGAEONE_REGULAR,
     ASSETS_SPRITE_KANI_DOTOWN,
-    // ASSETS_SPRITE_BRICK_WALL,
+    ASSETS_SPRITE_BRICK_WALL,
     // ASSETS_SPRITESHEET_PLAYER,
     // ASSETS_SPRITESHEET_CHASER_RED,
     // ASSETS_SPRITESHEET_CHASER_GREEN,
@@ -177,7 +177,7 @@ pub const ASSETS_FONT_REGGAEONE_REGULAR: &str = "font/ReggaeOne-Regular.ttf";
 
 // assets（スプライト）
 pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "image/sprite/kani_DOTOWN.png";
-// pub const ASSETS_SPRITE_BRICK_WALL: &str = "image/sprite/brick_wall.png";
+pub const ASSETS_SPRITE_BRICK_WALL: &str = "image/sprite/brick_wall.png";
 
 // assets（スプライトシート）
 // pub const ASSETS_SPRITESHEET_PLAYER: &str = "image/spritesheet/player.png";
@@ -228,7 +228,7 @@ impl Default for CameraSettings
 
 // コンパイル オプションの定数
 pub const ATTACH_VIEWPORT: fn() -> bool = || cfg!(feature = "attach_viewport");
-// pub const SPRITE_OFF: fn() -> bool = || cfg!(feature = "sprite_off");
+pub const SPRITE_OFF: fn() -> bool = || cfg!(feature = "sprite_off");
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -236,8 +236,8 @@ pub const ATTACH_VIEWPORT: fn() -> bool = || cfg!(feature = "attach_viewport");
 pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0; // フッターの蟹アイコン
 // pub const DEPTH_SPRITE_CHASER: f32 = 700.0; // チェイサーのスプライト
 // pub const DEPTH_SPRITE_PLAYER: f32 = 600.0; // プレイヤーのスプライト
-// pub const DEPTH_SPRITE_DOT: f32 = 500.0; // ドットスプライト
-// pub const DEPTH_SPRITE_BRICK_WALL: f32 = 400.0; // 壁スプライト
+pub const DEPTH_SPRITE_DOT: f32 = 500.0; // ドットスプライト
+pub const DEPTH_SPRITE_BRICK_WALL: f32 = 400.0; // 壁スプライト
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -275,8 +275,8 @@ impl Default for misc::MaskHitAnyKeyInput
 ////////////////////////////////////////////////////////////////////////////////
 
 // ドットのスプライトの情報
-// pub const SPRITE_DOT_RADIUS: f32 = PIXELS_PER_GRID * 0.08;
-// pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
+pub const SPRITE_DOT_RADIUS: f32 = PIXELS_PER_GRID * 0.08;
+pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
 
 ////////////////////////////////////////////////////////////////////////////////
 

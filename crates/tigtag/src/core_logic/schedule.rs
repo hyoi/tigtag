@@ -20,7 +20,7 @@ impl Plugin for Schedule
             .init_resource::<CameraSettings>()                  // カメラの設定を登録
             .init_resource::<Record>()                          // ゲームの成績
             .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
-            // .init_resource::<map::Map>()                        // ステージのマップ
+            .init_resource::<map::Map>()                        // ステージのマップ
             // .insert_resource(player::KeyMap::from( KEY_MAP ))   // マッピング（キー）
             // .insert_resource(player::GamepadMap::from(PAD_MAP)) // マッピング（ゲームパッド）
 
@@ -131,13 +131,13 @@ impl Plugin for Schedule
                     )
                         .run_if(not(on_message::<SkipOverlayMessage>)),
                     // ステージ初期化
-                    // map::make_new_stage_data, // マップデータ
-                    // (
-                    //     map::spawn_sprite,    // マップスプライト
+                    map::make_new_stage_data, // マップデータ
+                    (
+                        map::spawn_sprite,    // マップスプライト
                     //     player::spawn_sprite, // プレーヤースプライト
                     //     chaser::spawn_sprite, // チェイサースプライト
-                    // )
-                    //     .after(map::make_new_stage_data),
+                    )
+                        .after(map::make_new_stage_data),
                 ),
             )
             // ループ処理

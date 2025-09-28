@@ -167,13 +167,13 @@ impl I32x2TypeExt for (i32, i32)
         Vec2::new(self.0 as f32 + 0.5, -self.1 as f32 - 0.5) * PIXELS_PER_GRID
     }
 }
-// impl I32x2TypeExt for IVec2
-// {
-//     fn to_screen_pixels(&self) -> Vec2
-//     {
-//         Vec2::new(self.x as f32 + 0.5, -self.y as f32 - 0.5) * PIXELS_PER_GRID
-//     }
-// }
+impl I32x2TypeExt for IVec2
+{
+    fn to_screen_pixels(&self) -> Vec2
+    {
+        Vec2::new(self.x as f32 + 0.5, -self.y as f32 - 0.5) * PIXELS_PER_GRID
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

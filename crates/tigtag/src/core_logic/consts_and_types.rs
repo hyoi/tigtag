@@ -58,32 +58,32 @@ mod my_messages
 ////////////////////////////////////////////////////////////////////////////////
 
 // 四方を表す列挙型
-// #[derive(Default, Clone, Copy, PartialEq, Eq, Hash, Debug)]
-// pub enum News
-// {
-//     #[default]
-//     North,
-//     East,
-//     West,
-//     South,
-// }
+#[derive(Default, Clone, Copy, PartialEq, Eq, Hash, Debug)]
+pub enum News
+{
+    #[default]
+    North,
+    East,
+    West,
+    South,
+}
 
 // IVec2 = IVec2 + News
-// impl Add<News> for IVec2
-// {
-//     type Output = IVec2;
-//     fn add(mut self, news: News) -> IVec2
-//     {
-//         match news
-//         {
-//             News::North => self.y -= 1,
-//             News::East => self.x += 1,
-//             News::West => self.x -= 1,
-//             News::South => self.y += 1,
-//         }
-//         self
-//     }
-// }
+impl Add<News> for IVec2
+{
+    type Output = IVec2;
+    fn add(mut self, news: News) -> IVec2
+    {
+        match news
+        {
+            News::North => self.y -= 1,
+            News::East => self.x += 1,
+            News::West => self.x -= 1,
+            News::South => self.y += 1,
+        }
+        self
+    }
+}
 
 // IVec2 += News
 // impl AddAssign<News> for IVec2
@@ -155,24 +155,24 @@ mod my_messages
 ////////////////////////////////////////////////////////////////////////////////
 
 // オーファンルール対策（glamの型にメソッドを追加する準備）
-// pub trait GridToPixelOnMap
-// {
-//     fn to_screen_pixels_map_adjusted(&self) -> Vec2;
-// }
+pub trait GridToPixelOnMap
+{
+    fn to_screen_pixels_map_adjusted(&self) -> Vec2;
+}
 
 // glamの型にメソッドを追加する
-// impl GridToPixelOnMap for IVec2
-// {
-//     // マップと画面の座標調整値を加味してvec2へ変換する
-//     fn to_screen_pixels_map_adjusted(&self) -> Vec2
-//     {
-//         let grid = *self + ADJUST_MAP_ON_SCREEN;
-//         grid.to_screen_pixels()
-//     }
-// }
+impl GridToPixelOnMap for IVec2
+{
+    // マップと画面の座標調整値を加味してvec2へ変換する
+    fn to_screen_pixels_map_adjusted(&self) -> Vec2
+    {
+        let grid = *self + ADJUST_MAP_ON_SCREEN;
+        grid.to_screen_pixels()
+    }
+}
 
 // アジャスタ（マップ座標から画面座標への変換調整値）
-// const ADJUST_MAP_ON_SCREEN: IVec2 = IVec2::new(0, 1);
+const ADJUST_MAP_ON_SCREEN: IVec2 = IVec2::new(0, 1);
 
 ////////////////////////////////////////////////////////////////////////////////
 

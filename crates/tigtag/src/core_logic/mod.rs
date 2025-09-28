@@ -11,10 +11,11 @@ use overlay_ui::messages::OverlayMessage;
 
 pub mod detecting_change; // ステージクリアとゲームオーバーの判定
 
+pub mod map; // 迷路生成
+
 // mod animate_sprites; //スプライトアニメーション
 // pub use animate_sprites::*;
 
-// pub mod map; // 迷路生成
 // pub mod player; // プレイヤー
 // pub mod chaser; // チェイサー
 
