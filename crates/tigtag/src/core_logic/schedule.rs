@@ -22,7 +22,7 @@ impl Plugin for Schedule
             .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
             .init_resource::<map::Map>()                        // ステージのマップ
             .insert_resource(player::KeyMap::from( KEY_MAP ))   // マッピング（キー）
-            // .insert_resource(player::GamepadMap::from(PAD_MAP)) // マッピング（ゲームパッド）
+            .insert_resource(player::GamepadMap::from(PAD_MAP)) // マッピング（ゲームパッド）
 
             // Messageの登録
             .add_message::<misc::AnyButtonPressed>() //「Hit Any Key」の入力通知
@@ -171,10 +171,10 @@ impl Plugin for Schedule
                     (
                         // スプライトの位置を更新する
                         player::input_from_keyboard, // キー
-                        // player::input_from_gamepad,  // ゲームパッド
+                        player::input_from_gamepad,  // ゲームパッド
                         player::move_sprite
                             .after(player::input_from_keyboard)
-                        //     .after(player::input_from_gamepad),
+                            .after(player::input_from_gamepad),
                         // chaser::move_sprite,
                     ),
                     // スコアリング＆クリア判定

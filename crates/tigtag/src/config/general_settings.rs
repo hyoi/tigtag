@@ -296,17 +296,17 @@ pub const KEY_MAP: core_logic::player::KeyMapSlice = &[
 ];
 
 // ゲームパッドのボタン／スティックとコールバック関数の対応
-// #[rustfmt::skip]
-// pub const PAD_MAP: player::GamepadMapSlice = &[
-//     // 十字ボタン
-//     ( GamepadInput::Button( GamepadButton::DPadUp   ), player::callback::move_up    ),
-//     ( GamepadInput::Button( GamepadButton::DPadDown ), player::callback::move_down  ),
-//     ( GamepadInput::Button( GamepadButton::DPadLeft ), player::callback::move_left  ),
-//     ( GamepadInput::Button( GamepadButton::DPadRight), player::callback::move_right ),
-//     // 左スティック
-//     ( GamepadInput::Axis( GamepadAxis::LeftStickX ), player::callback::axis_x_normal ),
-//     ( GamepadInput::Axis( GamepadAxis::LeftStickY ), player::callback::axis_y_normal ),
-// ];
+#[rustfmt::skip]
+pub const PAD_MAP: core_logic::player::GamepadMapSlice = &[
+    // 十字ボタン
+    ( GamepadInput::Button( GamepadButton::DPadUp   ), core_logic::player::callback::move_up    ),
+    ( GamepadInput::Button( GamepadButton::DPadDown ), core_logic::player::callback::move_down  ),
+    ( GamepadInput::Button( GamepadButton::DPadLeft ), core_logic::player::callback::move_left  ),
+    ( GamepadInput::Button( GamepadButton::DPadRight), core_logic::player::callback::move_right ),
+    // 左スティック
+    ( GamepadInput::Axis( GamepadAxis::LeftStickX ), core_logic::player::callback::axis_x_normal ),
+    ( GamepadInput::Axis( GamepadAxis::LeftStickY ), core_logic::player::callback::axis_y_normal ),
+];
 
 ////////////////////////////////////////////////////////////////////////////////
 
