@@ -19,13 +19,13 @@ impl Plugin for Schedule
             // Resourceの登録
             .init_resource::<CameraSettings>()                  // カメラの設定を登録
             .init_resource::<Record>()                          // ゲームの成績
+            .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
             // .init_resource::<map::Map>()                        // ステージのマップ
-            // .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
             // .insert_resource(player::KeyMap::from( KEY_MAP ))   // マッピング（キー）
             // .insert_resource(player::GamepadMap::from(PAD_MAP)) // マッピング（ゲームパッド）
 
-            // // Eventの登録
-            // .add_event::<misc::AnyButtonPressed>() //「Hit Any Key」の入力通知
+            // Eventの登録
+            .add_message::<misc::AnyButtonPressed>() //「Hit Any Key」の入力通知
             // .add_event::<CountDownFinished>()      // カウントダウンの終了通知
             // .add_event::<EventPlayerInputNews>()   // プレイヤーキャラクターの操作入力通知
             // .add_event::<DotEaten>()               // スコアリングの伝達用
@@ -51,7 +51,7 @@ impl Plugin for Schedule
                     overlay_ui::messages::spawn, //全画面メッセージ
 
                     // 無条件遷移
-                    set_next_state::<TitleDemo>,
+                    misc::set_next_state(MyState::TitleDemo)
                 ),
             );
 
@@ -90,27 +90,27 @@ impl Plugin for Schedule
                 Update, // within MyState::TitleDemo
                 (
                     // Hit ANY Key に反応あればState遷移
-                    // misc::check_hit_any_key.in_set(MyLabel::HitAnyKey),
-                    // (
-                    //     // scoreとstageをゼロクリアする(demoの情報消去)
-                    //     detecting_change::initialize_score_stage,
-                    //     set_next_state::<StageStart>,
-                    // )
-                    //     .in_set(MyLabel::AfterHitAnyKey)
-                    //     .run_if(on_event::<misc::AnyButtonPressed>),
+                    misc::check_hit_any_key.in_set(misc::SystemOrderHitAnyKey::Marker),
+                    (
+                        // scoreとstageをゼロクリアする(demoの情報消去)
+                        detecting_change::initialize_score_stage,
+                        misc::set_next_state(MyState::StageStart)
+                    )
+                        .in_set(misc::SystemOrderHitAnyKey::After)
+                        .run_if(on_message::<misc::AnyButtonPressed>),
                     // DEMO の明滅
                     overlay_ui::effect::blinking_text::<OverlayTitleDemo>,
                 )
                     .run_if(in_state(MyState::TitleDemo)),
             )
             // 後処理
-            // .add_systems(
-            //     OnExit(MyState::TitleDemo),
-            //     (
-            //         // 全画面メッセージ（タイトル）非表示
-            //         misc::hide_component::<OverlayTitleDemo>,
-            //     ),
-            // )
+            .add_systems(
+                OnExit(MyState::TitleDemo),
+                (
+                    // 全画面メッセージ（タイトル）非表示
+                    misc::hide_component::<OverlayTitleDemo>,
+                ),
+            )
             ;
 
         //--------------------------------------------------------------------------

@@ -241,42 +241,42 @@ pub const DEPTH_SPRITE_KANI_DOTOWN: f32 = 900.0; // フッターの蟹アイコ�
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// ドットのスプライトの情報
-// pub const SPRITE_DOT_RADIUS: f32 = PIXELS_PER_GRID * 0.08;
-// pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
+// Hit ANY Keyの処理で無視するキーとボタン
+#[rustfmt::skip]
+pub const IGNORE_KEYS_HITANYKEY: &[KeyCode] = &[
+    KeyCode::AltLeft    , KeyCode::AltRight,
+    KeyCode::ControlLeft, KeyCode::ControlRight,
+    KeyCode::ShiftLeft  , KeyCode::ShiftRight,
+    KeyCode::SuperLeft  , KeyCode::SuperRight,
+    KeyCode::ArrowUp    , KeyCode::ArrowDown,
+    KeyCode::ArrowRight , KeyCode::ArrowLeft,
+    KeyCode::Fn,
+    KeyCode::Unidentified(NativeKeyCode::Windows(57443)), //ThinkPad [Fn]
+];
+#[rustfmt::skip]
+pub const IGNORE_BUTTONS_HITANYKEY: &[GamepadButton] = &[
+    GamepadButton::Select, //ps4[SHARE]
+    GamepadButton::Start,  //ps4[OPTIONS]
+    GamepadButton::Mode,   //ps4[PSボタン]
+];
+
+// .init_resource()用default
+impl Default for misc::MaskHitAnyKeyInput
+{
+    fn default() -> Self
+    {
+        Self {
+            keys: FxHashSet::from_iter(IGNORE_KEYS_HITANYKEY.iter()),
+            buttons: FxHashSet::from_iter(IGNORE_BUTTONS_HITANYKEY.iter()),
+        }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// Hit ANY Keyの処理で無視するキーとボタン
-// #[rustfmt::skip]
-// pub const IGNORE_KEYS_HITANYKEY: &[KeyCode] = &[
-//     KeyCode::AltLeft    , KeyCode::AltRight,
-//     KeyCode::ControlLeft, KeyCode::ControlRight,
-//     KeyCode::ShiftLeft  , KeyCode::ShiftRight,
-//     KeyCode::SuperLeft  , KeyCode::SuperRight,
-//     KeyCode::ArrowUp    , KeyCode::ArrowDown,
-//     KeyCode::ArrowRight , KeyCode::ArrowLeft,
-//     KeyCode::Fn,
-//     KeyCode::Unidentified(NativeKeyCode::Windows(57443)), //ThinkPad [Fn]
-// ];
-// #[rustfmt::skip]
-// pub const IGNORE_BUTTONS_HITANYKEY: &[GamepadButton] = &[
-//     GamepadButton::Select, //ps4[SHARE]
-//     GamepadButton::Start,  //ps4[OPTIONS]
-//     GamepadButton::Mode,   //ps4[PSボタン]
-// ];
-
-// init_resource()用default
-// impl Default for misc::MaskHitAnyKeyInput
-// {
-//     fn default() -> Self
-//     {
-//         Self {
-//             keys: FxHashSet::from_iter(IGNORE_KEYS_HITANYKEY.iter()),
-//             buttons: FxHashSet::from_iter(IGNORE_BUTTONS_HITANYKEY.iter()),
-//         }
-//     }
-// }
+// ドットのスプライトの情報
+// pub const SPRITE_DOT_RADIUS: f32 = PIXELS_PER_GRID * 0.08;
+// pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -82,72 +82,72 @@ pub enum SystemOrderHitAnyKey
 //------------------------------------------------------------------------------
 
 // Hit Any Keyの入力フィルターを保存するResource（Todo: ゲームパッドボタンも必要）
-// #[derive(Resource)]
-// pub struct MaskHitAnyKeyInput
-// {
-//     pub keys: FxHashSet<&'static KeyCode>,
-//     pub buttons: FxHashSet<&'static GamepadButton>,
-// }
+#[derive(Resource)]
+pub struct MaskHitAnyKeyInput
+{
+    pub keys: FxHashSet<&'static KeyCode>,
+    pub buttons: FxHashSet<&'static GamepadButton>,
+}
 
-// 何かしら入力があったことを通知するイベント
-// #[derive(Event)]
-// pub struct AnyButtonPressed;
+// 何かしら入力があったことを通知する、メッセージ
+#[derive(Message)]
+pub struct AnyButtonPressed;
 
 // 何かしら入力によりEventHitAnyKeyをセットする
-// pub fn check_hit_any_key(
-//     option_masking_input: Option<Res<MaskHitAnyKeyInput>>,
-//     input_keycode: Res<ButtonInput<KeyCode>>,
-//     option_target_gamepad: Option<Res<TargetGamepad>>,
-//     query_gamepads: Query<&Gamepad>,
-//     mut event: EventWriter<AnyButtonPressed>,
-// ) -> Result
-// {
-//     // 準備
-//     let masking_input = option_masking_input.ok_or("Resource not found.")?;
+pub fn check_hit_any_key(
+    option_masking_input: Option<Res<MaskHitAnyKeyInput>>,
+    input_keycode: Res<ButtonInput<KeyCode>>,
+    option_target_gamepad: Option<Res<TargetGamepad>>,
+    query_gamepads: Query<&Gamepad>,
+    mut event: MessageWriter<AnyButtonPressed>,
+) -> Result
+{
+    // 準備
+    let masking_input = option_masking_input.ok_or("Resource not found.")?;
 
-//     // キー入力を数える（マスクされるキーは除く）
-//     let mut is_pressed = input_keycode
-//         .get_just_pressed() // .get_pressed()だと[Fn]がすり抜けることがある
-//         .filter(|key| !masking_input.keys.contains(key))
-//         .count();
+    // キー入力を数える（マスクされるキーは除く）
+    let mut is_pressed = input_keycode
+        .get_just_pressed() // .get_pressed()だと[Fn]がすり抜けることがある
+        .filter(|key| !masking_input.keys.contains(key))
+        .count();
 
-//     #[cfg(debug_assertions)]
-//     if is_pressed != 0
-//     {
-//         input_keycode.get_just_pressed().for_each(|key| {
-//             dbg!(key);
-//         });
-//     }
+    #[cfg(debug_assertions)]
+    if is_pressed != 0
+    {
+        input_keycode.get_just_pressed().for_each(|key| {
+            dbg!(key);
+        });
+    }
 
-//     // キー入力がなく、ゲームパッドが接続されているなら
-//     if is_pressed == 0
-//         && let Some(target_gamepad) = option_target_gamepad
-//         && let Some(gamepad_entity) = target_gamepad.entity()
-//         && let Ok(gamepad) = query_gamepads.get(gamepad_entity)
-//     {
-//         // ボタン入力を数える（マスクされるボタンは除く）
-//         is_pressed = gamepad
-//             .get_just_pressed()
-//             .filter(|button| !masking_input.buttons.contains(button))
-//             .count();
+    // キー入力がなく、ゲームパッドが接続されているなら
+    if is_pressed == 0
+        && let Some(target_gamepad) = option_target_gamepad
+        && let Some(gamepad_entity) = target_gamepad.entity()
+        && let Ok(gamepad) = query_gamepads.get(gamepad_entity)
+    {
+        // ボタン入力を数える（マスクされるボタンは除く）
+        is_pressed = gamepad
+            .get_just_pressed()
+            .filter(|button| !masking_input.buttons.contains(button))
+            .count();
 
-//         #[cfg(debug_assertions)]
-//         if is_pressed != 0
-//         {
-//             gamepad.get_just_pressed().for_each(|button| {
-//                 dbg!(button);
-//             });
-//         }
-//     }
+        #[cfg(debug_assertions)]
+        if is_pressed != 0
+        {
+            gamepad.get_just_pressed().for_each(|button| {
+                dbg!(button);
+            });
+        }
+    }
 
-//     // キーかボタンの入力があるなら
-//     if is_pressed > 0
-//     {
-//         event.write(AnyButtonPressed);
-//     }
+    // キーかボタンの入力があるなら
+    if is_pressed > 0
+    {
+        event.write(AnyButtonPressed);
+    }
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -230,10 +230,10 @@ pub fn show_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
 }
 
 // QueryしたComponentを不可視にする
-// pub fn hide_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
-// {
-//     query.iter_mut().for_each(|mut v| *v = Visibility::Hidden);
-// }
+pub fn hide_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
+{
+    query.iter_mut().for_each(|mut v| *v = Visibility::Hidden);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

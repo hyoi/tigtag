@@ -24,10 +24,10 @@ pub struct Record
 impl Record
 {
     pub fn stage(&self) -> i32 { self.stage }
-    // pub fn stage_mut(&mut self) -> &mut i32 { &mut self.stage }
+    pub fn stage_mut(&mut self) -> &mut i32 { &mut self.stage }
 
     pub fn score(&self) -> i32 { self.score }
-    // pub fn score_mut(&mut self) -> &mut i32 { &mut self.score }
+    pub fn score_mut(&mut self) -> &mut i32 { &mut self.score }
 
     pub fn hi_score(&self) -> i32 { self.hi_score }
     // pub fn hi_score_mut(&mut self) -> &mut i32 { &mut self.hi_score }

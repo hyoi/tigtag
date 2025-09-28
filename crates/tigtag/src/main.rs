@@ -8,14 +8,14 @@ use bevy::{
     color::palettes::*,
     asset::{LoadedUntypedAsset, LoadState},
     camera::Viewport,
-    // input::{
-    //     keyboard::NativeKeyCode,
-    //     gamepad::{GamepadInput, GamepadAxisChangedEvent},
-    // },
+    input::{
+        keyboard::NativeKeyCode,
+        // gamepad::{GamepadInput, GamepadAxisChangedEvent},
+    },
     // audio::Volume,
 };
 use rand::prelude::*;
-// use rustc_hash::{FxHashMap, FxHashSet};
+use rustc_hash::{FxHashSet/*, FxHashMap*/};
 
 // standard library
 use std::{
