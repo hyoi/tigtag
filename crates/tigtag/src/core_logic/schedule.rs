@@ -65,8 +65,8 @@ impl Plugin for Schedule
                     // ヘッダーとフッターの表示情報を更新する
                     information::update_header_footer,
                     // スプライトアニメーション
-                    // animate_sprites::<player::Player>, // プレイヤー
-                    // animate_sprites::<chaser::Chaser>, // チェイサー
+                    animate_sprites::<player::Player>, // プレイヤー
+                    animate_sprites::<chaser::Chaser>, // チェイサー
                     // スプライト表示OFFの場合のアニメーション
                     // chaser::rotate_chaser_shape.run_if(SPRITE_OFF), // チェイサー回転
                 ),
