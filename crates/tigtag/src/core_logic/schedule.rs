@@ -26,12 +26,12 @@ impl Plugin for Schedule
 
             // Eventの登録
             .add_message::<misc::AnyButtonPressed>() //「Hit Any Key」の入力通知
-            // .add_event::<CountDownFinished>()      // カウントダウンの終了通知
+            .add_message::<SkipOverlayMessage>()     // 全画面メッセージ表示のスキップに使用
+            .add_message::<CountDownEnded>()         // カウントダウンの終了通知
             // .add_event::<EventPlayerInputNews>()   // プレイヤーキャラクターの操作入力通知
             // .add_event::<DotEaten>()               // スコアリングの伝達用
             // .add_event::<DotsAllEaten >()          // ステージクリアの伝達用
             // .add_event::<PlayerCaught>()           // ゲームオーバーの伝達用
-            // .add_event::<SkipOverlayMessage>()     // 全画面メッセージ表示のスキップに使用
             ;
 
         //--------------------------------------------------------------------------
@@ -90,11 +90,12 @@ impl Plugin for Schedule
                 Update, // within MyState::TitleDemo
                 (
                     // Hit ANY Key に反応あればState遷移
-                    misc::check_hit_any_key.in_set(misc::SystemOrderHitAnyKey::Marker),
+                    misc::check_hit_any_key
+                        .in_set(misc::SystemOrderHitAnyKey::Marker),
                     (
                         // scoreとstageをゼロクリアする(demoの情報消去)
                         detecting_change::initialize_score_stage,
-                        misc::set_next_state(MyState::StageStart)
+                        misc::set_next_state(MyState::StageStart),
                     )
                         .in_set(misc::SystemOrderHitAnyKey::After)
                         .run_if(on_message::<misc::AnyButtonPressed>),
@@ -110,56 +111,55 @@ impl Plugin for Schedule
                     // 全画面メッセージ（タイトル）非表示
                     misc::hide_component::<OverlayTitleDemo>,
                 ),
-            )
-            ;
+            );
 
         //--------------------------------------------------------------------------
         // ゲーム開始処理（MyState::StageStart）
-        // application
-        //     // 前処理
-        //     .add_systems(
-        //         OnEnter(MyState::StageStart),
-        //         (
-        //             // ステージ初期化
-        //             map::make_new_stage_data, // マップデータ
-        //             (
-        //                 map::spawn_sprite,    // マップスプライト
-        //                 player::spawn_sprite, // プレーヤースプライト
-        //                 chaser::spawn_sprite, // チェイサースプライト
-        //             )
-        //                 .after(map::make_new_stage_data),
-        //             // 全画面メッセージの表示スキップ指示があるなら即メインループへ
-        //             set_next_state::<MainLoop>
-        //                 .run_if(on_event::<SkipOverlayMessage>),
-        //             // 全画面メッセージ（ステージ開始）表示
-        //             (
-        //                 OverlayStageStart::init(),
-        //                 misc::show_component::<OverlayStageStart>
-        //                     .after(OverlayStageStart::init()),
-        //             )
-        //                 .run_if(not(on_event::<SkipOverlayMessage>)),
-        //         ),
-        //     )
-        //     // ループ処理
-        //     .add_systems(
-        //         Update, // within MyState::StageStart
-        //         (
-        //             // カウントダウン完了後にState遷移
-        //             overlay_ui::effect::countdown::<OverlayStageStart>,
-        //             set_next_state::<MainLoop>
-        //                 .run_if(on_event::<CountDownFinished>)
-        //                 .after(overlay_ui::effect::countdown::<OverlayStageStart>),
-        //         )
-        //             .run_if(in_state(MyState::StageStart)),
-        //     )
-        //     // 後処理
-        //     .add_systems(
-        //         OnExit(MyState::StageStart),
-        //         (
-        //             // 全画面メッセージ（ステージ開始）非表示
-        //             misc::hide_component::<OverlayStageStart>,
-        //         ),
-        //     );
+        application
+            // 前処理
+            .add_systems(
+                OnEnter(MyState::StageStart),
+                (
+                    // 全画面メッセージの表示スキップ指示があるなら即メインループへ
+                    misc::set_next_state(MyState::MainLoop)
+                        .run_if(on_message::<SkipOverlayMessage>),
+                    // 全画面メッセージ（ステージ開始）表示
+                    (
+                        OverlayStageStart::init(),
+                        misc::show_component::<OverlayStageStart>
+                            .after(OverlayStageStart::init()),
+                    )
+                        .run_if(not(on_message::<SkipOverlayMessage>)),
+                    // ステージ初期化
+                    // map::make_new_stage_data, // マップデータ
+                    // (
+                    //     map::spawn_sprite,    // マップスプライト
+                    //     player::spawn_sprite, // プレーヤースプライト
+                    //     chaser::spawn_sprite, // チェイサースプライト
+                    // )
+                    //     .after(map::make_new_stage_data),
+                ),
+            )
+            // ループ処理
+            .add_systems(
+                Update, // within MyState::StageStart
+                (
+                    // カウントダウン完了後にState遷移
+                    overlay_ui::effect::countdown::<OverlayStageStart>,
+                    misc::set_next_state(MyState::MainLoop)
+                        .run_if(on_message::<CountDownEnded>)
+                        .after(overlay_ui::effect::countdown::<OverlayStageStart>),
+                )
+                    .run_if(in_state(MyState::StageStart)),
+            )
+            // 後処理
+            .add_systems(
+                OnExit(MyState::StageStart),
+                (
+                    // 全画面メッセージ（ステージ開始）非表示
+                    misc::hide_component::<OverlayStageStart>,
+                ),
+            );
 
         // --------------------------------------------------------------------------
         // メインループ処理（MyState::MainLoop）

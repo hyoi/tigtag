@@ -47,12 +47,12 @@ pub use my_messages::*;
 mod my_messages
 {
     use super::*;
-    #[derive(Message)] pub struct CountDownFinished;
+    #[derive(Message)] pub struct CountDownEnded;
+    #[derive(Message)] pub struct SkipOverlayMessage;
 //     #[derive(Event, Default)] pub struct EventPlayerInputNews ( pub player::HashNews );
 //     #[derive(Event, Default)] pub struct DotsAllEaten ;
 //     #[derive(Event, Default)] pub struct DotEaten ;
 //     #[derive(Event, Default)] pub struct PlayerCaught;
-//     #[derive(Event, Default)] pub struct SkipOverlayMessage;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

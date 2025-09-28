@@ -68,7 +68,7 @@ pub fn countdown<T>(
     mut query_countdown: Query<(&mut T, &Children)>,
     mut text_writer: TextUiWriter,
     time: Res<Time>,
-    mut event: MessageWriter<CountDownFinished>,
+    mut event: MessageWriter<CountDownEnded>,
 ) -> Result
 where
     T: Component<Mutability = Mutable> + CountDown,
@@ -80,7 +80,7 @@ where
     let span_index = params.index();
 
     // 1秒経過したら
-    if params.timer().tick(time.delta()).finished()
+    if params.timer().tick(time.delta()).is_finished()
     {
         *params.counter() += 1; // カウントを減らす
         params.timer().reset(); // 1秒タイマーを再実行する
@@ -99,7 +99,7 @@ where
     else
     {
         // カウントダウンが終わったならイベントを発行
-        event.write(CountDownFinished);
+        event.write(CountDownEnded);
     }
 
     Ok(())
