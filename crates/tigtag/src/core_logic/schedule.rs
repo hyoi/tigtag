@@ -175,7 +175,7 @@ impl Plugin for Schedule
                         player::move_sprite
                             .after(player::input_from_keyboard)
                             .after(player::input_from_gamepad),
-                        // chaser::move_sprite,
+                        chaser::move_sprite,
                     ),
                     // スコアリング＆クリア判定
                     // detecting_change::scoring_and_stage_clear,

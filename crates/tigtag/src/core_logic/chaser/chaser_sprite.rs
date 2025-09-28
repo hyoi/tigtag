@@ -208,139 +208,134 @@ pub fn rotate_chaser_shape(
 ////////////////////////////////////////////////////////////////////////////////
 
 // チェイサーを移動させる
-// pub fn move_sprite(
-//     mut query_chaser: Query<(&mut Transform, &mut Sprite, &mut Chaser)>,
-//     query_player: Query<&player::Player>,
-//     option_map: Option<Res<map::Map>>,
-//     time: Res<Time>,
-// ) -> Result
-// {
-//     // 準備
-//     let player = query_player.single()?;
-//     let map = option_map.ok_or("Resource not found.")?;
-//     let time_delta = time.delta();
+pub fn move_sprite(
+    mut query_chaser: Query<(&mut Transform, &mut Sprite, &mut Chaser)>,
+    query_player: Query<&player::Player>,
+    option_map: Option<Res<map::Map>>,
+    time: Res<Time>,
+) -> Result
+{
+    // 準備
+    let player = query_player.single()?;
+    let map = option_map.ok_or("Resource not found.")?;
+    let time_delta = time.delta();
 
-//     // let mut chaser_timer_finished = Vec::new();
+    // 複数のチェイサーをループで処理する
+    for (mut transform, mut sprite, mut chaser) in query_chaser.iter_mut()
+    {
+        // スピードアップ係数をかけて、経過時間を割り増しする
+        let time_delta = time_delta.mul_f32(chaser.speedup); //speedup > 1.0
 
-//     // 複数のチェイサーをループで処理する
-//     for (mut transform, mut sprite, mut chaser) in query_chaser.iter_mut()
-//     {
-//         // スピードアップ係数をかけて、経過時間を割り増しする
-//         let time_delta = time_delta.mul_f32(chaser.speedup); //speedup > 1.0
+        // 移動タイマーがfinishしたなら
+        if chaser.timer.tick(time_delta).finished()
+        {
+            // セルの間を移動中のスプライトが半端な位置にいるなら
+            if chaser.px_start != chaser.px_end
+            {
+                // 移動先のセルにフィットさせる
+                chaser.px_start = chaser.px_end;
+                chaser.px_end = chaser
+                    .next_cell
+                    .to_screen_pixels_map_adjusted()
+                    .extend(DEPTH_SPRITE_CHASER);
+                transform.translation = chaser.px_end;
+            }
 
-//         // 移動タイマーがfinishしたなら
-//         if chaser.timer.tick(time_delta).finished()
-//         {
-//             // 後続の処理にtimer finishedを伝達する
-//             // chaser_timer_finished.push(chaser.color);
+            // 後退を除く三方の道を取得する
+            let mut sides = map.get_side_spaces_list(chaser.next_cell); //脇道のリスト
+            sides.retain(|side| chaser.next_cell + *side != chaser.cell); //戻り路を削除
 
-//             // セルの間を移動中のスプライトが半端な位置にいるなら
-//             if chaser.px_start != chaser.px_end
-//             {
-//                 // 移動先のセルにフィットさせる
-//                 chaser.px_start = chaser.px_end;
-//                 chaser.px_end = chaser
-//                     .next_cell
-//                     .to_screen_pixels_map_adjusted()
-//                     .extend(DEPTH_SPRITE_CHASER);
-//                 transform.translation = chaser.px_end;
-//             }
+            // チェイサーが次に進む方向を決める
+            chaser.is_stop = false; //停止フラグを倒す(停止はスタート時のみ)
+            let count = sides.len();
+            let new_side = match count
+            {
+                // 一本道（直線やコーナーを道なりに進む）
+                1 => sides[0],
+                // 三叉路か十字路なので進行方向を考える
+                2.. =>
+                {
+                    // 自動追尾の関数がセットされているなら
+                    if let Some(autochase) = chaser.option_fn_autochase
+                    {
+                        // 追尾関数
+                        autochase(&mut chaser, player, &sides)
+                    }
+                    else
+                    {
+                        // 進行方向をランダムに決める
+                        sides[rand::rng().random_range(0..count)]
+                    }
+                }
+                // ここには来ない（このゲームにはマップ上行き止まりはないので）
+                _ => chaser.direction.back(), // 逆走
+            };
 
-//             // 後退を除く三方の道を取得する
-//             let mut sides = map.get_side_spaces_list(chaser.next_cell); //脇道のリスト
-//             sides.retain(|side| chaser.next_cell + *side != chaser.cell); //戻り路を削除
+            // チェイサーの向きが変わったなら
+            if new_side != chaser.direction
+            {
+                // スプライトシートのアニメなら
+                if !SPRITE_OFF()
+                    && let Some(sprite_sheet) = &mut sprite.texture_atlas
+                {
+                    // スプライトシートのindexを変更してスプライトの向きを変更
+                    let old_news = chaser.direction;
+                    let old_offset = chaser.sprite_sheet_offset(old_news) as usize;
+                    let new_offset = chaser.sprite_sheet_offset(new_side) as usize;
+                    let index = &mut sprite_sheet.index;
+                    *index = *index + new_offset - old_offset;
+                }
 
-//             // チェイサーが次に進む方向を決める
-//             chaser.is_stop = false; //停止フラグを倒す(停止はスタート時のみ)
-//             let count = sides.len();
-//             let new_side = match count
-//             {
-//                 // 一本道（直線やコーナーを道なりに進む）
-//                 1 => sides[0],
-//                 // 三叉路か十字路なので進行方向を考える
-//                 2.. =>
-//                 {
-//                     // 自動追尾の関数がセットされているなら
-//                     if let Some(autochase) = chaser.option_fn_autochase
-//                     {
-//                         // 追尾関数
-//                         autochase(&mut chaser, player, &sides)
-//                     }
-//                     else
-//                     {
-//                         // 進行方向をランダムに決める
-//                         sides[rand::rng().random_range(0..count)]
-//                     }
-//                 }
-//                 // ここには来ない（このゲームにはマップ上行き止まりはないので）
-//                 _ => chaser.direction.back(), // 逆走
-//             };
+                // チェイサーの向き情報を更新
+                chaser.direction = new_side;
+            }
 
-//             // チェイサーの向きが変わったなら
-//             if new_side != chaser.direction
-//             {
-//                 // スプライトシートのアニメなら
-//                 if !SPRITE_OFF()
-//                     && let Some(sprite_sheet) = &mut sprite.texture_atlas
-//                 {
-//                     // スプライトシートのindexを変更してスプライトの向きを変更
-//                     let old_news = chaser.direction;
-//                     let old_offset = chaser.sprite_sheet_offset(old_news) as usize;
-//                     let new_offset = chaser.sprite_sheet_offset(new_side) as usize;
-//                     let index = &mut sprite_sheet.index;
-//                     *index = *index + new_offset - old_offset;
-//                 }
+            // 位置を更新
+            chaser.cell = chaser.next_cell; //現在の位置を更新
+            chaser.next_cell += new_side; //次の位置を更新
 
-//                 // チェイサーの向き情報を更新
-//                 chaser.direction = new_side;
-//             }
+            // 移動タイマーをリセットする
+            chaser.timer.reset();
+        }
+        else if !chaser.is_stop
+        {
+            // 移動中の中割表示の座標更新
+            let delta = chaser.base_speed * time_delta.as_secs_f32();
+            match chaser.direction
+            {
+                News::North => transform.translation.y += delta,
+                News::South => transform.translation.y -= delta,
+                News::East => transform.translation.x += delta,
+                News::West => transform.translation.x -= delta,
+            }
 
-//             // 位置を更新
-//             chaser.cell = chaser.next_cell; //現在の位置を更新
-//             chaser.next_cell += new_side; //次の位置を更新
+            // 当たり判定用の微小区間の座標更新
+            chaser.px_start = chaser.px_end;
+            chaser.px_end = transform.translation;
+        }
+    }
 
-//             // 移動タイマーをリセットする
-//             chaser.timer.reset();
-//         }
-//         else if !chaser.is_stop
-//         {
-//             // 移動中の中割表示の座標更新
-//             let delta = chaser.base_speed * time_delta.as_secs_f32();
-//             match chaser.direction
-//             {
-//                 News::North => transform.translation.y += delta,
-//                 News::South => transform.translation.y -= delta,
-//                 News::East => transform.translation.x += delta,
-//                 News::West => transform.translation.x -= delta,
-//             }
+    // チェイサーは重なるとスピードアップする
+    let mut colors = Vec::with_capacity(query_chaser.iter().len());
+    for (_, _, mut chaser) in query_chaser.iter_mut()
+    {
+        colors.push((chaser.color, chaser.next_cell));
+        chaser.speedup = 1.0; // スピードアップ係数初期化
+    }
+    for (color, cell) in colors
+    {
+        for (_, _, mut chaser) in query_chaser.iter_mut()
+        {
+            // セルが一致し、自分以外の色なら
+            if cell == chaser.next_cell && color != chaser.color
+            {
+                chaser.speedup += CHASER_ACCEL; // スピードアップ係数を割り増し
+            }
+        }
+    }
 
-//             // 当たり判定用の微小区間の座標更新
-//             chaser.px_start = chaser.px_end;
-//             chaser.px_end = transform.translation;
-//         }
-//     }
-
-//     // チェイサーは重なるとスピードアップする
-//     let mut colors = Vec::with_capacity(query_chaser.iter().len());
-//     for (_, _, mut chaser) in query_chaser.iter_mut()
-//     {
-//         colors.push((chaser.color, chaser.next_cell));
-//         chaser.speedup = 1.0; // スピードアップ係数初期化
-//     }
-//     for (color, cell) in colors
-//     {
-//         for (_, _, mut chaser) in query_chaser.iter_mut()
-//         {
-//             // セルが一致し、自分以外の色なら
-//             if cell == chaser.next_cell && color != chaser.color
-//             {
-//                 chaser.speedup += CHASER_ACCEL; // スピードアップ係数を割り増し
-//             }
-//         }
-//     }
-
-//     Ok(())
-// }
+    Ok(())
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
