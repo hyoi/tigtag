@@ -9,21 +9,21 @@ impl Default for core_logic::overlay_ui::messages::MessageSettings
     {
         Self(vec![
             Box::new(OverlayTitleDemo::default()),
-            // Box::new(OverlayStageStart::default()),
-            // Box::new(OverlayStageClear::default()),
-            // Box::new(OverlayGameOver::default()),
+            Box::new(OverlayStageStart::default()),
+            Box::new(OverlayStageClear::default()),
+            Box::new(OverlayGameOver::default()),
         ])
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 全画面表示のカントダウン用プレイスホルダー
-// pub const _CDPH_: &str = "_#_";
-
 // タイトルで使うカラー
 const TITLE_COLOR1: Color = Color::srgba(0.6, 1.0, 0.4, 0.75);
 const TITLE_COLOR2: Color = Color::srgba(0.0, 0.7, 0.5, 0.75);
+
+// 全画面表示のカントダウン用プレイスホルダー
+pub const _CDPH_: &str = "_#_";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -64,109 +64,109 @@ impl Default for OverlayTitleDemo
 ////////////////////////////////////////////////////////////////////////////////
 
 // 全画面メッセージ（ステージ開始）のComponent
-// #[derive(Component, Clone, OverlayMessage, CountDown)]
-// pub struct OverlayStageStart
-// {
-//     text_spans: &'static [overlay_ui::TextUiSpan],
-//     countdown: overlay_ui::effect::CountDownParams,
-// }
+#[derive(Component, Clone, OverlayMessage, CountDown)]
+pub struct OverlayStageStart
+{
+    text_spans: &'static [core_logic::overlay_ui::messages::TextUiSpan],
+    countdown: core_logic::overlay_ui::effect::CountDownParams,
+}
 
 // Componentの初期化
-// impl Default for OverlayStageStart
-// {
-//     fn default() -> Self
-//     {
-//         Self {
-//             #[rustfmt::skip]
-//             text_spans: &[
-//                 ( "START\n"   , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, COLOR_CYAN ),
-//                 ( "ready...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.0, COLOR_CYAN ),
-//                 ( _CDPH_      , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
-//             ],
-//             countdown: overlay_ui::effect::CountDownParams {
-//                 start_value: 5,
-//                 timer: Timer::from_seconds(1.0, TimerMode::Once),
-//                 counter: 0,
-//                 spans_index: 2,
-//             },
-//         }
-//     }
-// }
+impl Default for OverlayStageStart
+{
+    fn default() -> Self
+    {
+        Self {
+            #[rustfmt::skip]
+            text_spans: &[
+                ( "START\n"   , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 4.0, COLOR_CYAN ),
+                ( "ready...\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.0, COLOR_CYAN ),
+                ( _CDPH_      , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
+            ],
+            countdown: core_logic::overlay_ui::effect::CountDownParams {
+                start_value: 5,
+                timer: Timer::from_seconds(1.0, TimerMode::Once),
+                counter: 0,
+                spans_index: 2,
+            },
+        }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // 全画面メッセージ（ステージクリア）のComponent
-// #[derive(Component, Clone, OverlayMessage, CountDown)]
-// pub struct OverlayStageClear
-// {
-//     text_spans: &'static [overlay_ui::TextUiSpan],
-//     countdown: overlay_ui::effect::CountDownParams,
-// }
+#[derive(Component, Clone, OverlayMessage, CountDown)]
+pub struct OverlayStageClear
+{
+    text_spans: &'static [core_logic::overlay_ui::messages::TextUiSpan],
+    countdown: core_logic::overlay_ui::effect::CountDownParams,
+}
 
 // Componentの初期化
-// impl Default for OverlayStageClear
-// {
-//     fn default() -> Self
-//     {
-//         Self {
-//             #[rustfmt::skip]
-//             text_spans: &[
-//                 ( "CLEAR!!!\n"  , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.7, COLOR_CYAN ),
-//                 ( "next stage\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.0, COLOR_GOLD ),
-//                 ( "ready...\n"  , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.0, COLOR_CYAN ),
-//                 ( _CDPH_        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
-//             ],
-//             countdown: overlay_ui::effect::CountDownParams {
-//                 start_value: 10,
-//                 timer: Timer::from_seconds(1.0, TimerMode::Once),
-//                 counter: 0,
-//                 spans_index: 3,
-//             },
-//         }
-//     }
-// }
+impl Default for OverlayStageClear
+{
+    fn default() -> Self
+    {
+        Self {
+            #[rustfmt::skip]
+            text_spans: &[
+                ( "CLEAR!!!\n"  , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.7, COLOR_CYAN ),
+                ( "next stage\n", ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.0, COLOR_GOLD ),
+                ( "ready...\n"  , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 2.0, COLOR_CYAN ),
+                ( _CDPH_        , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
+            ],
+            countdown: core_logic::overlay_ui::effect::CountDownParams {
+                start_value: 10,
+                timer: Timer::from_seconds(1.0, TimerMode::Once),
+                counter: 0,
+                spans_index: 3,
+            },
+        }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // 全画面メッセージ（ゲームオーバー）のComponent
-// #[derive(Component, Clone, OverlayMessage, Blinking, CountDown)]
-// pub struct OverlayGameOver
-// {
-//     text_spans: &'static [overlay_ui::TextUiSpan],
-//     blinking: overlay_ui::effect::BlinkingParams,
-//     countdown: overlay_ui::effect::CountDownParams,
-// }
+#[derive(Component, Clone, OverlayMessage, Blinking, CountDown)]
+pub struct OverlayGameOver
+{
+    text_spans: &'static [core_logic::overlay_ui::messages::TextUiSpan],
+    blinking: core_logic::overlay_ui::effect::BlinkingParams,
+    countdown: core_logic::overlay_ui::effect::CountDownParams,
+}
 
 // Componentの初期化
-// impl Default for OverlayGameOver
-// {
-//     fn default() -> Self
-//     {
-//         Self {
-//             #[rustfmt::skip]
-//             text_spans: &[
-//                 ( "Game Over\n"   , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 4.0, COLOR_RED  ),
-//                 ( " \n"           , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.6, COLOR_NONE ),
-//                 ( "REPLAY?"       , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 2.0, COLOR_GOLD ),
-//                 ( "\n"            , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, COLOR_NONE ),
-//                 ( "Hit ANY key!\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN ),
-//                 ( "or\n"          , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, COLOR_CYAN ),
-//                 ( "ANY button!\n" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN ),
-//                 ( _CDPH_          , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
-//             ],
-//             blinking: overlay_ui::effect::BlinkingParams {
-//                 cycle: 0.0,
-//                 spans_index: 2,
-//             },
-//             countdown: overlay_ui::effect::CountDownParams {
-//                 start_value: 10,
-//                 timer: Timer::from_seconds(1.0, TimerMode::Once),
-//                 counter: 0,
-//                 spans_index: 7,
-//             },
-//         }
-//     }
-// }
+impl Default for OverlayGameOver
+{
+    fn default() -> Self
+    {
+        Self {
+            #[rustfmt::skip]
+            text_spans: &[
+                ( "Game Over\n"   , ASSETS_FONT_REGGAEONE_REGULAR   , PIXELS_PER_GRID * 4.0, COLOR_RED  ),
+                ( " \n"           , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.6, COLOR_NONE ),
+                ( "REPLAY?"       , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 2.0, COLOR_GOLD ),
+                ( "\n"            , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 1.2, COLOR_NONE ),
+                ( "Hit ANY key!\n", ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN ),
+                ( "or\n"          , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.8, COLOR_CYAN ),
+                ( "ANY button!\n" , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.9, COLOR_CYAN ),
+                ( _CDPH_          , ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 3.5, COLOR_GOLD ),
+            ],
+            blinking: core_logic::overlay_ui::effect::BlinkingParams {
+                cycle: 0.0,
+                spans_index: 2,
+            },
+            countdown: core_logic::overlay_ui::effect::CountDownParams {
+                start_value: 10,
+                timer: Timer::from_seconds(1.0, TimerMode::Once),
+                counter: 0,
+                spans_index: 7,
+            },
+        }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

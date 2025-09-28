@@ -159,7 +159,7 @@ impl Default for appctrl_input::UiOutlineToggleInput
 pub const PRELOAD_ASSETS: &[&str] = &[
     ASSETS_FONT_ORBITRON_BLACK,
     ASSETS_FONT_PRESSSTART2P_REGULAR,
-    // ASSETS_FONT_REGGAEONE_REGULAR,
+    ASSETS_FONT_REGGAEONE_REGULAR,
     ASSETS_SPRITE_KANI_DOTOWN,
     // ASSETS_SPRITE_BRICK_WALL,
     // ASSETS_SPRITESHEET_PLAYER,
@@ -173,7 +173,7 @@ pub const PRELOAD_ASSETS: &[&str] = &[
 // assets（フォント）
 pub const ASSETS_FONT_ORBITRON_BLACK: &str = "font/Orbitron-Black.ttf";
 pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "font/PressStart2P-Regular.ttf";
-// pub const ASSETS_FONT_REGGAEONE_REGULAR: &str = "font/ReggaeOne-Regular.ttf";
+pub const ASSETS_FONT_REGGAEONE_REGULAR: &str = "font/ReggaeOne-Regular.ttf";
 
 // assets（スプライト）
 pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "image/sprite/kani_DOTOWN.png";

@@ -41,7 +41,7 @@ use config::*;
 // proc-macro
 use macros::MyState;
 use macros::derive_appctrl_input;
-use macros::{OverlayMessage, Blinking /*CountDown*/};
+use macros::{OverlayMessage, Blinking, CountDown};
 // use macros::{OverlayMenu, ScalingItem};
 
 ////////////////////////////////////////////////////////////////////////////////

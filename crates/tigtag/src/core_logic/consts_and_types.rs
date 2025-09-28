@@ -6,9 +6,9 @@ use super::*;
 #[derive(Resource, Default)]
 pub struct Record
 {
-    score: i32,       // スコア
-    hi_score: i32,    // ハイスコア
-    stage: i32,       // ステージ数
+    score: i32,    // スコア
+    hi_score: i32, // ハイスコア
+    stage: i32,    // ステージ数
     // demo: DemoRecord, // demo用の記録
 }
 
@@ -41,19 +41,19 @@ impl Record
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// System間通知用イベント
-// pub use my_events::*;
-// #[rustfmt::skip]
-// mod my_events
-// {
-//     use super::*;
-//     #[derive(Event, Default)] pub struct CountDownFinished;
+// System間通知用メッセージ
+pub use my_messages::*;
+#[rustfmt::skip]
+mod my_messages
+{
+    use super::*;
+    #[derive(Message)] pub struct CountDownFinished;
 //     #[derive(Event, Default)] pub struct EventPlayerInputNews ( pub player::HashNews );
 //     #[derive(Event, Default)] pub struct DotsAllEaten ;
 //     #[derive(Event, Default)] pub struct DotEaten ;
 //     #[derive(Event, Default)] pub struct PlayerCaught;
 //     #[derive(Event, Default)] pub struct SkipOverlayMessage;
-// }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
