@@ -190,20 +190,20 @@ fn select_path_pink(
 ////////////////////////////////////////////////////////////////////////////////
 
 // チェイサー（正方形）を回転させる
-// pub fn rotate_chaser_shape(
-//     mut query_chaser: Query<&mut Transform, With<Chaser>>,
-//     time: Res<Time>,
-// )
-// {
-//     let time_delta = time.delta().as_secs_f32();
-//     let radian = TAU * time_delta;
-//     let quat = Quat::from_rotation_z(radian);
+pub fn rotate_chaser_shape(
+    mut query_chaser: Query<&mut Transform, With<Chaser>>,
+    time: Res<Time>,
+)
+{
+    let time_delta = time.delta().as_secs_f32();
+    let radian = TAU * time_delta;
+    let quat = Quat::from_rotation_z(radian);
 
-//     // 回転させる
-//     query_chaser
-//         .iter_mut()
-//         .for_each(|mut transform| transform.rotate(quat));
-// }
+    // 回転させる
+    query_chaser
+        .iter_mut()
+        .for_each(|mut transform| transform.rotate(quat));
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

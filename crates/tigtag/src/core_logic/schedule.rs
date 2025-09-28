@@ -68,7 +68,7 @@ impl Plugin for Schedule
                     animate_sprites::<player::Player>, // プレイヤー
                     animate_sprites::<chaser::Chaser>, // チェイサー
                     // スプライト表示OFFの場合のアニメーション
-                    // chaser::rotate_chaser_shape.run_if(SPRITE_OFF), // チェイサー回転
+                    chaser::rotate_chaser_shape.run_if(SPRITE_OFF), // チェイサー回転
                 ),
             );
 
