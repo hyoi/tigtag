@@ -13,8 +13,10 @@ pub fn derive_overlay_menu(input: TokenStream) -> TokenStream
     };
 
     // 構造体の内容が想定外なら
-    let required_field_type: &[(&str, &str)] =
-        &[("overlay_menu", "overlay_ui::pause_menu::OverlayMenuParams")];
+    let required_field_type: &[(&str, &str)] = &[(
+        "overlay_menu",
+        "core_logic::overlay_ui::pause_menu::OverlayMenuParams",
+    )];
     match is_valid_struct(&ast, required_field_type)
     {
         Ok(_) => (),
@@ -26,10 +28,10 @@ pub fn derive_overlay_menu(input: TokenStream) -> TokenStream
 
     // 文字列を作成して出力する
     quote! {
-        impl overlay_ui::pause_menu::OverlayMenu for #type_name
+        impl core_logic::overlay_ui::pause_menu::OverlayMenu for #type_name
         {
             fn init(&mut self) { *self = Self::default() }
-            fn settings(&self) -> &overlay_ui::pause_menu::MenuItemSettings
+            fn settings(&self) -> &core_logic::overlay_ui::pause_menu::MenuItemSettings
             {
                 &self.overlay_menu.settings
             }
@@ -51,8 +53,10 @@ pub fn derive_scaling_item(input: TokenStream) -> TokenStream
     };
 
     // 構造体の内容が想定外なら
-    let required_field_type: &[(&str, &str)] =
-        &[("scaling_item", "overlay_ui::pause_menu::ScalingItemParams")];
+    let required_field_type: &[(&str, &str)] = &[(
+        "scaling_item",
+        "core_logic::overlay_ui::pause_menu::ScalingItemParams",
+    )];
     match is_valid_struct(&ast, required_field_type)
     {
         Ok(_) => (),
@@ -64,7 +68,7 @@ pub fn derive_scaling_item(input: TokenStream) -> TokenStream
 
     // 文字列を作成して出力する
     quote! {
-        impl overlay_ui::pause_menu::ScalingItem for #type_name
+        impl core_logic::overlay_ui::pause_menu::ScalingItem for #type_name
         {
             fn scale_cycle_mut(&mut self) -> &mut f32 { &mut self.scaling_item.scale_cycle }
         }

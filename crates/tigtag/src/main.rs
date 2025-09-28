@@ -40,7 +40,7 @@ mod demo_play; // demoロジック
 use macros::MyState;
 use macros::derive_appctrl_input;
 use macros::{OverlayMessage, Blinking, CountDown};
-// use macros::{OverlayMenu, ScalingItem};
+use macros::{OverlayMenu, ScalingItem};
 
 ////////////////////////////////////////////////////////////////////////////////
 

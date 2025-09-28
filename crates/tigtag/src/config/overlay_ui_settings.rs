@@ -171,99 +171,100 @@ impl Default for OverlayGameOver
 ////////////////////////////////////////////////////////////////////////////////
 
 // 全画面メニュー（Pause）のComponent
-// #[derive(Component, Clone, OverlayMenu, ScalingItem)]
-// pub struct OverlayPauseMenu
-// {
-//     overlay_menu: overlay_ui::pause_menu::OverlayMenuParams,
-//     scaling_item: overlay_ui::pause_menu::ScalingItemParams,
-// }
+#[derive(Component, Clone, OverlayMenu, ScalingItem)]
+pub struct OverlayPauseMenu
+{
+    overlay_menu: core_logic::overlay_ui::pause_menu::OverlayMenuParams,
+    scaling_item: core_logic::overlay_ui::pause_menu::ScalingItemParams,
+}
 
 // Pauseメニューの設定に使う定数
-// pub const PAUSE_MENU_BG_COLOR: Color = Color::srgba(0.0, 0.0, 0.0, 0.9);
-// pub const PAUSE_TITLE_SIZE: f32 = PIXELS_PER_GRID * 3.5;
-// pub const PAUSE_SELECTED_COLOR: Color = COLOR_CYAN;
-// pub const PAUSE_NORMAL_COLOR: Color = COLOR_SILVER;
-// pub const PAUSE_BASE_SIZE: f32 = PIXELS_PER_GRID * 2.0;
+pub const PAUSE_MENU_BG_COLOR: Color = Color::srgba(0.0, 0.0, 0.0, 0.9);
+pub const PAUSE_TITLE_SIZE: f32 = PIXELS_PER_GRID * 3.5;
+pub const PAUSE_SELECTED_COLOR: Color = COLOR_CYAN;
+pub const PAUSE_NORMAL_COLOR: Color = COLOR_SILVER;
+pub const PAUSE_BASE_SIZE: f32 = PIXELS_PER_GRID * 2.0;
 
 // Componentの初期化
-// impl Default for OverlayPauseMenu
-// {
-//     fn default() -> Self
-//     {
-//         use overlay_ui::pause_menu::PauseMenuItem::*;
-//         Self {
-//             #[rustfmt::skip]
-//             overlay_menu: overlay_ui::pause_menu::OverlayMenuParams
-//             {
-//                 settings: Vec::from_iter(&[
-//                     ( Label , ( "PAUSE" , ASSETS_FONT_ORBITRON_BLACK, PAUSE_TITLE_SIZE     , COLOR_GOLD         ) ),
-//                     ( Label , ( " "     , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 1.2, COLOR_NONE         ) ),
-//                     ( Exit  , ( "EXIT"  , ASSETS_FONT_ORBITRON_BLACK, PAUSE_BASE_SIZE      , PAUSE_NORMAL_COLOR ) ),
-//                     // ( Label , ( " "     , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.8, COLOR_NONE         ) ),
-//                     // ( Config, ( "CONFIG", ASSETS_FONT_ORBITRON_BLACK, PAUSE_BASE_SIZE      , PAUSE_NORMAL_COLOR ) ),
-//                 ]),
-//                 selected_index: 2,
-//             },
-//             scaling_item: overlay_ui::pause_menu::ScalingItemParams::default(),
-//         }
-//     }
-// }
+impl Default for OverlayPauseMenu
+{
+    fn default() -> Self
+    {
+        use core_logic::overlay_ui::pause_menu::PauseMenuItem::*;
+        Self {
+            #[rustfmt::skip]
+            overlay_menu: core_logic::overlay_ui::pause_menu::OverlayMenuParams
+            {
+                settings: Vec::from_iter(&[
+                    ( Label , ( "PAUSE" , ASSETS_FONT_ORBITRON_BLACK, PAUSE_TITLE_SIZE     , COLOR_GOLD         ) ),
+                    ( Label , ( " "     , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 1.2, COLOR_NONE         ) ),
+                    ( Exit  , ( "EXIT"  , ASSETS_FONT_ORBITRON_BLACK, PAUSE_BASE_SIZE      , PAUSE_NORMAL_COLOR ) ),
+                    // ( Label , ( " "     , ASSETS_FONT_ORBITRON_BLACK, PIXELS_PER_GRID * 0.8, COLOR_NONE         ) ),
+                    // ( Config, ( "CONFIG", ASSETS_FONT_ORBITRON_BLACK, PAUSE_BASE_SIZE      , PAUSE_NORMAL_COLOR ) ),
+                ]),
+                selected_index: 2,
+            },
+            scaling_item:
+                core_logic::overlay_ui::pause_menu::ScalingItemParams::default(),
+        }
+    }
+}
 
 // Pauseメニューのキーとボタンの設定
-// impl Default for overlay_ui::pause_menu::PauseMenuOpen
-// {
-//     fn default() -> Self
-//     {
-//         Self {
-//             keys: vec![(KeyCode::Escape, None)],
-//             buttons: vec![GamepadButton::Mode], // Mode: ps4[PSボタン]
-//         }
-//     }
-// }
-// impl Default for overlay_ui::pause_menu::PauseMenuUp
-// {
-//     fn default() -> Self
-//     {
-//         Self {
-//             keys: vec![(KeyCode::ArrowUp, None), (KeyCode::KeyW, None)],
-//             buttons: vec![GamepadButton::DPadUp],
-//         }
-//     }
-// }
-// impl Default for overlay_ui::pause_menu::PauseMenuDown
-// {
-//     fn default() -> Self
-//     {
-//         Self {
-//             keys: vec![(KeyCode::ArrowDown, None), (KeyCode::KeyS, None)],
-//             buttons: vec![GamepadButton::DPadDown],
-//         }
-//     }
-// }
-// impl Default for overlay_ui::pause_menu::PauseMenuApply
-// {
-//     fn default() -> Self
-//     {
-//         Self {
-//             keys: vec![
-//                 (KeyCode::Enter, None),
-//                 (KeyCode::Space, None),
-//                 (KeyCode::KeyE, None),
-//             ],
-//             buttons: vec![GamepadButton::East],
-//         }
-//     }
-// }
-// impl Default for overlay_ui::pause_menu::PauseMenuCancel
-// {
-//     fn default() -> Self
-//     {
-//         Self {
-//             keys: vec![(KeyCode::Escape, None)],
-//             buttons: vec![GamepadButton::South],
-//         }
-//     }
-// }
+impl Default for core_logic::overlay_ui::pause_menu::PauseMenuOpen
+{
+    fn default() -> Self
+    {
+        Self {
+            keys: vec![(KeyCode::Escape, None)],
+            buttons: vec![GamepadButton::Mode], // Mode: ps4[PSボタン]
+        }
+    }
+}
+impl Default for core_logic::overlay_ui::pause_menu::PauseMenuUp
+{
+    fn default() -> Self
+    {
+        Self {
+            keys: vec![(KeyCode::ArrowUp, None), (KeyCode::KeyW, None)],
+            buttons: vec![GamepadButton::DPadUp],
+        }
+    }
+}
+impl Default for core_logic::overlay_ui::pause_menu::PauseMenuDown
+{
+    fn default() -> Self
+    {
+        Self {
+            keys: vec![(KeyCode::ArrowDown, None), (KeyCode::KeyS, None)],
+            buttons: vec![GamepadButton::DPadDown],
+        }
+    }
+}
+impl Default for core_logic::overlay_ui::pause_menu::PauseMenuApply
+{
+    fn default() -> Self
+    {
+        Self {
+            keys: vec![
+                (KeyCode::Enter, None),
+                (KeyCode::Space, None),
+                (KeyCode::KeyE, None),
+            ],
+            buttons: vec![GamepadButton::East],
+        }
+    }
+}
+impl Default for core_logic::overlay_ui::pause_menu::PauseMenuCancel
+{
+    fn default() -> Self
+    {
+        Self {
+            keys: vec![(KeyCode::Escape, None)],
+            buttons: vec![GamepadButton::South],
+        }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

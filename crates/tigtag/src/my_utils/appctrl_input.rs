@@ -28,7 +28,7 @@ pub struct InputDevicePack<'w, 's>
 
 pub trait IsPressed<T: AppCtrl>
 {
-    // fn is_pressed(&self, appctrl: &T) -> bool;
+    fn is_pressed(&self, appctrl: &T) -> bool;
     fn is_pressed_with_reset(&mut self, appctrl: &T) -> bool;
 }
 
@@ -37,29 +37,29 @@ where
     T: AppCtrl,
 {
     // キー入力とゲームパッドのボタン入力をチェックする
-    // fn is_pressed(&self, appctrl_setting: &T) -> bool
-    // {
-    //     // キーが押下されているか
-    //     let is_keys_pressed = appctrl_setting
-    //         .keys_iter()
-    //         .any(|appctrl_keys| self.input_keycode.is_just_pressed(appctrl_keys));
+    fn is_pressed(&self, appctrl_setting: &T) -> bool
+    {
+        // キーが押下されているか
+        let is_keys_pressed = appctrl_setting
+            .keys_iter()
+            .any(|appctrl_keys| self.input_keycode.is_just_pressed(appctrl_keys));
 
-    //     // キーの押下がないなら
-    //     let mut is_buttons_pressed = false;
-    //     if !is_keys_pressed
-    //         && let Some(target_gamepad) = &self.option_target_gamepad
-    //         && let Some(gamepad_entity) = target_gamepad.entity()
-    //         && let Ok(gamepad) = self.query_gamepads.get(gamepad_entity)
-    //     {
-    //         // ゲームパッドのボタンが押下されているか
-    //         is_buttons_pressed = appctrl_setting
-    //             .buttons_iter()
-    //             .any(|&appctrl_btn| gamepad.just_pressed(appctrl_btn));
-    //     }
+        // キーの押下がないなら
+        let mut is_buttons_pressed = false;
+        if !is_keys_pressed
+            && let Some(target_gamepad) = &self.option_target_gamepad
+            && let Some(gamepad_entity) = target_gamepad.entity()
+            && let Ok(gamepad) = self.query_gamepads.get(gamepad_entity)
+        {
+            // ゲームパッドのボタンが押下されているか
+            is_buttons_pressed = appctrl_setting
+                .buttons_iter()
+                .any(|&appctrl_btn| gamepad.just_pressed(appctrl_btn));
+        }
 
-    //     // 戻り値
-    //     is_keys_pressed || is_buttons_pressed
-    // }
+        // 戻り値
+        is_keys_pressed || is_buttons_pressed
+    }
 
     // .is_pressed()の拡張版。戻り値は同じ。副作用で押下された入力をキャンセルする
     fn is_pressed_with_reset(&mut self, appctrl_setting: &T) -> bool

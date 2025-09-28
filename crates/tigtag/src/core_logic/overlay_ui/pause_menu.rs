@@ -22,8 +22,8 @@ impl Plugin for Schedule
                 Update, // without MyState
                 // Pauseメニューの表示／非表示（トグル動作）
                 hook_input_and_toggle_pause
-                    .in_set(MyLabel::BeforeHitAnyKey) // HitAnyKeyより前に実行
-                    .before(appctrl_input::send_app_exit_event),
+                    .in_set(misc::SystemOrderHitAnyKey::Before) // HitAnyKeyの前に実行
+                    .before(appctrl_input::send_exit_app_message),
             )
             // ループ処理２
             .add_systems(
@@ -42,7 +42,7 @@ impl Plugin for Schedule
 ////////////////////////////////////////////////////////////////////////////////
 
 // メニューの設定を格納する変数
-pub type MenuItemSetting = (PauseMenuItem, TextUiSpan);
+pub type MenuItemSetting = (PauseMenuItem, messages::TextUiSpan);
 pub type MenuItemSettings = Vec<&'static MenuItemSetting>;
 
 // Pauseメニューアイテムの識別子
@@ -192,7 +192,7 @@ impl AddOverlatMenuItem for EntityCommands<'_>
                 ..default()
             },
             TextLayout {
-                justify: JustifyText::Center,
+                justify: Justify::Center,
                 linebreak: LineBreak::NoWrap,
             },
             TextColor(*color),
@@ -205,6 +205,7 @@ impl AddOverlatMenuItem for EntityCommands<'_>
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// Pauseメニューから戻るStateを保管するResource（初期値は意味なし）
 #[derive(Resource, Default, Deref, DerefMut)]
 pub struct BackTo(pub MyState);
 
@@ -215,7 +216,12 @@ fn hook_input_and_toggle_pause(
     option_state: Option<ResMut<State<MyState>>>,
     mut back_to: ResMut<BackTo>,
     mut query_overlay_menu: Query<(&mut Visibility, &mut OverlayPauseMenu)>,
-    mut query_menuitems: Query<(&MenuItem, Entity, &mut Transform, &mut TextColor)>,
+    mut query_menuitems: Query<(
+        &MenuItem,
+        Entity,
+        &mut UiTransform,
+        &mut TextColor,
+    )>,
     mut cmds: Commands,
 ) -> Result
 {
@@ -259,14 +265,14 @@ fn hook_input_and_toggle_pause(
                         // 選択されているアイテム（初期位置）
                         **color = PAUSE_SELECTED_COLOR; // 選択状態カラー
                         cmds.entity(entity).insert(ScalingText); // 拡縮効果用Component追加
-                        transform.scale = Vec2::ONE.extend(0.0); // 拡縮リセット
+                        transform.scale = Vec2::ONE; // 拡縮リセット
                     }
                     else
                     {
                         // 選択されていないいアイテム
                         **color = PAUSE_NORMAL_COLOR; // 非選択状態カラー
                         cmds.entity(entity).remove::<ScalingText>(); // 拡縮効果用Component削除
-                        transform.scale = Vec2::ONE.extend(0.0); // 拡縮リセット
+                        transform.scale = Vec2::ONE; // 拡縮リセット
                     }
                 });
 
@@ -308,9 +314,14 @@ pub fn select_and_apply_menuitem(
     ),
     mut input_device: appctrl_input::InputDevicePack,
     mut query_overlay_menu: Query<(&mut OverlayPauseMenu, &mut Visibility)>,
-    mut query_menuitems: Query<(&MenuItem, Entity, &mut Transform, &mut TextColor)>,
+    mut query_menuitems: Query<(
+        &MenuItem,
+        Entity,
+        &mut UiTransform,
+        &mut TextColor,
+    )>,
     mut cmds: Commands,
-    mut event_app_exit: EventWriter<AppExit>,
+    mut event_app_exit: MessageWriter<AppExit>,
     option_state: Option<ResMut<State<MyState>>>,
     back_to: ResMut<BackTo>,
 ) -> Result
@@ -363,7 +374,7 @@ pub fn select_and_apply_menuitem(
                         // 選択されているアイテム
                         **color = PAUSE_SELECTED_COLOR; // 選択状態カラー
                         cmds.entity(entity).insert(ScalingText); // 拡縮効果用Component追加
-                        transform.scale = Vec2::ONE.extend(0.0); // 拡縮リセット
+                        transform.scale = Vec2::ONE; // 拡縮リセット
 
                         *menu_setteing.scale_cycle_mut() = 0.0; // 拡縮サイクルのリセット
                         *menu_setteing.selected_index_mut() =
@@ -374,7 +385,7 @@ pub fn select_and_apply_menuitem(
                         // 選択されていないいアイテム
                         **color = PAUSE_NORMAL_COLOR; // 非選択状態カラー
                         cmds.entity(entity).remove::<ScalingText>(); // 拡縮効果用Component削除
-                        transform.scale = Vec2::ONE.extend(0.0); // 拡縮リセット
+                        transform.scale = Vec2::ONE; // 拡縮リセット
                     }
                 },
             );
@@ -416,7 +427,7 @@ pub struct ScalingText;
 // テキストを拡大縮小する
 fn scale_selected_text(
     mut query_overlay_menu: Query<&mut OverlayPauseMenu>,
-    mut query_menuitems: Query<&mut Transform, With<ScalingText>>,
+    mut query_menuitems: Query<&mut UiTransform, With<ScalingText>>,
     time: Res<Time>,
 ) -> Result
 {
@@ -428,7 +439,7 @@ fn scale_selected_text(
             *radian -= if *radian > TAU { TAU } else { 0.0 };
 
             let size = 1.0 + (*radian).sin() * 0.2 + 0.2;
-            transform.scale = (Vec2::ONE * size).extend(0.0);
+            transform.scale = Vec2::ONE * size;
         });
     }
 

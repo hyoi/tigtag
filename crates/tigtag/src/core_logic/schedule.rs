@@ -14,7 +14,7 @@ impl Plugin for Schedule
             // スケジュールの追加
             .add_plugins(init_app::Schedule { next: MyState::Initialize } ) // アプリ初期化とアセットロード
             .add_plugins(demo_play::Schedule)                               // デモプレイ
-            // .add_plugins(overlay_ui::pause_menu::Schedule)            // Pauseメニュー
+            .add_plugins(overlay_ui::pause_menu::Schedule)                  // Pauseメニュー
 
             // Resourceの登録
             .init_resource::<CameraSettings>()                  // カメラの設定を登録

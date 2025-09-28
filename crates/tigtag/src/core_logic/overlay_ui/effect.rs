@@ -107,31 +107,4 @@ where
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 効果の種類毎のパラメータ
-// #[derive(Clone)]
-// pub struct ScalingParams
-// {
-//     pub unselected_size: f32,
-//     pub selected_base_size: f32,
-//     pub max_scaling: f32,
-//     pub cycle: f32,
-//     pub spans_index: usize,
-//     pub spans_len: usize,
-// }
-
-// 効果の種類毎のトレイト
-// pub trait PopupMenu
-// {
-//     fn init(&mut self);
-//     fn resize_font(&mut self, time_delta: f32) -> f32;
-//     fn selected_menuitem_index(&self) -> usize;
-//     fn selected_menuitem_index_mut(&mut self) -> &mut usize;
-//     fn menuitem_len(&self) -> usize;
-//     fn unselected_size(&self) -> f32;
-//     fn selected_base_size(&self) -> f32;
-// }
-// pub trait PopupMenuItem {}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // End of code.
