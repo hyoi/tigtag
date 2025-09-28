@@ -58,36 +58,17 @@ pub const PLAYER_SPRITE_COLOR: Color = Color::Srgba(css::YELLOW); // 色
 #[derive(Resource, Default)]
 pub struct DemoMapParams
 {
-    dots_sum_y: [i32; map::MAP_HEIGHT_IN_CELLS as usize], // 行に残っているdotsを数えた配列
-    dots_sum_x: [i32; map::MAP_WIDTH_IN_CELLS as usize], // 列に残っているdotsを数えた配列
-    dots_rect: IVec2Rect,                                // 全dotを内包する最小の矩形
+    pub dots_sum_y: [i32; map::MAP_HEIGHT_IN_CELLS as usize], // 行に残っているdotsを数えた配列
+    pub dots_sum_x: [i32; map::MAP_WIDTH_IN_CELLS as usize],  // 列に残っているdotsを数えた配列
+    pub dots_rect: IVec2Rect,                                 // 全dotを内包する最小の矩形
 }
 
 #[derive(Default)]
-struct IVec2Rect
+pub struct IVec2Rect
 {
-    min: IVec2,
-    max: IVec2,
+    pub min: IVec2,
+    pub max: IVec2,
 }
-
-// impl DemoMapParams
-// {
-//     pub fn dots_sum_y(&self, y: i32) -> i32 { self.dots_sum_y[y as usize] }
-//     pub fn dots_sum_y_mut(&mut self, y: i32) -> &mut i32
-//     {
-//         &mut self.dots_sum_y[y as usize]
-//     }
-//     pub fn dots_sum_x(&self, x: i32) -> i32 { self.dots_sum_x[x as usize] }
-//     pub fn dots_sum_x_mut(&mut self, x: i32) -> &mut i32
-//     {
-//         &mut self.dots_sum_x[x as usize]
-//     }
-
-//     pub fn dots_rect_min(&self) -> IVec2 { self.dots_rect.min }
-//     pub fn dots_rect_min_mut(&mut self) -> &mut IVec2 { &mut self.dots_rect.min }
-//     pub fn dots_rect_max(&self) -> IVec2 { self.dots_rect.max }
-//     pub fn dots_rect_max_mut(&mut self) -> &mut IVec2 { &mut self.dots_rect.max }
-// }
 
 ////////////////////////////////////////////////////////////////////////////////
 

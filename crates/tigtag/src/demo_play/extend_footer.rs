@@ -4,12 +4,12 @@ use super::*;
 
 // 拡張するヘッダー／フッター
 const FOOTER_LEFT: header_footer::Position = header_footer::Position::BottomLeft;
-const _DRPH_: &str = "##-#####"; // Placeholder
 #[rustfmt::skip]
 const ADDITIONAL_DEMO_RECORD: &[header_footer::MessageSpan] = &[
     ( " demo ", ASSETS_FONT_ORBITRON_BLACK      , PIXELS_PER_GRID * 0.35, COLOR_TEAL   ),
     ( _DRPH_  , ASSETS_FONT_PRESSSTART2P_REGULAR, PIXELS_PER_GRID * 0.26, COLOR_SILVER ),
 ];
+const _DRPH_: &str = "##-#####"; // Placeholder
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -52,7 +52,7 @@ pub fn add_text_spans(
 
 // UIの表示を更新する(demo record)
 pub fn update_demo_record(
-    option_record: Option<ResMut<Record>>,
+    option_record: Option<ResMut<core_logic::Record>>,
     query_text_block: Query<(Entity, &header_footer::Position)>,
     mut text_writer: TextUiWriter,
 ) -> Result

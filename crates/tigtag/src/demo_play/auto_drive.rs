@@ -3,70 +3,21 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////
 
 // DemoAutoDriveFnのResource初期化用default
-impl Default for player::DemoAutoDriveFn
+impl Default for core_logic::player::DemoAutoDriveFn
 {
     fn default() -> Self { Self(select_escape_route) }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// demo時のプレイヤー自走に使うメソッド
-impl player::DemoMapParams
-{
-    // 指定のマスが、残dotsの最小矩形の中か？
-    pub fn is_inside_rect(&self, grid: IVec2) -> bool
-    {
-        let IVec2 { x: x1, y: y1 } = self.dots_rect_min();
-        let IVec2 { x: x2, y: y2 } = self.dots_rect_max();
-
-        (x1..=x2).contains(&grid.x) && (y1..=y2).contains(&grid.y)
-    }
-
-    // 指定のマスから残dotsの最小矩形までの単純距離(dx+dy)を求める
-    pub fn how_far_to_rect(&self, grid: IVec2) -> i32
-    {
-        let IVec2 { x: x1, y: y1 } = self.dots_rect_min();
-        let IVec2 { x: x2, y: y2 } = self.dots_rect_max();
-
-        let dx = if grid.x < x1
-        {
-            x1 - grid.x
-        }
-        else if grid.x > x2
-        {
-            grid.x - x2
-        }
-        else
-        {
-            0
-        };
-        let dy = if grid.y < y1
-        {
-            y1 - grid.y
-        }
-        else if grid.y > y2
-        {
-            grid.y - y2
-        }
-        else
-        {
-            0
-        };
-
-        dx + dy
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // デモ時の自走プレイヤーの移動方向を決める関数
 pub fn select_escape_route(
-    player: &player::Player,
-    query_chaser: Query<&chaser::Chaser>,
-    map: Res<map::Map>,
-    demo: Res<player::DemoMapParams>,
-    org_sides: &[News],
-) -> News
+    player: &core_logic::player::Player,
+    query_chaser: Query<&core_logic::chaser::Chaser>,
+    map: Res<core_logic::map::Map>,
+    demo: Res<core_logic::player::DemoMapParams>,
+    org_sides: &[core_logic::News],
+) -> core_logic::News
 {
     // 要素数は2(三叉路)～3(十字路)
     let mut sides = Vec::from(org_sides);
@@ -88,10 +39,10 @@ pub fn select_escape_route(
                 {
                     // 追手と正面衝突する方向へ進むのは悪手
                     match chaser.direction
-                    {   News::East  => News::West ,
-                        News::West  => News::East ,
-                        News::South => News::North,
-                        News::North => News::South,
+                    {   core_logic::News::East  => core_logic::News::West ,
+                        core_logic::News::West  => core_logic::News::East ,
+                        core_logic::News::South => core_logic::News::North,
+                        core_logic::News::North => core_logic::News::South,
                     }
                 };
             // bad_moveを候補から除く
@@ -186,61 +137,14 @@ pub fn select_escape_route(
     }
 }
 
-// プレイヤーが残dotsを含む最小の矩形の外にいる場合のheuristic関数
-fn heuristic_dots_rect(
-    grid: IVec2,
-    sides: &[(News, i32)],
-    demo: Res<player::DemoMapParams>,
-) -> Option<News>
-{
-    // 脇道ごとにdots_rectまでの単純距離(dx+dy)を求める
-    let mut vec = Vec::with_capacity(3);
-    for &(dxdy, _) in sides
-    {
-        let side = grid + dxdy;
-        let count = demo.how_far_to_rect(side);
-        vec.push((dxdy, count));
-    }
-
-    // 単純距離が最短の脇道を探す
-    vec.sort_by(|a, b| a.1.cmp(&b.1)); //小さい順にソート
-    let min_val = vec[0].1; //先頭の最小値
-    vec.retain(|x| x.1 <= min_val); //最小値だけのリストにする
-
-    // 脇道が1つだけならそれを、そうでないならNoneを返す
-    if vec.len() == 1
-    {
-        Some(vec[0].0)
-    }
-    else
-    {
-        None
-    }
-}
-
-impl map::Map
-{
-    // 指定した座標とその四方のドットを数える(結果は0～4)
-    fn count_dots_4sides(&self, center: IVec2) -> i32
-    {
-        // 指定の座標にドットはあるか
-        let mut count = i32::from(self.option_entity(center).is_some()); //true:1,false:0
-
-        // 四方にドットはあるか
-        self.get_side_spaces_list(center).iter().for_each(
-            |side| count += i32::from(self.option_entity(center + *side).is_some()), //true:1,false:0
-        );
-
-        count
-    }
-}
+////////////////////////////////////////////////////////////////////////////////
 
 // 脇道を走査してリスクを評価する
 fn check_byway_risk(
     mut target: IVec2,   //初期値：player.next_grid + side
     mut previous: IVec2, //初期値：player.next_grid
     chasers: &[IVec2],   //chaser.next_gridのリスト
-    map: &Res<map::Map>,
+    map: &Res<core_logic::map::Map>,
 ) -> Option<usize>
 {
     // chasersが空の場合(全ての追手が衝突寸前)、脇道にはリスクがない
@@ -359,13 +263,115 @@ fn check_byway_risk(
 // ざっくりチェイサーとの距離を測って最小値を返す
 fn heuristic(target: IVec2, chasers: &[IVec2]) -> i32
 {
-    let mut shortest = map::MAP_WIDTH_IN_CELLS + map::MAP_HEIGHT_IN_CELLS;
+    let mut shortest = core_logic::map::MAP_WIDTH_IN_CELLS + core_logic::map::MAP_HEIGHT_IN_CELLS;
     for chaser in chasers
     {
         let w_and_h = (target.x - chaser.x).abs() + (target.y - chaser.y).abs();
         shortest = shortest.min(w_and_h);
     }
     shortest
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+impl core_logic::map::Map
+{
+    // 指定した座標とその四方のドットを数える(結果は0～4)
+    fn count_dots_4sides(&self, center: IVec2) -> i32
+    {
+        // 指定の座標にドットはあるか
+        let mut count = i32::from(self.option_entity(center).is_some()); //true:1,false:0
+
+        // 四方にドットはあるか
+        self.get_side_spaces_list(center).iter().for_each(
+            |side| count += i32::from(self.option_entity(center + *side).is_some()), //true:1,false:0
+        );
+
+        count
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// demo時のプレイヤー自走に使うメソッド
+impl core_logic::player::DemoMapParams
+{
+    // 指定のマスが、残dotsの最小矩形の中か？
+    pub fn is_inside_rect(&self, grid: IVec2) -> bool
+    {
+        let IVec2 { x: x1, y: y1 } = self.dots_rect_min();
+        let IVec2 { x: x2, y: y2 } = self.dots_rect_max();
+
+        (x1..=x2).contains(&grid.x) && (y1..=y2).contains(&grid.y)
+    }
+
+    // 指定のマスから残dotsの最小矩形までの単純距離(dx+dy)を求める
+    pub fn how_far_to_rect(&self, grid: IVec2) -> i32
+    {
+        let IVec2 { x: x1, y: y1 } = self.dots_rect_min();
+        let IVec2 { x: x2, y: y2 } = self.dots_rect_max();
+
+        let dx = if grid.x < x1
+        {
+            x1 - grid.x
+        }
+        else if grid.x > x2
+        {
+            grid.x - x2
+        }
+        else
+        {
+            0
+        };
+        let dy = if grid.y < y1
+        {
+            y1 - grid.y
+        }
+        else if grid.y > y2
+        {
+            grid.y - y2
+        }
+        else
+        {
+            0
+        };
+
+        dx + dy
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// プレイヤーが残dotsを含む最小の矩形の外にいる場合のheuristic関数
+fn heuristic_dots_rect(
+    grid: IVec2,
+    sides: &[(core_logic::News, i32)],
+    demo: Res<core_logic::player::DemoMapParams>,
+) -> Option<core_logic::News>
+{
+    // 脇道ごとにdots_rectまでの単純距離(dx+dy)を求める
+    let mut vec = Vec::with_capacity(3);
+    for &(dxdy, _) in sides
+    {
+        let side = grid + dxdy;
+        let count = demo.how_far_to_rect(side);
+        vec.push((dxdy, count));
+    }
+
+    // 単純距離が最短の脇道を探す
+    vec.sort_by(|a, b| a.1.cmp(&b.1)); //小さい順にソート
+    let min_val = vec[0].1; //先頭の最小値
+    vec.retain(|x| x.1 <= min_val); //最小値だけのリストにする
+
+    // 脇道が1つだけならそれを、そうでないならNoneを返す
+    if vec.len() == 1
+    {
+        Some(vec[0].0)
+    }
+    else
+    {
+        None
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -227,7 +227,7 @@ pub fn move_sprite(
         let time_delta = time_delta.mul_f32(chaser.speedup); //speedup > 1.0
 
         // 移動タイマーがfinishしたなら
-        if chaser.timer.tick(time_delta).finished()
+        if chaser.timer.tick(time_delta).is_finished()
         {
             // セルの間を移動中のスプライトが半端な位置にいるなら
             if chaser.px_start != chaser.px_end

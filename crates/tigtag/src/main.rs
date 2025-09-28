@@ -22,7 +22,7 @@ use std::{
     slice::Iter,
     ops::{Range, Deref, DerefMut, Add, AddAssign},
     f32::consts::{TAU, PI},
-    // collections::VecDeque,
+    collections::VecDeque,
 };
 
 // internal submodules
@@ -34,7 +34,7 @@ use my_utils::*;
 mod config; // 設定各種
 use config::*;
 
-// mod demo_play; // demoロジック
+mod demo_play; // demoロジック
 
 // proc-macro
 use macros::MyState;
