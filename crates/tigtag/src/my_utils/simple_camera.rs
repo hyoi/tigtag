@@ -89,14 +89,11 @@ fn gen_viewport() -> Option<Viewport>
 {
     match ATTACH_VIEWPORT()
     {
-        true =>
-        {
-            Some(Viewport {
-                physical_position: UVec2::ZERO,
-                physical_size: SCREEN_PIXELS_RESO,
-                ..default()
-            })
-        }
+        true => Some(Viewport {
+            physical_position: UVec2::ZERO,
+            physical_size: SCREEN_PIXELS_RESO,
+            ..default()
+        }),
         _ => None,
     }
 }
