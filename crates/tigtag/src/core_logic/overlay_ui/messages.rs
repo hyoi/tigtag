@@ -3,7 +3,7 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////
 
 // 設定リストから全画面メッセージをspawnする
-pub fn spawn_messages(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
+pub fn spawn(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
 {
     MessageSettings::default()
         .drain(..)
@@ -63,22 +63,22 @@ where
     Self: Component<Mutability = Mutable> + Send + Sync + 'static + Default,
 {
     // Structの内部にアクセスするメソッド
-    fn text_spans(&self) -> &'static [overlay_ui::TextUiSpan];
+    fn text_spans(&self) -> &'static [TextUiSpan];
 
     // 表示直前にパラメータを初期化するメソッド（デフォルト実装）
     fn init(
-    ) -> impl FnMut(Query<&mut Self>, ResMut<Events<CountDownFinished>>) -> Result
+    ) -> impl FnMut(Query<&mut Self> /*ResMut<Events<CountDownFinished>>*/) -> Result
     where
         Self: std::marker::Sized,
     {
-        move |mut query_params: Query<&mut Self>,
-              mut event_countdown: ResMut<Events<CountDownFinished>>| {
+        move |mut query_params: Query<&mut Self>
+              /*mut event_countdown: ResMut<Events<CountDownFinished>>*/| {
             // 準備
             let mut params = query_params.single_mut()?;
 
             // 初期化
             *params = Self::default();
-            event_countdown.clear(); //[対策]EventCountDownが生きているので（v0.16.1）
+            // event_countdown.clear(); //[対策]EventCountDownが生きているので（v0.16.1）
 
             Ok(())
         }
@@ -125,7 +125,7 @@ impl AddOverlatMessage for EntityCommands<'_>
                     ..default()
                 },
                 TextLayout {
-                    justify: JustifyText::Center,
+                    justify: Justify::Center,
                     linebreak: LineBreak::NoWrap,
                 },
                 TextColor(*color),

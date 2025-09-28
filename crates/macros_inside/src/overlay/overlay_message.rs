@@ -13,8 +13,10 @@ pub fn derive_overlay_message(input: TokenStream) -> TokenStream
     };
 
     // 構造体の内容が想定外なら
-    let required_field_type: &[(&str, &str)] =
-        &[("text_spans", "&'static[overlay_ui::TextUiSpan]")];
+    let required_field_type: &[(&str, &str)] = &[(
+        "text_spans",
+        "&'static[core_logic::overlay_ui::messages::TextUiSpan]",
+    )];
     match is_valid_struct(&ast, required_field_type)
     {
         Ok(_) => (),
@@ -26,9 +28,10 @@ pub fn derive_overlay_message(input: TokenStream) -> TokenStream
 
     // 文字列を作成して出力する
     quote! {
-        impl overlay_ui::OverlayMessage for #type_name
+        impl core_logic::overlay_ui::messages::OverlayMessage for #type_name
         {
-            fn text_spans(&self) -> &'static [overlay_ui::TextUiSpan] { self.text_spans }
+            fn text_spans(&self) -> &'static [core_logic::overlay_ui::messages::TextUiSpan]
+            { self.text_spans }
         }
     }
 }
@@ -47,7 +50,7 @@ pub fn derive_blinking(input: TokenStream) -> TokenStream
 
     // 構造体の内容が想定外なら
     let required_field_type: &[(&str, &str)] =
-        &[("blinking", "overlay_ui::effect::BlinkingParams")];
+        &[("blinking", "core_logic::overlay_ui::effect::BlinkingParams")];
     match is_valid_struct(&ast, required_field_type)
     {
         Ok(_) => (),
@@ -59,7 +62,7 @@ pub fn derive_blinking(input: TokenStream) -> TokenStream
 
     // 文字列を作成して出力する
     quote! {
-        impl overlay_ui::effect::Blinking for #type_name
+        impl core_logic::overlay_ui::effect::Blinking for #type_name
         {
             fn alpha(&mut self, time_delta: f32) -> f32
             {
@@ -87,8 +90,10 @@ pub fn derive_countdown(input: TokenStream) -> TokenStream
     };
 
     // 構造体の内容が想定外なら
-    let required_field_type: &[(&str, &str)] =
-        &[("countdown", "overlay_ui::effect::CountDownParams")];
+    let required_field_type: &[(&str, &str)] = &[(
+        "countdown",
+        "core_logic::overlay_ui::effect::CountDownParams",
+    )];
     match is_valid_struct(&ast, required_field_type)
     {
         Ok(_) => (),
@@ -100,7 +105,7 @@ pub fn derive_countdown(input: TokenStream) -> TokenStream
 
     // 文字列を作成して出力する
     quote! {
-        impl overlay_ui::effect::CountDown for #type_name
+        impl core_logic::overlay_ui::effect::CountDown for #type_name
         {
             fn index(&self) -> usize { self.countdown.spans_index }
             fn start_value(&self) -> i32 { self.countdown.start_value }

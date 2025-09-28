@@ -1,11 +1,7 @@
 // external crates
 use bevy::{
     prelude::*,
-    ecs::{
-        error::warn,
-        system::SystemParam,
-        // component::Mutable,
-    },
+    ecs::{error::warn, system::SystemParam, component::Mutable},
     window::{EnabledButtons, WindowMode},
     log::LogPlugin,
     diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
@@ -24,8 +20,8 @@ use rand::prelude::*;
 // standard library
 use std::{
     slice::Iter,
-    ops::{Range, Deref, DerefMut, /*Add, AddAssign*/},
-    // f32::consts::{TAU, PI},
+    ops::{Range, Deref, DerefMut /*Add, AddAssign*/},
+    f32::consts::{TAU /*PI*/},
     // collections::VecDeque,
 };
 
@@ -45,7 +41,7 @@ use config::*;
 // proc-macro
 use macros::MyState;
 use macros::derive_appctrl_input;
-// use macros::{OverlayMessage, Blinking, CountDown};
+use macros::{OverlayMessage, Blinking /*CountDown*/};
 // use macros::{OverlayMenu, ScalingItem};
 
 ////////////////////////////////////////////////////////////////////////////////
