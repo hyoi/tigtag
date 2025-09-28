@@ -190,6 +190,19 @@ pub fn despawn_component<T: Component>(
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// 指定されたMyStateへ遷移するSystem
+pub fn set_next_state(
+    my_state: MyState,
+) -> impl FnMut(ResMut<NextState<MyState>>) -> Result
+{
+    move |mut next_state: ResMut<NextState<MyState>>| -> Result {
+        next_state.set(my_state);
+        Ok(())
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // UIを描画するカメラにComponent「IsDefaultUiCamera」を追加する
 pub fn select_ui_camera(
     camera2d_entity: Query<Entity, With<Camera2d>>,

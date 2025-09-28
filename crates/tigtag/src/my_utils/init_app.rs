@@ -3,7 +3,11 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////
 
 // プラグインの設定
-pub struct Schedule;
+#[rustfmt::skip]
+pub struct Schedule { pub next: MyState }
+#[rustfmt::skip]
+impl Schedule { fn next_state(&self) -> MyState { self.next } }
+
 impl Plugin for Schedule
 {
     fn build(&self, application: &mut App)
@@ -76,8 +80,7 @@ impl Plugin for Schedule
                     // ローディング完了を検知してフラグを立てる
                     check_loading_done,
                     // ループ脱出
-                    change_state_by_resource::<ChangeTo>
-                        .run_if(resource_exists::<ChangeTo>) // State変更先がinsertされていること
+                    misc::set_next_state(self.next_state())
                         .run_if(on_message::<AssetsAllLoaded>), // 完了フラグが立つこと
                 )
                     .run_if(in_state(MyState::LoadAssets)),
@@ -293,18 +296,6 @@ fn check_loading_done(
     message_assets_all_loaded.write(AssetsAllLoaded);
 
     Ok(())
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// 処理が完了した後のState変更先を格納するResource
-#[derive(Resource)]
-pub struct ChangeTo(pub MyState);
-
-// ChangeMyStateトレイトの実装
-impl ChangeMyState for ChangeTo
-{
-    fn state(&self) -> MyState { self.0 }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
