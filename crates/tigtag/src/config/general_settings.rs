@@ -91,15 +91,15 @@ pub enum MyState
 }
 
 // ゲームの状態の判定
-// #[allow(dead_code)]
-// impl MyState
-// {
-//     pub fn is_demoplay(&self) -> bool { self.is_titledemo() || self.is_demoloop() }
-//     pub fn is_playing(&self) -> bool
-//     {
-//         self.is_stagestart() || self.is_mainloop() || self.is_stageclear()
-//     }
-// }
+#[allow(dead_code)]
+impl MyState
+{
+    pub fn is_demoplay(&self) -> bool { self.is_titledemo() || self.is_demoloop() }
+    pub fn is_playing(&self) -> bool
+    {
+        self.is_stagestart() || self.is_mainloop() || self.is_stageclear()
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -281,19 +281,19 @@ pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
 ////////////////////////////////////////////////////////////////////////////////
 
 // キーコードとコールバック関数の対応
-// #[rustfmt::skip]
-// pub const KEY_MAP: player::KeyMapSlice = &[
-//     // WASD
-//     ( KeyCode::KeyW, player::callback::move_up    ),
-//     ( KeyCode::KeyS, player::callback::move_down  ),
-//     ( KeyCode::KeyA, player::callback::move_left  ),
-//     ( KeyCode::KeyD, player::callback::move_right ),
-//     // カーソルキー
-//     ( KeyCode::ArrowUp   , player::callback::move_up    ),
-//     ( KeyCode::ArrowDown , player::callback::move_down  ),
-//     ( KeyCode::ArrowLeft , player::callback::move_left  ),
-//     ( KeyCode::ArrowRight, player::callback::move_right ),
-// ];
+#[rustfmt::skip]
+pub const KEY_MAP: core_logic::player::KeyMapSlice = &[
+    // WASD
+    ( KeyCode::KeyW, core_logic::player::callback::move_up    ),
+    ( KeyCode::KeyS, core_logic::player::callback::move_down  ),
+    ( KeyCode::KeyA, core_logic::player::callback::move_left  ),
+    ( KeyCode::KeyD, core_logic::player::callback::move_right ),
+    // カーソルキー
+    ( KeyCode::ArrowUp   , core_logic::player::callback::move_up    ),
+    ( KeyCode::ArrowDown , core_logic::player::callback::move_down  ),
+    ( KeyCode::ArrowLeft , core_logic::player::callback::move_left  ),
+    ( KeyCode::ArrowRight, core_logic::player::callback::move_right ),
+];
 
 // ゲームパッドのボタン／スティックとコールバック関数の対応
 // #[rustfmt::skip]

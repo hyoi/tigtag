@@ -49,7 +49,7 @@ mod my_messages
     use super::*;
     #[derive(Message)] pub struct CountDownEnded;
     #[derive(Message)] pub struct SkipOverlayMessage;
-//     #[derive(Event, Default)] pub struct EventPlayerInputNews ( pub player::HashNews );
+    #[derive(Message, Default)] pub struct PlayerMovementInput ( pub player::HashNews );
 //     #[derive(Event, Default)] pub struct DotsAllEaten ;
 //     #[derive(Event, Default)] pub struct DotEaten ;
 //     #[derive(Event, Default)] pub struct PlayerCaught;
@@ -86,19 +86,19 @@ impl Add<News> for IVec2
 }
 
 // IVec2 += News
-// impl AddAssign<News> for IVec2
-// {
-//     fn add_assign(&mut self, news: News)
-//     {
-//         match news
-//         {
-//             News::North => self.y -= 1,
-//             News::East => self.x += 1,
-//             News::West => self.x -= 1,
-//             News::South => self.y += 1,
-//         }
-//     }
-// }
+impl AddAssign<News> for IVec2
+{
+    fn add_assign(&mut self, news: News)
+    {
+        match news
+        {
+            News::North => self.y -= 1,
+            News::East => self.x += 1,
+            News::West => self.x -= 1,
+            News::South => self.y += 1,
+        }
+    }
+}
 
 // IVec2 = IVec2 + &mut News
 // impl Add<&mut News> for IVec2
@@ -117,40 +117,40 @@ impl Add<News> for IVec2
 //     }
 // }
 
-// impl News
-// {
-//     // 背面の方角を得る
-//     pub fn back(&self) -> Self
-//     {
-//         match self
-//         {
-//             News::North => News::South,
-//             News::East => News::West,
-//             News::West => News::East,
-//             News::South => News::North,
-//         }
-//     }
+impl News
+{
+    // 背面の方角を得る
+    pub fn back(&self) -> Self
+    {
+        match self
+        {
+            News::North => News::South,
+            News::East => News::West,
+            News::West => News::East,
+            News::South => News::North,
+        }
+    }
 
-//     // //時計回りで方角を得る
-//     // pub fn turn_right( &self ) -> Self
-//     // {   match self
-//     //     {   News::North => News::East,
-//     //         News::East  => News::South,
-//     //         News::West  => News::North,
-//     //         News::South => News::West,
-//     //     }
-//     // }
+    // //時計回りで方角を得る
+    // pub fn turn_right( &self ) -> Self
+    // {   match self
+    //     {   News::North => News::East,
+    //         News::East  => News::South,
+    //         News::West  => News::North,
+    //         News::South => News::West,
+    //     }
+    // }
 
-//     // //反時計回りで方角を得る
-//     // pub fn turn_left( &self ) -> Self
-//     // {   match self
-//     //     {   News::North => News::West,
-//     //         News::East  => News::North,
-//     //         News::West  => News::South,
-//     //         News::South => News::East,
-//     //     }
-//     // }
-// }
+    // //反時計回りで方角を得る
+    // pub fn turn_left( &self ) -> Self
+    // {   match self
+    //     {   News::North => News::West,
+    //         News::East  => News::North,
+    //         News::West  => News::South,
+    //         News::South => News::East,
+    //     }
+    // }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

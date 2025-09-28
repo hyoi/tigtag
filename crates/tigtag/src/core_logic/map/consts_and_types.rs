@@ -176,31 +176,31 @@ impl Map
         }
     }
 
-    // pub fn get_side_spaces_list(&self, cell: IVec2) -> Vec<News>
-    // {
-    //     let mut vec = Vec::<News>::with_capacity(4);
-    //     if self.is_inside(cell)
-    //     {
-    //         let bits = self.bits(cell);
-    //         if bits & Map::BIT_PATH_RIGHT != 0
-    //         {
-    //             vec.push(News::East)
-    //         }
-    //         if bits & Map::BIT_PATH_LEFT != 0
-    //         {
-    //             vec.push(News::West)
-    //         }
-    //         if bits & Map::BIT_PATH_DOWN != 0
-    //         {
-    //             vec.push(News::South)
-    //         }
-    //         if bits & Map::BIT_PATH_UP != 0
-    //         {
-    //             vec.push(News::North)
-    //         }
-    //     }
-    //     vec // 範囲外は空になる（最外壁の外の座標だから上下左右に道はない）
-    // }
+    pub fn get_side_spaces_list(&self, cell: IVec2) -> Vec<News>
+    {
+        let mut vec = Vec::<News>::with_capacity(4);
+        if self.is_inside(cell)
+        {
+            let bits = self.bits(cell);
+            if bits & Map::BIT_PATH_RIGHT != 0
+            {
+                vec.push(News::East)
+            }
+            if bits & Map::BIT_PATH_LEFT != 0
+            {
+                vec.push(News::West)
+            }
+            if bits & Map::BIT_PATH_DOWN != 0
+            {
+                vec.push(News::South)
+            }
+            if bits & Map::BIT_PATH_UP != 0
+            {
+                vec.push(News::North)
+            }
+        }
+        vec // 範囲外は空になる（最外壁の外の座標だから上下左右に道はない）
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

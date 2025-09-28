@@ -55,20 +55,20 @@ pub const PLAYER_SPRITE_COLOR: Color = Color::Srgba(css::YELLOW); // 色
 ////////////////////////////////////////////////////////////////////////////////
 
 // マップのドット配置情報（demo用）
-// #[derive(Resource, Default)]
-// pub struct DemoMapParams
-// {
-//     dots_sum_y: [i32; map::MAP_HEIGHT_IN_CELLS as usize], // 行に残っているdotsを数えた配列
-//     dots_sum_x: [i32; map::MAP_WIDTH_IN_CELLS as usize], // 列に残っているdotsを数えた配列
-//     dots_rect: IVec2Rect,                                // 全dotを内包する最小の矩形
-// }
+#[derive(Resource, Default)]
+pub struct DemoMapParams
+{
+    dots_sum_y: [i32; map::MAP_HEIGHT_IN_CELLS as usize], // 行に残っているdotsを数えた配列
+    dots_sum_x: [i32; map::MAP_WIDTH_IN_CELLS as usize], // 列に残っているdotsを数えた配列
+    dots_rect: IVec2Rect,                                // 全dotを内包する最小の矩形
+}
 
-// #[derive(Default)]
-// struct IVec2Rect
-// {
-//     min: IVec2,
-//     max: IVec2,
-// }
+#[derive(Default)]
+struct IVec2Rect
+{
+    min: IVec2,
+    max: IVec2,
+}
 
 // impl DemoMapParams
 // {
@@ -92,17 +92,17 @@ pub const PLAYER_SPRITE_COLOR: Color = Color::Srgba(css::YELLOW); // 色
 ////////////////////////////////////////////////////////////////////////////////
 
 // 自走プレイヤー(デモ時)の移動方向を決める関数（関数ポインタ）
-// #[derive(Resource)]
-// #[allow(clippy::type_complexity)]
-// pub struct DemoAutoDriveFn(
-//     pub  fn(
-//         &Player,                // プレイヤーのComponent
-//         Query<&chaser::Chaser>, // チェイサーのComponent
-//         Res<map::Map>,          // マップ
-//         Res<DemoMapParams>,     // デモ用情報
-//         &[News],                // プレイヤーがいるセルの四方の道のリスト
-//     ) -> News,
-// );
+#[derive(Resource)]
+#[allow(clippy::type_complexity)]
+pub struct DemoAutoDriveFn(
+    pub  fn(
+        &Player,                // プレイヤーのComponent
+        Query<&chaser::Chaser>, // チェイサーのComponent
+        Res<map::Map>,          // マップ
+        Res<DemoMapParams>,     // デモ用情報
+        &[News],                // プレイヤーがいるセルの四方の道のリスト
+    ) -> News,
+);
 
 ////////////////////////////////////////////////////////////////////////////////
 

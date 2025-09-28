@@ -21,14 +21,14 @@ impl Plugin for Schedule
             .init_resource::<Record>()                          // ゲームの成績
             .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
             .init_resource::<map::Map>()                        // ステージのマップ
-            // .insert_resource(player::KeyMap::from( KEY_MAP ))   // マッピング（キー）
+            .insert_resource(player::KeyMap::from( KEY_MAP ))   // マッピング（キー）
             // .insert_resource(player::GamepadMap::from(PAD_MAP)) // マッピング（ゲームパッド）
 
-            // Eventの登録
+            // Messageの登録
             .add_message::<misc::AnyButtonPressed>() //「Hit Any Key」の入力通知
             .add_message::<SkipOverlayMessage>()     // 全画面メッセージ表示のスキップに使用
             .add_message::<CountDownEnded>()         // カウントダウンの終了通知
-            // .add_event::<EventPlayerInputNews>()   // プレイヤーキャラクターの操作入力通知
+            .add_message::<PlayerMovementInput>()    // プレイヤーキャラクターの操作入力通知
             // .add_event::<DotEaten>()               // スコアリングの伝達用
             // .add_event::<DotsAllEaten >()          // ステージクリアの伝達用
             // .add_event::<PlayerCaught>()           // ゲームオーバーの伝達用
@@ -163,31 +163,31 @@ impl Plugin for Schedule
 
         // --------------------------------------------------------------------------
         // メインループ処理（MyState::MainLoop）
-        // application
-        //     // ループ処理
-        //     .add_systems(
-        //         Update, // within MyState::MainLoop
-        //         (
-        //             (
-        //                 // スプライトの位置を更新する
-        //                 player::input_from_keyboard, // キー
-        //                 player::input_from_gamepad,  // ゲームパッド
-        //                 player::move_sprite
-        //                     .after(player::input_from_keyboard)
-        //                     .after(player::input_from_gamepad),
-        //                 chaser::move_sprite,
-        //             ),
-        //             // スコアリング＆クリア判定
-        //             detecting_change::scoring_and_stage_clear,
-        //             set_next_state::<StageClear>.run_if(on_event::<DotsAllEaten>),
-        //             // 衝突判定
-        //             detecting_change::collisions_and_gameover
-        //                 .run_if(not(on_event::<DotsAllEaten>)), // DotsAllEaten ➡ スキップ
-        //             set_next_state::<GameOver>.run_if(on_event::<PlayerCaught>),
-        //         )
-        //             .chain()
-        //             .run_if(in_state(MyState::MainLoop)),
-        //     );
+        application
+            // ループ処理
+            .add_systems(
+                Update, // within MyState::MainLoop
+                (
+                    (
+                        // スプライトの位置を更新する
+                        player::input_from_keyboard, // キー
+                        // player::input_from_gamepad,  // ゲームパッド
+                        player::move_sprite
+                            .after(player::input_from_keyboard)
+                        //     .after(player::input_from_gamepad),
+                        // chaser::move_sprite,
+                    ),
+                    // スコアリング＆クリア判定
+                    // detecting_change::scoring_and_stage_clear,
+                    // set_next_state::<StageClear>.run_if(on_event::<DotsAllEaten>),
+                    // 衝突判定
+                    // detecting_change::collisions_and_gameover
+                    //     .run_if(not(on_event::<DotsAllEaten>)), // DotsAllEaten ➡ スキップ
+                    // set_next_state::<GameOver>.run_if(on_event::<PlayerCaught>),
+                )
+                    .chain()
+                    .run_if(in_state(MyState::MainLoop)),
+            );
 
         //--------------------------------------------------------------------------
         // ステージクリアの処理（MyState::StageClear）
