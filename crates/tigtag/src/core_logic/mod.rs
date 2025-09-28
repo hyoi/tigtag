@@ -18,5 +18,4 @@ pub mod chaser; // チェイサー
 mod animate_sprites; //スプライトアニメーション
 pub use animate_sprites::*;
 
-
 // End of code.
