@@ -29,8 +29,8 @@ impl Plugin for Schedule
             .add_message::<SkipOverlayMessage>()     // 全画面メッセージ表示のスキップに使用
             .add_message::<CountDownEnded>()         // カウントダウンの終了通知
             .add_message::<PlayerMovementInput>()    // プレイヤーキャラクターの操作入力通知
-            // .add_event::<DotEaten>()               // スコアリングの伝達用
-            // .add_event::<DotsAllEaten >()          // ステージクリアの伝達用
+            .add_message::<DotsAllEaten >()          // ステージクリアの伝達用
+            .add_message::<DotEaten>()               // スコアリングの伝達用
             // .add_event::<PlayerCaught>()           // ゲームオーバーの伝達用
             ;
 
@@ -178,8 +178,9 @@ impl Plugin for Schedule
                         chaser::move_sprite,
                     ),
                     // スコアリング＆クリア判定
-                    // detecting_change::scoring_and_stage_clear,
-                    // set_next_state::<StageClear>.run_if(on_event::<DotsAllEaten>),
+                    detecting_change::scoring_and_stage_clear,
+                    misc::set_next_state(MyState::StageClear)
+                        .run_if(on_message::<DotsAllEaten>),
                     // 衝突判定
                     // detecting_change::collisions_and_gameover
                     //     .run_if(not(on_event::<DotsAllEaten>)), // DotsAllEaten ➡ スキップ
@@ -191,39 +192,39 @@ impl Plugin for Schedule
 
         //--------------------------------------------------------------------------
         // ステージクリアの処理（MyState::StageClear）
-        // application
-        //     // 前処理
-        //     .add_systems(
-        //         OnEnter(MyState::StageClear),
-        //         (
-        //             // 全画面メッセージ（ステージクリア）表示
-        //             OverlayStageClear::init(),
-        //             misc::show_component::<OverlayStageClear>
-        //                 .after(OverlayStageClear::init()),
-        //         ),
-        //     )
-        //     // ループ処理
-        //     .add_systems(
-        //         Update, // within MyState::StageClear
-        //         (
-        //             // カウントダウン完了後にState遷移
-        //             overlay_ui::effect::countdown::<OverlayStageClear>,
-        //             set_next_state::<StageStart>
-        //                 .run_if(on_event::<CountDownFinished>)
-        //                 .after(overlay_ui::effect::countdown::<OverlayStageClear>),
-        //         )
-        //             .run_if(in_state(MyState::StageClear)),
-        //     )
-        //     // 後処理
-        //     .add_systems(
-        //         OnExit(MyState::StageClear),
-        //         (
-        //             // 全画面メッセージ（ステージクリア）非表示
-        //             misc::hide_component::<OverlayStageClear>,
-        //             // 後続の MyState::StageStart で全画面メッセージを表示しない
-        //             misc::set_event::<SkipOverlayMessage>,
-        //         ),
-        //     );
+        application
+            // 前処理
+            .add_systems(
+                OnEnter(MyState::StageClear),
+                (
+                    // 全画面メッセージ（ステージクリア）表示
+                    OverlayStageClear::init(),
+                    misc::show_component::<OverlayStageClear>
+                        .after(OverlayStageClear::init()),
+                ),
+            )
+            // ループ処理
+            .add_systems(
+                Update, // within MyState::StageClear
+                (
+                    // カウントダウン完了後にState遷移
+                    overlay_ui::effect::countdown::<OverlayStageClear>,
+                    misc::set_next_state(MyState::StageStart)
+                        .run_if(on_message::<CountDownEnded>)
+                        .after(overlay_ui::effect::countdown::<OverlayStageClear>),
+                )
+                    .run_if(in_state(MyState::StageClear)),
+            )
+            // 後処理
+            .add_systems(
+                OnExit(MyState::StageClear),
+                (
+                    // 全画面メッセージ（ステージクリア）非表示
+                    misc::hide_component::<OverlayStageClear>,
+                    // 後続の MyState::StageStart で全画面メッセージを表示しない
+                    misc::set_message::<SkipOverlayMessage>,
+                ),
+            );
 
         //--------------------------------------------------------------------------
         // ゲームオーバーの処理（MyState::GameOver）

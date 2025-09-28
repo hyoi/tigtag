@@ -12,7 +12,7 @@ use bevy::{
         keyboard::NativeKeyCode,
         gamepad::{GamepadInput, GamepadAxisChangedEvent},
     },
-    // audio::Volume,
+    audio::Volume,
 };
 use rand::prelude::*;
 use rustc_hash::{FxHashSet, FxHashMap};

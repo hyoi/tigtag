@@ -17,54 +17,54 @@ pub fn initialize_score_stage(option_record: Option<ResMut<Record>>) -> Result
 ////////////////////////////////////////////////////////////////////////////////
 
 // スコアリングとステージクリアの判定
-// #[allow(clippy::too_many_arguments)]
-// pub fn scoring_and_stage_clear(
-//     query_player: Query<&player::Player>,
-//     option_map: Option<ResMut<map::Map>>,
-//     option_record: Option<ResMut<Record>>,
-//     option_state: Option<Res<State<MyState>>>,
-//     mut event_clear: EventWriter<DotsAllEaten>,
-//     mut cmds: Commands,
-//     asset_svr: Res<AssetServer>,
-//     mut event_eatdot: EventWriter<DotEaten>, // demo用event
-// ) -> Result
-// {
-//     // 準備
-//     let player = query_player.single()?;
-//     let mut map = option_map.ok_or("Resource not found.")?;
-//     let mut record = option_record.ok_or("Resource not found.")?;
-//     let state = option_state.ok_or("Resource not found.")?;
+#[allow(clippy::too_many_arguments)]
+pub fn scoring_and_stage_clear(
+    query_player: Query<&player::Player>,
+    option_map: Option<ResMut<map::Map>>,
+    option_record: Option<ResMut<Record>>,
+    option_state: Option<Res<State<MyState>>>,
+    mut message_clear: MessageWriter<DotsAllEaten>,
+    mut cmds: Commands,
+    asset_svr: Res<AssetServer>,
+    mut message_eatdot: MessageWriter<DotEaten>, // demo用Message
+) -> Result
+{
+    // 準備
+    let player = query_player.single()?;
+    let mut map = option_map.ok_or("Resource not found.")?;
+    let mut record = option_record.ok_or("Resource not found.")?;
+    let state = option_state.ok_or("Resource not found.")?;
 
-//     // プレイヤーの位置にドットがあるなら
-//     if let Some(dot) = map.option_entity(player.cell)
-//     {
-//         // ドットの削除とスコア更新
-//         cmds.entity(dot).despawn();
-//         *map.option_entity_mut(player.cell) = None;
-//         map.remaining_dots -= 1;
-//         event_eatdot.write(DotEaten);
-//         *record.score_mut() += 1;
+    // プレイヤーの位置にドットがあるなら
+    if let Some(dot) = map.option_entity(player.cell)
+    {
+        // ドットの削除とスコア更新
+        cmds.entity(dot).despawn();
+        *map.option_entity_mut(player.cell) = None;
+        map.remaining_dots -= 1;
+        message_eatdot.write(DotEaten);
+        *record.score_mut() += 1;
 
-//         // 1度beepを鳴らす(自動despawn処理付き)
-//         let sound_beep = AudioPlayer::new(asset_svr.load(ASSETS_SOUND_BEEP));
-//         let setting = PlaybackSettings::DESPAWN.with_volume(VOLUME_SOUND_BEEP);
-//         cmds.spawn((sound_beep, setting));
+        // 1度beepを鳴らす(自動despawn処理付き)
+        let sound_beep = AudioPlayer::new(asset_svr.load(ASSETS_SOUND_BEEP));
+        let setting = PlaybackSettings::DESPAWN.with_volume(VOLUME_SOUND_BEEP);
+        cmds.spawn((sound_beep, setting));
 
-//         // ハイスコアの更新（Demoでプレイヤーの記録が壊されないように）
-//         if record.score() > record.hi_score() && !state.get().is_demoplay()
-//         {
-//             *record.hi_score_mut() = record.score();
-//         }
+        // ハイスコアの更新（Demoでプレイヤーの記録が壊されないように）
+        if record.score() > record.hi_score() && !state.get().is_demoplay()
+        {
+            *record.hi_score_mut() = record.score();
+        }
 
-//         // 全ドットを拾ったらEventでステージクリアを通知
-//         if map.remaining_dots <= 0
-//         {
-//             event_clear.write(DotsAllEaten);
-//         }
-//     }
+        // 全ドットを拾ったらEventでステージクリアを通知
+        if map.remaining_dots <= 0
+        {
+            message_clear.write(DotsAllEaten);
+        }
+    }
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

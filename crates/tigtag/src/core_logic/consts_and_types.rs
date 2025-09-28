@@ -30,7 +30,7 @@ impl Record
     pub fn score_mut(&mut self) -> &mut i32 { &mut self.score }
 
     pub fn hi_score(&self) -> i32 { self.hi_score }
-    // pub fn hi_score_mut(&mut self) -> &mut i32 { &mut self.hi_score }
+    pub fn hi_score_mut(&mut self) -> &mut i32 { &mut self.hi_score }
 
     // pub fn demo_hi_score(&self) -> i32 { self.demo.hi_score }
     // pub fn demo_hi_score_mut(&mut self) -> &mut i32 { &mut self.demo.hi_score }
@@ -48,10 +48,10 @@ mod my_messages
 {
     use super::*;
     #[derive(Message)] pub struct CountDownEnded;
-    #[derive(Message)] pub struct SkipOverlayMessage;
-    #[derive(Message, Default)] pub struct PlayerMovementInput ( pub player::HashNews );
-//     #[derive(Event, Default)] pub struct DotsAllEaten ;
-//     #[derive(Event, Default)] pub struct DotEaten ;
+    #[derive(Message, Default)] pub struct SkipOverlayMessage;
+    #[derive(Message)] pub struct PlayerMovementInput ( pub player::HashNews );
+    #[derive(Message)] pub struct DotsAllEaten ;
+    #[derive(Message)] pub struct DotEaten ;
 //     #[derive(Event, Default)] pub struct PlayerCaught;
 }
 

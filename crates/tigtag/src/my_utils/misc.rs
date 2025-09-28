@@ -237,13 +237,13 @@ pub fn hide_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 指定のEventを送信する
-// pub fn set_event<T: Event + Default>(mut event_writer: EventWriter<T>) -> Result
-// {
-//     event_writer.write(T::default());
+// 指定のMessageを送信する
+pub fn set_message<T: Message + Default>(mut message_writer: MessageWriter<T>) -> Result
+{
+    message_writer.write(T::default());
 
-//     Ok(())
-// }
+    Ok(())
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

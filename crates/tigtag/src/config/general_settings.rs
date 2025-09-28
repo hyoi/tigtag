@@ -167,7 +167,7 @@ pub const PRELOAD_ASSETS: &[&str] = &[
     ASSETS_SPRITESHEET_CHASER_GREEN,
     ASSETS_SPRITESHEET_CHASER_BLUE,
     ASSETS_SPRITESHEET_CHASER_PINK,
-    // ASSETS_SOUND_BEEP,
+    ASSETS_SOUND_BEEP,
 ];
 
 // assets（フォント）
@@ -188,8 +188,8 @@ pub const ASSETS_SPRITESHEET_CHASER_BLUE: &str = "image/spritesheet/chaser_blue.
 pub const ASSETS_SPRITESHEET_CHASER_PINK: &str = "image/spritesheet/chaser_pink.png";
 
 // assets（サウンド）
-// pub const ASSETS_SOUND_BEEP: &str = "audio/sound/beep.ogg";
-// pub const VOLUME_SOUND_BEEP: Volume = Volume::Linear(0.1); //SEボリューム
+pub const ASSETS_SOUND_BEEP: &str = "audio/sound/beep.ogg";
+pub const VOLUME_SOUND_BEEP: Volume = Volume::Linear(0.1); //SEボリューム
 
 ////////////////////////////////////////////////////////////////////////////////
 
