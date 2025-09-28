@@ -31,7 +31,7 @@ impl Plugin for Schedule
             .add_message::<PlayerMovementInput>()    // プレイヤーキャラクターの操作入力通知
             .add_message::<DotsAllEaten >()          // ステージクリアの伝達用
             .add_message::<DotEaten>()               // スコアリングの伝達用
-            // .add_event::<PlayerCaught>()           // ゲームオーバーの伝達用
+            .add_message::<PlayerCaught>()           // ゲームオーバーの伝達用
             ;
 
         //--------------------------------------------------------------------------
@@ -182,9 +182,11 @@ impl Plugin for Schedule
                     misc::set_next_state(MyState::StageClear)
                         .run_if(on_message::<DotsAllEaten>),
                     // 衝突判定
-                    // detecting_change::collisions_and_gameover
-                    //     .run_if(not(on_event::<DotsAllEaten>)), // DotsAllEaten ➡ スキップ
-                    // set_next_state::<GameOver>.run_if(on_event::<PlayerCaught>),
+                    detecting_change::collisions_and_gameover
+                        // DotsAllEaten ➡ スキップ
+                        .run_if(not(on_message::<DotsAllEaten>)),
+                    misc::set_next_state(MyState::GameOver)
+                        .run_if(on_message::<PlayerCaught>),
                 )
                     .chain()
                     .run_if(in_state(MyState::MainLoop)),
@@ -228,46 +230,47 @@ impl Plugin for Schedule
 
         //--------------------------------------------------------------------------
         // ゲームオーバーの処理（MyState::GameOver）
-        // application
-        //     // 前処理
-        //     .add_systems(
-        //         OnEnter(MyState::GameOver),
-        //         (
-        //             // 全画面メッセージ（ステージクリア）表示
-        //             OverlayGameOver::init(),
-        //             misc::show_component::<OverlayGameOver>
-        //                 .after(OverlayGameOver::init()),
-        //         ),
-        //     )
-        //     // ループ処理
-        //     .add_systems(
-        //         Update, // within MyState::GameOver
-        //         (
-        //             // カウントダウン完了後にState遷移
-        //             overlay_ui::effect::countdown::<OverlayGameOver>,
-        //             set_next_state::<TitleDemo>
-        //                 .run_if(on_event::<CountDownFinished>)
-        //                 .after(overlay_ui::effect::countdown::<OverlayGameOver>),
-        //             // Replay? の明滅
-        //             overlay_ui::effect::blinking_text::<OverlayGameOver>,
-        //             // Hit ANY Key に反応あればState遷移
-        //             misc::check_hit_any_key.in_set(MyLabel::HitAnyKey),
-        //             set_next_state::<StageStart>
-        //                 .in_set(MyLabel::AfterHitAnyKey)
-        //                 .run_if(on_event::<misc::AnyButtonPressed>),
-        //         )
-        //             .run_if(in_state(MyState::GameOver)),
-        //     )
-        //     // 後処理
-        //     .add_systems(
-        //         OnExit(MyState::GameOver),
-        //         (
-        //             // 全画面メッセージ（ステージクリア）非表示
-        //             misc::hide_component::<OverlayGameOver>,
-        //             // scoreとstageをゼロクリアする
-        //             detecting_change::initialize_score_stage,
-        //         ),
-        //     );
+        application
+            // 前処理
+            .add_systems(
+                OnEnter(MyState::GameOver),
+                (
+                    // 全画面メッセージ（ステージクリア）表示
+                    OverlayGameOver::init(),
+                    misc::show_component::<OverlayGameOver>
+                        .after(OverlayGameOver::init()),
+                ),
+            )
+            // ループ処理
+            .add_systems(
+                Update, // within MyState::GameOver
+                (
+                    // カウントダウン完了後にState遷移
+                    overlay_ui::effect::countdown::<OverlayGameOver>,
+                    misc::set_next_state(MyState::TitleDemo)
+                        .run_if(on_message::<CountDownEnded>)
+                        .after(overlay_ui::effect::countdown::<OverlayGameOver>),
+                    // Replay? の明滅
+                    overlay_ui::effect::blinking_text::<OverlayGameOver>,
+                    // Hit ANY Key に反応あればState遷移
+                    misc::check_hit_any_key
+                        .in_set(misc::SystemOrderHitAnyKey::Marker),
+                    misc::set_next_state(MyState::StageStart)
+                        .in_set(misc::SystemOrderHitAnyKey::After)
+                        .run_if(on_message::<misc::AnyButtonPressed>),
+                )
+                    .run_if(in_state(MyState::GameOver)),
+            )
+            // 後処理
+            .add_systems(
+                OnExit(MyState::GameOver),
+                (
+                    // 全画面メッセージ（ステージクリア）非表示
+                    misc::hide_component::<OverlayGameOver>,
+                    // scoreとstageをゼロクリアする
+                    detecting_change::initialize_score_stage,
+                ),
+            );
     }
 }
 
