@@ -56,8 +56,6 @@ pub trait SpriteAnimation
     fn num_patterns(&self) -> u32;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
 // Playerのトレイト実装
 impl SpriteAnimation for player::Player
 {
@@ -71,48 +69,48 @@ impl SpriteAnimation for player::Player
 }
 
 // Chaserのトレイト実装
-impl SpriteAnimation for chaser::Chaser
-{
-    fn sprite_sheet_offset(&self, news: News) -> u32
-    {
-        *self.anime.sprite_sheet_offsets.get(&news).unwrap()
-    }
-    fn direction(&self) -> News { self.direction }
-    fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime.timer }
-    fn num_patterns(&self) -> u32 { self.anime.num_patterns }
-}
+// impl SpriteAnimation for chaser::Chaser
+// {
+//     fn sprite_sheet_offset(&self, news: News) -> u32
+//     {
+//         *self.anime.sprite_sheet_offsets.get(&news).unwrap()
+//     }
+//     fn direction(&self) -> News { self.direction }
+//     fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime.timer }
+//     fn num_patterns(&self) -> u32 { self.anime.num_patterns }
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // スプライトをアニメーションさせる
-pub fn animate_sprites<T>(
-    mut query_target: Query<(&mut Sprite, &mut T)>,
-    time: Res<Time>,
-) where
-    T: Component<Mutability = Mutable> + SpriteAnimation,
-{
-    for (mut sprite, mut character) in &mut query_target
-    {
-        // アニメーションのタイマー
-        let delta = time.delta();
-        let finished = character.anime_timer_mut().tick(delta).just_finished();
+// pub fn animate_sprites<T>(
+//     mut query_target: Query<(&mut Sprite, &mut T)>,
+//     time: Res<Time>,
+// ) where
+//     T: Component<Mutability = Mutable> + SpriteAnimation,
+// {
+//     for (mut sprite, mut character) in &mut query_target
+//     {
+//         // アニメーションのタイマー
+//         let delta = time.delta();
+//         let finished = character.anime_timer_mut().tick(delta).just_finished();
 
-        if finished && let Some(texture_atlas) = &mut sprite.texture_atlas
-        {
-            // アニメのパターンを1つ進める
-            let index = &mut texture_atlas.index;
-            *index += 1;
+//         if finished && let Some(texture_atlas) = &mut sprite.texture_atlas
+//         {
+//             // アニメのパターンを1つ進める
+//             let index = &mut texture_atlas.index;
+//             *index += 1;
 
-            // スプライトシートの情報を取り出す
-            let news = character.direction();
-            let offset = character.sprite_sheet_offset(news) as usize;
-            let count = character.num_patterns() as usize;
+//             // スプライトシートの情報を取り出す
+//             let news = character.direction();
+//             let offset = character.sprite_sheet_offset(news) as usize;
+//             let count = character.num_patterns() as usize;
 
-            // アニメのパターンを周期的に繰り返す
-            *index = offset + (*index - offset) % count;
-        }
-    }
-}
+//             // アニメのパターンを周期的に繰り返す
+//             *index = offset + (*index - offset) % count;
+//         }
+//     }
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 

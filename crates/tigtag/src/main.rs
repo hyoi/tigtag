@@ -15,13 +15,13 @@ use bevy::{
     // audio::Volume,
 };
 use rand::prelude::*;
-use rustc_hash::{FxHashSet /*, FxHashMap*/};
+use rustc_hash::{FxHashSet, FxHashMap};
 
 // standard library
 use std::{
     slice::Iter,
     ops::{Range, Deref, DerefMut, Add, /*AddAssign*/},
-    f32::consts::{TAU /*PI*/},
+    f32::consts::{TAU, PI},
     // collections::VecDeque,
 };
 

@@ -18,8 +18,6 @@ pub struct Player
     pub anime: SpriteAnimationParams, // スプライトアニメーションの情報
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
 // プレイヤーの初期状態
 impl Default for Player
 {
@@ -57,54 +55,54 @@ pub const PLAYER_SPRITE_COLOR: Color = Color::Srgba(css::YELLOW); // 色
 ////////////////////////////////////////////////////////////////////////////////
 
 // マップのドット配置情報（demo用）
-#[derive(Resource, Default)]
-pub struct DemoMapParams
-{
-    dots_sum_y: [i32; map::MAP_HEIGHT_IN_CELLS as usize], // 行に残っているdotsを数えた配列
-    dots_sum_x: [i32; map::MAP_WIDTH_IN_CELLS as usize], // 列に残っているdotsを数えた配列
-    dots_rect: IVec2Rect,                                // 全dotを内包する最小の矩形
-}
+// #[derive(Resource, Default)]
+// pub struct DemoMapParams
+// {
+//     dots_sum_y: [i32; map::MAP_HEIGHT_IN_CELLS as usize], // 行に残っているdotsを数えた配列
+//     dots_sum_x: [i32; map::MAP_WIDTH_IN_CELLS as usize], // 列に残っているdotsを数えた配列
+//     dots_rect: IVec2Rect,                                // 全dotを内包する最小の矩形
+// }
 
-#[derive(Default)]
-struct IVec2Rect
-{
-    min: IVec2,
-    max: IVec2,
-}
+// #[derive(Default)]
+// struct IVec2Rect
+// {
+//     min: IVec2,
+//     max: IVec2,
+// }
 
-impl DemoMapParams
-{
-    pub fn dots_sum_y(&self, y: i32) -> i32 { self.dots_sum_y[y as usize] }
-    pub fn dots_sum_y_mut(&mut self, y: i32) -> &mut i32
-    {
-        &mut self.dots_sum_y[y as usize]
-    }
-    pub fn dots_sum_x(&self, x: i32) -> i32 { self.dots_sum_x[x as usize] }
-    pub fn dots_sum_x_mut(&mut self, x: i32) -> &mut i32
-    {
-        &mut self.dots_sum_x[x as usize]
-    }
+// impl DemoMapParams
+// {
+//     pub fn dots_sum_y(&self, y: i32) -> i32 { self.dots_sum_y[y as usize] }
+//     pub fn dots_sum_y_mut(&mut self, y: i32) -> &mut i32
+//     {
+//         &mut self.dots_sum_y[y as usize]
+//     }
+//     pub fn dots_sum_x(&self, x: i32) -> i32 { self.dots_sum_x[x as usize] }
+//     pub fn dots_sum_x_mut(&mut self, x: i32) -> &mut i32
+//     {
+//         &mut self.dots_sum_x[x as usize]
+//     }
 
-    pub fn dots_rect_min(&self) -> IVec2 { self.dots_rect.min }
-    pub fn dots_rect_min_mut(&mut self) -> &mut IVec2 { &mut self.dots_rect.min }
-    pub fn dots_rect_max(&self) -> IVec2 { self.dots_rect.max }
-    pub fn dots_rect_max_mut(&mut self) -> &mut IVec2 { &mut self.dots_rect.max }
-}
+//     pub fn dots_rect_min(&self) -> IVec2 { self.dots_rect.min }
+//     pub fn dots_rect_min_mut(&mut self) -> &mut IVec2 { &mut self.dots_rect.min }
+//     pub fn dots_rect_max(&self) -> IVec2 { self.dots_rect.max }
+//     pub fn dots_rect_max_mut(&mut self) -> &mut IVec2 { &mut self.dots_rect.max }
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // 自走プレイヤー(デモ時)の移動方向を決める関数（関数ポインタ）
-#[derive(Resource)]
-#[allow(clippy::type_complexity)]
-pub struct DemoAutoDriveFn(
-    pub  fn(
-        &Player,                // プレイヤーのComponent
-        Query<&chaser::Chaser>, // チェイサーのComponent
-        Res<map::Map>,          // マップ
-        Res<DemoMapParams>,     // デモ用情報
-        &[News],                // プレイヤーがいるセルの四方の道のリスト
-    ) -> News,
-);
+// #[derive(Resource)]
+// #[allow(clippy::type_complexity)]
+// pub struct DemoAutoDriveFn(
+//     pub  fn(
+//         &Player,                // プレイヤーのComponent
+//         Query<&chaser::Chaser>, // チェイサーのComponent
+//         Res<map::Map>,          // マップ
+//         Res<DemoMapParams>,     // デモ用情報
+//         &[News],                // プレイヤーがいるセルの四方の道のリスト
+//     ) -> News,
+// );
 
 ////////////////////////////////////////////////////////////////////////////////
 
