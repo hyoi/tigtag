@@ -27,6 +27,36 @@ pub type FnAutoChase = fn(
     &[News],         //
 ) -> News;
 
+// チェイサーの初期状態
+impl Default for Chaser
+{
+    fn default() -> Self
+    {
+        const CHASER_TIME_PER_GRID: f32 = 0.20; // 0.13; //１グリッド進むために必要な時間
+
+        Self {
+            cell: IVec2::default(),
+            next_cell: IVec2::default(),
+            px_start: Vec3::default(),
+            px_end: Vec3::default(),
+            direction: News::South,
+            speedup: 1.0,
+            timer: Timer::from_seconds(CHASER_TIME_PER_GRID, TimerMode::Once),
+            is_stop: true,
+            base_speed: PIXELS_PER_GRID / CHASER_TIME_PER_GRID,
+            anime: SpriteAnimationParams {
+                timer: Timer::from_seconds(ANIME_TIMER_CHASER, TimerMode::Repeating),
+                ..default()
+            },
+            option_fn_autochase: None,
+            color: Srgba::NONE,
+        }
+    }
+}
+
+// スプライトアニメーションの切替間隔
+const ANIME_TIMER_CHASER: f32 = 0.15;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // チェイサーのスタート座標
@@ -67,45 +97,13 @@ pub const CHASERS_SPRITE_INFO: &[(&str, Srgba, Option<FnAutoChase>)] = &[
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// チェイサーの初期状態
-impl Default for Chaser
-{
-    fn default() -> Self
-    {
-        const CHASER_TIME_PER_GRID: f32 = 0.20; // 0.13; //１グリッド進むために必要な時間
-
-        Self {
-            cell: IVec2::default(),
-            next_cell: IVec2::default(),
-            px_start: Vec3::default(),
-            px_end: Vec3::default(),
-            direction: News::South,
-            speedup: 1.0,
-            timer: Timer::from_seconds(CHASER_TIME_PER_GRID, TimerMode::Once),
-            is_stop: true,
-            base_speed: PIXELS_PER_GRID / CHASER_TIME_PER_GRID,
-            anime: SpriteAnimationParams {
-                timer: Timer::from_seconds(ANIME_TIMER_CHASER, TimerMode::Repeating),
-                ..default()
-            },
-            option_fn_autochase: None,
-            color: Srgba::NONE,
-        }
-    }
-}
-
-// スプライトアニメーションの切替間隔
-const ANIME_TIMER_CHASER: f32 = 0.15;
-
-////////////////////////////////////////////////////////////////////////////////
-
 // 正方形メッシュの情報
 pub const CHASER_SPRITE_SCALING: f32 = 0.6;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // スピードアップの割増
-pub const CHASER_ACCEL: f32 = 0.4;
+// pub const CHASER_ACCEL: f32 = 0.4;
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -135,7 +135,7 @@ impl Plugin for Schedule
                     (
                         map::spawn_sprite,    // マップスプライト
                         player::spawn_sprite, // プレーヤースプライト
-                    //     chaser::spawn_sprite, // チェイサースプライト
+                        chaser::spawn_sprite, // チェイサースプライト
                     )
                         .after(map::make_new_stage_data),
                 ),

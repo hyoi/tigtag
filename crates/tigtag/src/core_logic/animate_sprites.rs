@@ -69,16 +69,16 @@ impl SpriteAnimation for player::Player
 }
 
 // Chaserのトレイト実装
-// impl SpriteAnimation for chaser::Chaser
-// {
-//     fn sprite_sheet_offset(&self, news: News) -> u32
-//     {
-//         *self.anime.sprite_sheet_offsets.get(&news).unwrap()
-//     }
-//     fn direction(&self) -> News { self.direction }
-//     fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime.timer }
-//     fn num_patterns(&self) -> u32 { self.anime.num_patterns }
-// }
+impl SpriteAnimation for chaser::Chaser
+{
+    fn sprite_sheet_offset(&self, news: News) -> u32
+    {
+        *self.anime.sprite_sheet_offsets.get(&news).unwrap()
+    }
+    fn direction(&self) -> News { self.direction }
+    fn anime_timer_mut(&mut self) -> &mut Timer { &mut self.anime.timer }
+    fn num_patterns(&self) -> u32 { self.anime.num_patterns }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
