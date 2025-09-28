@@ -238,9 +238,9 @@ pub fn hide_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
 ////////////////////////////////////////////////////////////////////////////////
 
 // 指定のMessageを送信する
-pub fn set_message<T: Message + Default>(mut message_writer: MessageWriter<T>) -> Result
+pub fn set_message<T: Message + Default>(mut message: MessageWriter<T>) -> Result
 {
-    message_writer.write(T::default());
+    message.write(T::default());
 
     Ok(())
 }

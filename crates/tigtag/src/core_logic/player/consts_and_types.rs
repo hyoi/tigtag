@@ -59,8 +59,8 @@ pub const PLAYER_SPRITE_COLOR: Color = Color::Srgba(css::YELLOW); // 色
 pub struct DemoMapParams
 {
     pub dots_sum_y: [i32; map::MAP_HEIGHT_IN_CELLS as usize], // 行に残っているdotsを数えた配列
-    pub dots_sum_x: [i32; map::MAP_WIDTH_IN_CELLS as usize],  // 列に残っているdotsを数えた配列
-    pub dots_rect: IVec2Rect,                                 // 全dotを内包する最小の矩形
+    pub dots_sum_x: [i32; map::MAP_WIDTH_IN_CELLS as usize], // 列に残っているdotsを数えた配列
+    pub dots_rect: IVec2Rect, // 全dotを内包する最小の矩形
 }
 
 #[derive(Default)]

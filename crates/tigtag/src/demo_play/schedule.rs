@@ -85,7 +85,7 @@ impl Plugin for Schedule
             .add_systems(
                 OnEnter(MyState::DemoLoop),
                 // 無条件遷移
-                misc::set_next_state(MyState::TitleDemo)
+                misc::set_next_state(MyState::TitleDemo),
             );
     }
 }
@@ -119,8 +119,10 @@ fn make_data_for_demo(
 
     // dotsを内包する最小の矩形の初期値は決め打ちでいい(Mapをそう作っているから)
     *demo.dots_rect_min_mut() = IVec2::new(1, 1);
-    *demo.dots_rect_max_mut() =
-        IVec2::new(core_logic::map::MAP_WIDTH_IN_CELLS - 2, core_logic::map::MAP_HEIGHT_IN_CELLS - 2);
+    *demo.dots_rect_max_mut() = IVec2::new(
+        core_logic::map::MAP_WIDTH_IN_CELLS - 2,
+        core_logic::map::MAP_HEIGHT_IN_CELLS - 2,
+    );
 
     Ok(())
 }
