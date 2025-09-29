@@ -50,7 +50,7 @@ fn main() -> AppExit
     // アプリの生成
     App::new()
         // メインスケジュール
-        .add_plugins(core_logic::schedule::Schedule)
+        .add_plugins(core_logic::Schedule)
         // アプリ実行
         .run()
 }

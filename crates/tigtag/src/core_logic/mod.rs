@@ -1,6 +1,7 @@
 use super::*;
 
 pub mod schedule; // スケジュール
+pub use schedule::Schedule;
 
 mod consts_and_types; // 定数＆型定義
 pub use consts_and_types::*;
