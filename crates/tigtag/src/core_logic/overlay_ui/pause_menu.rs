@@ -22,7 +22,7 @@ impl Plugin for Schedule
                 Update, // without MyState
                 // Pauseメニューの表示／非表示（トグル動作）
                 hook_input_and_toggle_pause
-                    .in_set(misc::SystemOrderHitAnyKey::Before) // HitAnyKeyの前に実行
+                    .in_set(misc::execution_order::Before::HitAnyKey)
                     .before(appctrl_input::send_exit_app_message),
             )
             // ループ処理２

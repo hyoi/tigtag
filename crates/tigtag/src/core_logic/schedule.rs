@@ -91,13 +91,13 @@ impl Plugin for Schedule
                 (
                     // Hit ANY Key に反応あればState遷移
                     misc::check_hit_any_key
-                        .in_set(misc::SystemOrderHitAnyKey::Marker),
+                        .in_set(misc::execution_order::Target::HitAnyKey),
                     (
                         // scoreとstageをゼロクリアする(demoの情報消去)
                         detecting_change::initialize_score_stage,
                         misc::set_next_state(MyState::StageStart),
                     )
-                        .in_set(misc::SystemOrderHitAnyKey::After)
+                        .in_set(misc::execution_order::After::HitAnyKey)
                         .run_if(on_message::<misc::AnyButtonPressed>),
                     // DEMO の明滅
                     overlay_ui::effect::blinking_text::<OverlayTitleDemo>,
@@ -254,9 +254,9 @@ impl Plugin for Schedule
                     overlay_ui::effect::blinking_text::<OverlayGameOver>,
                     // Hit ANY Key に反応あればState遷移
                     misc::check_hit_any_key
-                        .in_set(misc::SystemOrderHitAnyKey::Marker),
+                        .in_set(misc::execution_order::Target::HitAnyKey),
                     misc::set_next_state(MyState::StageStart)
-                        .in_set(misc::SystemOrderHitAnyKey::After)
+                        .in_set(misc::execution_order::After::HitAnyKey)
                         .run_if(on_message::<misc::AnyButtonPressed>),
                 )
                     .run_if(in_state(MyState::GameOver)),

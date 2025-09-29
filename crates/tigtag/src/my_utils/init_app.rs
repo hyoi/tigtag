@@ -37,25 +37,23 @@ impl Plugin for Schedule
                         appctrl_input::send_exit_app_message, // アプリの終了
                         appctrl_input::toggle_fullscreen,     // 全画面切換
                     )
-                        .in_set(misc::SystemOrderHitAnyKey::Before) // HitAnyKeyの前に実行
+                        .in_set(misc::execution_order::Before::HitAnyKey)
                         .run_if(not(misc::WASM)), // WASMでは実行しない
                     // UI outline表示
                     appctrl_input::toggle_ui_outline_gizmo
-                        .in_set(misc::SystemOrderHitAnyKey::Before) // HitAnyKeyの前に実行
+                        .in_set(misc::execution_order::Before::HitAnyKey)
                         .run_if(misc::DEBUG),
                 ),
             )
-            // システムセット間の実行順序を登録
+            // システムセットの実行順の制御
             .configure_sets(
                 Update,
                 (
-                    // HitAnyKey（Marker）の前に実行
-                    misc::SystemOrderHitAnyKey::Before
-                        .before(misc::SystemOrderHitAnyKey::Marker),
-                    // HitAnyKey（Marker）の後に実行
-                    misc::SystemOrderHitAnyKey::After
-                        .after(misc::SystemOrderHitAnyKey::Marker),
-                ),
+                    misc::execution_order::Before::HitAnyKey,
+                    misc::execution_order::Target::HitAnyKey,
+                    misc::execution_order::After::HitAnyKey,
+                )
+                    .chain(),
             );
 
         // ローディングアニメを表示しながらアセットをロードする

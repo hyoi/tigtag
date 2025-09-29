@@ -71,12 +71,16 @@ pub fn watch_gamepad_connections(
 ////////////////////////////////////////////////////////////////////////////////
 
 // システムの実行順を制御するためのSystemSet
-#[derive(SystemSet, Hash, Debug, Eq, PartialEq, Clone)]
-pub enum SystemOrderHitAnyKey
+#[rustfmt::skip]
+pub mod execution_order
 {
-    Before, // HitAnyKeyの前に実行するSystem
-    Marker,
-    After, // HitAnyKeyの後に実行するSystem
+    use super::*;
+    #[derive(SystemSet, Hash, Debug, Eq, PartialEq, Clone)]
+    pub enum Before { HitAnyKey, }
+    #[derive(SystemSet, Hash, Debug, Eq, PartialEq, Clone)]
+    pub enum Target { HitAnyKey, }
+    #[derive(SystemSet, Hash, Debug, Eq, PartialEq, Clone)]
+    pub enum After { HitAnyKey, }
 }
 
 //------------------------------------------------------------------------------
