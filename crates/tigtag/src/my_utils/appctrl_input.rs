@@ -108,6 +108,7 @@ pub trait ButtonInputKeyCodeExt
 {
     fn is_just_pressed(&self, keys: &MainKeyAndModifiers) -> bool;
 }
+
 impl ButtonInputKeyCodeExt for ButtonInput<KeyCode>
 {
     // 主キーと装飾キーの組み合わせが押下されているか

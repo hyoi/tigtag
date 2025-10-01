@@ -49,6 +49,7 @@ impl Plugin for Schedule
             .configure_sets(
                 Update,
                 (
+                    // HitAnyKey
                     misc::execution_order::Before::HitAnyKey,
                     misc::execution_order::Target::HitAnyKey,
                     misc::execution_order::After::HitAnyKey,
@@ -69,7 +70,7 @@ impl Plugin for Schedule
                 ),
             )
             // ループ処理
-            .add_message::<AssetsAllLoaded>() // ロード完了フラグ
+            .add_message::<AssetsAllLoaded>() // ロード完了メッセージの登録
             .add_systems(
                 Update, // within MyState::LoadAssets
                 (
@@ -79,7 +80,7 @@ impl Plugin for Schedule
                     check_loading_done,
                     // ループ脱出
                     misc::set_next_state(self.next_state())
-                        .run_if(on_message::<AssetsAllLoaded>), // 完了フラグが立つこと
+                        .run_if(on_message::<AssetsAllLoaded>), // 完了メッセージ受信
                 )
                     .run_if(in_state(MyState::LoadAssets)),
             )
@@ -242,10 +243,6 @@ fn move_sprite(
 #[derive(Resource, Deref)]
 struct LoadedAssets(Vec<Handle<LoadedUntypedAsset>>);
 
-// ローディング完了フラグ
-#[derive(Message)]
-struct AssetsAllLoaded;
-
 // Assetsのロードを開始する
 fn start_loading(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
 {
@@ -260,6 +257,10 @@ fn start_loading(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
 
     Ok(())
 }
+
+// ローディング完了メッセージ
+#[derive(Message)]
+struct AssetsAllLoaded;
 
 // Assetsのロードは完了したか？
 fn check_loading_done(

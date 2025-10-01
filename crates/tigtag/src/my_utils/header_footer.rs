@@ -8,7 +8,7 @@ pub struct TextBlock<'a>
     pub position: Position,           // Component
     pub align_self: AlignSelf,        // textblock内の寄せ（上中下）
     pub justify_self: JustifySelf,    // textblock内の寄せ（左中右）
-    pub bg_color: Srgba,              // textblockの背景色
+    pub bg_color: Color,              // textblockの背景色
     pub textspans: &'a [MessageSpan], // 表示文字列の情報
     pub update_info: Option<(usize, FormatterFn)>,
 }
@@ -24,6 +24,7 @@ pub enum Position
     BottomCenter,
     BottomRight,
 }
+
 impl Position
 {
     fn index_xy(&self) -> (i16, i16)
@@ -130,7 +131,7 @@ impl AddTextBlock for EntityCommands<'_>
                     ..default()
                 },
                 TextColor(*color),
-                BackgroundColor(text_block.bg_color.into()),
+                BackgroundColor(text_block.bg_color),
                 Node {
                     grid_row: GridPlacement::start(row),
                     grid_column: GridPlacement::start(column),

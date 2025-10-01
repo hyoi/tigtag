@@ -181,19 +181,6 @@ impl I32x2TypeExt for IVec2
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// QueryしたEnityを削除する（条件がComponent）
-pub fn despawn_component<T: Component>(
-    query_entity: Query<Entity, With<T>>,
-    mut cmds: Commands, // cmdsをmoveするので通常の関数としては使い勝手が悪い！
-) -> Result
-{
-    query_entity.iter().for_each(|id| cmds.entity(id).despawn());
-
-    Ok(())
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // 指定されたMyStateへ遷移するSystem
 pub fn set_next_state(
     my_state: MyState,
@@ -203,6 +190,18 @@ pub fn set_next_state(
         next_state.set(my_state);
         Ok(())
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// QueryしたEnityを削除する（条件がComponent）
+pub fn despawn_component<T: Component>(
+    query_entity: Query<Entity, With<T>>,
+    mut cmds: Commands, // cmdsをmoveするので通常の関数としては使い勝手が悪い！
+) -> Result
+{
+    query_entity.iter().for_each(|id| cmds.entity(id).despawn());
+    Ok(())
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,15 +227,17 @@ pub fn select_ui_camera(
 ////////////////////////////////////////////////////////////////////////////////
 
 // QueryしたComponentを可視化する
-pub fn show_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
+pub fn show_component<T: Component>(mut query: Query<&mut Visibility, With<T>>) -> Result
 {
     query.iter_mut().for_each(|mut v| *v = Visibility::Visible);
+    Ok(())
 }
 
 // QueryしたComponentを不可視にする
-pub fn hide_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
+pub fn hide_component<T: Component>(mut query: Query<&mut Visibility, With<T>>) -> Result
 {
     query.iter_mut().for_each(|mut v| *v = Visibility::Hidden);
+    Ok(())
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -245,7 +246,6 @@ pub fn hide_component<T: Component>(mut query: Query<&mut Visibility, With<T>>)
 pub fn set_message<T: Message + Default>(mut message: MessageWriter<T>) -> Result
 {
     message.write(T::default());
-
     Ok(())
 }
 

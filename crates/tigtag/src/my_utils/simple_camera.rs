@@ -21,6 +21,7 @@ pub trait BoxedTrait: Send + Sync + 'static
         color: Color,
         transform: Transform,
     );
+
     // SettingのCloneを実装する場合に必要になるメソッド
     // fn clone_box(&self) -> Box<dyn BoxedTrait>;
 }
@@ -70,6 +71,7 @@ where
             Msaa::Sample4,
         ));
     }
+
     // SettingのCloneを実装する場合に必要になるメソッド
     // fn clone_box(&self) -> Box<dyn BoxedTrait> { Box::new(self.clone()) }
 }
@@ -97,6 +99,29 @@ fn gen_viewport() -> Option<Viewport>
         _ => None,
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+// 極座標カメラ用の型
+// #[derive(Default, Clone)]
+// pub struct Orbit
+// {
+//     pub r: f32,     // 極座標のr（中心点から飛翔体までの距離）
+//     pub theta: f32, // 極座標のΘ（中心点から見た飛翔体の仰角）
+//     pub phi: f32,   // 極座標のφ（中心点から見た飛翔体の平面の回転角）
+// }
+// impl Orbit
+// {
+//     // 極座標から直交座標へ変換するメソッド
+//     pub fn vec3(&self) -> Vec3
+//     {
+//         let x = self.r * self.theta.sin() * self.phi.sin();
+//         let y = -self.r * self.theta.cos();
+//         let z = self.r * self.theta.sin() * self.phi.cos();
+
+//         Vec3::new(x, y, z)
+//     }
+// }
 
 ////////////////////////////////////////////////////////////////////////////////
 

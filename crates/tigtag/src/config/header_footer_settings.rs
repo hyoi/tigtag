@@ -37,7 +37,7 @@ pub const HEADER_STAGE: header_footer::TextBlock = header_footer::TextBlock {
     position: header_footer::Position::TopLeft,
     align_self: AlignSelf::Start,     // セル内の上寄せ
     justify_self: JustifySelf::Start, // セル内の左寄せ
-    bg_color: Srgba::NONE,
+    bg_color: COLOR_NONE,
     #[rustfmt::skip]
     textspans: &[
         ( " STAGE ", ASSETS_FONT_ORBITRON_BLACK      , HEADER_LABEL_SIZE, COLOR_GOLD  ),
@@ -50,7 +50,7 @@ pub const HEADER_SCORE: header_footer::TextBlock = header_footer::TextBlock {
     position: header_footer::Position::TopCenter,
     align_self: AlignSelf::Start,      // セル内の上寄せ
     justify_self: JustifySelf::Center, // セル内の中央寄せ
-    bg_color: Srgba::NONE,
+    bg_color: COLOR_NONE,
     #[rustfmt::skip]
     textspans: &[
         ( " SCORE ", ASSETS_FONT_ORBITRON_BLACK      , HEADER_LABEL_SIZE, COLOR_GOLD  ),
@@ -63,7 +63,7 @@ pub const HEADER_HI_SCORE: header_footer::TextBlock = header_footer::TextBlock {
     position: header_footer::Position::TopRight,
     align_self: AlignSelf::Start,   // セル内の上寄せ
     justify_self: JustifySelf::End, // セル内の右寄せ
-    bg_color: Srgba::NONE,
+    bg_color: COLOR_NONE,
     #[rustfmt::skip]
     textspans: &[
         ( " Hi-SCORE ", ASSETS_FONT_ORBITRON_BLACK      , HEADER_LABEL_SIZE, COLOR_GOLD  ),
@@ -78,7 +78,7 @@ pub const FOOTER_FPS: header_footer::TextBlock = header_footer::TextBlock {
     position: header_footer::Position::BottomLeft,
     align_self: AlignSelf::End,       // セル内の下寄せ
     justify_self: JustifySelf::Start, // セル内の左寄せ
-    bg_color: Srgba::NONE,
+    bg_color: COLOR_NONE,
     #[rustfmt::skip]
     textspans: &[
         ( "  FPS ", ASSETS_FONT_ORBITRON_BLACK      , FOOTER_LABEL_SIZE, COLOR_TEAL   ),
@@ -91,7 +91,7 @@ pub const FOOTER_AUTHER: header_footer::TextBlock = header_footer::TextBlock {
     position: header_footer::Position::BottomCenter,
     align_self: AlignSelf::End,        // セル内の下寄せ
     justify_self: JustifySelf::Center, // セル内の中央寄せ
-    bg_color: Srgba::NONE,
+    bg_color: COLOR_NONE,
     #[rustfmt::skip]
     textspans: &[
         ( COPYRIGHT, ASSETS_FONT_ORBITRON_BLACK, FOOTER_LABEL_SIZE, COLOR_TEAL ),
@@ -103,7 +103,7 @@ pub const FOOTER_POWERED_BY: header_footer::TextBlock = header_footer::TextBlock
     position: header_footer::Position::BottomRight,
     align_self: AlignSelf::End,     // セル内の下寄せ
     justify_self: JustifySelf::End, // セル内の右寄せ
-    bg_color: Srgba::NONE,
+    bg_color: COLOR_NONE,
     #[rustfmt::skip]
     textspans: &[
         ( "Powered by ", ASSETS_FONT_ORBITRON_BLACK, FOOTER_LABEL_SIZE, COLOR_TEAL   ),
