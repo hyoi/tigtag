@@ -27,16 +27,12 @@ macros.workspace = true
 
 [workspace.dependencies]
 #Bevyのバージョン／ブランチ等の指定
-#bevy = { version = "0.16.0-rc.5", features = [
 #bevy = { git = "https://github.com/bevyengine/bevy", features = [  # Master branch
 #bevy = { git = "https://github.com/bevyengine/bevy", tag = "v0.15.0-rc.3", features = [
 #bevy = { git = "https://github.com/bevyengine/bevy", branch = "release-0.14.0", features = [
+#bevy = { version = "=0.17.0-rc.2", features = ["bevy_ui_debug"] }
 
-bevy = { version = "=0.17.0-rc.2", features = ["bevy_ui_debug"] }
-#bevy = { version = "0.16", features = [
-#    "configurable_error_handler", # v0.17廃止
-#    "bevy_ui_debug"
-#] }
+bevy = { version = "0.17", features = ["bevy_ui_debug"] }
 
 #依存するその他のcrate
 rand = "0.9"
