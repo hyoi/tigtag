@@ -36,8 +36,8 @@ pub fn update_header_footer(
                         fps.average()
                             .map_or(NUM3_2.to_string(), |avg| fn_format(&avg))
                     }),
-                // update_infoがSomeなのでここには来ないはず
-                _ => NUM2.to_string(),
+                // update_info.0がSomeなのでここには来ないはず
+                _ => unimplemented!("Configuration error."),
             };
 
             // 表示を更新する
