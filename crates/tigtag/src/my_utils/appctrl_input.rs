@@ -22,7 +22,7 @@ pub trait AppCtrl
 pub struct InputDevicePack<'w, 's>
 {
     input_keycode: ResMut<'w, ButtonInput<KeyCode>>,
-    option_target_gamepad: Option<ResMut<'w, misc::TargetGamepad>>,
+    option_target_gamepad: Option<ResMut<'w, handle_input::TargetGamepad>>,
     query_gamepads: Query<'w, 's, &'static mut Gamepad>,
 }
 

@@ -11,6 +11,7 @@ use bevy::{
     input::{
         keyboard::NativeKeyCode,
         gamepad::{GamepadInput, GamepadAxisChangedEvent},
+        mouse::{MouseMotion, MouseWheel},
     },
     audio::Volume,
 };

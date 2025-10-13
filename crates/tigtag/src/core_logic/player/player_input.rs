@@ -101,7 +101,7 @@ pub fn input_from_keyboard(
 // ゲームパッドの入力を保存する
 pub fn input_from_gamepad(
     option_gamepad_map: Option<Res<GamepadMap>>,
-    option_target_gamepad: Option<ResMut<my_utils::misc::TargetGamepad>>,
+    option_target_gamepad: Option<ResMut<handle_input::TargetGamepad>>,
     time: Res<Time>,
     query_gamepads: Query<&Gamepad>,
     mut event_input: MessageWriter<PlayerMovementInput>,

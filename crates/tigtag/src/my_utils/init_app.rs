@@ -30,8 +30,8 @@ impl Plugin for Schedule
             .add_systems(
                 Update, // without MyState
                 (
-                    // gamepadの接続を検出
-                    misc::watch_gamepad_connections,
+                    // gamepadの接続を検出して必要なら切り替える
+                    handle_input::check_gamepad_connections,
                     // 特別な入力のハンドリング
                     (
                         appctrl_input::send_exit_app_message, // アプリの終了

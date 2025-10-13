@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5,68 +6,6 @@ use super::*;
 // .run_if( condition )用の定数
 pub const DEBUG: fn() -> bool = || cfg!(debug_assertions);
 pub const WASM: fn() -> bool = || cfg!(target_arch = "wasm32");
-
-////////////////////////////////////////////////////////////////////////////////
-
-// gamepadのEntityを保存するResource
-#[derive(Resource, Default)]
-pub struct TargetGamepad(Option<Entity>);
-
-// アクセス用メソッド
-impl TargetGamepad
-{
-    pub fn entity(&self) -> Option<Entity> { self.0 }
-    pub fn entity_mut(&mut self) -> &mut Option<Entity> { &mut self.0 }
-}
-
-// gamepadの接続を検出して必要なら切り替える
-pub fn watch_gamepad_connections(
-    option_target_gamepad: Option<ResMut<TargetGamepad>>,
-    mut query_gamepads: Query<(Entity, &Name), With<Gamepad>>,
-    mut cmds: Commands,
-)
-{
-    // gamepadの接続状態を調べてResourceを更新する（クロージャ）
-    let mut check_gamepad = |target_gamepad: &mut TargetGamepad| {
-        // gamepadのEntityが保存されているなら
-        if let Some(entity) = target_gamepad.entity()
-        {
-            // そのEntityが存在しないなら（切断）
-            if !query_gamepads.contains(entity)
-            {
-                // Entityを探す（結果はNoneかもしれない）
-                let (entity, _name) = query_gamepads.iter_mut().next().unzip();
-                *target_gamepad.entity_mut() = entity;
-
-                #[cfg(debug_assertions)]
-                dbg!(&_name, target_gamepad.entity()); // Some⇒Some、Some⇒None
-            }
-        }
-        else if !query_gamepads.is_empty()
-        // 現在gamepadの接続があるなら
-        {
-            // Entityを探す（結果は必ずSome）
-            let (entity, _name) = query_gamepads.iter_mut().next().unzip();
-            *target_gamepad.entity_mut() = entity;
-
-            #[cfg(debug_assertions)]
-            dbg!(&_name, target_gamepad.entity()); // None⇒Some
-        }
-    };
-
-    // Resourceが登録済みなら
-    if let Some(mut target_gamepad) = option_target_gamepad
-    {
-        check_gamepad(&mut target_gamepad);
-    }
-    else
-    {
-        // Resourceが未登録なら、初期化した後に登録する
-        let mut target_gamepad = TargetGamepad::default();
-        check_gamepad(&mut target_gamepad);
-        cmds.insert_resource(target_gamepad);
-    }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -101,7 +40,7 @@ pub struct AnyButtonPressed;
 pub fn check_hit_any_key(
     option_masking_input: Option<Res<MaskHitAnyKeyInput>>,
     input_keycode: Res<ButtonInput<KeyCode>>,
-    option_target_gamepad: Option<Res<TargetGamepad>>,
+    option_target_gamepad: Option<Res<handle_input::TargetGamepad>>,
     query_gamepads: Query<&Gamepad>,
     mut event: MessageWriter<AnyButtonPressed>,
 ) -> Result
@@ -222,6 +161,19 @@ pub fn select_ui_camera(
     cmds.entity(id).insert(IsDefaultUiCamera);
 
     Ok(())
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// 最大公約数を求める関数 (u32)
+#[rustfmt::skip]
+pub fn gcd_u32(a: u32, b: u32) -> u32
+{
+    if b == 0 {
+        a
+    } else {
+        gcd_u32(b, a % b)
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
