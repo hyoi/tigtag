@@ -49,7 +49,6 @@ mod my_messages
     use super::*;
     #[derive(Message)] pub struct CountDownEnded;
     #[derive(Message, Default)] pub struct SkipOverlayMessage;
-    #[derive(Message)] pub struct PlayerMovementInput ( pub player::HashNews );
     #[derive(Message)] pub struct DotsAllEaten ;
     #[derive(Message)] pub struct DotEaten ;
     #[derive(Message)] pub struct PlayerCaught;

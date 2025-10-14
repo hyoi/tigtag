@@ -21,14 +21,14 @@ impl Plugin for Schedule
             .init_resource::<Record>()                          // ゲームの成績
             .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
             .init_resource::<map::Map>()                        // ステージのマップ
-            .insert_resource(player::KeyMap::from( KEY_MAP ))   // マッピング（キー）
-            .insert_resource(player::GamepadMap::from(PAD_MAP)) // マッピング（ゲームパッド）
+            .insert_resource(handle_input::MappingKeyboard::from(KEYBOARD_MAP)) // マッピング
+            .insert_resource(handle_input::MappingGamepad::from(GAMEPAD_MAP))   // マッピング
 
             // Messageの登録
             .add_message::<misc::AnyButtonPressed>() //「Hit Any Key」の入力通知
             .add_message::<SkipOverlayMessage>()     // 全画面メッセージ表示のスキップに使用
             .add_message::<CountDownEnded>()         // カウントダウンの終了通知
-            .add_message::<PlayerMovementInput>()    // プレイヤーキャラクターの操作入力通知
+            .add_message::<handle_input::MessUserAction>() // デバイスからの入力
             .add_message::<DotsAllEaten >()          // ステージクリアの伝達用
             .add_message::<DotEaten>()               // スコアリングの伝達用
             .add_message::<PlayerCaught>()           // ゲームオーバーの伝達用
@@ -170,11 +170,12 @@ impl Plugin for Schedule
                 (
                     (
                         // スプライトの位置を更新する
-                        player::input_from_keyboard, // キー
-                        player::input_from_gamepad,  // ゲームパッド
+                        handle_input::check_keyboard, // キー
+                        handle_input::check_gamepad,  // ゲームパッド
                         player::move_sprite
-                            .after(player::input_from_keyboard)
-                            .after(player::input_from_gamepad),
+                            .after(handle_input::check_keyboard)
+                            .after(handle_input::check_gamepad)
+                            .run_if(on_message::<handle_input::MessUserAction>),
                         chaser::move_sprite,
                     ),
                     // スコアリング＆クリア判定

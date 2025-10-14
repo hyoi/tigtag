@@ -280,32 +280,32 @@ pub const SPRITE_DOT_COLOR: Color = Color::srgb(1.0, 1.0, 0.7);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// キーコードとコールバック関数の対応
+// キーコードとアクションの対応
 #[rustfmt::skip]
-pub const KEY_MAP: core_logic::player::KeyMapSlice = &[
+pub const KEYBOARD_MAP: handle_input::ConnfigKeyboard = &[
     // WASD
-    ( KeyCode::KeyW, core_logic::player::callback::move_up    ),
-    ( KeyCode::KeyS, core_logic::player::callback::move_down  ),
-    ( KeyCode::KeyA, core_logic::player::callback::move_left  ),
-    ( KeyCode::KeyD, core_logic::player::callback::move_right ),
+    ( KeyCode::KeyW, handle_input::UserAction::MoveUp    ),
+    ( KeyCode::KeyS, handle_input::UserAction::MoveDown  ),
+    ( KeyCode::KeyA, handle_input::UserAction::MoveLeft  ),
+    ( KeyCode::KeyD, handle_input::UserAction::MoveRight ),
     // カーソルキー
-    ( KeyCode::ArrowUp   , core_logic::player::callback::move_up    ),
-    ( KeyCode::ArrowDown , core_logic::player::callback::move_down  ),
-    ( KeyCode::ArrowLeft , core_logic::player::callback::move_left  ),
-    ( KeyCode::ArrowRight, core_logic::player::callback::move_right ),
+    ( KeyCode::ArrowUp   , handle_input::UserAction::MoveUp    ),
+    ( KeyCode::ArrowDown , handle_input::UserAction::MoveDown  ),
+    ( KeyCode::ArrowLeft , handle_input::UserAction::MoveLeft  ),
+    ( KeyCode::ArrowRight, handle_input::UserAction::MoveRight ),
 ];
 
-// ゲームパッドのボタン／スティックとコールバック関数の対応
+// ゲームパッドのボタン／スティックとアクションの対応
 #[rustfmt::skip]
-pub const PAD_MAP: core_logic::player::GamepadMapSlice = &[
+pub const GAMEPAD_MAP: handle_input::ConnfigGamepad = &[
     // 十字ボタン
-    ( GamepadInput::Button( GamepadButton::DPadUp   ), core_logic::player::callback::move_up    ),
-    ( GamepadInput::Button( GamepadButton::DPadDown ), core_logic::player::callback::move_down  ),
-    ( GamepadInput::Button( GamepadButton::DPadLeft ), core_logic::player::callback::move_left  ),
-    ( GamepadInput::Button( GamepadButton::DPadRight), core_logic::player::callback::move_right ),
+    ( GAMEPAD_UP   , handle_input::UserAction::MoveUp    ),
+    ( GAMEPAD_DOWN , handle_input::UserAction::MoveDown  ),
+    ( GAMEPAD_LEFT , handle_input::UserAction::MoveLeft  ),
+    ( GAMEPAD_RIGHT, handle_input::UserAction::MoveRight ),
     // 左スティック
-    ( GamepadInput::Axis( GamepadAxis::LeftStickX ), core_logic::player::callback::axis_x_normal ),
-    ( GamepadInput::Axis( GamepadAxis::LeftStickY ), core_logic::player::callback::axis_y_normal ),
+    ( GAMEPAD_STICK_LEFT_Y, handle_input::UserAction::AxisVertNormal  ( 1.0 ) ),
+    ( GAMEPAD_STICK_LEFT_X, handle_input::UserAction::AxisHorizNormal ( 1.0 ) ),
 ];
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -10,7 +10,7 @@ use bevy::{
     camera::Viewport,
     input::{
         keyboard::NativeKeyCode,
-        gamepad::{GamepadInput, GamepadAxisChangedEvent},
+        gamepad::GamepadInput,
         mouse::{MouseMotion, MouseWheel},
     },
     audio::Volume,

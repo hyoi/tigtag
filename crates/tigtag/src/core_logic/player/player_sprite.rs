@@ -92,7 +92,7 @@ pub fn move_sprite(
     mut query_sprite: Query<&mut Sprite, With<Player>>, //SPRITE_OFFだとspawnされないので空
     option_map: Option<Res<map::Map>>,
     option_state: Option<Res<State<MyState>>>,
-    mut event_reader: MessageReader<PlayerMovementInput>,
+    mut message_reader: MessageReader<handle_input::MessUserAction>,
     time: Res<Time>,
     query_chaser: Query<&chaser::Chaser>,
     option_demo_params: Option<Res<DemoMapParams>>,
@@ -104,11 +104,36 @@ pub fn move_sprite(
     let map = option_map.ok_or("Resource not found.")?;
     let state = option_state.ok_or("Resource not found.")?;
 
+    // 入力（UserAction,value）をフラットなVecにまとめる
+    let mut flat_messages = Vec::<(handle_input::UserAction, f32)>::new();
+    message_reader
+        .read()
+        .for_each(|x| flat_messages.extend(x.0.clone()));
+
     // 入力（NEWS）のイベントをハッシュ集合へ統合する
     let mut input_news = FxHashSet::<News>::default();
-    event_reader
-        .read()
-        .for_each(|event| input_news.extend(&event.0));
+    flat_messages
+        .iter()
+        .for_each(|&(action, value)| {
+            use handle_input::UserAction::*;
+            #[rustfmt::skip]
+            let news = match action
+            {
+                // デジタル入力
+                MoveUp    => News::North,
+                MoveDown  => News::South,
+                MoveLeft  => News::West,
+                MoveRight => News::East,
+                // アナログ入力
+                AxisVertNormal   (_) => if value > 0.0 { News::North } else { News::South },
+                AxisVertReverse  (_) => if value > 0.0 { News::South } else { News::North },
+                AxisHorizNormal  (_) => if value > 0.0 { News::East  } else { News::West  },
+                AxisHorizReverse (_) => if value > 0.0 { News::West  } else { News::East  },
+                // エラー
+                _ => unreachable!("Invalid value(UserAction) in the message buffer."),
+            };
+            input_news.insert(news);
+        });
 
     // 前回からの経過時間 × スピードアップ係数（プレイヤーのスピードアップは未実装）
     let time_delta = time.delta().mul_f32(player.speedup); //speedup > 1.0
