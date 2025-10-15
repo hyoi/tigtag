@@ -3,6 +3,15 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// 名前空間のトップレベルへ輸出する識別子
+pub mod prelude
+{
+    pub use super::I32x2TypeExt;
+    pub use super::execution_order;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // .run_if( condition )用の定数
 pub const DEBUG: fn() -> bool = || cfg!(debug_assertions);
 pub const WASM: fn() -> bool = || cfg!(target_arch = "wasm32");
@@ -179,14 +188,18 @@ pub fn gcd_u32(a: u32, b: u32) -> u32
 ////////////////////////////////////////////////////////////////////////////////
 
 // QueryしたComponentを可視化する
-pub fn show_component<T: Component>(mut query: Query<&mut Visibility, With<T>>) -> Result
+pub fn show_component<T: Component>(
+    mut query: Query<&mut Visibility, With<T>>,
+) -> Result
 {
     query.iter_mut().for_each(|mut v| *v = Visibility::Visible);
     Ok(())
 }
 
 // QueryしたComponentを不可視にする
-pub fn hide_component<T: Component>(mut query: Query<&mut Visibility, With<T>>) -> Result
+pub fn hide_component<T: Component>(
+    mut query: Query<&mut Visibility, With<T>>,
+) -> Result
 {
     query.iter_mut().for_each(|mut v| *v = Visibility::Hidden);
     Ok(())

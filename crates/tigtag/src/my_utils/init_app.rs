@@ -37,11 +37,11 @@ impl Plugin for Schedule
                         appctrl_input::send_exit_app_message, // アプリの終了
                         appctrl_input::toggle_fullscreen,     // 全画面切換
                     )
-                        .in_set(misc::execution_order::Before::HitAnyKey)
+                        .in_set(execution_order::Before::HitAnyKey)
                         .run_if(not(misc::WASM)), // WASMでは実行しない
                     // UI outline表示
                     appctrl_input::toggle_ui_outline_gizmo
-                        .in_set(misc::execution_order::Before::HitAnyKey)
+                        .in_set(execution_order::Before::HitAnyKey)
                         .run_if(misc::DEBUG),
                 ),
             )
@@ -50,9 +50,9 @@ impl Plugin for Schedule
                 Update,
                 (
                     // HitAnyKey
-                    misc::execution_order::Before::HitAnyKey,
-                    misc::execution_order::Target::HitAnyKey,
-                    misc::execution_order::After::HitAnyKey,
+                    execution_order::Before::HitAnyKey,
+                    execution_order::Target::HitAnyKey,
+                    execution_order::After::HitAnyKey,
                 )
                     .chain(),
             );

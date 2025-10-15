@@ -30,7 +30,7 @@ use std::{
 mod core_logic; // ゲームロジック
 
 mod my_utils; // 共通ライブラリ
-use my_utils::*;
+use my_utils::prelude::*;
 
 mod config; // 設定各種
 use config::*;

@@ -33,32 +33,4 @@ pub const COLOR_BLUE: Color = Color::Srgba(css::BLUE);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 十字ボタンの単純な表記
-pub const GAMEPAD_UP: GamepadInput = GamepadInput::Button(GamepadButton::DPadUp);
-pub const GAMEPAD_DOWN: GamepadInput = GamepadInput::Button(GamepadButton::DPadDown);
-pub const GAMEPAD_LEFT: GamepadInput = GamepadInput::Button(GamepadButton::DPadLeft);
-pub const GAMEPAD_RIGHT: GamepadInput = GamepadInput::Button(GamepadButton::DPadRight);
-// ショルダーの単純な表記
-pub const GAMEPAD_TRIG1_LEFT: GamepadInput = GamepadInput::Button(GamepadButton::LeftTrigger);
-pub const GAMEPAD_TRIG1_RIGHT: GamepadInput = GamepadInput::Button(GamepadButton::RightTrigger);
-pub const GAMEPAD_TRIG2_LEFT: GamepadInput = GamepadInput::Button(GamepadButton::LeftTrigger2);
-pub const GAMEPAD_TRIG2_RIGHT: GamepadInput = GamepadInput::Button(GamepadButton::RightTrigger2);
-// スティックの単純な表記
-pub const GAMEPAD_STICK_LEFT_Y: GamepadInput = GamepadInput::Axis(GamepadAxis::LeftStickY);
-pub const GAMEPAD_STICK_LEFT_X: GamepadInput = GamepadInput::Axis(GamepadAxis::LeftStickX);
-pub const GAMEPAD_STICK_RIGHT_Y: GamepadInput = GamepadInput::Axis(GamepadAxis::RightStickY);
-pub const GAMEPAD_STICK_RIGHT_X: GamepadInput = GamepadInput::Axis(GamepadAxis::RightStickX);
-
-////////////////////////////////////////////////////////////////////////////////
-
-// マウス入力の単純な表記
-pub const MOUSE_BUTTON_LEFT: handle_input::MouseInput = handle_input::MouseInput::ButtonLeft;
-pub const MOUSE_BUTTON_RIGHT: handle_input::MouseInput = handle_input::MouseInput::ButtonRight;
-pub const MOUSE_WHEEL_Y: handle_input::MouseInput = handle_input::MouseInput::WheelY;
-pub const MOUSE_WHEEL_X: handle_input::MouseInput = handle_input::MouseInput::WheelX;
-pub const MOUSE_MOTION_Y: handle_input::MouseInput = handle_input::MouseInput::MotionY;
-pub const MOUSE_MOTION_X: handle_input::MouseInput = handle_input::MouseInput::MotionX;
-
-////////////////////////////////////////////////////////////////////////////////
-
 // End of code.
