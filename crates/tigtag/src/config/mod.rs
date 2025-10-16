@@ -3,9 +3,6 @@ use super::*;
 mod general_settings; // ゲーム関係の諸々の設定
 pub use general_settings::*;
 
-mod consts; // 設定で使う定数
-pub use consts::*;
-
 mod header_footer_settings; // ヘッダー・フッターの設定
 pub use header_footer_settings::*;
 
