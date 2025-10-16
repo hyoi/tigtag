@@ -82,8 +82,7 @@ impl InitLogPlugin for LogPlugin
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States, MyState)]
 pub enum MyState
 {
-    #[default]
-    LoadAssets,
+    #[default] LoadAssets,
     Initialize,
     TitleDemo, DemoLoop,
     StageStart, MainLoop, StageClear, GameOver,
@@ -91,14 +90,12 @@ pub enum MyState
 }
 
 // ゲームの状態の判定
+#[rustfmt::skip]
 #[allow(dead_code)]
 impl MyState
 {
     pub fn is_demoplay(&self) -> bool { self.is_titledemo() || self.is_demoloop() }
-    pub fn is_playing(&self) -> bool
-    {
-        self.is_stagestart() || self.is_mainloop() || self.is_stageclear()
-    }
+    pub fn is_playing(&self) -> bool { self.is_stagestart() || self.is_mainloop() || self.is_stageclear() }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
