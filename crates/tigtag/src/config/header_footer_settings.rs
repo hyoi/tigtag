@@ -12,6 +12,8 @@ pub const HEADER_FOOTER: &[header_footer::TextBlock] = &[
     FOOTER_POWERED_BY, // Powered by
 ];
 
+//------------------------------------------------------------------------------
+
 // フォントサイズ
 const HEADER_LABEL_SIZE: f32 = PIXELS_PER_GRID * 0.58;
 const HEADER_VALUE_SIZE: f32 = PIXELS_PER_GRID * 0.7;

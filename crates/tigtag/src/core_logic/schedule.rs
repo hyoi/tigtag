@@ -43,7 +43,8 @@ impl Plugin for Schedule
                 (
                     // カメラのspawn
                     simple_camera::spawn::<CameraSettings>,
-                    misc::select_ui_camera // UIを描画するカメラの選択
+                    // UIを描画するカメラの選択
+                    misc::set_ui_camera::<SimpleCamera2d>
                         .after(simple_camera::spawn::<CameraSettings>),
 
                     // TextUIのspawn
@@ -95,6 +96,7 @@ impl Plugin for Schedule
                     (
                         // scoreとstageをゼロクリアする(demoの情報消去)
                         detecting_change::initialize_score_stage,
+                        // Stateを変更
                         misc::set_next_state(MyState::StageStart),
                     )
                         .in_set(misc::execution_order::After::HitAnyKey)
