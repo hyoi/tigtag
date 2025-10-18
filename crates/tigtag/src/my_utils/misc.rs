@@ -198,6 +198,23 @@ pub fn select_ui_camera(
     Ok(())
 }
 
+//------------------------------------------------------------------------------
+
+// 指定されたComponent（カメラ）にComponent「IsDefaultUiCamera」を追加する
+type WithCamera2dOr3d = Or<(With<Camera2d>, With<Camera3d>)>;
+pub fn set_ui_camera<T: Component>(
+    camera_entity: Query<Entity, (With<T>, WithCamera2dOr3d)>,
+    mut cmds: Commands,
+) -> Result
+{
+    // カメラのEntity IDを決定する
+    let id = camera_entity.single()?;
+
+    // UIを描画するCameraにマーカーComponentを追加する
+    cmds.entity(id).insert(IsDefaultUiCamera);
+    Ok(())
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // 最大公約数を求める関数 (u32)
