@@ -170,9 +170,6 @@ impl GridToPixelOnMap for IVec2
     }
 }
 
-// アジャスタ（マップ座標から画面座標への変換調整値）
-const ADJUST_MAP_ON_SCREEN: IVec2 = IVec2::new(0, 1);
-
 ////////////////////////////////////////////////////////////////////////////////
 
 // End of code.
