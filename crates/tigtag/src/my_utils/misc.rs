@@ -34,6 +34,8 @@ pub mod prelude
     pub const COLOR_GRAY: Color = Color::Srgba(css::GRAY);
     pub const COLOR_RED: Color = Color::Srgba(css::RED);
     pub const COLOR_BLUE: Color = Color::Srgba(css::BLUE);
+    pub const COLOR_BISQUE: Color = Color::Srgba(css::BISQUE);
+    pub const COLOR_MAROON: Color = Color::Srgba(css::MAROON);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,27 +131,26 @@ pub fn check_hit_any_key(
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// スクリーン(第四象限)のピクセル座標(Vec2)へ変換する
-
-// (i32, i32)とIVec2を拡張するトレイト
+// (i32, i32)とIVec2を「スクリーン第四象限のピクセル座標(Vec2)」へ変換する拡張トレイト
 pub trait I32x2TypeExt
 {
+    const UNIT: Vec2 = Vec2::new( PIXELS_PER_GRID, -PIXELS_PER_GRID ); // Y軸は負方向
+    const ADJUSTOR: f32 = 0.5; // アンカーがグリッド中央なので補正(0.5)が必要
     fn to_screen_pixels(&self) -> Vec2;
 }
 
-// Y軸は負方向。アンカーがグリッド中央なので補正(0.5)が必要
 impl I32x2TypeExt for (i32, i32)
 {
     fn to_screen_pixels(&self) -> Vec2
     {
-        Vec2::new(self.0 as f32 + 0.5, -self.1 as f32 - 0.5) * PIXELS_PER_GRID
+        ( IVec2::from(*self).as_vec2() + Self::ADJUSTOR ) * Self::UNIT
     }
 }
 impl I32x2TypeExt for IVec2
 {
     fn to_screen_pixels(&self) -> Vec2
     {
-        Vec2::new(self.x as f32 + 0.5, -self.y as f32 - 0.5) * PIXELS_PER_GRID
+        ( self.as_vec2() + Self::ADJUSTOR ) * Self::UNIT
     }
 }
 
