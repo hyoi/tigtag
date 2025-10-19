@@ -19,8 +19,8 @@ impl Plugin for Schedule
             // Resourceの登録
             .init_resource::<CameraSettings>()                  // カメラの設定を登録
             .init_resource::<Record>()                          // ゲームの成績
-            .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
             .init_resource::<map::Map>()                        // ステージのマップ
+            .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
             .insert_resource(handle_input::MappingKeyboard::from(KEYBOARD_MAP)) // マッピング
             .insert_resource(handle_input::MappingGamepad::from(GAMEPAD_MAP))   // マッピング
 
