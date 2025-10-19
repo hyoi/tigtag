@@ -42,7 +42,7 @@ pub fn scoring_and_stage_clear(
         cmds.entity(dot).despawn();
         *map.option_entity_mut(player.cell) = None;
         map.remaining_dots -= 1;
-        message_eatdot.write(DotEaten);
+        message_eatdot.write(DotEaten (player.cell)); // DotEatenのフィールドはtigtag3d用
         *record.score_mut() += 1;
 
         // 1度beepを鳴らす(自動despawn処理付き)

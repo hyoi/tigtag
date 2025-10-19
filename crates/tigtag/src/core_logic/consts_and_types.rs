@@ -44,13 +44,14 @@ impl Record
 // System間通知用メッセージ
 pub use my_messages::*;
 #[rustfmt::skip]
+#[allow(dead_code)]
 mod my_messages
 {
     use super::*;
     #[derive(Message)] pub struct CountDownEnded;
     #[derive(Message, Default)] pub struct SkipOverlayMessage;
     #[derive(Message)] pub struct DotsAllEaten ;
-    #[derive(Message)] pub struct DotEaten ;
+    #[derive(Message)] pub struct DotEaten (pub IVec2); // フィールドはtigtag3d用
     #[derive(Message)] pub struct PlayerCaught;
 }
 
