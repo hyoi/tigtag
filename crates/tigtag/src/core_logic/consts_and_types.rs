@@ -53,6 +53,8 @@ mod my_messages
     #[derive(Message)] pub struct DotsAllEaten ;
     #[derive(Message)] pub struct DotEaten (pub IVec2); // フィールドはtigtag3d用
     #[derive(Message)] pub struct PlayerCaught;
+    #[derive(Message)] pub struct PlayerPositionAdjusted;
+    #[derive(Message)] pub struct ChaserPositionAdjusted;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

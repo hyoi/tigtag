@@ -32,6 +32,8 @@ impl Plugin for Schedule
             .add_message::<DotsAllEaten >()          // ステージクリアの伝達用
             .add_message::<DotEaten>()               // スコアリングの伝達用
             .add_message::<PlayerCaught>()           // ゲームオーバーの伝達用
+            .add_message::<PlayerPositionAdjusted>() // プレイヤーの位置補正の伝達用
+            .add_message::<ChaserPositionAdjusted>() // チェイサーの位置補正の伝達用
             ;
 
         //--------------------------------------------------------------------------

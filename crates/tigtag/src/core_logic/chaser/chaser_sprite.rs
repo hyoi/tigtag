@@ -213,6 +213,7 @@ pub fn move_sprite(
     query_player: Query<&player::Player>,
     option_map: Option<Res<map::Map>>,
     time: Res<Time>,
+    mut message_writer: MessageWriter<ChaserPositionAdjusted>,
 ) -> Result
 {
     // 準備
@@ -229,6 +230,9 @@ pub fn move_sprite(
         // 移動タイマーがfinishしたなら
         if chaser.timer.tick(time_delta).is_finished()
         {
+            // 移動タイマーのfinishをメッセージでパッシングする
+            message_writer.write(ChaserPositionAdjusted);
+
             // セルの間を移動中のスプライトが半端な位置にいるなら
             if chaser.px_start != chaser.px_end
             {
