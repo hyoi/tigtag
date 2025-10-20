@@ -28,7 +28,8 @@ pub type FnAutoChase = fn(
 ) -> News;
 
 // チェイサーの初期状態
-impl Chaser {
+impl Chaser
+{
     pub const TIME_PER_GRID: f32 = 0.20; // 0.13; //１グリッド進むために必要な時間
 }
 impl Default for Chaser

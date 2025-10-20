@@ -19,7 +19,8 @@ pub struct Player
 }
 
 // プレイヤーの初期状態
-impl Player {
+impl Player
+{
     pub const TIME_PER_GRID: f32 = 0.15; // 0.09; //１グリッド進むために必要な時間
 }
 impl Default for Player
