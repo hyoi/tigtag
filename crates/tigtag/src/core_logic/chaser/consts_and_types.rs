@@ -28,12 +28,13 @@ pub type FnAutoChase = fn(
 ) -> News;
 
 // チェイサーの初期状態
+impl Chaser {
+    pub const TIME_PER_GRID: f32 = 0.20; // 0.13; //１グリッド進むために必要な時間
+}
 impl Default for Chaser
 {
     fn default() -> Self
     {
-        const CHASER_TIME_PER_GRID: f32 = 0.20; // 0.13; //１グリッド進むために必要な時間
-
         Self {
             cell: IVec2::default(),
             next_cell: IVec2::default(),
@@ -41,9 +42,9 @@ impl Default for Chaser
             px_end: Vec3::default(),
             direction: News::South,
             speedup: 1.0,
-            timer: Timer::from_seconds(CHASER_TIME_PER_GRID, TimerMode::Once),
+            timer: Timer::from_seconds(Self::TIME_PER_GRID, TimerMode::Once),
             is_stop: true,
-            base_speed: PIXELS_PER_GRID / CHASER_TIME_PER_GRID,
+            base_speed: PIXELS_PER_GRID / Self::TIME_PER_GRID,
             anime: SpriteAnimationParams {
                 timer: Timer::from_seconds(ANIME_TIMER_CHASER, TimerMode::Repeating),
                 ..default()
