@@ -52,7 +52,7 @@ fn is_valid_struct(
                 .as_ref()
                 .map(|ident| (ident.to_string(), &field.ty))
         })
-        .collect::<FxHashMap<_, _>>();
+        .collect::<HashMap<_, _>>();
 
     // 必須のフィールド名と型のペアが全て存在するか確認する
     for (required_name, required_type_str) in required_field_type

@@ -1,7 +1,7 @@
 // external crates
 use proc_macro2::TokenStream;
 use quote::*;
-use rustc_hash::FxHashMap;
+use std::collections::HashMap;
 
 ////////////////////////////////////////////////////////////////////////////////
 
