@@ -22,7 +22,6 @@ bevy.workspace = true
 rand.workspace = true
 getrandom.workspace = true
 chrono.workspace = true
-rustc-hash.workspace = true
 macros.workspace = true
 
 [workspace.dependencies]
@@ -38,7 +37,6 @@ bevy = { version = "0.17", features = ["bevy_ui_debug"] }
 rand = "0.9"
 getrandom = { version = "0.3", features = [ "wasm_js" ] } #wasmコンパイル時のエラー対策
 chrono = "0.4"
-rustc-hash = "2"
 
 #マクロ関係の依存
 macros        = { path = "crates/macros"        }

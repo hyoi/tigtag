@@ -7,7 +7,7 @@ pub struct SpriteAnimationParams
 {
     pub timer: Timer,                               // タイマー
     pub num_patterns: u32,                          // フレーム数
-    pub sprite_sheet_offsets: FxHashMap<News, u32>, // 先頭位置(offset値)
+    pub sprite_sheet_offsets: HashMap<News, u32>, // 先頭位置(offset値)
 }
 
 // スプライトシートの情報１
@@ -19,7 +19,7 @@ impl Default for SpriteAnimationParams
         Self {
             timer: Timer::from_seconds(0.15, TimerMode::Repeating),
             num_patterns: NUM_PATTERNS,
-            sprite_sheet_offsets: FxHashMap::from_iter([
+            sprite_sheet_offsets: HashMap::from_iter([
                 (News::North, 0),
                 (News::East, NUM_PATTERNS),
                 (News::West, NUM_PATTERNS * 2),

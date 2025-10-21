@@ -112,7 +112,7 @@ pub fn move_sprite(
         .for_each(|x| flat_messages.extend(x.0.clone()));
 
     // 入力（NEWS）のイベントをハッシュ集合へ統合する
-    let mut input_news = FxHashSet::<News>::default();
+    let mut input_news = HashSet::<News>::new();
     flat_messages
         .iter()
         .for_each(|&(action, value)| {

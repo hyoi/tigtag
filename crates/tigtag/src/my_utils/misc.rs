@@ -65,8 +65,8 @@ pub mod execution_order
 #[derive(Resource)]
 pub struct MaskHitAnyKeyInput
 {
-    pub keys: FxHashSet<&'static KeyCode>,
-    pub buttons: FxHashSet<&'static GamepadButton>,
+    pub keys: HashSet<&'static KeyCode>,
+    pub buttons: HashSet<&'static GamepadButton>,
 }
 
 // 何かしら入力があったことを通知する、メッセージ

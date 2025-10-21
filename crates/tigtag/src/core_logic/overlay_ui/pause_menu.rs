@@ -246,7 +246,7 @@ fn hook_input_and_toggle_pause(
             menu_setteing.init();
 
             // ラベルを除いたメニューアイテムのHash集合を作る
-            let indexes: FxHashSet<_> = (0..)
+            let indexes: HashSet<_> = (0..)
                 .zip(menu_setteing.settings())
                 .filter_map(|(index, setting)| match setting.0.is_label()
                 {

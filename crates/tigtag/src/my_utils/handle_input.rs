@@ -138,31 +138,31 @@ pub type ConnfigMouse = &'static [(MouseInput, UserAction)];
 
 // マッピングをResourceに保存する為の型とメソッド
 #[derive(Resource, Deref)]
-pub struct MappingKeyboard(pub FxHashMap<KeyCode, UserAction>);
+pub struct MappingKeyboard(pub HashMap<KeyCode, UserAction>);
 #[derive(Resource, Deref)]
-pub struct MappingGamepad(pub FxHashMap<GamepadInput, UserAction>);
+pub struct MappingGamepad(pub HashMap<GamepadInput, UserAction>);
 #[derive(Resource, Deref)]
-pub struct MappingMouse(pub FxHashMap<MouseInput, UserAction>);
+pub struct MappingMouse(pub HashMap<MouseInput, UserAction>);
 
 impl MappingKeyboard
 {
     pub fn from(key_map: ConnfigKeyboard) -> Self
     {
-        Self(FxHashMap::from_iter(key_map.iter().copied()))
+        Self(HashMap::from_iter(key_map.iter().copied()))
     }
 }
 impl MappingGamepad
 {
     pub fn from(gamepad_map: ConnfigGamepad) -> Self
     {
-        Self(FxHashMap::from_iter(gamepad_map.iter().copied()))
+        Self(HashMap::from_iter(gamepad_map.iter().copied()))
     }
 }
 impl MappingMouse
 {
     pub fn from(mouse_map: ConnfigMouse) -> Self
     {
-        Self(FxHashMap::from_iter(mouse_map.iter().copied()))
+        Self(HashMap::from_iter(mouse_map.iter().copied()))
     }
 }
 

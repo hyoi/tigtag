@@ -14,9 +14,9 @@ use bevy::{
         mouse::{MouseMotion, MouseWheel},
     },
     audio::Volume,
+    platform::collections::{HashMap, HashSet},
 };
 use rand::prelude::*;
-use rustc_hash::{FxHashSet, FxHashMap};
 
 // standard library
 use std::{

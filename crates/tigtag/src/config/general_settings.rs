@@ -263,8 +263,8 @@ impl Default for misc::MaskHitAnyKeyInput
     fn default() -> Self
     {
         Self {
-            keys: FxHashSet::from_iter(IGNORE_KEYS_HITANYKEY.iter()),
-            buttons: FxHashSet::from_iter(IGNORE_BUTTONS_HITANYKEY.iter()),
+            keys: HashSet::from_iter(IGNORE_KEYS_HITANYKEY.iter()),
+            buttons: HashSet::from_iter(IGNORE_BUTTONS_HITANYKEY.iter()),
         }
     }
 }
