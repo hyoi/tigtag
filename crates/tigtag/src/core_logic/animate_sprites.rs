@@ -5,8 +5,8 @@ use super::*;
 // スプライトアニメーションの情報
 pub struct SpriteAnimationParams
 {
-    pub timer: Timer,                               // タイマー
-    pub num_patterns: u32,                          // フレーム数
+    pub timer: Timer,                             // タイマー
+    pub num_patterns: u32,                        // フレーム数
     pub sprite_sheet_offsets: HashMap<News, u32>, // 先頭位置(offset値)
 }
 
