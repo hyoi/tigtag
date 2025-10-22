@@ -33,7 +33,7 @@ mod my_utils; // 共通ライブラリ
 use my_utils::prelude::*;
 
 mod config; // 設定各種
-use config::*;
+use config::prelude::*;
 
 mod demo_play; // demoロジック
 

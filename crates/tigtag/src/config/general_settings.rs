@@ -2,36 +2,6 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// WindowPluginの初期化
-#[rustfmt::skip]
-pub trait InitWindowPlugin { fn initialize() -> Self; }
-impl InitWindowPlugin for WindowPlugin
-{
-    fn initialize() -> Self
-    {
-        // 主ウィンドウの設定
-        let window = Window {
-            resolution: SCREEN_PIXELS_RESO.into(), // ウィンドウのサイズ
-            resizable: false,                      // リサイズ不可
-            decorations: true,                     // タイトルバー表示
-            title: format!("{APP_TITLE} v{APP_VER}"), // タイトルバーに表示するタイトル
-            enabled_buttons: EnabledButtons {
-                minimize: false, // 最小化ボタン非表示
-                maximize: false, // 最大化ボタン非表示
-                close: true,     // クローズボタン表示
-            },
-            // fit_canvas_to_parent: true, // v0.13で廃止(#11057)、v0.14で復活(#11278)
-            ..default()
-        };
-
-        // 返り値
-        Self {
-            primary_window: Some(window),
-            ..default()
-        }
-    }
-}
-
 // ウィンドウ縦横(Pixel)
 pub const SCREEN_PIXELS_RESO: UVec2 =
     UVec2::new(SCREEN_PIXELS_WIDTH as u32, SCREEN_PIXELS_HEIGHT as u32);
@@ -51,28 +21,6 @@ pub const SCREEN_GRIDS_HEIGHT: i32 = 19; // memo: 19 best 24
 pub const APP_TITLE: &str = "TigTag"; // env!("CARGO_PKG_NAME");
 pub const APP_VER: &str = env!("CARGO_PKG_VERSION");
 pub const COPYRIGHT: &str = "hyoi 2021 - 2025";
-
-////////////////////////////////////////////////////////////////////////////////
-
-// LogPluginの初期化
-#[rustfmt::skip]
-pub trait InitLogPlugin { fn initialize() -> Self; }
-impl InitLogPlugin for LogPlugin
-{
-    fn initialize() -> Self
-    {
-        // ログレベルの設定
-        let develop = "warn,wgpu_hal=error";
-        let release = "error";
-
-        // 返り値
-        let log_level = if misc::DEBUG() { develop } else { release };
-        Self {
-            filter: log_level.into(),
-            ..default()
-        }
-    }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
