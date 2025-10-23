@@ -144,16 +144,15 @@ pub const ASSETS_FONT_PRESSSTART2P_REGULAR: &str = "font/PressStart2P-Regular.tt
 pub const ASSETS_FONT_REGGAEONE_REGULAR: &str = "font/ReggaeOne-Regular.ttf";
 
 // assets（スプライト）
-pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "image/sprite/kani_DOTOWN.png";
-pub const ASSETS_SPRITE_BRICK_WALL: &str = "image/sprite/brick_wall.png";
+pub const ASSETS_SPRITE_KANI_DOTOWN: &str = "sprite/kani_DOTOWN.png";
+pub const ASSETS_SPRITE_BRICK_WALL: &str = "sprite/brick_wall.png";
 
 // assets（スプライトシート）
-pub const ASSETS_SPRITESHEET_PLAYER: &str = "image/spritesheet/player.png";
-pub const ASSETS_SPRITESHEET_CHASER_RED: &str = "image/spritesheet/chaser_red.png";
-pub const ASSETS_SPRITESHEET_CHASER_GREEN: &str =
-    "image/spritesheet/chaser_green.png";
-pub const ASSETS_SPRITESHEET_CHASER_BLUE: &str = "image/spritesheet/chaser_blue.png";
-pub const ASSETS_SPRITESHEET_CHASER_PINK: &str = "image/spritesheet/chaser_pink.png";
+pub const ASSETS_SPRITESHEET_PLAYER: &str = "spritesheet/player.png";
+pub const ASSETS_SPRITESHEET_CHASER_RED: &str = "spritesheet/chaser_red.png";
+pub const ASSETS_SPRITESHEET_CHASER_GREEN: &str = "spritesheet/chaser_green.png";
+pub const ASSETS_SPRITESHEET_CHASER_BLUE: &str = "spritesheet/chaser_blue.png";
+pub const ASSETS_SPRITESHEET_CHASER_PINK: &str = "spritesheet/chaser_pink.png";
 
 // assets（サウンド）
 pub const ASSETS_SOUND_BEEP: &str = "audio/sound/beep.ogg";
