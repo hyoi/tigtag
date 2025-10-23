@@ -24,6 +24,7 @@ use std::{
     ops::{Range, Deref, DerefMut, Add, AddAssign},
     f32::consts::{TAU, PI},
     collections::VecDeque,
+    sync::LazyLock,
 };
 
 // internal submodules
