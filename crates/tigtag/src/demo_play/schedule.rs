@@ -120,8 +120,8 @@ fn make_data_for_demo(
     // dotsを内包する最小の矩形の初期値は決め打ちでいい(Mapをそう作っているから)
     *demo.dots_rect_min_mut() = IVec2::new(1, 1);
     *demo.dots_rect_max_mut() = IVec2::new(
-        core_logic::map::MAP_WIDTH_IN_CELLS - 2,
-        core_logic::map::MAP_HEIGHT_IN_CELLS - 2,
+        MAP_WIDTH_IN_CELLS - 2,
+        MAP_HEIGHT_IN_CELLS - 2,
     );
 
     Ok(())
@@ -167,22 +167,22 @@ fn update_data_for_demo(
     // .position()が&mutで要素にアクセスするwarningの表示を抑止
     let x = core_logic::map::MAP_CELLS_X_RANGE
         .position(|i| demo.dots_sum_x(i) != 0)
-        .unwrap_or(core_logic::map::MAP_WIDTH_IN_CELLS as usize) as i32;
+        .unwrap_or(MAP_WIDTH_IN_CELLS as usize) as i32;
     #[allow(const_item_mutation)]
     // .position()が&mutで要素にアクセスするwarningの表示を抑止
     let y = core_logic::map::MAP_CELLS_Y_RANGE
         .position(|i| demo.dots_sum_y(i) != 0)
-        .unwrap_or(core_logic::map::MAP_HEIGHT_IN_CELLS as usize) as i32;
+        .unwrap_or(MAP_HEIGHT_IN_CELLS as usize) as i32;
     *demo.dots_rect_min_mut() = IVec2::new(x, y);
 
     // dotsを内包する最小の矩形の右下座標（max）を更新する
-    let x = core_logic::map::MAP_WIDTH_IN_CELLS
+    let x = MAP_WIDTH_IN_CELLS
         - 1
         - core_logic::map::MAP_CELLS_X_RANGE
             .rev()
             .position(|i| demo.dots_sum_x(i) != 0)
             .unwrap_or(0) as i32;
-    let y = core_logic::map::MAP_HEIGHT_IN_CELLS
+    let y = MAP_HEIGHT_IN_CELLS
         - 1
         - core_logic::map::MAP_CELLS_Y_RANGE
             .rev()

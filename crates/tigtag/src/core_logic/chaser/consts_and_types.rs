@@ -68,8 +68,8 @@ pub const CHASER_START_POSITION: &[IVec2] = &[
     IVec2::new(MAX_X, 1),
     IVec2::new(MAX_X, MAX_Y),
 ];
-const MAX_X: i32 = map::MAP_WIDTH_IN_CELLS - 2;
-const MAX_Y: i32 = map::MAP_HEIGHT_IN_CELLS - 2;
+const MAX_X: i32 = MAP_WIDTH_IN_CELLS - 2;
+const MAX_Y: i32 = MAP_HEIGHT_IN_CELLS - 2;
 
 ////////////////////////////////////////////////////////////////////////////////
 

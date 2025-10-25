@@ -40,10 +40,6 @@ impl Default for Map
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// マップ縦横幅
-pub const MAP_WIDTH_IN_CELLS: i32 = SCREEN_GRIDS_WIDTH; // w <= SCREEN_GRIDS_WIDTH;
-pub const MAP_HEIGHT_IN_CELLS: i32 = SCREEN_GRIDS_HEIGHT - 2; // h <= SCREEN_GRIDS_HEIGHT - 2;
-
 // マップのレンジ（外壁含む）
 pub const MAP_CELLS_X_RANGE: Range<i32> = 0..MAP_WIDTH_IN_CELLS;
 pub const MAP_CELLS_Y_RANGE: Range<i32> = 0..MAP_HEIGHT_IN_CELLS;

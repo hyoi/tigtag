@@ -11,6 +11,10 @@ const BASE_SCALING: f32 = 4.0;
 pub const SCREEN_GRIDS_WIDTH: i32 = 25; // memo: 25 best 43
 pub const SCREEN_GRIDS_HEIGHT: i32 = 19; // memo: 19 best 24
 
+// マップ縦横幅
+pub const MAP_WIDTH_IN_CELLS: i32 = SCREEN_GRIDS_WIDTH; // w <= SCREEN_GRIDS_WIDTH;
+pub const MAP_HEIGHT_IN_CELLS: i32 = SCREEN_GRIDS_HEIGHT - 2; // h <= SCREEN_GRIDS_HEIGHT - 2;
+
 // ウィンドウ縦横(Pixel)
 pub const SCREEN_PIXELS_RESO: UVec2 =
     UVec2::new(SCREEN_PIXELS_WIDTH as u32, SCREEN_PIXELS_HEIGHT as u32);

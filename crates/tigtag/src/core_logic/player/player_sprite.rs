@@ -20,13 +20,13 @@ pub fn spawn_sprite(
     query_entity.iter().for_each(|id| cmds.entity(id).despawn());
 
     // 乱数で初期位置を決める(マップ中央付近の通路)
-    let half_w = map::MAP_WIDTH_IN_CELLS / 2;
-    let half_h = map::MAP_HEIGHT_IN_CELLS / 2;
+    let half_w = MAP_WIDTH_IN_CELLS / 2;
+    let half_h = MAP_HEIGHT_IN_CELLS / 2;
     let short_side = if half_w >= half_h { half_h } else { half_w };
     let x1 = short_side - 1;
     let y1 = short_side - 1;
-    let x2 = map::MAP_WIDTH_IN_CELLS - short_side;
-    let y2 = map::MAP_HEIGHT_IN_CELLS - short_side;
+    let x2 = MAP_WIDTH_IN_CELLS - short_side;
+    let y2 = MAP_HEIGHT_IN_CELLS - short_side;
 
     let player_cell = loop
     {

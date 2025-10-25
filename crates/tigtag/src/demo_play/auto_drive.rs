@@ -264,7 +264,7 @@ fn check_byway_risk(
 fn heuristic(target: IVec2, chasers: &[IVec2]) -> i32
 {
     let mut shortest =
-        core_logic::map::MAP_WIDTH_IN_CELLS + core_logic::map::MAP_HEIGHT_IN_CELLS;
+        MAP_WIDTH_IN_CELLS + MAP_HEIGHT_IN_CELLS;
     for chaser in chasers
     {
         let w_and_h = (target.x - chaser.x).abs() + (target.y - chaser.y).abs();
