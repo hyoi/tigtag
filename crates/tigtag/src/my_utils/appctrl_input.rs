@@ -175,11 +175,12 @@ pub fn toggle_fullscreen(
     // 準備
     let mut window = query_window.single_mut()?;
 
-    // ウィンドウ／フルスクリーンの切替キー・ボタンが押下されたなら
+    // 切替キー・ボタンが押下されたなら
     if input_device.is_pressed_with_reset(&*appctrl)
     {
         match window.mode
         {
+            // ウィンドウ => フルスクリーン
             WindowMode::Windowed =>
             {
                 window.resolution.set_scale_factor(2.0);
@@ -188,6 +189,7 @@ pub fn toggle_fullscreen(
                     VideoModeSelection::Current,
                 );
             }
+            // フルスクリーン => ウィンドウ
             _ =>
             {
                 window.resolution.set_scale_factor(1.0);
