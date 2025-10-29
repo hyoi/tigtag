@@ -44,7 +44,7 @@ impl Plugin for Schedule
                         .in_set(execution_order::Before::HitAnyKey)
                         .run_if(misc::DEBUG),
                     // 全画面時にヘッダー／フッターが画面の左上に寄るのを補正する
-                    appctrl_input::adjust_header_footer_layout
+                    header_footer::adjust_header_footer_layout
                         .run_if(any_match_filter::<Changed<Window>>),
                 ),
             )
