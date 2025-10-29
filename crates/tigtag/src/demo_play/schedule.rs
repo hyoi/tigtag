@@ -119,10 +119,8 @@ fn make_data_for_demo(
 
     // dotsを内包する最小の矩形の初期値は決め打ちでいい(Mapをそう作っているから)
     *demo.dots_rect_min_mut() = IVec2::new(1, 1);
-    *demo.dots_rect_max_mut() = IVec2::new(
-        MAP_WIDTH_IN_CELLS - 2,
-        MAP_HEIGHT_IN_CELLS - 2,
-    );
+    *demo.dots_rect_max_mut() =
+        IVec2::new(MAP_WIDTH_IN_CELLS - 2, MAP_HEIGHT_IN_CELLS - 2);
 
     Ok(())
 }
