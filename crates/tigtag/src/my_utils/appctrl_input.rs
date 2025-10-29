@@ -165,40 +165,76 @@ pub fn send_exit_app_message(
 #[derive_appctrl_input]
 pub struct FullScreenToggleInput;
 
-// ウィンドウとフルスクリーンを切り替える(トグル動作)
+// ウィンドウと全画面を切り替える(トグル動作)
 pub fn toggle_fullscreen(
     appctrl: Local<FullScreenToggleInput>, // 初回のみdefault()で初期化
     mut input_device: InputDevicePack,
     mut query_window: Query<&mut Window>,
+    mut query_headder_footer_layout_node: Query<
+        &mut Node,
+        With<header_footer::LayoutNode>,
+    >,
 ) -> Result
 {
     // 準備
     let mut window = query_window.single_mut()?;
+    let mut headder_footer_layout_node =
+        query_headder_footer_layout_node.single_mut()?;
 
     // 切替キー・ボタンが押下されたなら
     if input_device.is_pressed_with_reset(&*appctrl)
     {
         match window.mode
         {
-            // ウィンドウ => フルスクリーン
+            // ウィンドウ => 全画面
             WindowMode::Windowed =>
             {
                 window.resolution.set_scale_factor(2.0);
-                window.mode = WindowMode::Fullscreen(
-                    MonitorSelection::Primary,
-                    VideoModeSelection::Current,
-                );
+                window.mode =
+                    WindowMode::BorderlessFullscreen(MonitorSelection::Primary);
             }
-            // フルスクリーン => ウィンドウ
+            // 全画面 => ウィンドウ
             _ =>
             {
                 window.resolution.set_scale_factor(1.0);
                 window.mode = WindowMode::Windowed;
+                // ヘッダー／フッターのNodeのアジャスタをクリアする
+                headder_footer_layout_node.left = Val::Px(0.0);
+                headder_footer_layout_node.top = Val::Px(0.0);
             }
         };
+    }
 
-        #[cfg(debug_assertions)]
-        dbg!(&window.mode, &window.resolution);
+    Ok(())
+}
+
+// 全画面時にヘッダー／フッターが画面の左上に寄るのを補正する
+pub fn adjust_header_footer_layout(
+    query_window: Query<&Window>,
+    query_camera: Query<&Camera, With<IsDefaultUiCamera>>,
+    mut query_headder_footer_layout_node: Query<
+        &mut Node,
+        With<header_footer::LayoutNode>,
+    >,
+) -> Result
+{
+    // 準備
+    let window = query_window.single()?;
+    let camera = query_camera.single()?;
+    let mut headder_footer_layout_node =
+        query_headder_footer_layout_node.single_mut()?;
+
+    // フルスクリーンがウィンドウより大きいなら
+    if matches!(window.mode, WindowMode::BorderlessFullscreen(_))
+        && let Some(rect) = camera.logical_viewport_rect()
+        && (rect.width() > SCREEN_PIXELS_WIDTH
+            || rect.height() > SCREEN_PIXELS_HEIGHT)
+    {
+        // ヘッダー／フッターが画面の左上に寄るのを補正する
+        let adjust_x = (rect.width() - SCREEN_PIXELS_WIDTH) * 0.5;
+        let adjust_y = (rect.height() - SCREEN_PIXELS_HEIGHT) * 0.5;
+        headder_footer_layout_node.left = Val::Px(adjust_x);
+        headder_footer_layout_node.top = Val::Px(adjust_y);
     }
 
     Ok(())

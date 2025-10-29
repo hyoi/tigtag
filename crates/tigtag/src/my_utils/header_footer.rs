@@ -58,19 +58,26 @@ pub struct UpdateInfo(pub Option<(usize, FormatterFn)>);
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// ヘッダー／フッターのレイアウトノードのComponet
+#[derive(Component)]
+pub struct LayoutNode;
+
 // ヘッダー／フッターをspawnする
 pub fn spawn(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
 {
     // 親ノード（GRIDレイアウト(3x3)）
-    let mut layout_node = cmds.spawn(Node {
-        // width: Val::Px(SCREEN_PIXELS_WIDTH),
-        // height: Val::Px(SCREEN_PIXELS_HEIGHT),
-        width: Val::Percent(100.0),
-        height: Val::Percent(100.0),
-        display: Display::Grid, // CSSグリッドレイアウト
-        grid_template_columns: RepeatedGridTrack::fr(3, 1.0), // ３列
-        ..default()
-    });
+    let mut layout_node = cmds.spawn((
+        LayoutNode, //マーカーComponent
+        Node {
+            width: Val::Px(SCREEN_PIXELS_WIDTH),
+            height: Val::Px(SCREEN_PIXELS_HEIGHT),
+            // width: Val::Percent(100.0),
+            // height: Val::Percent(100.0),
+            display: Display::Grid, // CSSグリッドレイアウト
+            grid_template_columns: RepeatedGridTrack::fr(3, 1.0), // ３列
+            ..default()
+        },
+    ));
 
     // 子のTextBlockをspawnする
     HEADER_FOOTER.iter().for_each(|conf| {
