@@ -170,21 +170,22 @@ impl AddTextBlock for EntityCommands<'_>
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 全画面時にヘッダー／フッターが画面の左上に寄るのを補正する
+// 全画面時にヘッダー／フッターの位置を画面中央に寄せる
 pub fn adjust_header_footer_layout(
-    query_window: Query<&Window>,
+    window: Single<&Window>,
     option_camera: Option<Single<&Camera, With<IsDefaultUiCamera>>>,
-    mut query_headder_footer_layout_node: Query<
+    mut headder_footer_layout_node: Single<
         &mut Node,
         With<header_footer::LayoutNode>,
     >,
 ) -> Result
 {
     // 準備
-    let window = query_window.single()?;
-    let Some ( camera ) = option_camera else {return Ok(())};
-    let mut headder_footer_layout_node =
-        query_headder_footer_layout_node.single_mut()?;
+    let Some(camera) = option_camera
+    else
+    {
+        return Ok(());
+    };
 
     // 全画面なら
     if matches!(window.mode, WindowMode::BorderlessFullscreen(_))
@@ -194,7 +195,7 @@ pub fn adjust_header_footer_layout(
             && (rect.width() > SCREEN_PIXELS_WIDTH
                 || rect.height() > SCREEN_PIXELS_HEIGHT)
         {
-            // UIの表示位置を補正する
+            // UIの表示位置を調整する
             let adjust_x = (rect.width() - SCREEN_PIXELS_WIDTH) * 0.5;
             let adjust_y = (rect.height() - SCREEN_PIXELS_HEIGHT) * 0.5;
             headder_footer_layout_node.left = Val::Px(adjust_x);
@@ -204,18 +205,15 @@ pub fn adjust_header_footer_layout(
             {
                 let top = headder_footer_layout_node.top;
                 let left = headder_footer_layout_node.left;
-                let bottom = headder_footer_layout_node.bottom;
-                let right = headder_footer_layout_node.right;
-                dbg!(window.mode);
-                dbg!(top, left, bottom, right);
+                dbg!(top, left);
             }
         }
     }
-    // 全画面以外で補正が設定されているなら
+    // 全画面以外で調整値が設定されているなら
     else if headder_footer_layout_node.left != Val::Auto
         || headder_footer_layout_node.top != Val::Auto
     {
-        // 補正をクリアする
+        // 調整値をクリアする
         headder_footer_layout_node.left = Val::Auto;
         headder_footer_layout_node.top = Val::Auto;
 
@@ -223,10 +221,7 @@ pub fn adjust_header_footer_layout(
         {
             let top = headder_footer_layout_node.top;
             let left = headder_footer_layout_node.left;
-            let bottom = headder_footer_layout_node.bottom;
-            let right = headder_footer_layout_node.right;
-            dbg!(window.mode);
-            dbg!(top, left, bottom, right);
+            dbg!(top, left);
         }
     }
 

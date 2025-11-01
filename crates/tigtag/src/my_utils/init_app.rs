@@ -35,9 +35,9 @@ impl Plugin for Schedule
                     (
                         // アプリの終了
                         appctrl_input::send_exit_app_message,
-                        // 全画面切換
+                        // 全画面切替（window.mode変更）とスケールファクターの変更
                         appctrl_input::toggle_fullscreen,
-                        // 全画面切換に伴うヘッダー／フッターの位置ずれを調整する
+                        // ヘッダー／フッターの位置ずれを調整する
                         header_footer::adjust_header_footer_layout
                             .after(appctrl_input::toggle_fullscreen)
                             .run_if(any_match_filter::<Changed<Window>>),
