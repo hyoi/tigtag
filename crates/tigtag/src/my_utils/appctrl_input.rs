@@ -169,12 +169,10 @@ pub struct FullScreenToggleInput;
 pub fn toggle_fullscreen(
     appctrl: Local<FullScreenToggleInput>, // 初回のみdefault()で初期化
     mut input_device: InputDevicePack,
-    mut query_window: Query<&mut Window>,
+    mut window: Single<&mut Window>,
+    mut local_width_height: Local<(u32, u32)>,
 ) -> Result
 {
-    // 準備
-    let mut window = query_window.single_mut()?;
-
     // 切替キー・ボタンが押下されたなら
     if input_device.is_pressed_with_reset(&*appctrl)
     {
@@ -183,17 +181,55 @@ pub fn toggle_fullscreen(
             // ウィンドウ => 全画面
             WindowMode::Windowed =>
             {
-                window.resolution.set_scale_factor(2.0);
                 window.mode =
                     WindowMode::BorderlessFullscreen(MonitorSelection::Current);
             }
             // 全画面 => ウィンドウ
             _ =>
             {
-                window.resolution.set_scale_factor(1.0);
                 window.mode = WindowMode::Windowed;
             }
         };
+    }
+
+    // スケールファクターの算出用にCurrentモニターの改造をを取得する
+    // Note: window.modeの変更がwindow.resolutionに反映されるタイミングは1フレーム後
+    let width = window.resolution.physical_width();
+    let height = window.resolution.physical_height();
+
+    // window.modeの変更がwindow.resolutionに反映されたなら
+    if local_width_height.0 != width || local_width_height.1 != height
+    {
+        // window.resolutionの変化検出用に現在の値を保存する
+        *local_width_height = (width, height);
+
+        // window.modeが全画面なら
+        if matches!(window.mode, WindowMode::BorderlessFullscreen(_))
+        {
+            // モニタ解像度の幅が高さより長いなら
+            let scale = if width > height
+            {
+                height as f32 / SCREEN_PIXELS_HEIGHT
+            }
+            else
+            {
+                width as f32 / SCREEN_PIXELS_WIDTH
+            };
+
+            // スケールファクターをセットする
+            window.resolution.set_scale_factor(scale);
+        }
+        else
+        {
+            // スケールファクターを解除する
+            window.resolution.set_scale_factor(1.0);
+        }
+
+        #[cfg(debug_assertions)]
+        {
+            dbg!(window.mode);
+            dbg!(&window.resolution);
+        }
     }
 
     Ok(())
