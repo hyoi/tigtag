@@ -32,10 +32,15 @@ impl Plugin for Schedule
                 (
                     // gamepadの接続を検出して必要なら切り替える
                     handle_input::check_gamepad_connections,
-                    // 特別な入力のハンドリング
                     (
-                        appctrl_input::send_exit_app_message, // アプリの終了
-                        appctrl_input::toggle_fullscreen,     // 全画面切換
+                        // アプリの終了
+                        appctrl_input::send_exit_app_message,
+                        // 全画面切換
+                        appctrl_input::toggle_fullscreen,
+                        // 全画面切換に伴うヘッダー／フッターの位置ずれを調整する
+                        header_footer::adjust_header_footer_layout
+                            .after(appctrl_input::toggle_fullscreen)
+                            .run_if(any_match_filter::<Changed<Window>>),
                     )
                         .in_set(execution_order::Before::HitAnyKey)
                         .run_if(not(misc::WASM)), // WASMでは実行しない
@@ -43,9 +48,6 @@ impl Plugin for Schedule
                     appctrl_input::toggle_ui_outline_gizmo
                         .in_set(execution_order::Before::HitAnyKey)
                         .run_if(misc::DEBUG),
-                    // 全画面時にヘッダー／フッターが画面の左上に寄るのを補正する
-                    header_footer::adjust_header_footer_layout
-                        .run_if(any_match_filter::<Changed<Window>>),
                 ),
             )
             // システムセットの実行順の制御
