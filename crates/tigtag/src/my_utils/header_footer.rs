@@ -228,7 +228,7 @@ pub fn adjust_header_footer_layout(
             dbg!(window.mode);
             dbg!(top, left, bottom, right);
         }
-}
+    }
 
     Ok(())
 }
