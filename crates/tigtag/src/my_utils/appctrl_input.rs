@@ -185,7 +185,7 @@ pub fn toggle_fullscreen(
             {
                 window.resolution.set_scale_factor(2.0);
                 window.mode =
-                    WindowMode::BorderlessFullscreen(MonitorSelection::Primary);
+                    WindowMode::BorderlessFullscreen(MonitorSelection::Current);
             }
             // 全画面 => ウィンドウ
             _ =>
