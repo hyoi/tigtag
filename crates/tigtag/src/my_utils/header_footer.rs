@@ -173,7 +173,7 @@ impl AddTextBlock for EntityCommands<'_>
 // 全画面時にヘッダー／フッターが画面の左上に寄るのを補正する
 pub fn adjust_header_footer_layout(
     query_window: Query<&Window>,
-    query_camera: Query<&Camera, With<IsDefaultUiCamera>>,
+    option_camera: Option<Single<&Camera, With<IsDefaultUiCamera>>>,
     mut query_headder_footer_layout_node: Query<
         &mut Node,
         With<header_footer::LayoutNode>,
@@ -182,31 +182,53 @@ pub fn adjust_header_footer_layout(
 {
     // 準備
     let window = query_window.single()?;
-    let camera = query_camera.single()?;
+    let Some ( camera ) = option_camera else {return Ok(())};
     let mut headder_footer_layout_node =
         query_headder_footer_layout_node.single_mut()?;
 
     // 全画面なら
     if matches!(window.mode, WindowMode::BorderlessFullscreen(_))
     {
-        // 全画面のサイズの縦辺か横辺がウィンドウより長いなら
+        // モニタの縦横がウィンドウの各辺より長いなら
         if let Some(rect) = camera.logical_viewport_rect()
             && (rect.width() > SCREEN_PIXELS_WIDTH
                 || rect.height() > SCREEN_PIXELS_HEIGHT)
         {
-            // ヘッダー／フッターが画面の左上に寄るのを補正する
+            // UIの表示位置を補正する
             let adjust_x = (rect.width() - SCREEN_PIXELS_WIDTH) * 0.5;
             let adjust_y = (rect.height() - SCREEN_PIXELS_HEIGHT) * 0.5;
             headder_footer_layout_node.left = Val::Px(adjust_x);
             headder_footer_layout_node.top = Val::Px(adjust_y);
+
+            #[cfg(debug_assertions)]
+            {
+                let top = headder_footer_layout_node.top;
+                let left = headder_footer_layout_node.left;
+                let bottom = headder_footer_layout_node.bottom;
+                let right = headder_footer_layout_node.right;
+                dbg!(window.mode);
+                dbg!(top, left, bottom, right);
+            }
         }
     }
-    else
+    // 全画面以外で補正が設定されているなら
+    else if headder_footer_layout_node.left != Val::Auto
+        || headder_footer_layout_node.top != Val::Auto
     {
-        // アジャスタをクリアする
-        headder_footer_layout_node.left = Val::Px(0.0);
-        headder_footer_layout_node.top = Val::Px(0.0);
-    }
+        // 補正をクリアする
+        headder_footer_layout_node.left = Val::Auto;
+        headder_footer_layout_node.top = Val::Auto;
+
+        #[cfg(debug_assertions)]
+        {
+            let top = headder_footer_layout_node.top;
+            let left = headder_footer_layout_node.left;
+            let bottom = headder_footer_layout_node.bottom;
+            let right = headder_footer_layout_node.right;
+            dbg!(window.mode);
+            dbg!(top, left, bottom, right);
+        }
+}
 
     Ok(())
 }
