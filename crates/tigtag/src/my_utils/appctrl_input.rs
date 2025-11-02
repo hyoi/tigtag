@@ -206,14 +206,16 @@ pub fn toggle_fullscreen(
         // window.modeが全画面なら
         if matches!(window.mode, WindowMode::BorderlessFullscreen(_))
         {
-            // モニタ解像度の幅が高さより長いなら
-            let scale = if width > height
+            // Currentモニターとウィンドウの縦・横の長さからスケールファクターを決める
+            let scale_width = width as f32 / SCREEN_PIXELS_WIDTH;
+            let scale_height = height as f32 / SCREEN_PIXELS_HEIGHT;
+            let scale = if SCREEN_PIXELS_WIDTH * scale_height > width as f32
             {
-                height as f32 / SCREEN_PIXELS_HEIGHT
+                scale_width
             }
             else
             {
-                width as f32 / SCREEN_PIXELS_WIDTH
+                scale_height
             };
 
             // スケールファクターをセットする
