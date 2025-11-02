@@ -25,5 +25,7 @@
     "files.trimTrailingWhitespace": true,
     "[markdown]":
     {   "files.trimTrailingWhitespace": false
-    }
+    },
+
+    "liveServer.settings.port": 5501
 }
