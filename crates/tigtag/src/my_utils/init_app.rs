@@ -27,6 +27,7 @@ impl Plugin for Schedule
             // Stateの初期化
             .init_state::<MyState>()
             // 汎用的な処理の登録
+            .init_resource::<appctrl_input::ScaleFactor>() // 全画面表示のスケールファクター
             .add_systems(
                 Update, // without MyState
                 (
@@ -35,8 +36,12 @@ impl Plugin for Schedule
                     (
                         // アプリの終了
                         appctrl_input::send_exit_app_message,
-                        // 全画面切替（window.mode変更）とスケールファクターの変更
+                        // 全画面切替（window.mode変更）
                         appctrl_input::toggle_fullscreen,
+                        // スケールファクターを再計算して設定
+                        appctrl_input::update_scale_factor
+                            .after(appctrl_input::toggle_fullscreen)
+                            .run_if(any_match_filter::<Changed<Window>>),
                         // ヘッダー／フッターの位置ずれを調整する
                         header_footer::adjust_header_footer_layout
                             .after(appctrl_input::toggle_fullscreen)

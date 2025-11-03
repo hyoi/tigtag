@@ -170,37 +170,50 @@ pub fn toggle_fullscreen(
     appctrl: Local<FullScreenToggleInput>, // 初回のみdefault()で初期化
     mut input_device: InputDevicePack,
     mut window: Single<&mut Window>,
-    mut local_width_height: Local<(u32, u32)>,
 ) -> Result
 {
     // 切替キー・ボタンが押下されたなら
     if input_device.is_pressed_with_reset(&*appctrl)
     {
-        match window.mode
+        window.mode = match window.mode
         {
             // ウィンドウ => 全画面
             WindowMode::Windowed =>
-            {
-                window.mode =
-                    WindowMode::BorderlessFullscreen(MonitorSelection::Current);
-            }
+                WindowMode::BorderlessFullscreen(MonitorSelection::Current),
             // 全画面 => ウィンドウ
-            _ =>
-            {
-                window.mode = WindowMode::Windowed;
-            }
+            _ => WindowMode::Windowed,
         };
     }
 
-    // スケールファクターの算出用にCurrentモニターの解像度をを取得する
-    // Note: window.modeの変更がwindow.resolutionに反映されるタイミングは1フレーム後
+    Ok(())
+}
+
+//------------------------------------------------------------------------------
+
+// 全画面時にCurrentモニターのスケールファクターを保存するResource
+#[derive(Resource, Default, Debug)]
+pub struct ScaleFactor(Option<f32>); // default: ScaleFactor(None) -> Windowed
+
+// 解像度変更を検知してスケールファクターを再計算し、設定変更とResource更新を行う
+pub fn update_scale_factor(
+    mut window: Single<&mut Window>,
+    option_scale_factor: Option<ResMut<ScaleFactor>>,
+    mut local_width_height: Local<(u32, u32)>,
+) -> Result
+{
+    // 準備
+    let mut scale_factor = option_scale_factor.ok_or("Resource not found.")?;
+
+    // スケールファクターの算出用にCurrentモニターの解像度を取得する
+    // Note: window.modeが変更され後、1フレーム待たないとCurrentモニターの解像度を
+    //       取得できない。window.resolutionの更新に1フレーム必要らしい
     let width = window.resolution.physical_width();
     let height = window.resolution.physical_height();
 
     // window.modeの変更がwindow.resolutionに反映されたなら
     if local_width_height.0 != width || local_width_height.1 != height
     {
-        // window.resolutionの変化検出用に現在の値を保存する
+        // window.resolutionの変化検出用に現在の値を記録する
         *local_width_height = (width, height);
 
         // window.modeが全画面なら
@@ -218,19 +231,22 @@ pub fn toggle_fullscreen(
                 scale_height
             };
 
-            // スケールファクターをセットする
+            // スケールファクターのセットとResourceの更新
             window.resolution.set_scale_factor(scale);
+            *scale_factor = ScaleFactor(Some(scale));
         }
         else
         {
-            // スケールファクターを解除する
+            // スケールファクターの解除とResourceの更新
             window.resolution.set_scale_factor(1.0);
+            *scale_factor = ScaleFactor(None);
         }
 
         #[cfg(debug_assertions)]
         {
             dbg!(window.mode);
             dbg!(&window.resolution);
+            dbg!(scale_factor);
         }
     }
 
