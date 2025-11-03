@@ -192,7 +192,7 @@ pub fn toggle_fullscreen(
         };
     }
 
-    // スケールファクターの算出用にCurrentモニターの改造をを取得する
+    // スケールファクターの算出用にCurrentモニターの解像度をを取得する
     // Note: window.modeの変更がwindow.resolutionに反映されるタイミングは1フレーム後
     let width = window.resolution.physical_width();
     let height = window.resolution.physical_height();
