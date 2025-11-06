@@ -200,13 +200,6 @@ pub fn adjust_header_footer_layout(
             let adjust_y = (rect.height() - SCREEN_PIXELS_HEIGHT) * 0.5;
             headder_footer_layout_node.left = Val::Px(adjust_x);
             headder_footer_layout_node.top = Val::Px(adjust_y);
-
-            #[cfg(debug_assertions)]
-            {
-                let top = headder_footer_layout_node.top;
-                let left = headder_footer_layout_node.left;
-                dbg!(top, left);
-            }
         }
     }
     // 全画面以外で調整値が設定されているなら
@@ -216,13 +209,6 @@ pub fn adjust_header_footer_layout(
         // 調整値をクリアする
         headder_footer_layout_node.left = Val::Auto;
         headder_footer_layout_node.top = Val::Auto;
-
-        #[cfg(debug_assertions)]
-        {
-            let top = headder_footer_layout_node.top;
-            let left = headder_footer_layout_node.left;
-            dbg!(top, left);
-        }
     }
 
     Ok(())
