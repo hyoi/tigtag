@@ -175,13 +175,13 @@ pub fn toggle_fullscreen(
     // 切替キー・ボタンが押下されたなら
     if input_device.is_pressed_with_reset(&*appctrl)
     {
+        use WindowMode::*;
         window.mode = match window.mode
         {
             // ウィンドウ => 全画面
-            WindowMode::Windowed =>
-                WindowMode::BorderlessFullscreen(MonitorSelection::Current),
+            Windowed => BorderlessFullscreen(MonitorSelection::Current),
             // 全画面 => ウィンドウ
-            _ => WindowMode::Windowed,
+            _ => Windowed,
         };
     }
 
@@ -191,14 +191,14 @@ pub fn toggle_fullscreen(
 //------------------------------------------------------------------------------
 
 // 全画面時にCurrentモニターのスケールファクターを保存するResource
-#[derive(Resource, Default, Debug)]
-pub struct ScaleFactor(Option<f32>); // default: ScaleFactor(None) -> Windowed
+#[derive(Resource, Default, Debug, PartialEq, Clone, Copy)]
+pub struct ScaleFactor(pub Option<f32>); // default: ScaleFactor(None) -> Windowed
 
 // 解像度変更を検知してスケールファクターを再計算し、設定変更とResource更新を行う
 pub fn update_scale_factor(
     mut window: Single<&mut Window>,
     option_scale_factor: Option<ResMut<ScaleFactor>>,
-    mut local_width_height: Local<(u32, u32)>,
+    mut local_resolution: Local<(u32, u32)>,
 ) -> Result
 {
     // 準備
@@ -211,10 +211,10 @@ pub fn update_scale_factor(
     let height = window.resolution.physical_height();
 
     // window.modeの変更がwindow.resolutionに反映されたなら
-    if local_width_height.0 != width || local_width_height.1 != height
+    if local_resolution.0 != width || local_resolution.1 != height
     {
         // window.resolutionの変化検出用に現在の値を記録する
-        *local_width_height = (width, height);
+        *local_resolution = (width, height);
 
         // window.modeが全画面なら
         if matches!(window.mode, WindowMode::BorderlessFullscreen(_))
@@ -222,7 +222,7 @@ pub fn update_scale_factor(
             // Currentモニターとウィンドウの縦・横の長さからスケールファクターを決める
             let scale_width = width as f32 / SCREEN_PIXELS_WIDTH;
             let scale_height = height as f32 / SCREEN_PIXELS_HEIGHT;
-            let scale = if SCREEN_PIXELS_WIDTH * scale_height > width as f32
+            let scale = if scale_width < scale_height
             {
                 scale_width
             }
@@ -240,13 +240,6 @@ pub fn update_scale_factor(
             // スケールファクターの解除とResourceの更新
             window.resolution.set_scale_factor(1.0);
             *scale_factor = ScaleFactor(None);
-        }
-
-        #[cfg(debug_assertions)]
-        {
-            dbg!(window.mode);
-            dbg!(&window.resolution);
-            dbg!(scale_factor);
         }
     }
 
