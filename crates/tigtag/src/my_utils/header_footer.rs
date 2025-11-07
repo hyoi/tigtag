@@ -174,41 +174,43 @@ impl AddTextBlock for EntityCommands<'_>
 pub fn adjust_header_footer_layout(
     window: Single<&Window>,
     option_camera: Option<Single<&Camera, With<IsDefaultUiCamera>>>,
-    mut headder_footer_layout_node: Single<
-        &mut Node,
-        With<header_footer::LayoutNode>,
-    >,
+    mut headder_footer_layout_node: Single<&mut Node, With<LayoutNode>>,
+    mut local_logical_viewport: Local<Rect>,
 ) -> Result
 {
-    // 準備
-    let Some(camera) = option_camera
-    else
+    // カメラにviewportがセットされているなら
+    if let Some(camera) = option_camera
+        && let Some(rect) = camera.logical_viewport_rect()
     {
-        return Ok(());
-    };
-
-    // 全画面なら
-    if matches!(window.mode, WindowMode::BorderlessFullscreen(_))
-    {
-        // モニタの縦横がウィンドウの各辺より長いなら
-        if let Some(rect) = camera.logical_viewport_rect()
-            && (rect.width() > SCREEN_PIXELS_WIDTH
-                || rect.height() > SCREEN_PIXELS_HEIGHT)
+        // viewportが変化したなら
+        if rect != *local_logical_viewport
         {
-            // UIの表示位置を調整する
-            let adjust_x = (rect.width() - SCREEN_PIXELS_WIDTH) * 0.5;
-            let adjust_y = (rect.height() - SCREEN_PIXELS_HEIGHT) * 0.5;
-            headder_footer_layout_node.left = Val::Px(adjust_x);
-            headder_footer_layout_node.top = Val::Px(adjust_y);
+            // viewportの変化検知用に現在の値を保存する
+            *local_logical_viewport = rect;
+
+            // window.modeが全画面なら
+            if matches!(window.mode, WindowMode::BorderlessFullscreen(_))
+            {
+                // viewportの縦または横が、ウィンドウ各辺の設定より長いなら
+                if rect.width() > SCREEN_PIXELS_WIDTH
+                    || rect.height() > SCREEN_PIXELS_HEIGHT
+                {
+                    // UIの表示位置（top、left）を調整する
+                    let adjust_x = (rect.width() - SCREEN_PIXELS_WIDTH) * 0.5;
+                    let adjust_y = (rect.height() - SCREEN_PIXELS_HEIGHT) * 0.5;
+                    headder_footer_layout_node.left = Val::Px(adjust_x);
+                    headder_footer_layout_node.top = Val::Px(adjust_y);
+                }
+            }
+            // 全画面以外の時、調整値が設定されていたなら
+            else if headder_footer_layout_node.left != Val::Auto
+                || headder_footer_layout_node.top != Val::Auto
+            {
+                // 調整値をクリアする
+                headder_footer_layout_node.left = Val::Auto;
+                headder_footer_layout_node.top = Val::Auto;
+            }
         }
-    }
-    // 全画面以外で調整値が設定されているなら
-    else if headder_footer_layout_node.left != Val::Auto
-        || headder_footer_layout_node.top != Val::Auto
-    {
-        // 調整値をクリアする
-        headder_footer_layout_node.left = Val::Auto;
-        headder_footer_layout_node.top = Val::Auto;
     }
 
     Ok(())
