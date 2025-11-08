@@ -36,16 +36,26 @@ impl Plugin for Schedule
                     (
                         // アプリの終了
                         appctrl_input::send_exit_app_message,
-                        // 全画面切替（window.mode変更）
-                        appctrl_input::toggle_fullscreen,
-                        // スケールファクターを再計算して設定
-                        appctrl_input::update_scale_factor
-                            .after(appctrl_input::toggle_fullscreen)
-                            .run_if(any_match_filter::<Changed<Window>>),
-                        // ヘッダー／フッターの位置ずれを調整する
-                        header_footer::adjust_header_footer_layout
-                            .after(appctrl_input::toggle_fullscreen)
-                            .run_if(any_match_filter::<Changed<Window>>),
+                        // 全画面切替関係
+                        (
+                            // window.mode変更
+                            appctrl_input::toggle_fullscreen,
+                            // スケールファクター他を計算して設定
+                            appctrl_input::update_scale_factor
+                                .run_if(any_match_filter::<Changed<Window>>),
+                            // ヘッダー／フッターの位置ずれを調整する
+                            header_footer::adjust_header_footer_layout
+                                .run_if(
+                                    resource_changed::<appctrl_input::ScaleFactor>,
+                                ),
+                            // for Debug
+                            dbg_show_resource_scale_factor
+                                .run_if(
+                                    resource_changed::<appctrl_input::ScaleFactor>,
+                                )
+                                .run_if(misc::DEBUG),
+                        )
+                            .chain(),
                     )
                         .in_set(execution_order::Before::HitAnyKey)
                         .run_if(not(misc::WASM)), // WASMでは実行しない
@@ -337,6 +347,30 @@ fn check_loading_done(
 
     // ローディング完了を通知
     message_assets_all_loaded.write(AssetsAllLoaded);
+
+    Ok(())
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// for Debug
+fn dbg_show_resource_scale_factor(
+    scale_factor: Res<appctrl_input::ScaleFactor>,
+    window: Single<&Window>,
+    mut local_scale_factor: Local<appctrl_input::ScaleFactor>,
+) -> Result
+{
+    if *scale_factor != *local_scale_factor
+    {
+        dbg!("===[ここから]==============");
+        dbg!(window.mode);
+        dbg!(&window.resolution);
+        dbg!(&scale_factor);
+        dbg!(SCREEN_PIXELS_WIDTH, SCREEN_PIXELS_HEIGHT);
+        dbg!("===[ここまで]==============");
+
+        *local_scale_factor = *scale_factor;
+    }
 
     Ok(())
 }

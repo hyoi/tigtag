@@ -190,39 +190,39 @@ pub fn toggle_fullscreen(
 
 //------------------------------------------------------------------------------
 
-// 全画面時にCurrentモニターのスケールファクターを保存するResource
+// 全画面時にCurrentモニターのスケールファクター他を保存するResource
 #[derive(Resource, Default, Debug, PartialEq, Clone, Copy)]
-pub struct ScaleFactor(pub Option<f32>); // default: ScaleFactor(None) -> Windowed
+pub struct ScaleFactor(pub Option<(f32, Vec2, Vec2)>); // default: ScaleFactor(None) -> Windowed
 
-// 解像度変更を検知してスケールファクターを再計算し、設定変更とResource更新を行う
+// 解像度変更を検知してスケールファクター他を計算し、変更とResource更新を行う
 pub fn update_scale_factor(
     mut window: Single<&mut Window>,
+    option_camera: Option<Single<&Camera, With<IsDefaultUiCamera>>>,
     option_scale_factor: Option<ResMut<ScaleFactor>>,
     mut local_resolution: Local<(u32, u32)>,
+    mut local_logical_viewport: Local<Rect>,
 ) -> Result
 {
     // 準備
-    let mut scale_factor = option_scale_factor.ok_or("Resource not found.")?;
+    let mut res_scale_factor = option_scale_factor.ok_or("Resource not found.")?;
 
-    // スケールファクターの算出用にCurrentモニターの解像度を取得する
-    // Note: window.modeが変更され後、1フレーム待たないとCurrentモニターの解像度を
-    //       取得できない。window.resolutionの更新に1フレーム必要らしい
-    let width = window.resolution.physical_width();
-    let height = window.resolution.physical_height();
+    // モニター解像度を取得する
+    let reso_width = window.resolution.physical_width();
+    let reso_height = window.resolution.physical_height();
 
-    // window.modeの変更がwindow.resolutionに反映されたなら
-    if local_resolution.0 != width || local_resolution.1 != height
+    // モニター解像度が変化したなら（おそらくwindow.mode変更から1フレーム遅れる）
+    if (reso_width, reso_height) != *local_resolution
     {
-        // window.resolutionの変化検出用に現在の値を記録する
-        *local_resolution = (width, height);
+        // モニター解像度の変化検出用に現在の値を記録する
+        *local_resolution = (reso_width, reso_height);
 
         // window.modeが全画面なら
         if matches!(window.mode, WindowMode::BorderlessFullscreen(_))
         {
-            // Currentモニターとウィンドウの縦・横の長さからスケールファクターを決める
-            let scale_width = width as f32 / SCREEN_PIXELS_WIDTH;
-            let scale_height = height as f32 / SCREEN_PIXELS_HEIGHT;
-            let scale = if scale_width < scale_height
+            // モニター解像度とウィンドウサイズからスケールファクターを決める
+            let scale_width = reso_width as f32 / SCREEN_PIXELS_WIDTH;
+            let scale_height = reso_height as f32 / SCREEN_PIXELS_HEIGHT;
+            let scale_facter = if scale_width < scale_height
             {
                 scale_width
             }
@@ -231,15 +231,39 @@ pub fn update_scale_factor(
                 scale_height
             };
 
-            // スケールファクターのセットとResourceの更新
-            window.resolution.set_scale_factor(scale);
-            *scale_factor = ScaleFactor(Some(scale));
+            // viewportの位置ずれ調整用の値を記録する
+            let viewport_adjuster = Vec2::new(
+                reso_width as f32 - SCREEN_PIXELS_WIDTH * scale_facter,
+                reso_height as f32 - SCREEN_PIXELS_HEIGHT * scale_facter,
+            ) * 0.5;
+
+            // スケールファクターを設定しResourceを更新
+            window.resolution.set_scale_factor(scale_facter);
+            *res_scale_factor =
+                ScaleFactor(Some((scale_facter, Vec2::ZERO, viewport_adjuster)));
         }
         else
         {
-            // スケールファクターの解除とResourceの更新
+            // スケールファクターを解除しResourceを更新
             window.resolution.set_scale_factor(1.0);
-            *scale_factor = ScaleFactor(None);
+            *res_scale_factor = ScaleFactor(None);
+        }
+    }
+
+    // カメラのviewportが変化したなら（おそらくスケールファクター変更から1フレーム遅れる）
+    if let Some(camera) = option_camera
+        && let Some(logical_viewport_rect) = camera.logical_viewport_rect()
+        && logical_viewport_rect != *local_logical_viewport
+    {
+        // viewportのサイズの変化検出用に現在の値を記録する
+        *local_logical_viewport = logical_viewport_rect;
+
+        // Resourceを更新
+        if let ScaleFactor(Some((_, ui_adjuster, _))) = &mut *res_scale_factor
+        {
+            let x = (logical_viewport_rect.max.x - SCREEN_PIXELS_WIDTH) * 0.5;
+            let y = (logical_viewport_rect.max.y - SCREEN_PIXELS_HEIGHT) * 0.5;
+            *ui_adjuster = Vec2::new(x, y);
         }
     }
 

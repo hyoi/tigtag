@@ -170,47 +170,34 @@ impl AddTextBlock for EntityCommands<'_>
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// 全画面時にヘッダー／フッターの位置を画面中央に寄せる
+// 全画面時にヘッダー／フッターの位置を構成して画面中央に寄せる
 pub fn adjust_header_footer_layout(
     window: Single<&Window>,
-    option_camera: Option<Single<&Camera, With<IsDefaultUiCamera>>>,
     mut headder_footer_layout_node: Single<&mut Node, With<LayoutNode>>,
-    mut local_logical_viewport: Local<Rect>,
+    option_scale_factor: Option<Res<appctrl_input::ScaleFactor>>,
 ) -> Result
 {
-    // カメラにviewportがセットされているなら
-    if let Some(camera) = option_camera
-        && let Some(rect) = camera.logical_viewport_rect()
-    {
-        // viewportが変化したなら
-        if rect != *local_logical_viewport
-        {
-            // viewportの変化検知用に現在の値を保存する
-            *local_logical_viewport = rect;
+    // 準備
+    let res_scale_factor = option_scale_factor.ok_or("Resource not found.")?;
 
-            // window.modeが全画面なら
-            if matches!(window.mode, WindowMode::BorderlessFullscreen(_))
-            {
-                // viewportの縦または横が、ウィンドウ各辺の設定より長いなら
-                if rect.width() > SCREEN_PIXELS_WIDTH
-                    || rect.height() > SCREEN_PIXELS_HEIGHT
-                {
-                    // UIの表示位置（top、left）を調整する
-                    let adjust_x = (rect.width() - SCREEN_PIXELS_WIDTH) * 0.5;
-                    let adjust_y = (rect.height() - SCREEN_PIXELS_HEIGHT) * 0.5;
-                    headder_footer_layout_node.left = Val::Px(adjust_x);
-                    headder_footer_layout_node.top = Val::Px(adjust_y);
-                }
-            }
-            // 全画面以外の時、調整値が設定されていたなら
-            else if headder_footer_layout_node.left != Val::Auto
-                || headder_footer_layout_node.top != Val::Auto
-            {
-                // 調整値をクリアする
-                headder_footer_layout_node.left = Val::Auto;
-                headder_footer_layout_node.top = Val::Auto;
-            }
+    // カメラにviewportがセットされているなら
+    if let appctrl_input::ScaleFactor(Some((_, ui_adjuster, _))) = *res_scale_factor
+    {
+        // window.modeが全画面なら
+        if matches!(window.mode, WindowMode::BorderlessFullscreen(_))
+        {
+            // UIの表示位置（top、left）を調整する
+            headder_footer_layout_node.left = Val::Px(ui_adjuster.x);
+            headder_footer_layout_node.top = Val::Px(ui_adjuster.y);
         }
+    }
+    // 全画面以外の時、調整値が設定されていたなら
+    else if headder_footer_layout_node.left != Val::Auto
+        || headder_footer_layout_node.top != Val::Auto
+    {
+        // 調整値をクリアする
+        headder_footer_layout_node.left = Val::Auto;
+        headder_footer_layout_node.top = Val::Auto;
     }
 
     Ok(())
