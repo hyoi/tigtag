@@ -30,8 +30,8 @@ macros.workspace = true
 #bevy = { git = "https://github.com/bevyengine/bevy", tag = "v0.15.0-rc.3", features = [
 #bevy = { git = "https://github.com/bevyengine/bevy", branch = "release-0.14.0", features = [
 
-bevy = { version = "=0.18.0-rc.2", features = ["bevy_ui_debug"] }
-#bevy = { version = "0.18", features = ["bevy_ui_debug"] }
+#bevy = { version = "=0.18.0-rc.2", features = ["bevy_ui_debug"] }
+bevy = { version = "0.18", features = ["bevy_ui_debug"] }
 
 #依存するその他のcrate
 rand = "0.9"
