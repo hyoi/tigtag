@@ -1,48 +1,72 @@
 // external crates
 use bevy::{
     prelude::*,
-    ecs::{error::warn, system::SystemParam, component::Mutable},
-    window::{EnabledButtons, WindowMode},
-    log::LogPlugin,
-    diagnostic::{FrameTimeDiagnosticsPlugin, DiagnosticsStore},
-    color::palettes::*,
-    asset::{LoadedUntypedAsset, LoadState},
-    camera::Viewport,
-    input::{
-        keyboard::NativeKeyCode,
-        gamepad::GamepadInput,
-        mouse::{MouseMotion, MouseWheel},
+    window::{WindowMode, EnabledButtons},
+    render::{
+        RenderPlugin,
+        settings::{Backends, RenderCreation, WgpuSettings},
     },
-    audio::Volume,
-    platform::collections::{HashMap, HashSet},
+    log::{LogPlugin, Level},
+    diagnostic::{FrameTimeDiagnosticsPlugin/*, DiagnosticsStore*/},
+    ecs::{error::warn/*, system::SystemParam, component::Mutable*/},
+    // color::palettes::*,
+    // asset::{LoadedUntypedAsset, LoadState},
+    // camera::Viewport,
+    // input::{
+    //     keyboard::NativeKeyCode,
+    //     gamepad::GamepadInput,
+    //     mouse::{MouseMotion, MouseWheel},
+    // },
+    // audio::Volume,
+    // platform::collections::{HashMap, HashSet},
 };
-use rand::prelude::*;
+use const_format::formatcp;
+// use rand::prelude::*;
 
 // standard library
-use std::{
-    slice::Iter,
-    ops::{Range, Deref, DerefMut, Add, AddAssign},
-    f32::consts::{TAU, PI},
-    collections::VecDeque,
-    sync::LazyLock,
-};
+// use std::{
+//     // slice::Iter,
+//     // ops::{Range, Deref, DerefMut, Add, AddAssign},
+//     // f32::consts::{TAU, PI},
+//     // collections::VecDeque,
+//     // sync::LazyLock,
+// };
 
 // internal submodules
-mod core_logic; // ゲームロジック
+mod config; // 設定ファイル
+use config::common::*;
 
-mod my_utils; // 共通ライブラリ
-use my_utils::prelude::*;
+// mod my_plugins; // 自作のプラグイン
+// use my_plugins::common::*;
 
-mod config; // 設定各種
-use config::prelude::*;
+// mod my_utils; // 共通ライブラリ
+// use my_utils::common::*;
 
-mod demo_play; // demoロジック
+// mod core_logic; // アプリ本体
+// use core_logic::common::*;
 
-// proc-macro
-use macros::MyState;
-use macros::derive_appctrl_input;
-use macros::{OverlayMessage, Blinking, CountDown};
-use macros::{OverlayMenu, ScalingItem};
+// mod core_logic; // ゲームロジック
+
+// mod my_utils; // 共通ライブラリ
+// use my_utils::prelude::*;
+
+// mod config; // 設定各種
+// use config::prelude::*;
+
+// mod demo_play; // demoロジック
+
+// // proc-macro
+// use macros::MyState;
+// use macros::derive_appctrl_input;
+// use macros::{OverlayMessage, Blinking, CountDown};
+// use macros::{OverlayMenu, ScalingItem};
+
+////////////////////////////////////////////////////////////////////////////////
+
+// アプリの情報
+const APP_TITLE: &str = "TigTag"; // env!("CARGO_PKG_NAME");
+const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
+const APP_COPYRIGHT: &str = "hyoi 2021-2026";
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -50,11 +74,52 @@ use macros::{OverlayMenu, ScalingItem};
 fn main() -> AppExit
 {
     // アプリの生成
-    App::new()
-        // メインスケジュール
-        .add_plugins(core_logic::Schedule)
-        // アプリ実行
-        .run()
+    let mut application = App::new();
+
+    // 準備
+    application
+        // first party plugins
+        .add_plugins((
+            DefaultPlugins
+                .set(WindowPlugin::initialize()) // 主ウィンドウ初期化
+                .set(RenderPlugin::initialize(Backends::DX12)) // バックエンド切替
+                .set(ImagePlugin::default_nearest()) // ピクセルパーフェクト
+                .set(LogPlugin::initialize()), // ログ出力制御
+            FrameTimeDiagnosticsPlugin::default(), // FPS Plugin
+        ))
+        // エラーハンドラを登録
+        .set_error_handler(warn);
+
+    // 自作のプラグインの登録
+    // application.add_plugins((
+    //     // ゲームパッド接続状態の管理
+    //     controller::GamepadConnectionCheck,
+    //     // フルスクリーン処理
+    //     #[cfg(not(target_arch = "wasm32"))]
+    //     fullscreen::PluginConfig {
+    //         base_resolution: WINDOW_BASE_RESOLUTION.as_vec2(),
+    //         toggle_trigger: TRIGGER_FULLSCREEN,
+    //     },
+    //     // 各種雑多な処理
+    //     misc::PluginConfig {
+    //         app_exit_trigger: Some(TRIGGER_APP_EXIT),
+    //         ui_outline_trigger: Some(TRIGGER_UI_OUTLINE),
+    //         ..default()
+    //     },
+    // ));
+
+    // メインスケジュール
+    // application.add_plugins(core_logic::Schedule);
+
+    // アプリの実行
+    application.run()
+
+    // アプリの生成
+    // App::new()
+    //     // メインスケジュール
+    //     .add_plugins(core_logic::Schedule)
+    //     // アプリ実行
+    //     .run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
