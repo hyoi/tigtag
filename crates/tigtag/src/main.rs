@@ -36,8 +36,8 @@ use const_format::formatcp;
 mod config; // 設定ファイル
 use config::common::*;
 
-// mod my_plugins; // 自作のプラグイン
-// use my_plugins::common::*;
+mod my_plugins; // 自作のプラグイン
+use my_plugins::common::*;
 
 // mod my_utils; // 共通ライブラリ
 // use my_utils::common::*;
@@ -91,22 +91,23 @@ fn main() -> AppExit
         .set_error_handler(warn);
 
     // 自作のプラグインの登録
-    // application.add_plugins((
-    //     // ゲームパッド接続状態の管理
-    //     controller::GamepadConnectionCheck,
-    //     // フルスクリーン処理
-    //     #[cfg(not(target_arch = "wasm32"))]
-    //     fullscreen::PluginConfig {
-    //         base_resolution: WINDOW_BASE_RESOLUTION.as_vec2(),
-    //         toggle_trigger: TRIGGER_FULLSCREEN,
-    //     },
-    //     // 各種雑多な処理
-    //     misc::PluginConfig {
-    //         app_exit_trigger: Some(TRIGGER_APP_EXIT),
-    //         ui_outline_trigger: Some(TRIGGER_UI_OUTLINE),
-    //         ..default()
-    //     },
-    // ));
+    application.add_plugins((
+        // ゲームパッド接続状態の管理
+        controller::GamepadConnectionCheck,
+        // フルスクリーン処理
+        #[cfg(not(target_arch = "wasm32"))]
+        fullscreen::PluginConfig {
+            base_resolution: WINDOW_BASE_RESOLUTION.as_vec2(),
+            toggle_trigger: TRIGGER_FULLSCREEN,
+        },
+        // 各種雑多な処理
+        #[allow(clippy::needless_update)]
+        misc::PluginConfig {
+            app_exit_trigger: Some(TRIGGER_APP_EXIT),
+            ui_outline_trigger: Some(TRIGGER_UI_OUTLINE),
+            ..default()
+        },
+    ));
 
     // メインスケジュール
     // application.add_plugins(core_logic::Schedule);

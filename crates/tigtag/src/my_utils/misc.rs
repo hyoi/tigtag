@@ -12,10 +12,10 @@ pub mod prelude
     pub use super::execution_order;
 
     // 修飾キーのグループ化
-    use KeyCode::*;
-    pub const MODIFIERS_ALT: &[KeyCode] = &[AltLeft, AltRight];
-    pub const MODIFIERS_CTRL: &[KeyCode] = &[ControlLeft, ControlRight];
-    pub const MODIFIERS_SHIFT: &[KeyCode] = &[ShiftLeft, ShiftRight];
+    // use KeyCode::*;
+    // pub const MODIFIERS_ALT: &[KeyCode] = &[AltLeft, AltRight];
+    // pub const MODIFIERS_CTRL: &[KeyCode] = &[ControlLeft, ControlRight];
+    // pub const MODIFIERS_SHIFT: &[KeyCode] = &[ShiftLeft, ShiftRight];
 
     // Gridに関連する定数
     pub const GRIDS_X_RANGE: Range<i32> = 0..SCREEN_GRIDS_WIDTH;

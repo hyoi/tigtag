@@ -76,54 +76,54 @@ impl MyState
 ////////////////////////////////////////////////////////////////////////////////
 
 // アプリ終了のキーとボタンの設定
-impl Default for appctrl_input::ExitAppInput
-{
-    fn default() -> Self
-    {
-        Self {
-            keys: vec![
-                (KeyCode::Escape, None),
-                (KeyCode::F4, Some(Vec::from(MODIFIERS_ALT))),
-            ],
-            buttons: vec![
-                GamepadButton::Mode, //ps4[PSボタン]
-            ],
-        }
-    }
-}
+// impl Default for appctrl_input::ExitAppInput
+// {
+//     fn default() -> Self
+//     {
+//         Self {
+//             keys: vec![
+//                 (KeyCode::Escape, None),
+//                 (KeyCode::F4, Some(Vec::from(MODIFIERS_ALT))),
+//             ],
+//             buttons: vec![
+//                 GamepadButton::Mode, //ps4[PSボタン]
+//             ],
+//         }
+//     }
+// }
 
 //------------------------------------------------------------------------------
 
 // 全画面切替のキーとボタンの設定
-impl Default for appctrl_input::FullScreenToggleInput
-{
-    fn default() -> Self
-    {
-        Self {
-            keys: vec![
-                (KeyCode::Enter, Some(Vec::from(MODIFIERS_ALT))),
-                (KeyCode::F11, None),
-            ],
-            buttons: vec![
-                GamepadButton::Select, //ps4[SHARE]
-            ],
-        }
-    }
-}
+// impl Default for appctrl_input::FullScreenToggleInput
+// {
+//     fn default() -> Self
+//     {
+//         Self {
+//             keys: vec![
+//                 (KeyCode::Enter, Some(Vec::from(MODIFIERS_ALT))),
+//                 (KeyCode::F11, None),
+//             ],
+//             buttons: vec![
+//                 GamepadButton::Select, //ps4[SHARE]
+//             ],
+//         }
+//     }
+// }
 
 //------------------------------------------------------------------------------
 
 // UI outlineの表示／非表示を切替えるキー
-impl Default for appctrl_input::UiOutlineToggleInput
-{
-    fn default() -> Self
-    {
-        Self {
-            keys: vec![(KeyCode::Tab, Some(Vec::from(MODIFIERS_CTRL)))],
-            buttons: vec![],
-        }
-    }
-}
+// impl Default for appctrl_input::UiOutlineToggleInput
+// {
+//     fn default() -> Self
+//     {
+//         Self {
+//             keys: vec![(KeyCode::Tab, Some(Vec::from(MODIFIERS_CTRL)))],
+//             buttons: vec![],
+//         }
+//     }
+// }
 
 ///////////////////////////////////////////////////////////////////////////////
 
