@@ -9,6 +9,7 @@ use bevy::{
     log::{LogPlugin, Level},
     diagnostic::{FrameTimeDiagnosticsPlugin /*, DiagnosticsStore*/},
     ecs::{error::warn /*, system::SystemParam, component::Mutable*/},
+    audio::Volume,
     // color::palettes::*,
     // asset::{LoadedUntypedAsset, LoadState},
     // camera::Viewport,
@@ -17,7 +18,6 @@ use bevy::{
     //     gamepad::GamepadInput,
     //     mouse::{MouseMotion, MouseWheel},
     // },
-    // audio::Volume,
     // platform::collections::{HashMap, HashSet},
 };
 use const_format::formatcp;

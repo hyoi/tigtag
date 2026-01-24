@@ -12,12 +12,11 @@ impl Plugin for Schedule
         // Stateの初期化とアセットの事前ロード
         application
             .insert_state(MyState::LoadAssets) // Stateの初期化
-            // .add_plugins(load_assets::Schedule {
-            //     in_state: MyState::LoadAssets, // 事前ロードを実行するState
-            //     next_state: MyState::Initialize, // 事前ロード完了後の遷移先State
-            //     target_assets: PRELOAD_ASSETS, // ロード対象のリスト
-            // })
-            ;
+            .add_plugins(load_assets::Schedule {
+                in_state: MyState::LoadAssets, // 事前ロードを実行するState
+                next_state: MyState::Initialize, // 事前ロード完了後の遷移先State
+                target_assets: PRELOAD_ASSETS, // ロード対象のリスト
+            });
 
         //--------------------------------------------------------------------------
         // 各種登録
