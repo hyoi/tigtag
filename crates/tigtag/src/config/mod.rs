@@ -5,7 +5,7 @@ use super::*;
 // サブモジュール（pub modしない）
 mod initialize; // アプリの初期化
 mod input; // 入力処理の設定
-// mod state; // 状態管理の設定
+mod state; // 状態管理の設定
 // mod assets; // アセットファイル関係
 // mod camera; // カメラの設定
 
@@ -18,7 +18,7 @@ pub mod common
     // サブモジュール名を不要にしたい識別子はpub useする
     pub use super::initialize::common::*;
     pub use super::input::*;
-    // pub use super::state::*;
+    pub use super::state::*;
     // pub use super::assets::*;
     // pub use super::camera::*;
 }

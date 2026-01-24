@@ -42,21 +42,14 @@ use my_plugins::common::*;
 mod core_logic; // アプリ本体
 use core_logic::common::*;
 
+// mod demo_play; // demoロジック
+
 // mod my_utils; // 共通ライブラリ
 // use my_utils::common::*;
 
-// mod core_logic; // ゲームロジック
+// proc-macro
+use macros::MyState;
 
-// mod my_utils; // 共通ライブラリ
-// use my_utils::prelude::*;
-
-// mod config; // 設定各種
-// use config::prelude::*;
-
-// mod demo_play; // demoロジック
-
-// // proc-macro
-// use macros::MyState;
 // use macros::derive_appctrl_input;
 // use macros::{OverlayMessage, Blinking, CountDown};
 // use macros::{OverlayMenu, ScalingItem};

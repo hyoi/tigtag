@@ -8,33 +8,44 @@ impl Plugin for Schedule
 {
     fn build(&self, application: &mut App)
     {
+        //----------------------------------------------------------------------
+        // Stateの初期化とアセットの事前ロード
+        application
+            .insert_state(MyState::LoadAssets) // Stateの初期化
+            // .add_plugins(load_assets::Schedule {
+            //     in_state: MyState::LoadAssets, // 事前ロードを実行するState
+            //     next_state: MyState::Initialize, // 事前ロード完了後の遷移先State
+            //     target_assets: PRELOAD_ASSETS, // ロード対象のリスト
+            // })
+            ;
+
         //--------------------------------------------------------------------------
         // 各種登録
-        application
-            // スケジュールの追加
-            // .add_plugins(init_app::Schedule { next: MyState::Initialize } ) // アプリ初期化とアセットロード
-            // .add_plugins(demo_play::Schedule)                               // デモプレイ
-            // .add_plugins(overlay_ui::pause_menu::Schedule)                  // Pauseメニュー
+        // application
+        //     // スケジュールの追加
+        //     // .add_plugins(init_app::Schedule { next: MyState::Initialize } ) // アプリ初期化とアセットロード
+        //     // .add_plugins(demo_play::Schedule)                               // デモプレイ
+        //     // .add_plugins(overlay_ui::pause_menu::Schedule)                  // Pauseメニュー
 
-            // Resourceの登録
-            // .init_resource::<CameraSettings>()                  // カメラの設定を登録
-            // .init_resource::<Record>()                          // ゲームの成績
-            // .init_resource::<map::Map>()                        // ステージのマップ
-            // .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
-            // .insert_resource(handle_input::MappingKeyboard::from(KEYBOARD_MAP)) // マッピング
-            // .insert_resource(handle_input::MappingGamepad::from(GAMEPAD_MAP))   // マッピング
+        //     // Resourceの登録
+        //     // .init_resource::<CameraSettings>()                  // カメラの設定を登録
+        //     // .init_resource::<Record>()                          // ゲームの成績
+        //     // .init_resource::<map::Map>()                        // ステージのマップ
+        //     // .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
+        //     // .insert_resource(handle_input::MappingKeyboard::from(KEYBOARD_MAP)) // マッピング
+        //     // .insert_resource(handle_input::MappingGamepad::from(GAMEPAD_MAP))   // マッピング
 
-            // Messageの登録
-            // .add_message::<misc::AnyButtonPressed>() //「Hit Any Key」の入力通知
-            // .add_message::<SkipOverlayMessage>()     // 全画面メッセージ表示のスキップに使用
-            // .add_message::<CountDownEnded>()         // カウントダウンの終了通知
-            // .add_message::<handle_input::MessUserAction>() // デバイスからの入力
-            // .add_message::<DotsAllEaten >()          // ステージクリアの伝達用
-            // .add_message::<DotEaten>()               // スコアリングの伝達用
-            // .add_message::<PlayerCaught>()           // ゲームオーバーの伝達用
-            // .add_message::<PlayerPositionAdjusted>() // プレイヤーの位置補正の伝達用
-            // .add_message::<ChaserPositionAdjusted>() // チェイサーの位置補正の伝達用
-            ;
+        //     // Messageの登録
+        //     // .add_message::<misc::AnyButtonPressed>() //「Hit Any Key」の入力通知
+        //     // .add_message::<SkipOverlayMessage>()     // 全画面メッセージ表示のスキップに使用
+        //     // .add_message::<CountDownEnded>()         // カウントダウンの終了通知
+        //     // .add_message::<handle_input::MessUserAction>() // デバイスからの入力
+        //     // .add_message::<DotsAllEaten >()          // ステージクリアの伝達用
+        //     // .add_message::<DotEaten>()               // スコアリングの伝達用
+        //     // .add_message::<PlayerCaught>()           // ゲームオーバーの伝達用
+        //     // .add_message::<PlayerPositionAdjusted>() // プレイヤーの位置補正の伝達用
+        //     // .add_message::<ChaserPositionAdjusted>() // チェイサーの位置補正の伝達用
+        //     ;
 
         //--------------------------------------------------------------------------
         // 初期化（MyState::Initialize）

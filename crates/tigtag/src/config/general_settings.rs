@@ -52,17 +52,17 @@ pub const MAP_HEIGHT_IN_CELLS: i32 = SCREEN_GRIDS_HEIGHT - 2; // h <= SCREEN_GRI
 ////////////////////////////////////////////////////////////////////////////////
 
 // ゲームの状態
-#[rustfmt::skip]
-#[allow(dead_code)]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States, MyState)]
-pub enum MyState
-{
-    #[default] LoadAssets,
-    Initialize,
-    TitleDemo, DemoLoop,
-    StageStart, MainLoop, StageClear, GameOver,
-    Pause,
-}
+// #[rustfmt::skip]
+// #[allow(dead_code)]
+// #[derive(Clone, Copy, Eq, PartialEq, Hash, Debug, Default, States, MyState)]
+// pub enum MyState
+// {
+//     #[default] LoadAssets,
+//     Initialize,
+//     TitleDemo, DemoLoop,
+//     StageStart, MainLoop, StageClear, GameOver,
+//     Pause,
+// }
 
 // ゲームの状態の判定
 #[rustfmt::skip]
