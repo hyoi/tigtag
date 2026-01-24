@@ -3,7 +3,8 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////
 
 // ログフィルター
-const LOG_FILTER_DEVELOP: &str = formatcp!("warn,wgpu_hal=error,{}=info", env!("CARGO_PKG_NAME"));
+const LOG_FILTER_DEVELOP: &str =
+    formatcp!("warn,wgpu_hal=error,{}=info", env!("CARGO_PKG_NAME"));
 const LOG_FILTER_RELEASE: &str = "error";
 
 // LogPluginの初期化
