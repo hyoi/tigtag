@@ -19,6 +19,7 @@ attach_viewport = [] #cameraにviewportをセットするコンパイルスイ�
 
 [dependencies]
 bevy.workspace = true
+const_format.workspace = true
 rand.workspace = true
 getrandom.workspace = true
 chrono.workspace = true
@@ -40,6 +41,7 @@ bevy = { version = "0.18", default-features = false, features = [
 ] }
 
 #依存するその他のcrate
+const_format = "0.2"
 rand = "0.9"
 getrandom = { version = "0.3", features = [ "wasm_js" ] } #wasmコンパイル時のエラー対策
 chrono = "0.4"
