@@ -39,11 +39,11 @@ use config::common::*;
 mod my_plugins; // 自作のプラグイン
 use my_plugins::common::*;
 
+mod core_logic; // アプリ本体
+use core_logic::common::*;
+
 // mod my_utils; // 共通ライブラリ
 // use my_utils::common::*;
-
-// mod core_logic; // アプリ本体
-// use core_logic::common::*;
 
 // mod core_logic; // ゲームロジック
 
@@ -110,17 +110,10 @@ fn main() -> AppExit
     ));
 
     // メインスケジュール
-    // application.add_plugins(core_logic::Schedule);
+    application.add_plugins(core_logic::Schedule);
 
     // アプリの実行
     application.run()
-
-    // アプリの生成
-    // App::new()
-    //     // メインスケジュール
-    //     .add_plugins(core_logic::Schedule)
-    //     // アプリ実行
-    //     .run()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
