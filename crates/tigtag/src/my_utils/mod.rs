@@ -22,7 +22,6 @@ pub mod common
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// pub mod appctrl_input; // アプリの汎用的な操作
 // pub mod header_footer; // シンプルヘッダー＆フッター
 // pub mod handle_input; // 入力処理
 // pub mod orbit_camera; // 球座標カメラ
@@ -31,7 +30,6 @@ pub mod common
 // #[allow(unused_imports)]
 // pub mod prelude
 // {
-//     // pub use super::appctrl_input;
 //     // pub use super::header_footer;
 
 //     // pub use super::handle_input;
