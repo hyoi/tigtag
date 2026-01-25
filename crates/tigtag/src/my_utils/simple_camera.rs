@@ -1,4 +1,8 @@
-use super::*;
+// external crates
+use bevy::prelude::*;
+
+// standard library
+use std::ops::{Deref, DerefMut};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -64,7 +68,6 @@ where
             Camera {
                 order,
                 clear_color: color.into(),
-                viewport: gen_viewport(),
                 ..default()
             },
             transform,
@@ -81,24 +84,6 @@ where
 // {
 //     fn clone(&self) -> Self { Setting(self.0, self.1, self.2.clone_box(), self.3) }
 // }
-
-////////////////////////////////////////////////////////////////////////////////
-
-// タイトルバーWクリックや最大化ボタンによるウィンドウ最大化、および
-// WASMでCanvasへのfit(最大化)を設定した場合に表示が崩れることがある。
-// それを緩和するためカメラにviewportを設定する場合に使う
-fn gen_viewport() -> Option<Viewport>
-{
-    match ATTACH_VIEWPORT()
-    {
-        true => Some(Viewport {
-            physical_position: UVec2::ZERO,
-            physical_size: SCREEN_PIXELS_RESO,
-            ..default()
-        }),
-        _ => None,
-    }
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 

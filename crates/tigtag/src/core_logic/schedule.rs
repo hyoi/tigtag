@@ -18,55 +18,55 @@ impl Plugin for Schedule
                 target_assets: PRELOAD_ASSETS, // ロード対象のリスト
             });
 
-        //--------------------------------------------------------------------------
+        //----------------------------------------------------------------------
         // 各種登録
-        // application
-        //     // スケジュールの追加
-        //     // .add_plugins(init_app::Schedule { next: MyState::Initialize } ) // アプリ初期化とアセットロード
-        //     // .add_plugins(demo_play::Schedule)                               // デモプレイ
-        //     // .add_plugins(overlay_ui::pause_menu::Schedule)                  // Pauseメニュー
+        application
+            // スケジュールの追加
+            // .add_plugins(demo_play::Schedule)              // デモプレイ
+            // .add_plugins(overlay_ui::pause_menu::Schedule) // Pauseメニュー
 
-        //     // Resourceの登録
-        //     // .init_resource::<CameraSettings>()                  // カメラの設定を登録
-        //     // .init_resource::<Record>()                          // ゲームの成績
-        //     // .init_resource::<map::Map>()                        // ステージのマップ
-        //     // .init_resource::<misc::MaskHitAnyKeyInput>()        // 「Hit Any Key」の入力マスク
-        //     // .insert_resource(handle_input::MappingKeyboard::from(KEYBOARD_MAP)) // マッピング
-        //     // .insert_resource(handle_input::MappingGamepad::from(GAMEPAD_MAP))   // マッピング
+            // Resourceの登録
+            .init_resource::<CameraSettings>()           // カメラの設定を登録
+            // .init_resource::<Record>()                   // ゲームの成績
+            // .init_resource::<map::Map>()                 // ステージのマップ
+            // .init_resource::<misc::MaskHitAnyKeyInput>() // 「Hit Any Key」の入力マスク
+            // .insert_resource(handle_input::MappingKeyboard::from(KEYBOARD_MAP)) // マッピング
+            // .insert_resource(handle_input::MappingGamepad::from(GAMEPAD_MAP))   // マッピング
 
-        //     // Messageの登録
-        //     // .add_message::<misc::AnyButtonPressed>() //「Hit Any Key」の入力通知
-        //     // .add_message::<SkipOverlayMessage>()     // 全画面メッセージ表示のスキップに使用
-        //     // .add_message::<CountDownEnded>()         // カウントダウンの終了通知
-        //     // .add_message::<handle_input::MessUserAction>() // デバイスからの入力
-        //     // .add_message::<DotsAllEaten >()          // ステージクリアの伝達用
-        //     // .add_message::<DotEaten>()               // スコアリングの伝達用
-        //     // .add_message::<PlayerCaught>()           // ゲームオーバーの伝達用
-        //     // .add_message::<PlayerPositionAdjusted>() // プレイヤーの位置補正の伝達用
-        //     // .add_message::<ChaserPositionAdjusted>() // チェイサーの位置補正の伝達用
-        //     ;
+            // Messageの登録
+            // .add_message::<misc::AnyButtonPressed>() //「Hit Any Key」の入力通知
+            // .add_message::<SkipOverlayMessage>()     // 全画面メッセージ表示のスキップに使用
+            // .add_message::<CountDownEnded>()         // カウントダウンの終了通知
+            // .add_message::<handle_input::MessUserAction>() // デバイスからの入力
+            // .add_message::<DotsAllEaten >()          // ステージクリアの伝達用
+            // .add_message::<DotEaten>()               // スコアリングの伝達用
+            // .add_message::<PlayerCaught>()           // ゲームオーバーの伝達用
+            // .add_message::<PlayerPositionAdjusted>() // プレイヤーの位置補正の伝達用
+            // .add_message::<ChaserPositionAdjusted>() // チェイサーの位置補正の伝達用
+            ;
 
-        //--------------------------------------------------------------------------
+        //----------------------------------------------------------------------
         // 初期化（MyState::Initialize）
-        // application
-        //     // 前処理
-        //     .add_systems(
-        //         OnEnter(MyState::Initialize),
-        //         (
-        //             // カメラのspawn
-        //             // simple_camera::spawn::<CameraSettings>,
-        //             // UIを描画するカメラの選択
-        //             // misc::set_ui_camera::<SimpleCamera2d>
-        //             //     .after(simple_camera::spawn::<CameraSettings>),
-        //             // TextUIのspawn
-        //             // header_footer::spawn, // ヘッダー／フッター
-        //             // overlay_ui::messages::spawn, //全画面メッセージ
-        //             // 無条件遷移
-        //             // misc::set_next_state(MyState::TitleDemo),
-        //         ),
-        //     );
+        application
+            // 前処理
+            .add_systems(
+                OnEnter(MyState::Initialize),
+                (
+                    // カメラのspawn
+                    simple_camera::spawn::<CameraSettings>,
+                    // UIを描画するカメラの選択
+                    // misc::set_ui_camera::<SimpleCamera2d>
+                    //     .after(simple_camera::spawn::<CameraSettings>),
+                    // TextUIのspawn
+                    // header_footer::spawn, // ヘッダー／フッター
+                    // overlay_ui::messages::spawn, //全画面メッセージ
 
-        //--------------------------------------------------------------------------
+                    // 無条件遷移
+                    set_next_state(MyState::TitleDemo),
+                ),
+            );
+
+        //----------------------------------------------------------------------
         // 常に実行する処理（Update without MyState）
         // application
         //     // ループ処理
@@ -83,7 +83,7 @@ impl Plugin for Schedule
         //         ),
         //     );
 
-        //--------------------------------------------------------------------------
+        //----------------------------------------------------------------------
         // タイトル画面の処理（MyState::TitleDemo）
         // application
         //     // 前処理
@@ -125,7 +125,7 @@ impl Plugin for Schedule
         //     //     ),
         //     // );
 
-        //--------------------------------------------------------------------------
+        //----------------------------------------------------------------------
         // ゲーム開始処理（MyState::StageStart）
         // application
         //     // 前処理
@@ -173,7 +173,7 @@ impl Plugin for Schedule
         //         ),
         //     );
 
-        // --------------------------------------------------------------------------
+        //----------------------------------------------------------------------
         // メインループ処理（MyState::MainLoop）
         // application
         //     // ループ処理
@@ -205,7 +205,7 @@ impl Plugin for Schedule
         //             .run_if(in_state(MyState::MainLoop)),
         //     );
 
-        //--------------------------------------------------------------------------
+        //----------------------------------------------------------------------
         // ステージクリアの処理（MyState::StageClear）
         // application
         //     // 前処理
@@ -241,7 +241,7 @@ impl Plugin for Schedule
         //         ),
         //     );
 
-        //--------------------------------------------------------------------------
+        //----------------------------------------------------------------------
         // ゲームオーバーの処理（MyState::GameOver）
         // application
         //     // 前処理
