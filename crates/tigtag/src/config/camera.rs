@@ -33,15 +33,13 @@ impl Default for CameraSettings
 {
     fn default() -> Self
     {
-        Self(vec![
-            simple_camera::Setting::from((
-                CAMERA_ORDER_2D,
-                CAMERA_BG_COLOR_2D,
-                SimpleCam2d,
-                Camera2d,
-                Transform::from_translation(POSITION_CAMERA_2D),
-            )),
-        ])
+        Self(vec![simple_camera::Setting::from((
+            CAMERA_ORDER_2D,
+            CAMERA_BG_COLOR_2D,
+            SimpleCam2d,
+            Camera2d,
+            Transform::from_translation(POSITION_CAMERA_2D),
+        ))])
     }
 }
 

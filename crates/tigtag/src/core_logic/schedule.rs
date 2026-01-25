@@ -57,9 +57,14 @@ impl Plugin for Schedule
                     // UIを描画するカメラの選択
                     // misc::set_ui_camera::<SimpleCamera2d>
                     //     .after(simple_camera::spawn::<CameraSettings>),
-                    // TextUIのspawn
-                    // header_footer::spawn, // ヘッダー／フッター
-                    // overlay_ui::messages::spawn, //全画面メッセージ
+
+                    // ヘッダー／フッターのspawn
+                    header_footer::spawn(
+                        HEADER_FOOTER,
+                        WINDOW_BASE_RESOLUTION.as_vec2(),
+                    ),
+                    // 全画面メッセージのspawn
+                    // overlay_ui::messages::spawn,
 
                     // 無条件遷移
                     set_next_state(MyState::TitleDemo),

@@ -1,4 +1,5 @@
-use super::*;
+// external crates
+use bevy::prelude::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -63,41 +64,49 @@ pub struct UpdateInfo(pub Option<(usize, FormatterFn)>);
 pub struct LayoutNode;
 
 // ヘッダー／フッターをspawnする
-pub fn spawn(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
+pub fn spawn(
+    header_footer: &[TextBlock],
+    resolution: Vec2,
+) -> impl FnMut(
+    Commands,         // (a)
+    Res<AssetServer>, // (b)
+)
 {
-    // 親ノード（GRIDレイアウト(3x3)）
-    let mut layout_node = cmds.spawn((
-        LayoutNode, //マーカーComponent
-        Node {
-            width: Val::Px(SCREEN_PIXELS_WIDTH),
-            height: Val::Px(SCREEN_PIXELS_HEIGHT),
-            // width: Val::Percent(100.0),
-            // height: Val::Percent(100.0),
-            display: Display::Grid, // CSSグリッドレイアウト
-            grid_template_columns: RepeatedGridTrack::fr(3, 1.0), // ３列
-            ..default()
-        },
-    ));
+    move |
+        mut cmds: Commands, // (a)
+        asset_svr: Res<AssetServer>, // (b)
+    |
+    {
+        // 親ノード（GRIDレイアウト(3x3)）
+        let mut layout_node = cmds.spawn((
+            LayoutNode, //マーカーComponent
+            Node {
+                width: Val::Px(resolution.x),
+                height: Val::Px(resolution.y),
+                display: Display::Grid, // CSSグリッドレイアウト
+                grid_template_columns: RepeatedGridTrack::fr(3, 1.0), // ３列
+                ..default()
+            },
+        ));
 
-    // 子のTextBlockをspawnする
-    HEADER_FOOTER.iter().for_each(|conf| {
-        layout_node.add_textblock(conf, &asset_svr);
-    });
+        // 子のTextBlockをspawnする
+        header_footer.iter().for_each(|conf| {
+            layout_node.add_textblock(conf, &asset_svr);
+        });
 
-    // おまけ(蟹スプライト)
-    let grid = (SPRITE_KANI_GRID_X, SPRITE_KANI_GRID_Y);
-    let vec3 = grid.to_screen_pixels().extend(DEPTH_SPRITE_KANI_DOTOWN);
-    cmds.spawn((
-        Sprite {
-            image: asset_svr.load(ASSETS_SPRITE_KANI_DOTOWN),
-            custom_size: Some(CELL_CUSTOM_SIZE * SPRITE_KANI_MAGNIFY),
-            color: SPRITE_KANI_ALPHA,
-            ..default()
-        },
-        Transform::from_translation(vec3),
-    ));
-
-    Ok(())
+        // おまけ(蟹スプライト)
+        // let grid = (SPRITE_KANI_GRID_X, SPRITE_KANI_GRID_Y);
+        // let vec3 = grid.to_screen_pixels().extend(DEPTH_SPRITE_KANI_DOTOWN);
+        // cmds.spawn((
+        //     Sprite {
+        //         image: asset_svr.load(ASSETS_SPRITE_KANI_DOTOWN),
+        //         custom_size: Some(CELL_CUSTOM_SIZE * SPRITE_KANI_MAGNIFY),
+        //         color: SPRITE_KANI_ALPHA,
+        //         ..default()
+        //     },
+        //     Transform::from_translation(vec3),
+        // ));
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,41 +175,6 @@ impl AddTextBlock for EntityCommands<'_>
 
         self // method-chain
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// 全画面時にヘッダー／フッターの位置を構成して画面中央に寄せる
-pub fn adjust_header_footer_layout(
-    window: Single<&Window>,
-    mut headder_footer_layout_node: Single<&mut Node, With<LayoutNode>>,
-    option_scale_factor: Option<Res<appctrl_input::ScaleFactor>>,
-) -> Result
-{
-    // 準備
-    let res_scale_factor = option_scale_factor.ok_or("Resource not found.")?;
-
-    // カメラにviewportがセットされているなら
-    if let appctrl_input::ScaleFactor(Some((_, ui_adjuster, _))) = *res_scale_factor
-    {
-        // window.modeが全画面なら
-        if matches!(window.mode, WindowMode::BorderlessFullscreen(_))
-        {
-            // UIの表示位置（top、left）を調整する
-            headder_footer_layout_node.left = Val::Px(ui_adjuster.x);
-            headder_footer_layout_node.top = Val::Px(ui_adjuster.y);
-        }
-    }
-    // 全画面以外の時、調整値が設定されていたなら
-    else if headder_footer_layout_node.left != Val::Auto
-        || headder_footer_layout_node.top != Val::Auto
-    {
-        // 調整値をクリアする
-        headder_footer_layout_node.left = Val::Auto;
-        headder_footer_layout_node.top = Val::Auto;
-    }
-
-    Ok(())
 }
 
 ////////////////////////////////////////////////////////////////////////////////

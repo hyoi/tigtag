@@ -4,6 +4,8 @@
 mod misc; // 共通
 mod simple_camera; // シンプルカメラ
 
+mod header_footer; // シンプルヘッダー＆フッター
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // 親モジュールへ識別子を輸出する
@@ -14,13 +16,14 @@ pub mod common
     pub mod misc          {pub use super::super::misc::*;}
     pub mod simple_camera {pub use super::super::simple_camera::*;}
 
+    pub mod header_footer {pub use super::super::header_footer::*;}
+
     // サブモジュール名を不要にしたい識別子はpub useする
-    // pub use super::controller::InputDeviceIsPressed;
+    pub use super::misc::public::*;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// pub mod header_footer; // シンプルヘッダー＆フッター
 // pub mod handle_input; // 入力処理
 // pub mod orbit_camera; // 球座標カメラ
 
@@ -28,8 +31,6 @@ pub mod common
 // #[allow(unused_imports)]
 // pub mod prelude
 // {
-//     // pub use super::header_footer;
-
 //     // pub use super::handle_input;
 //     // pub use super::handle_input::prelude::*;
 

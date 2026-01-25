@@ -108,7 +108,7 @@ struct SpriteTile
 // スプライト（とカメラ）を生成する
 fn spawn_sprite_with_camera2d(
     query_camera2d: Query<&Camera2d>, //
-    mut cmds: Commands, //
+    mut cmds: Commands,               //
 )
 {
     // カメラ2Dが存在しないなら

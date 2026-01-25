@@ -4,6 +4,9 @@ use bevy::prelude::*;
 // standard library
 use std::ops::{Deref, DerefMut};
 
+// external modules
+use crate::fullscreen;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // カメラをspawnするために必要な情報
@@ -72,6 +75,7 @@ where
             },
             transform,
             Msaa::Sample4,
+            fullscreen::Target::default(),
         ));
     }
 
