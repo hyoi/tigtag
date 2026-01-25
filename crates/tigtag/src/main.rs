@@ -59,7 +59,7 @@ use my_utils::common::*;
 // アプリの情報
 const APP_TITLE: &str = "TigTag"; // env!("CARGO_PKG_NAME");
 const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
-const APP_COPYRIGHT: &str = "hyoi 2021-2026";
+const APP_COPYRIGHT: &str = "hyoi 2021_2026";
 
 ////////////////////////////////////////////////////////////////////////////////
 
