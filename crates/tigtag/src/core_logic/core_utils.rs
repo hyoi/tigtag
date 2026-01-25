@@ -32,6 +32,7 @@ pub fn set_next_state(my_state: MyState) -> impl FnMut(ResMut<NextState<MyState>
 {
     move |mut next_state: ResMut<NextState<MyState>>| {
         next_state.set(my_state);
+        info!("into {:?} state", my_state);
     }
 }
 
