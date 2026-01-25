@@ -34,68 +34,6 @@ pub mod prelude
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// gamepadのEntityを保存するResource
-#[derive(Resource, Default)]
-pub struct TargetGamepad(Option<Entity>);
-
-// アクセス用メソッド
-impl TargetGamepad
-{
-    pub fn entity(&self) -> Option<Entity> { self.0 }
-    pub fn entity_mut(&mut self) -> &mut Option<Entity> { &mut self.0 }
-}
-
-// gamepadの接続を検出して必要なら切り替える
-pub fn check_gamepad_connections(
-    option_target_gamepad: Option<ResMut<TargetGamepad>>,
-    mut query_gamepads: Query<(Entity, &Name), With<Gamepad>>,
-    mut cmds: Commands,
-)
-{
-    // gamepadの接続状態を調べてResourceを更新する（クロージャ）
-    let mut check_gamepad = |target_gamepad: &mut TargetGamepad| {
-        // gamepadのEntityが保存されているなら
-        if let Some(entity) = target_gamepad.entity()
-        {
-            // そのEntityが存在しないなら（切断）
-            if !query_gamepads.contains(entity)
-            {
-                // Entityを探す（結果はNoneかもしれない）
-                let (entity, _name) = query_gamepads.iter_mut().next().unzip();
-                *target_gamepad.entity_mut() = entity;
-
-                #[cfg(debug_assertions)]
-                dbg!(&_name, target_gamepad.entity()); // Some⇒Some、Some⇒None
-            }
-        }
-        else if !query_gamepads.is_empty()
-        // 現在gamepadの接続があるなら
-        {
-            // Entityを探す（結果は必ずSome）
-            let (entity, _name) = query_gamepads.iter_mut().next().unzip();
-            *target_gamepad.entity_mut() = entity;
-
-            #[cfg(debug_assertions)]
-            dbg!(&_name, target_gamepad.entity()); // None⇒Some
-        }
-    };
-
-    // Resourceが登録済みなら
-    if let Some(mut target_gamepad) = option_target_gamepad
-    {
-        check_gamepad(&mut target_gamepad);
-    }
-    else
-    {
-        // Resourceが未登録なら、初期化した後に登録する
-        let mut target_gamepad = TargetGamepad::default();
-        check_gamepad(&mut target_gamepad);
-        cmds.insert_resource(target_gamepad);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // デバイスからの入力を抽象化するためのUserAction
 #[derive(Clone, Copy, PartialEq, Debug)]
 #[allow(dead_code)]
