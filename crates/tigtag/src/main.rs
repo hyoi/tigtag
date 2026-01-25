@@ -36,16 +36,13 @@ use rand::prelude::*;
 mod config; // 設定ファイル
 use config::common::*;
 
-mod my_plugins; // 自作のプラグイン
-use my_plugins::common::*;
+mod my_utils; // 共通ライブラリ
+use my_utils::common::*;
 
 mod core_logic; // アプリ本体
 use core_logic::common::*;
 
 // mod demo_play; // demoロジック
-
-mod my_utils; // 共通ライブラリ
-use my_utils::common::*;
 
 // proc-macro
 // use macros::MyState;

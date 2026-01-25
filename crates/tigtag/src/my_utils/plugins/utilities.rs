@@ -3,7 +3,7 @@ use bevy::prelude::*;
 
 // external modules
 #[allow(unused_imports)]
-use crate::controller::{
+use crate::my_utils::plugins::controller::{
     InputDeviceConfig, //
     InputDevicePack,   //
 };

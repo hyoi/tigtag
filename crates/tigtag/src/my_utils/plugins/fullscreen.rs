@@ -6,7 +6,7 @@ use bevy::{
 };
 
 // external modules
-use crate::controller::{
+use crate::my_utils::plugins::controller::{
     InputDeviceConfig, //
     InputDevicePack,   //
 };

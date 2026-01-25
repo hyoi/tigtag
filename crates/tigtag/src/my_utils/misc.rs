@@ -19,7 +19,7 @@ pub fn despawn_component<T: Component>(
 
 // 名前空間のトップレベルへ輸出する識別子
 #[allow(dead_code)]
-pub mod public
+pub mod common
 {
     use super::*;
 
