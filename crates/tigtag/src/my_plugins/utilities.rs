@@ -1,5 +1,3 @@
-// #![allow(dead_code)]
-
 // external crates
 use bevy::prelude::*;
 
