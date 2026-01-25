@@ -49,7 +49,8 @@ pub fn derive_mystate(input: TokenStream) -> TokenStream
         )*
 
         // 同名structによって指定されたMyStateへ遷移するSystem
-        pub fn set_next_state<T: Send + Sync + Default + ChangeMyState>
+        // pub fn set_next_state<T: Send + Sync + Default + ChangeMyState>
+        pub fn change_state_to<T: Send + Sync + Default + ChangeMyState>
         (   next: Local<T>,
             mut next_state: ResMut<NextState<#enum_type>>
         )

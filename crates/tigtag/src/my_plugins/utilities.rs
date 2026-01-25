@@ -4,6 +4,7 @@
 use bevy::prelude::*;
 
 // external modules
+#[allow(unused_imports)]
 use crate::controller::{
     InputDeviceConfig, //
     InputDevicePack,   //
@@ -12,6 +13,7 @@ use crate::controller::{
 ////////////////////////////////////////////////////////////////////////////////
 
 // 雑多な処理をまとめたスケジュール
+#[allow(dead_code)]
 #[derive(Default)]
 pub struct PluginConfig
 {
@@ -21,13 +23,13 @@ pub struct PluginConfig
 
 impl Plugin for PluginConfig
 {
-    fn build(&self, application: &mut App)
+    fn build(&self, _application: &mut App)
     {
         // アプリウィンドウの基本的な機能
         #[cfg(not(target_arch = "wasm32"))]
         if let Some(app_exit_trigger) = self.app_exit_trigger
         {
-            application
+            _application
                 // アプリの終了
                 .insert_resource(ConfigExitApp(app_exit_trigger))
                 .add_systems(
@@ -40,7 +42,7 @@ impl Plugin for PluginConfig
         #[cfg(debug_assertions)]
         if let Some(ui_outline_trigger) = self.ui_outline_trigger
         {
-            application
+            _application
                 // UI outlineの表示
                 .insert_resource(ConfigToggleOutLine(ui_outline_trigger))
                 .add_systems(
@@ -54,10 +56,12 @@ impl Plugin for PluginConfig
 ////////////////////////////////////////////////////////////////////////////////
 
 // 設定を登録するためのResource
+#[cfg(not(target_arch = "wasm32"))]
 #[derive(Resource)]
 pub struct ConfigExitApp(pub InputDeviceConfig);
 
 // アプリを終了する
+#[cfg(not(target_arch = "wasm32"))]
 pub fn send_exit_app_message(
     mut controller: InputDevicePack,
     config: Res<ConfigExitApp>,
@@ -75,10 +79,12 @@ pub fn send_exit_app_message(
 ////////////////////////////////////////////////////////////////////////////////
 
 // 設定を登録するためのResource
+#[cfg(debug_assertions)]
 #[derive(Resource)]
 pub struct ConfigToggleOutLine(pub InputDeviceConfig);
 
 // UI outlineの表示／非表示を切り替える
+#[cfg(debug_assertions)]
 pub fn toggle_ui_outline_gizmo(
     mut controller: InputDevicePack,
     config: Res<ConfigToggleOutLine>,

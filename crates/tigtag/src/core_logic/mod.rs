@@ -5,7 +5,7 @@ use super::*;
 // サブモジュール（pub modしない）
 mod schedule; // メインスケジュール
 mod load_assets; // アセットの事前ローディング
-// mod core_utils; // 共通その他
+mod core_utils; // 共通その他
 
 //------------------------------------------------------------------------------
 
@@ -18,12 +18,9 @@ pub use schedule::Schedule;
 #[rustfmt::skip]
 pub mod common
 {
-    // 原則はサブモジュール名を必須とする
-    // pub mod misc {pub use super::super::misc::*;}
-
     // サブモジュール名を不要にしたい識別子はpub useする
-    // pub use super::core_utils::set_next_state;
-    // pub use super::core_utils::I32x2TypeExt;
+    pub use super::core_utils::I32x2TypeExt;
+    pub use super::core_utils::set_next_state;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,4 +1,4 @@
-use super::*;
+// use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -35,7 +35,7 @@ pub const ASSETS_SPRITESHEET_CHASER_PINK: &str = "spritesheet/chaser_pink.png";
 
 // assets（サウンド）
 pub const ASSETS_SOUND_BEEP: &str = "audio/sound/beep.ogg";
-pub const VOLUME_SOUND_BEEP: Volume = Volume::Linear(0.1); //SEボリューム
+// pub const VOLUME_SOUND_BEEP: Volume = Volume::Linear(0.1); //SEボリューム
 
 ////////////////////////////////////////////////////////////////////////////////
 

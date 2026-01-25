@@ -9,9 +9,9 @@ use bevy::{
     log::{LogPlugin, Level},
     diagnostic::{FrameTimeDiagnosticsPlugin /*, DiagnosticsStore*/},
     ecs::{error::warn /*, system::SystemParam, component::Mutable*/},
-    audio::Volume,
-    // color::palettes::*,
-    // asset::{LoadedUntypedAsset, LoadState},
+    color::palettes::*,
+    asset::{LoadedUntypedAsset, LoadState},
+    // audio::Volume,
     // camera::Viewport,
     // input::{
     //     keyboard::NativeKeyCode,
@@ -21,7 +21,7 @@ use bevy::{
     // platform::collections::{HashMap, HashSet},
 };
 use const_format::formatcp;
-// use rand::prelude::*;
+use rand::prelude::*;
 
 // standard library
 // use std::{
@@ -44,11 +44,11 @@ use core_logic::common::*;
 
 // mod demo_play; // demoロジック
 
-// mod my_utils; // 共通ライブラリ
-// use my_utils::common::*;
+mod my_utils; // 共通ライブラリ
+use my_utils::common::*;
 
 // proc-macro
-use macros::MyState;
+// use macros::MyState;
 
 // use macros::derive_appctrl_input;
 // use macros::{OverlayMessage, Blinking, CountDown};
@@ -95,7 +95,7 @@ fn main() -> AppExit
         },
         // 各種雑多な処理
         #[allow(clippy::needless_update)]
-        misc::PluginConfig {
+        utilities::PluginConfig {
             app_exit_trigger: Some(TRIGGER_APP_EXIT),
             ui_outline_trigger: Some(TRIGGER_UI_OUTLINE),
             ..default()

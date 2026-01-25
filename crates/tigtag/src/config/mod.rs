@@ -7,7 +7,7 @@ mod initialize; // アプリの初期化
 mod input; // 入力処理の設定
 mod state; // 状態管理の設定
 mod assets; // アセット関係
-// mod camera; // カメラの設定
+mod camera; // カメラの設定
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -20,7 +20,7 @@ pub mod common
     pub use super::input::*;
     pub use super::state::*;
     pub use super::assets::*;
-    // pub use super::camera::*;
+    pub use super::camera::*;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
