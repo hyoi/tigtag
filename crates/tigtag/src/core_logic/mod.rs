@@ -7,6 +7,9 @@ mod schedule; // メインスケジュール
 mod load_assets; // アセットの事前ローディング
 mod core_utils; // 共通その他
 
+mod overlay_ui; // 全画面メッセージ関連
+// use overlay_ui::messages::OverlayMessage;
+
 //------------------------------------------------------------------------------
 
 // core_logic::Schedule として公開したい
@@ -18,6 +21,9 @@ pub use schedule::Schedule;
 #[rustfmt::skip]
 pub mod common
 {
+    // 原則はサブモジュール名を必須とする
+    // pub mod misc {pub use super::super::misc::*;}
+
     // サブモジュール名を不要にしたい識別子はpub useする
     pub use super::core_utils::I32x2TypeExt;
     pub use super::core_utils::set_next_state;
@@ -29,8 +35,6 @@ pub mod common
 // pub use consts_and_types::*;
 
 // pub mod information; // 表示情報更新（ヘッダー・フッター）
-// pub mod overlay_ui; // 全画面メッセージ関連
-// use overlay_ui::messages::OverlayMessage;
 
 // pub mod detecting_change; // ステージクリアとゲームオーバーの判定
 

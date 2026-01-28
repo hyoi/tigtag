@@ -10,6 +10,7 @@ mod assets; // アセット関係
 mod camera; // カメラの設定
 
 mod ui_top_bottom; // ヘッダー・フッターの設定
+mod overlay_message; // 全画面UIの設定
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -25,6 +26,7 @@ pub mod common
     pub use super::camera::*;
 
     pub use super::ui_top_bottom::*;
+    // pub use super::overlay_message::*;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
