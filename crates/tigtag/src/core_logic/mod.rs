@@ -8,7 +8,6 @@ mod load_assets; // アセットの事前ローディング
 mod core_utils; // 共通その他
 
 mod overlay_ui; // 全画面メッセージ関連
-// use overlay_ui::messages::OverlayMessage;
 
 //------------------------------------------------------------------------------
 
