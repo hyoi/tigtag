@@ -3,11 +3,14 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////
 
 // サブモジュール（pub modしない）
+mod config; // 設定ファイル
 mod schedule; // メインスケジュール
 mod load_assets; // アセットの事前ローディング
 mod core_utils; // 共通その他
 
 mod overlay_ui; // 全画面メッセージ関連
+
+// mod demo_play; // demoロジック
 
 //------------------------------------------------------------------------------
 
@@ -24,6 +27,7 @@ pub mod common
     pub mod overlay_ui {pub use super::super::overlay_ui::*;}
 
     // サブモジュール名を不要にしたい識別子はpub useする
+    pub use super::config::common::*;
     pub use super::core_utils::I32x2TypeExt;
     pub use super::core_utils::set_next_state;
 }
