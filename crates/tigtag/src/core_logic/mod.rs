@@ -21,7 +21,7 @@ pub use schedule::Schedule;
 pub mod common
 {
     // 原則はサブモジュール名を必須とする
-    // pub mod misc {pub use super::super::misc::*;}
+    pub mod overlay_ui {pub use super::super::overlay_ui::*;}
 
     // サブモジュール名を不要にしたい識別子はpub useする
     pub use super::core_utils::I32x2TypeExt;

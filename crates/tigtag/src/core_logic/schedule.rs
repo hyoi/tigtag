@@ -64,7 +64,7 @@ impl Plugin for Schedule
                         WINDOW_BASE_RESOLUTION.as_vec2(),
                     ),
                     // 全画面メッセージのspawn
-                    // overlay_ui::messages::spawn,
+                    overlay_ui::messages::spawn,
 
                     // 無条件遷移
                     set_next_state(MyState::TitleDemo),

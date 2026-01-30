@@ -1,20 +1,20 @@
-// use super::*;
+use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // 全画面メッセージの設定リスト
-// impl Default for core_logic::overlay_ui::messages::MessageSettings
-// {
-//     fn default() -> Self
-//     {
-//         Self(vec![
-//             Box::new(OverlayTitleDemo::default()),
-//             Box::new(OverlayStageStart::default()),
-//             Box::new(OverlayStageClear::default()),
-//             Box::new(OverlayGameOver::default()),
-//         ])
-//     }
-// }
+impl Default for overlay_ui::messages::MessageSettings
+{
+    fn default() -> Self
+    {
+        Self(vec![
+            // Box::new(OverlayTitleDemo::default()),
+            // Box::new(OverlayStageStart::default()),
+            // Box::new(OverlayStageClear::default()),
+            // Box::new(OverlayGameOver::default()),
+        ])
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

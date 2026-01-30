@@ -3,32 +3,31 @@ use super::*;
 ////////////////////////////////////////////////////////////////////////////////
 
 // 設定リストから全画面メッセージをspawnする
-// pub fn spawn(mut cmds: Commands, asset_svr: Res<AssetServer>) -> Result
-// {
-//     MessageSettings::default()
-//         .drain(..)
-//         .for_each(|boxed_component| {
-//             boxed_component.spawn_overlay_msg(&mut cmds, &asset_svr)
-//         });
-
-//     Ok(())
-// }
+pub fn spawn(mut cmds: Commands, asset_svr: Res<AssetServer>)
+{
+    MessageSettings::default()
+    //     .drain(..)
+    //     .for_each(|boxed_component| {
+    //         boxed_component.spawn_overlay_msg(&mut cmds, &asset_svr)
+    //     })
+    ;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // 全画面メッセージの設定を格納する型
 // #[derive(Deref, DerefMut)]
-// pub struct MessageSettings(pub Vec<Box<dyn BoxedOverlayMessage>>);
+pub struct MessageSettings(pub Vec<Box<dyn BoxedOverlayMessage>>);
 
 // 全画面メッセージspawn用のトレイト
-// pub trait BoxedOverlayMessage: Send + Sync + 'static
-// {
-//     fn spawn_overlay_msg(
-//         self: Box<Self>,
-//         cmds: &mut Commands,
-//         asset_svr: &Res<AssetServer>,
-//     );
-// }
+pub trait BoxedOverlayMessage: Send + Sync + 'static
+{
+    fn spawn_overlay_msg(
+        self: Box<Self>,
+        cmds: &mut Commands,
+        asset_svr: &Res<AssetServer>,
+    );
+}
 
 // トレイトの実装
 // impl<T: Component + Clone + 'static + OverlayMessage> BoxedOverlayMessage for T
